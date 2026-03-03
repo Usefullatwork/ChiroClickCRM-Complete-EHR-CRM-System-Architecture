@@ -108,7 +108,7 @@ export default function HistorySection({
               aria-label="Smerteintensitet VAS skala"
               className="w-full"
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
               <span>0</span>
               <span className="font-medium text-blue-600">
                 {consultData.subjective.painIntensity || 0}

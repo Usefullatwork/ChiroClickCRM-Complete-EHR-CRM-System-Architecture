@@ -144,7 +144,7 @@ export default function SALTDemo() {
                 <Copy className="w-6 h-6 text-amber-500" />
                 {lang === 'no' ? 'SALT Demo' : 'SALT Demo'}
               </h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {lang === 'no'
                   ? 'Samme Som Forrige Behandling - Effektiv kloning av konsultasjoner'
                   : 'Same As Last Treatment - Efficient encounter cloning'}
@@ -199,7 +199,7 @@ export default function SALTDemo() {
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-gray-600 line-clamp-2">
+                    <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
                       {enc.subjective?.chief_complaint}
                     </p>
                     <div className="mt-2 flex flex-wrap gap-1">
@@ -230,7 +230,7 @@ export default function SALTDemo() {
               <div className="p-4 space-y-4">
                 {/* Main SALT Button */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-2">
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                     {lang === 'no'
                       ? 'Full SALT-knapp med alternativer'
                       : 'Full SALT Button with options'}
@@ -245,7 +245,7 @@ export default function SALTDemo() {
 
                 {/* Compact SALT Button */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-2">
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                     {lang === 'no' ? 'Kompakt verktøylinje-versjon' : 'Compact toolbar version'}
                   </label>
                   <SALTButtonCompact
@@ -257,7 +257,7 @@ export default function SALTDemo() {
 
                 {/* Quick Bar */}
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-2">
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                     {lang === 'no'
                       ? 'Hurtig SALT-linje med forhåndsinnstilte modifikatorer'
                       : 'Quick SALT bar with preset modifiers'}
@@ -280,7 +280,7 @@ export default function SALTDemo() {
                 </h2>
                 <button
                   onClick={handleReset}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <RotateCcw className="w-4 h-4" />
                   {lang === 'no' ? 'Nullstill' : 'Reset'}
@@ -298,7 +298,7 @@ export default function SALTDemo() {
                         {currentNote.subjective.chief_complaint}
                       </p>
                     ) : (
-                      <p className="text-sm text-gray-400 italic">
+                      <p className="text-sm text-gray-400 dark:text-gray-300 italic">
                         {lang === 'no'
                           ? 'Ingen data - bruk SALT for å klone'
                           : 'No data - use SALT to clone'}
@@ -316,7 +316,7 @@ export default function SALTDemo() {
                     {currentNote.objective?.observation ? (
                       <p className="text-sm text-gray-700">{currentNote.objective.observation}</p>
                     ) : (
-                      <p className="text-sm text-gray-400 italic">
+                      <p className="text-sm text-gray-400 dark:text-gray-300 italic">
                         {lang === 'no' ? 'Ingen data' : 'No data'}
                       </p>
                     )}

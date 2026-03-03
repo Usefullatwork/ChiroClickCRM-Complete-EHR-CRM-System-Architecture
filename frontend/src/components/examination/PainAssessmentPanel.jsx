@@ -146,7 +146,7 @@ function VASSlider({ value, onChange, label, labelNo, lang = 'no' }) {
           <span className={`text-2xl font-bold ${getColor(value).replace('bg-', 'text-')}`}>
             {value}
           </span>
-          <span className="text-xs text-gray-500">/10</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">/10</span>
         </div>
       </div>
 
@@ -166,14 +166,14 @@ function VASSlider({ value, onChange, label, labelNo, lang = 'no' }) {
               #ef4444 80%, #ef4444 100%)`,
           }}
         />
-        <div className="flex justify-between text-xs text-gray-400 mt-1">
+        <div className="flex justify-between text-xs text-gray-400 dark:text-gray-300 mt-1">
           <span>0</span>
           <span>5</span>
           <span>10</span>
         </div>
       </div>
 
-      <p className="text-xs text-center text-gray-500">{getLabel(value)}</p>
+      <p className="text-xs text-center text-gray-500 dark:text-gray-400">{getLabel(value)}</p>
     </div>
   );
 }
@@ -203,7 +203,7 @@ function ChipGroup({ items, selectedIds, onChange, lang = 'no' }) {
                        ${
                          isSelected
                            ? 'bg-teal-100 border-teal-300 text-teal-700'
-                           : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                           : 'bg-white border-gray-200 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                        }`}
           >
             {item.icon && <span className="mr-1">{item.icon}</span>}
@@ -450,7 +450,7 @@ export default function PainAssessmentPanel({
             {lang === 'no' ? 'Smertevurdering' : 'Pain Assessment'}
           </h3>
           {entries.length > 0 && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {entries.length} {lang === 'no' ? 'smerteområder' : 'pain areas'}
             </p>
           )}
@@ -481,7 +481,7 @@ export default function PainAssessmentPanel({
       {entries.length === 0 ? (
         <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
           <Target className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             {lang === 'no' ? 'Ingen smerteområder registrert' : 'No pain areas recorded'}
           </p>
           <button

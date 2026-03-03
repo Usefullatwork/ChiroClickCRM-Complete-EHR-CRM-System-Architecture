@@ -193,7 +193,7 @@ export default function NewPatient() {
           </button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{t('newPatient')}</h1>
-            <p className="text-gray-600">Create a new patient record</p>
+            <p className="text-gray-600 dark:text-gray-300">Create a new patient record</p>
           </div>
         </div>
       </div>
@@ -214,7 +214,7 @@ export default function NewPatient() {
         {/* Basic Information */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
-            <User className="w-5 h-5 text-gray-600" />
+            <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             <h2 className="text-lg font-semibold">{t('personalInfo')}</h2>
           </div>
 
@@ -329,7 +329,7 @@ export default function NewPatient() {
         {/* Contact Information */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
-            <Phone className="w-5 h-5 text-gray-600" />
+            <Phone className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             <h2 className="text-lg font-semibold">{t('contactInfo')}</h2>
           </div>
 
@@ -399,7 +399,7 @@ export default function NewPatient() {
         {/* Address */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
-            <MapPin className="w-5 h-5 text-gray-600" />
+            <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             <h2 className="text-lg font-semibold">{t('address')}</h2>
           </div>
 
@@ -444,7 +444,7 @@ export default function NewPatient() {
         {/* Clinical Information */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
-            <FileText className="w-5 h-5 text-gray-600" />
+            <FileText className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             <h2 className="text-lg font-semibold">{t('clinical')}</h2>
           </div>
 
@@ -578,7 +578,7 @@ export default function NewPatient() {
         {/* Treatment Preferences */}
         <div className="pt-6 border-t border-gray-200">
           <h3 className="text-lg font-medium text-gray-900 mb-4">Behandlingspreferanser</h3>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
             Angi hva pasienten er komfortabel med. La stå tom hvis ikke avklart.
           </p>
           <div className="space-y-4">
@@ -614,9 +614,9 @@ export default function NewPatient() {
                     name="treatment_pref_needles"
                     checked={formData.treatment_pref_needles === null}
                     onChange={() => handleChange('treatment_pref_needles', null)}
-                    className="w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500"
+                    className="w-4 h-4 text-gray-600 dark:text-gray-300 border-gray-300 focus:ring-gray-500"
                   />
-                  <span className="text-sm text-gray-500">Ikke avklart</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Ikke avklart</span>
                 </label>
               </div>
             </div>
@@ -651,9 +651,9 @@ export default function NewPatient() {
                     name="treatment_pref_adjustments"
                     checked={formData.treatment_pref_adjustments === null}
                     onChange={() => handleChange('treatment_pref_adjustments', null)}
-                    className="w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500"
+                    className="w-4 h-4 text-gray-600 dark:text-gray-300 border-gray-300 focus:ring-gray-500"
                   />
-                  <span className="text-sm text-gray-500">Ikke avklart</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Ikke avklart</span>
                 </label>
               </div>
             </div>
@@ -690,9 +690,9 @@ export default function NewPatient() {
                     name="treatment_pref_neck_adjustments"
                     checked={formData.treatment_pref_neck_adjustments === null}
                     onChange={() => handleChange('treatment_pref_neck_adjustments', null)}
-                    className="w-4 h-4 text-gray-600 border-gray-300 focus:ring-gray-500"
+                    className="w-4 h-4 text-gray-600 dark:text-gray-300 border-gray-300 focus:ring-gray-500"
                   />
-                  <span className="text-sm text-gray-500">Ikke avklart</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Ikke avklart</span>
                 </label>
               </div>
             </div>

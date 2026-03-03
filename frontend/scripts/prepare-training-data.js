@@ -18,8 +18,8 @@ const __dirname = path.dirname(__filename);
 
 // Configuration
 const CONFIG = {
-  inputDir: 'D:\\ChiroClickCRM-Complete-EHR-CRM-System-Architecture\\training-data-extracted',
-  outputDir: 'D:\\ChiroClickCRM-Complete-EHR-CRM-System-Architecture\\ai-training',
+  inputDir: 'D:\\ChiroClickEHR-Complete-EHR-CRM-System-Architecture\\training-data-extracted',
+  outputDir: 'D:\\ChiroClickEHR-Complete-EHR-CRM-System-Architecture\\ai-training',
   ollamaModelName: 'chiro-no',
 };
 

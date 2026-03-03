@@ -1,5 +1,5 @@
 /**
- * ChiroClickCRM Patient Portal Service Worker
+ * ChiroClickEHR Patient Portal Service Worker
  *
  * Provides offline support for the patient portal:
  * - Caches static assets (app shell)

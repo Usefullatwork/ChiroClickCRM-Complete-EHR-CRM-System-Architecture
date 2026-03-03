@@ -90,7 +90,7 @@ const StarRating = ({ value, onChange, labels, disabled = false }) => {
         ))}
       </div>
       {(hoverValue || value) > 0 && labels && (
-        <span className="text-sm text-slate-600 animate-fade-in">
+        <span className="text-sm text-slate-600 dark:text-slate-300 animate-fade-in">
           {labels[(hoverValue || value) - 1]}
         </span>
       )}
@@ -118,7 +118,7 @@ const TimeTracker = ({ startTime, text }) => {
   };
 
   return (
-    <div className="flex items-center gap-2 text-sm text-slate-500">
+    <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
       <Clock size={14} />
       <span>
         {text}: {formatTime(elapsed)}

@@ -426,7 +426,7 @@ export default function AutomationRules({ language = 'no' }) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">{t.title}</h2>
-          <p className="text-sm text-gray-500">{t.subtitle}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
         </div>
         <button
           onClick={() => {
@@ -484,19 +484,19 @@ export default function AutomationRules({ language = 'no' }) {
                                 className={`px-2 py-0.5 text-xs font-medium rounded-full ${
                                   rule.is_active
                                     ? 'bg-green-100 text-green-700'
-                                    : 'bg-gray-100 text-gray-500'
+                                    : 'bg-gray-100 text-gray-500 dark:text-gray-400'
                                 }`}
                               >
                                 {rule.is_active ? t.active : t.inactive}
                               </span>
                             </div>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
                               {triggerInfo.description[language]}
                             </p>
                           </div>
 
                           {/* Stats */}
-                          <div className="hidden md:flex items-center gap-6 text-sm text-gray-500">
+                          <div className="hidden md:flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
                             <div className="text-center">
                               <div className="font-medium text-gray-900">
                                 {rule.execution_count || 0}
@@ -522,7 +522,7 @@ export default function AutomationRules({ language = 'no' }) {
                             className={`p-2 rounded-lg transition-colors ${
                               rule.is_active
                                 ? 'text-green-600 hover:bg-green-50'
-                                : 'text-gray-400 hover:bg-gray-100'
+                                : 'text-gray-400 dark:text-gray-300 hover:bg-gray-100'
                             }`}
                             title={rule.is_active ? 'Deaktiver' : 'Aktiver'}
                           >
@@ -536,7 +536,7 @@ export default function AutomationRules({ language = 'no' }) {
                           {/* Edit */}
                           <button
                             onClick={() => handleEdit(rule)}
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                            className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
                           >
                             <Edit className="w-5 h-5" />
                           </button>
@@ -544,7 +544,7 @@ export default function AutomationRules({ language = 'no' }) {
                           {/* Expand */}
                           <button
                             onClick={() => setExpandedRule(isExpanded ? null : rule.id)}
-                            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+                            className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
                           >
                             <ChevronDown
                               className={`w-5 h-5 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
@@ -554,7 +554,7 @@ export default function AutomationRules({ language = 'no' }) {
                           {/* Delete */}
                           <button
                             onClick={() => handleDelete(rule)}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                            className="p-2 text-gray-400 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-lg"
                           >
                             <Trash2 className="w-5 h-5" />
                           </button>
@@ -566,18 +566,24 @@ export default function AutomationRules({ language = 'no' }) {
                         <div className="mt-4 pt-4 border-t border-gray-100">
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                             <div>
-                              <span className="text-gray-500">{t.triggerType}:</span>
+                              <span className="text-gray-500 dark:text-gray-400">
+                                {t.triggerType}:
+                              </span>
                               <p className="font-medium">{triggerInfo.name[language]}</p>
                             </div>
                             <div>
-                              <span className="text-gray-500">{t.messageType}:</span>
+                              <span className="text-gray-500 dark:text-gray-400">
+                                {t.messageType}:
+                              </span>
                               <p className="font-medium">
                                 {rule.actions?.[0]?.type === 'SEND_SMS' ? 'SMS' : 'E-post'}
                               </p>
                             </div>
                             {rule.trigger_config?.days_threshold && (
                               <div>
-                                <span className="text-gray-500">{t.daysThreshold}:</span>
+                                <span className="text-gray-500 dark:text-gray-400">
+                                  {t.daysThreshold}:
+                                </span>
                                 <p className="font-medium">
                                   {rule.trigger_config.days_threshold} dager
                                 </p>
@@ -585,7 +591,9 @@ export default function AutomationRules({ language = 'no' }) {
                             )}
                             {rule.trigger_config?.send_time && (
                               <div>
-                                <span className="text-gray-500">{t.sendTime}:</span>
+                                <span className="text-gray-500 dark:text-gray-400">
+                                  {t.sendTime}:
+                                </span>
                                 <p className="font-medium">{rule.trigger_config.send_time}</p>
                               </div>
                             )}
@@ -602,7 +610,7 @@ export default function AutomationRules({ language = 'no' }) {
           <div className="bg-white rounded-lg border border-gray-200 px-6 py-12 text-center">
             <Zap className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <h3 className="text-lg font-medium text-gray-900">{t.noRules}</h3>
-            <p className="text-sm text-gray-500 mt-1">{t.noRulesDesc}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t.noRulesDesc}</p>
             <button
               onClick={() => {
                 resetForm();
@@ -641,7 +649,9 @@ export default function AutomationRules({ language = 'no' }) {
                   <TriggerIcon className={`w-5 h-5 text-${trigger.color}-600`} />
                 </div>
                 <h4 className="font-medium text-gray-900">{trigger.name[language]}</h4>
-                <p className="text-sm text-gray-500 mt-1">{trigger.description[language]}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  {trigger.description[language]}
+                </p>
               </button>
             );
           })}
@@ -663,7 +673,7 @@ export default function AutomationRules({ language = 'no' }) {
                   setEditingRule(null);
                   resetForm();
                 }}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -802,7 +812,7 @@ export default function AutomationRules({ language = 'no' }) {
                   <div className="font-medium text-gray-900">
                     {formData.is_active ? t.active : t.inactive}
                   </div>
-                  <div className="text-sm text-gray-500">
+                  <div className="text-sm text-gray-500 dark:text-gray-400">
                     {formData.is_active
                       ? language === 'no'
                         ? 'Regelen vil kjore automatisk'

@@ -250,7 +250,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {template.description[lang] || template.description.en}
               </p>
-              <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+              <div className="flex items-center gap-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
                 <span>
                   {template.duration} {lang === 'no' ? 'uker' : 'weeks'}
                 </span>
@@ -272,7 +272,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
         {onCancel && (
           <button
             onClick={onCancel}
-            className="mt-4 px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
+            className="mt-4 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900"
           >
             {t.cancel}
           </button>
@@ -294,7 +294,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                     ? 'bg-green-500 text-white'
                     : i + 1 === step
                       ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                 }`}
               >
                 {i + 1 < step ? '✓' : i + 1}
@@ -430,7 +430,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                 ))}
                 <button
                   onClick={addGoal}
-                  className="px-4 py-2 text-sm border border-dashed border-gray-300 rounded-lg hover:border-blue-500 text-gray-600 hover:text-blue-600"
+                  className="px-4 py-2 text-sm border border-dashed border-gray-300 rounded-lg hover:border-blue-500 text-gray-600 dark:text-gray-300 hover:text-blue-600"
                 >
                   + {t.addGoal}
                 </button>
@@ -461,7 +461,9 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                   className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-500">#{i + 1}</span>
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      #{i + 1}
+                    </span>
                     <button
                       onClick={() => removeMilestone(i)}
                       className="text-sm text-red-500 hover:text-red-700"
@@ -471,7 +473,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                       {t.milestoneTitle}
                     </label>
                     <input
@@ -484,7 +486,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                         {t.targetDate}
                       </label>
                       <input
@@ -495,7 +497,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                         {t.outcomeMeasure}
                       </label>
                       <select
@@ -512,7 +514,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                         {t.targetScore}
                       </label>
                       <input
@@ -528,12 +530,14 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
               ))}
 
               {milestones.length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-4">{t.noMilestones}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                  {t.noMilestones}
+                </p>
               )}
 
               <button
                 onClick={addMilestone}
-                className="w-full px-4 py-2 text-sm border border-dashed border-gray-300 rounded-lg hover:border-blue-500 text-gray-600 hover:text-blue-600"
+                className="w-full px-4 py-2 text-sm border border-dashed border-gray-300 rounded-lg hover:border-blue-500 text-gray-600 dark:text-gray-300 hover:text-blue-600"
               >
                 + {t.addMilestone}
               </button>
@@ -546,36 +550,36 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-500">{t.title}:</span>
+                <span className="text-gray-500 dark:text-gray-400">{t.title}:</span>
                 <p className="font-medium text-gray-900 dark:text-white">{formData.title}</p>
               </div>
               <div>
-                <span className="text-gray-500">{t.condition}:</span>
+                <span className="text-gray-500 dark:text-gray-400">{t.condition}:</span>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {formData.conditionDescription || '-'}
                 </p>
               </div>
               <div>
-                <span className="text-gray-500">{t.frequency}:</span>
+                <span className="text-gray-500 dark:text-gray-400">{t.frequency}:</span>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {formData.frequency || '-'}
                 </p>
               </div>
               <div>
-                <span className="text-gray-500">{t.totalSessions}:</span>
+                <span className="text-gray-500 dark:text-gray-400">{t.totalSessions}:</span>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {formData.totalSessions}
                 </p>
               </div>
               <div>
-                <span className="text-gray-500">{t.startDate}:</span>
+                <span className="text-gray-500 dark:text-gray-400">{t.startDate}:</span>
                 <p className="font-medium text-gray-900 dark:text-white">{formData.startDate}</p>
               </div>
             </div>
 
             {formData.goals.length > 0 && (
               <div>
-                <span className="text-sm text-gray-500">{t.goals}:</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">{t.goals}:</span>
                 <ul className="mt-1 space-y-1">
                   {formData.goals
                     .filter((g) => g.trim())
@@ -584,7 +588,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                         key={i}
                         className="text-sm text-gray-900 dark:text-white flex items-start gap-2"
                       >
-                        <span className="text-gray-400 mt-0.5">-</span> {g}
+                        <span className="text-gray-400 dark:text-gray-300 mt-0.5">-</span> {g}
                       </li>
                     ))}
                 </ul>
@@ -593,7 +597,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
 
             {milestones.length > 0 && (
               <div>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   {t.milestonesTitle} ({milestones.length}):
                 </span>
                 <div className="mt-1 space-y-2">
@@ -603,7 +607,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                       <div key={i} className="text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded">
                         <span className="font-medium">{m.title}</span>
                         {m.outcomeMeasure && (
-                          <span className="ml-2 text-gray-500">
+                          <span className="ml-2 text-gray-500 dark:text-gray-400">
                             {m.outcomeMeasure} {m.targetScore ? `<= ${m.targetScore}` : ''}
                           </span>
                         )}
@@ -629,7 +633,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
           {onCancel && (
             <button
               onClick={onCancel}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
+              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900"
             >
               {t.cancel}
             </button>

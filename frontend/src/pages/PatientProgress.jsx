@@ -163,7 +163,7 @@ export default function PatientProgress() {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-semibold text-gray-900">Treningsfremgang</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Oversikt over pasientenes overholdelse av treningsprogram
           </p>
         </div>
@@ -174,7 +174,7 @@ export default function PatientProgress() {
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Aktive pasienter</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Aktive pasienter</p>
                   <p className="text-2xl font-semibold text-gray-900 mt-1">
                     {clinicOverview.overview?.activePatients || 0}
                   </p>
@@ -188,7 +188,7 @@ export default function PatientProgress() {
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Aktive denne uken</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Aktive denne uken</p>
                   <p className="text-2xl font-semibold text-gray-900 mt-1">
                     {clinicOverview.overview?.activeThisWeek || 0}
                   </p>
@@ -202,7 +202,7 @@ export default function PatientProgress() {
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Totale ovelser utfort</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Totale ovelser utfort</p>
                   <p className="text-2xl font-semibold text-gray-900 mt-1">
                     {clinicOverview.overview?.totalCompletions || 0}
                   </p>
@@ -216,7 +216,7 @@ export default function PatientProgress() {
             <div className="bg-white rounded-lg border border-gray-200 p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600">Gj.snitt smerte (30d)</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Gj.snitt smerte (30d)</p>
                   <div className="flex items-center gap-2 mt-1">
                     <p className="text-2xl font-semibold text-gray-900">
                       {clinicOverview.overview?.avgPain30d || '-'}
@@ -282,7 +282,7 @@ export default function PatientProgress() {
           <div className="flex flex-wrap gap-4">
             <div className="flex-1 min-w-[200px]">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Sok etter pasient..."
@@ -333,7 +333,7 @@ export default function PatientProgress() {
           {complianceLoading ? (
             <div className="p-12 text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="text-sm text-gray-500 mt-3">Laster pasienter...</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">Laster pasienter...</p>
             </div>
           ) : filteredPatients.length > 0 ? (
             <div className="divide-y divide-gray-100">
@@ -352,7 +352,7 @@ export default function PatientProgress() {
                       </div>
                       <div>
                         <h4 className="font-medium text-gray-900">{patient.patientName}</h4>
-                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                        <div className="flex items-center gap-4 mt-1 text-sm text-gray-500 dark:text-gray-400">
                           <span className="flex items-center gap-1">
                             <Activity className="w-3 h-3" />
                             {patient.activeDaysThisWeek}/7 dager denne uken
@@ -379,7 +379,7 @@ export default function PatientProgress() {
                       >
                         {patient.status?.label || 'Ukjent'}
                       </span>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                      <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                     </div>
                   </div>
                 </div>
@@ -389,7 +389,9 @@ export default function PatientProgress() {
             <div className="p-12 text-center">
               <Users className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <h3 className="text-lg font-medium text-gray-900 mb-1">Ingen pasienter funnet</h3>
-              <p className="text-sm text-gray-500">Ingen pasienter matcher sokekriteriene</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Ingen pasienter matcher sokekriteriene
+              </p>
             </div>
           )}
         </div>
@@ -406,11 +408,13 @@ export default function PatientProgress() {
           onClick={() => navigate('/progress')}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <ChevronLeft className="w-5 h-5 text-gray-600" />
+          <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </button>
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Pasientfremgang</h1>
-          <p className="text-sm text-gray-500 mt-1">Detaljert oversikt over treningsoverholdelse</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            Detaljert oversikt over treningsoverholdelse
+          </p>
         </div>
       </div>
 
@@ -420,7 +424,7 @@ export default function PatientProgress() {
           <div className="bg-white rounded-lg border border-gray-200 p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Totale ovelser</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Totale ovelser</p>
                 <p className="text-2xl font-semibold text-gray-900 mt-1">
                   {patientStats.summary?.totalCompletions || 0}
                 </p>
@@ -434,7 +438,7 @@ export default function PatientProgress() {
           <div className="bg-white rounded-lg border border-gray-200 p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Aktive dager</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Aktive dager</p>
                 <p className="text-2xl font-semibold text-gray-900 mt-1">
                   {patientStats.summary?.activeDays || 0}
                 </p>
@@ -448,12 +452,12 @@ export default function PatientProgress() {
           <div className="bg-white rounded-lg border border-gray-200 p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Navarende rekke</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Navarende rekke</p>
                 <div className="flex items-center gap-2 mt-1">
                   <p className="text-2xl font-semibold text-gray-900">
                     {patientStats.summary?.currentStreak || 0}
                   </p>
-                  <span className="text-sm text-gray-500">dager</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">dager</span>
                 </div>
               </div>
               <div className="w-12 h-12 rounded-lg bg-orange-50 flex items-center justify-center">
@@ -465,7 +469,7 @@ export default function PatientProgress() {
           <div className="bg-white rounded-lg border border-gray-200 p-5">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600">Gj.snitt smerte</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Gj.snitt smerte</p>
                 <div className="flex items-center gap-2 mt-1">
                   <p className="text-2xl font-semibold text-gray-900">
                     {patientStats.summary?.avgPain || '-'}
@@ -520,7 +524,9 @@ export default function PatientProgress() {
             />
           ) : (
             <div className="h-48 flex items-center justify-center">
-              <p className="text-sm text-gray-500">Ingen smertedata tilgjengelig</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Ingen smertedata tilgjengelig
+              </p>
             </div>
           )}
         </div>
@@ -559,11 +565,11 @@ export default function PatientProgress() {
                     >
                       {prescription.status === 'active' ? 'Aktiv' : prescription.status}
                     </span>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
                       {prescription.totalPrescribed} ovelser
                     </span>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                     Fra {new Date(prescription.startDate).toLocaleDateString('no-NO')}
                     {prescription.endDate &&
                       ` til ${new Date(prescription.endDate).toLocaleDateString('no-NO')}`}
@@ -575,7 +581,7 @@ export default function PatientProgress() {
                   >
                     {prescription.complianceRate}%
                   </p>
-                  <p className="text-sm text-gray-500">overholdelse</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">overholdelse</p>
                 </div>
               </div>
             ))}

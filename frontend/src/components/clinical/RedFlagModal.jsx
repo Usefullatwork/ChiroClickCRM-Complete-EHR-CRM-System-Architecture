@@ -127,11 +127,15 @@ export default function RedFlagModal({
                     >
                       {t.severityLabels[flag.severity]}
                     </span>
-                    <span className="text-xs text-gray-500">{flag.categoryLabel}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {flag.categoryLabel}
+                    </span>
                   </div>
                   <p className="text-sm font-medium text-red-800">{flag.description}</p>
                   <div className="mt-2 p-2 bg-white rounded border border-red-200">
-                    <span className="text-xs font-medium text-gray-600">{t.action}:</span>
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                      {t.action}:
+                    </span>
                     <p className="text-sm text-red-700 mt-0.5">{flag.action}</p>
                   </div>
                 </div>

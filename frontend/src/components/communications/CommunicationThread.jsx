@@ -29,9 +29,9 @@ function PatientGroup({ patientName, messages, lang }) {
       >
         <div className="flex items-center gap-3">
           {expanded ? (
-            <ChevronDown className="w-4 h-4 text-gray-500 flex-shrink-0" />
+            <ChevronDown className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
           ) : (
-            <ChevronRight className="w-4 h-4 text-gray-500 flex-shrink-0" />
+            <ChevronRight className="w-4 h-4 text-gray-500 dark:text-gray-400 flex-shrink-0" />
           )}
           <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
             <User className="w-4 h-4 text-blue-600 dark:text-blue-400" />
@@ -45,7 +45,7 @@ function PatientGroup({ patientName, messages, lang }) {
             {messages.length} {messages.length === 1 ? 'melding' : 'meldinger'}
           </span>
           {lastDate && (
-            <span className="text-xs text-gray-400 dark:text-gray-500">
+            <span className="text-xs text-gray-400 dark:text-gray-300">
               {formatDate(lastDate, lang, {
                 month: 'short',
                 day: 'numeric',
@@ -104,7 +104,7 @@ function PatientGroup({ patientName, messages, lang }) {
                     </span>
                   )}
                   {date && (
-                    <span className="text-[11px] text-gray-400 dark:text-gray-500 whitespace-nowrap">
+                    <span className="text-[11px] text-gray-400 dark:text-gray-300 whitespace-nowrap">
                       {formatDate(date, lang, {
                         hour: '2-digit',
                         minute: '2-digit',

@@ -154,7 +154,7 @@ const AutoAcceptSettings = () => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">Auto-godkjenning</h1>
-        <p className="text-gray-600 mt-1">
+        <p className="text-gray-600 dark:text-gray-300 mt-1">
           Konfigurer automatisk godkjenning av avtaler og henvisninger
         </p>
       </div>
@@ -192,7 +192,9 @@ const AutoAcceptSettings = () => {
               </div>
               <div className="text-left">
                 <h2 className="font-medium text-gray-900">Avtaler</h2>
-                <p className="text-sm text-gray-500">Automatisk bekreft nye timebestillinger</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Automatisk bekreft nye timebestillinger
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -200,15 +202,15 @@ const AutoAcceptSettings = () => {
                 className={`px-2 py-1 rounded text-xs font-medium ${
                   settings.autoAcceptAppointments
                     ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-100 text-gray-600'
+                    : 'bg-gray-100 text-gray-600 dark:text-gray-300'
                 }`}
               >
                 {settings.autoAcceptAppointments ? 'Aktiv' : 'Inaktiv'}
               </span>
               {expandedSection === 'appointments' ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
+                <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
               )}
             </div>
           </button>
@@ -260,9 +262,9 @@ const AutoAcceptSettings = () => {
                         min="0"
                         max="1440"
                       />
-                      <span className="text-sm text-gray-500">minutter</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">minutter</span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Vent denne tiden før avtalen godkjennes automatisk
                     </p>
                   </div>
@@ -271,7 +273,7 @@ const AutoAcceptSettings = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <label className="text-sm font-medium text-gray-700">Kun i kontortid</label>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
                         Godkjenn kun avtaler innenfor 08:00-18:00 på hverdager
                       </p>
                     </div>
@@ -336,7 +338,7 @@ const AutoAcceptSettings = () => {
                         </button>
                       ))}
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Disse avtaletypene vil kreve manuell godkjenning
                     </p>
                   </div>
@@ -358,7 +360,9 @@ const AutoAcceptSettings = () => {
               </div>
               <div className="text-left">
                 <h2 className="font-medium text-gray-900">Henvisninger</h2>
-                <p className="text-sm text-gray-500">Automatisk godta innkommende henvisninger</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Automatisk godta innkommende henvisninger
+                </p>
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -366,15 +370,15 @@ const AutoAcceptSettings = () => {
                 className={`px-2 py-1 rounded text-xs font-medium ${
                   settings.autoAcceptReferrals
                     ? 'bg-green-100 text-green-700'
-                    : 'bg-gray-100 text-gray-600'
+                    : 'bg-gray-100 text-gray-600 dark:text-gray-300'
                 }`}
               >
                 {settings.autoAcceptReferrals ? 'Aktiv' : 'Inaktiv'}
               </span>
               {expandedSection === 'referrals' ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
+                <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
               )}
             </div>
           </button>
@@ -426,7 +430,7 @@ const AutoAcceptSettings = () => {
                         min="0"
                         max="1440"
                       />
-                      <span className="text-sm text-gray-500">minutter</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">minutter</span>
                     </div>
                   </div>
 
@@ -436,7 +440,7 @@ const AutoAcceptSettings = () => {
                       <label className="text-sm font-medium text-gray-700">
                         Krev fullstendig informasjon
                       </label>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
                         Godkjenn kun henvisninger med pasientnavn, henvisende lege og årsak
                       </p>
                     </div>
@@ -500,13 +504,15 @@ const AutoAcceptSettings = () => {
               </div>
               <div className="text-left">
                 <h2 className="font-medium text-gray-900">Varsler</h2>
-                <p className="text-sm text-gray-500">Få beskjed når noe blir automatisk godkjent</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Få beskjed når noe blir automatisk godkjent
+                </p>
               </div>
             </div>
             {expandedSection === 'notifications' ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
+              <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
+              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             )}
           </button>
 
@@ -592,24 +598,28 @@ const AutoAcceptSettings = () => {
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                <History className="w-5 h-5 text-gray-600" />
+                <History className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               </div>
               <div className="text-left">
                 <h2 className="font-medium text-gray-900">Aktivitetslogg</h2>
-                <p className="text-sm text-gray-500">Se historikk over automatiske godkjenninger</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Se historikk over automatiske godkjenninger
+                </p>
               </div>
             </div>
             {showLog ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
+              <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
+              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             )}
           </button>
 
           {showLog && (
             <div className="border-t border-gray-100 max-h-64 overflow-y-auto">
               {log.length === 0 ? (
-                <div className="p-4 text-center text-gray-500 text-sm">Ingen aktivitet ennå</div>
+                <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
+                  Ingen aktivitet ennå
+                </div>
               ) : (
                 <div className="divide-y divide-gray-100">
                   {log.map((entry, index) => (
@@ -628,9 +638,14 @@ const AutoAcceptSettings = () => {
                         >
                           {entry.action === 'accepted' ? 'godkjent' : 'avvist'}
                         </span>
-                        {entry.reason && <span className="text-gray-500"> - {entry.reason}</span>}
+                        {entry.reason && (
+                          <span className="text-gray-500 dark:text-gray-400">
+                            {' '}
+                            - {entry.reason}
+                          </span>
+                        )}
                       </div>
-                      <span className="text-gray-400 text-xs">
+                      <span className="text-gray-400 dark:text-gray-300 text-xs">
                         {new Date(entry.created_at).toLocaleString('nb-NO')}
                       </span>
                     </div>

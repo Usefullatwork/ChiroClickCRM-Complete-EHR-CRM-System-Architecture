@@ -854,7 +854,7 @@ export default function FacialLinesChart({
             </div>
             <div>
               <h3 className="font-semibold text-gray-800">{t.title}</h3>
-              <p className="text-xs text-gray-500">{t.subtitle}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{t.subtitle}</p>
             </div>
           </div>
 
@@ -870,7 +870,7 @@ export default function FacialLinesChart({
             <button
               onClick={handleClearAll}
               className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 hover:bg-gray-200
-                        text-gray-600 rounded-lg text-sm transition-colors"
+                        text-gray-600 dark:text-gray-300 rounded-lg text-sm transition-colors"
             >
               <RotateCcw className="w-3.5 h-3.5" />
               {t.clearAll}
@@ -883,7 +883,7 @@ export default function FacialLinesChart({
         {/* Left Panel - Layer Controls */}
         <div className="w-56 border-r border-gray-200 p-3 space-y-3 bg-gray-50">
           <div>
-            <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+            <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
               {t.layers}
             </h4>
             <div className="space-y-1.5">
@@ -891,7 +891,7 @@ export default function FacialLinesChart({
               <button
                 onClick={() => setShowOutline(!showOutline)}
                 className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm transition-colors
-                  ${showOutline ? 'bg-gray-200 text-gray-800' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+                  ${showOutline ? 'bg-gray-200 text-gray-800' : 'bg-white text-gray-500 dark:text-gray-400 hover:bg-gray-100'}`}
               >
                 {showOutline ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                 <span>{t.outline}</span>
@@ -901,7 +901,7 @@ export default function FacialLinesChart({
               <button
                 onClick={() => setShowFascialLines(!showFascialLines)}
                 className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm transition-colors
-                  ${showFascialLines ? 'bg-blue-100 text-blue-700' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+                  ${showFascialLines ? 'bg-blue-100 text-blue-700' : 'bg-white text-gray-500 dark:text-gray-400 hover:bg-gray-100'}`}
               >
                 {showFascialLines ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                 <span>{t.fascialLines}</span>
@@ -911,7 +911,7 @@ export default function FacialLinesChart({
               <button
                 onClick={() => setShowMuscles(!showMuscles)}
                 className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm transition-colors
-                  ${showMuscles ? 'bg-red-100 text-red-700' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+                  ${showMuscles ? 'bg-red-100 text-red-700' : 'bg-white text-gray-500 dark:text-gray-400 hover:bg-gray-100'}`}
               >
                 {showMuscles ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                 <span>{t.muscles}</span>
@@ -921,7 +921,7 @@ export default function FacialLinesChart({
               <button
                 onClick={() => setShowTriggerPoints(!showTriggerPoints)}
                 className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm transition-colors
-                  ${showTriggerPoints ? 'bg-orange-100 text-orange-700' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+                  ${showTriggerPoints ? 'bg-orange-100 text-orange-700' : 'bg-white text-gray-500 dark:text-gray-400 hover:bg-gray-100'}`}
               >
                 {showTriggerPoints ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                 <span>{t.triggerPoints}</span>
@@ -931,7 +931,7 @@ export default function FacialLinesChart({
               <button
                 onClick={() => setShowNerves(!showNerves)}
                 className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-sm transition-colors
-                  ${showNerves ? 'bg-purple-100 text-purple-700' : 'bg-white text-gray-500 hover:bg-gray-100'}`}
+                  ${showNerves ? 'bg-purple-100 text-purple-700' : 'bg-white text-gray-500 dark:text-gray-400 hover:bg-gray-100'}`}
               >
                 {showNerves ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                 <span>{t.nerves}</span>
@@ -943,7 +943,7 @@ export default function FacialLinesChart({
           <button
             onClick={() => setShowLegend(!showLegend)}
             className="w-full flex items-center justify-between px-2.5 py-2 bg-white rounded-lg
-                      text-sm text-gray-600 hover:bg-gray-100 transition-colors"
+                      text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 transition-colors"
           >
             <span className="flex items-center gap-2">
               <Layers className="w-4 h-4" />
@@ -958,7 +958,9 @@ export default function FacialLinesChart({
               {/* Fascial Lines Legend */}
               {showFascialLines && (
                 <div>
-                  <h5 className="text-xs font-medium text-gray-600 mb-1.5">{t.fascialLines}</h5>
+                  <h5 className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1.5">
+                    {t.fascialLines}
+                  </h5>
                   <div className="space-y-1">
                     {Object.entries(FASCIAL_LINES)
                       .slice(0, 5)
@@ -968,7 +970,7 @@ export default function FacialLinesChart({
                             className="w-3 h-0.5 rounded"
                             style={{ backgroundColor: line.color }}
                           />
-                          <span className="text-gray-600 truncate">
+                          <span className="text-gray-600 dark:text-gray-300 truncate">
                             {line[lang]?.name || line.en.name}
                           </span>
                         </div>
@@ -980,7 +982,9 @@ export default function FacialLinesChart({
               {/* Nerve Zones Legend */}
               {showNerves && (
                 <div>
-                  <h5 className="text-xs font-medium text-gray-600 mb-1.5">{t.nerves}</h5>
+                  <h5 className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-1.5">
+                    {t.nerves}
+                  </h5>
                   <div className="space-y-1">
                     {Object.entries(NERVE_ZONES).map(([id, zone]) => (
                       <div key={id} className="flex items-center gap-2 text-xs">
@@ -988,7 +992,9 @@ export default function FacialLinesChart({
                           className="w-3 h-3 rounded"
                           style={{ backgroundColor: zone.color.replace('0.3', '0.6') }}
                         />
-                        <span className="text-gray-600">{zone[lang]?.name || zone.en.name}</span>
+                        <span className="text-gray-600 dark:text-gray-300">
+                          {zone[lang]?.name || zone.en.name}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -1192,14 +1198,16 @@ export default function FacialLinesChart({
               </h4>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-gray-500">{t.muscleInfo}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{t.muscleInfo}</span>
                   <p className="text-sm text-gray-700">
                     {selectedTriggerPoint.muscle[lang]?.description ||
                       selectedTriggerPoint.muscle.en.description}
                   </p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">{t.referralPattern}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {t.referralPattern}
+                  </span>
                   <p className="text-sm text-gray-700 font-medium">
                     {typeof selectedTriggerPoint.triggerPoint.referral === 'object'
                       ? selectedTriggerPoint.triggerPoint.referral[lang] ||
@@ -1220,13 +1228,13 @@ export default function FacialLinesChart({
               </h4>
               <div className="space-y-2">
                 <div>
-                  <span className="text-xs text-gray-500">Description</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Description</span>
                   <p className="text-sm text-gray-700">
                     {selectedLine[lang]?.description || selectedLine.en.description}
                   </p>
                 </div>
                 <div>
-                  <span className="text-xs text-gray-500">{t.technique}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">{t.technique}</span>
                   <p className="text-sm text-gray-700 font-medium">
                     {selectedLine[lang]?.technique || selectedLine.en.technique}
                   </p>
@@ -1239,16 +1247,16 @@ export default function FacialLinesChart({
           {!selectedTriggerPoint && !selectedLine && (
             <div className="bg-white rounded-lg p-4 text-center">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Zap className="w-6 h-6 text-gray-400" />
+                <Zap className="w-6 h-6 text-gray-400 dark:text-gray-300" />
               </div>
-              <p className="text-sm text-gray-500">{t.noSelection}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t.noSelection}</p>
             </div>
           )}
 
           {/* Marked Points List */}
           {value.markers && value.markers.length > 0 && (
             <div className="mt-3">
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+              <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
                 {lang === 'no' ? 'Markerte punkter' : 'Marked Points'}
               </h4>
               <div className="space-y-1.5 max-h-48 overflow-y-auto">
@@ -1258,7 +1266,9 @@ export default function FacialLinesChart({
                     className="bg-white rounded p-2 text-xs border border-gray-200"
                   >
                     <div className="font-medium text-gray-800">{marker.muscle}</div>
-                    <div className="text-gray-500 truncate">{marker.description}</div>
+                    <div className="text-gray-500 dark:text-gray-400 truncate">
+                      {marker.description}
+                    </div>
                   </div>
                 ))}
               </div>

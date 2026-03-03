@@ -67,7 +67,7 @@ function RegionalDiagramsDemo({ values = {}, onChange, lang = 'no' }) {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-gray-600 dark:text-gray-300">
         {lang === 'no'
           ? 'Klikk på diagrammene for å markere funn. Velg venstre eller høyre side.'
           : 'Click on diagrams to mark findings. Select left or right side.'}
@@ -98,7 +98,7 @@ function LowerExtremityDemo({ values = {}, onChange, lang = 'no' }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-gray-600 dark:text-gray-300">
         {lang === 'no'
           ? 'Underekstremitet diagram med isjiasnerven og dermatomer (L4, L5, S1). Skriv inn SLR-vinkel for å se det på diagrammet.'
           : 'Lower extremity diagram with sciatic nerve and dermatomes (L4, L5, S1). Enter SLR angle to see it on the diagram.'}
@@ -161,7 +161,7 @@ function LowerExtremityDemo({ values = {}, onChange, lang = 'no' }) {
 function UpperExtremityDemo({ values = {}, onChange, lang = 'no' }) {
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-gray-600 dark:text-gray-300">
         {lang === 'no'
           ? 'Overekstremitet diagram med median-, ulnar- og radialisnervene samt dermatomer (C5-T1).'
           : 'Upper extremity diagram with median, ulnar, and radial nerves with dermatomes (C5-T1).'}
@@ -378,7 +378,7 @@ export default function ExaminationDemo() {
               <h1 className="text-2xl font-bold text-gray-800">
                 {lang === 'no' ? 'Undersøkelseskomponenter Demo' : 'Examination Components Demo'}
               </h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {lang === 'no'
                   ? 'Test alle 19 kliniske undersøkelseskomponenter inkludert ROM-skyveknapper'
                   : 'Test all 19 clinical examination components including ROM arc sliders'}
@@ -407,7 +407,7 @@ export default function ExaminationDemo() {
                 <h2 className="font-semibold text-gray-700">
                   {lang === 'no' ? 'Komponenter' : 'Components'}
                 </h2>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {currentIndex + 1} / {DEMO_COMPONENTS.length}
                 </p>
               </div>
@@ -429,14 +429,16 @@ export default function ExaminationDemo() {
                                  ${
                                    isActive
                                      ? 'bg-teal-50 text-teal-700'
-                                     : 'hover:bg-gray-50 text-gray-600'
+                                     : 'hover:bg-gray-50 text-gray-600 dark:text-gray-300'
                                  }`}
                     >
                       <div
                         className={`w-8 h-8 rounded-lg flex items-center justify-center
                                       ${isActive ? config.color : 'bg-gray-100'}`}
                       >
-                        <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-500'}`} />
+                        <Icon
+                          className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'}`}
+                        />
                       </div>
                       <div className="flex-1 min-w-0">
                         <span
@@ -451,7 +453,7 @@ export default function ExaminationDemo() {
                           </span>
                         )}
                       </div>
-                      <span className="text-xs text-gray-400">{index + 1}</span>
+                      <span className="text-xs text-gray-400 dark:text-gray-300">{index + 1}</span>
                     </button>
                   );
                 })}
@@ -462,7 +464,7 @@ export default function ExaminationDemo() {
                 <button
                   onClick={goToPrevious}
                   className="flex-1 flex items-center justify-center gap-1 px-3 py-2
-                            bg-gray-100 hover:bg-gray-200 rounded-lg text-sm text-gray-600"
+                            bg-gray-100 hover:bg-gray-200 rounded-lg text-sm text-gray-600 dark:text-gray-300"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   {lang === 'no' ? 'Forrige' : 'Prev'}
@@ -497,7 +499,7 @@ export default function ExaminationDemo() {
                     <h2 className="text-xl font-semibold text-gray-800">
                       {lang === 'no' ? activeConfig?.nameNo : activeConfig?.name}
                     </h2>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {lang === 'no' ? 'Komponent' : 'Component'} #{currentIndex + 1}
                     </p>
                   </div>
@@ -539,7 +541,7 @@ export default function ExaminationDemo() {
                       navigator.clipboard.writeText(generatedNarratives[activeComponent])
                     }
                     className="mt-3 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg
-                              text-sm text-gray-600 transition-colors"
+                              text-sm text-gray-600 dark:text-gray-300 transition-colors"
                   >
                     {lang === 'no' ? 'Kopier til utklippstavle' : 'Copy to clipboard'}
                   </button>
@@ -551,7 +553,7 @@ export default function ExaminationDemo() {
             <details className="mt-4 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
               <summary
                 className="px-6 py-3 bg-gray-50 cursor-pointer hover:bg-gray-100
-                                 text-sm font-medium text-gray-600"
+                                 text-sm font-medium text-gray-600 dark:text-gray-300"
               >
                 {lang === 'no' ? 'Vis komponentdata (Debug)' : 'Show component data (Debug)'}
               </summary>
@@ -611,7 +613,7 @@ export default function ExaminationDemo() {
             })}
           </div>
 
-          <div className="mt-4 flex items-center gap-4 text-xs text-gray-500">
+          <div className="mt-4 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-green-500" />
               {lang === 'no' ? 'Data registrert' : 'Data entered'}

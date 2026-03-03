@@ -358,7 +358,7 @@ function ShortcutsHelpModal({ lang = 'en', onClose }) {
         <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">
           {shortcut.keys[0]}
         </kbd>
-        <span className="text-gray-400 text-xs">{t.then}</span>
+        <span className="text-gray-400 dark:text-gray-300 text-xs">{t.then}</span>
         <kbd className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs font-mono">
           {shortcut.keys[1]}
         </kbd>

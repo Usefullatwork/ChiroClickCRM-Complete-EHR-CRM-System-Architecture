@@ -627,8 +627,8 @@ export default function MacroMatrix({
       <div
         className={`bg-white rounded-lg shadow-sm border border-gray-200 p-8 flex items-center justify-center ${className}`}
       >
-        <Loader2 className="w-5 h-5 animate-spin text-gray-400 mr-2" />
-        <span className="text-sm text-gray-500">Laster makroer...</span>
+        <Loader2 className="w-5 h-5 animate-spin text-gray-400 dark:text-gray-300 mr-2" />
+        <span className="text-sm text-gray-500 dark:text-gray-400">Laster makroer...</span>
       </div>
     );
   }
@@ -645,7 +645,7 @@ export default function MacroMatrix({
           <div className="flex items-center gap-2">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
               <input
                 type="text"
                 value={searchTerm}
@@ -659,13 +659,13 @@ export default function MacroMatrix({
             <div className="flex border border-gray-300 rounded-lg overflow-hidden">
               <button
                 onClick={() => setViewMode('grid')}
-                className={`p-1.5 ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                className={`p-1.5 ${viewMode === 'grid' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 dark:text-gray-300 hover:bg-gray-50'}`}
               >
                 <Grid className="w-4 h-4" />
               </button>
               <button
                 onClick={() => setViewMode('list')}
-                className={`p-1.5 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}
+                className={`p-1.5 ${viewMode === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600 dark:text-gray-300 hover:bg-gray-50'}`}
               >
                 <List className="w-4 h-4" />
               </button>
@@ -675,7 +675,7 @@ export default function MacroMatrix({
             {onCustomMacrosChange && (
               <button
                 onClick={() => setShowCustomize(!showCustomize)}
-                className="p-1.5 text-gray-600 hover:bg-gray-100 rounded-lg"
+                className="p-1.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg"
               >
                 <Settings className="w-4 h-4" />
               </button>
@@ -687,7 +687,7 @@ export default function MacroMatrix({
       {/* Search Results */}
       {searchResults && (
         <div className="p-4 border-b border-gray-200 bg-yellow-50">
-          <p className="text-sm text-gray-600 mb-2">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
             Fant {searchResults.length} makroer for &quot;{searchTerm}&quot;
           </p>
           <div className="space-y-2 max-h-60 overflow-y-auto">
@@ -699,9 +699,13 @@ export default function MacroMatrix({
               >
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-gray-900">{macro.label}</span>
-                  <span className="text-xs text-gray-500">{macro.categoryName}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {macro.categoryName}
+                  </span>
                 </div>
-                <p className="text-xs text-gray-600 mt-1 line-clamp-1">{macro.text}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 line-clamp-1">
+                  {macro.text}
+                </p>
               </button>
             ))}
           </div>
@@ -738,7 +742,7 @@ export default function MacroMatrix({
                 ${
                   activeCategory === catId
                     ? `border-${category.color}-600 text-${category.color}-700 bg-white`
-                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                    : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900 hover:bg-gray-100'
                 }
               `}
               style={{
@@ -750,7 +754,9 @@ export default function MacroMatrix({
             >
               <span>{category.icon}</span>
               <span>{category.name}</span>
-              <span className="text-xs text-gray-400">({category.macros.length})</span>
+              <span className="text-xs text-gray-400 dark:text-gray-300">
+                ({category.macros.length})
+              </span>
             </button>
           ))}
         </div>
@@ -784,7 +790,7 @@ export default function MacroMatrix({
                       className={`w-3 h-3 ${
                         favorites.includes(macro.id) || macro.isFavorite
                           ? 'text-amber-500 fill-current'
-                          : 'text-gray-400'
+                          : 'text-gray-400 dark:text-gray-300'
                       }`}
                     />
                   </button>
@@ -814,12 +820,12 @@ export default function MacroMatrix({
                         className={`w-4 h-4 ${
                           favorites.includes(macro.id) || macro.isFavorite
                             ? 'text-amber-500 fill-current'
-                            : 'text-gray-300 group-hover:text-gray-400'
+                            : 'text-gray-300 group-hover:text-gray-400 dark:text-gray-300'
                         }`}
                       />
                     </button>
                   </div>
-                  <p className="text-xs text-gray-600 mt-1">{macro.text}</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-300 mt-1">{macro.text}</p>
                 </button>
               ))}
             </div>

@@ -221,7 +221,7 @@ function ChipSelector({ items, selectedIds = [], onChange, lang = 'no' }) {
                      ${
                        selectedIds.includes(item.id)
                          ? 'bg-teal-100 border-teal-300 text-teal-700 font-medium'
-                         : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                         : 'bg-white border-gray-200 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                      }`}
         >
           {lang === 'no' ? item.nameNo : item.name}
@@ -259,7 +259,7 @@ function HeadacheTypeSection({ values, onChange, lang }) {
             <span className="font-medium text-sm text-gray-700">
               {lang === 'no' ? type.nameNo : type.name}
             </span>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {lang === 'no' ? type.durationNo : type.duration}
             </p>
           </button>
@@ -293,7 +293,9 @@ function RedFlagsSection({ values, onChange, lang }) {
       className={`p-4 rounded-lg border ${hasRedFlags ? 'bg-red-50 border-red-200' : 'bg-gray-50 border-gray-200'}`}
     >
       <div className="flex items-center gap-2 mb-3">
-        <AlertTriangle className={`w-5 h-5 ${hasRedFlags ? 'text-red-600' : 'text-gray-400'}`} />
+        <AlertTriangle
+          className={`w-5 h-5 ${hasRedFlags ? 'text-red-600' : 'text-gray-400 dark:text-gray-300'}`}
+        />
         <h4 className="text-sm font-medium text-gray-700">
           {lang === 'no' ? 'Røde flagg' : 'Red Flags'} (SNOOPY)
         </h4>
@@ -325,7 +327,9 @@ function RedFlagsSection({ values, onChange, lang }) {
               className="mt-0.5 w-4 h-4 text-red-600 rounded border-gray-300 focus:ring-red-500"
             />
             <div>
-              <span className="text-xs font-bold text-gray-400 mr-1">{flag.letter}:</span>
+              <span className="text-xs font-bold text-gray-400 dark:text-gray-300 mr-1">
+                {flag.letter}:
+              </span>
               <span className="text-sm text-gray-700">
                 {lang === 'no' ? flag.nameNo : flag.name}
               </span>
@@ -454,7 +458,7 @@ export default function HeadacheAssessment({
           <h3 className="text-lg font-semibold text-gray-800">
             {lang === 'no' ? 'Hodepineutredning' : 'Headache Assessment'}
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {lang === 'no'
               ? 'Klassifisering og røde flagg-screening'
               : 'Classification and red flag screening'}

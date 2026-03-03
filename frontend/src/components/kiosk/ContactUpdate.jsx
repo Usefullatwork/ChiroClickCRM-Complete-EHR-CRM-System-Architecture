@@ -42,12 +42,12 @@ export default function ContactUpdate({ appointment, lang = 'no', onNext, onBack
     <div className="flex flex-col h-full">
       <div className="text-center mb-8">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">{t.title}</h1>
-        <p className="text-lg text-slate-500">{t.subtitle}</p>
+        <p className="text-lg text-slate-500 dark:text-slate-400">{t.subtitle}</p>
       </div>
 
       <div className="flex-1 space-y-6 max-w-md mx-auto w-full">
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-slate-600 mb-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
             <Phone className="w-4 h-4" />
             {t.phone}
           </label>
@@ -61,7 +61,7 @@ export default function ContactUpdate({ appointment, lang = 'no', onNext, onBack
         </div>
 
         <div>
-          <label className="flex items-center gap-2 text-sm font-medium text-slate-600 mb-2">
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
             <Mail className="w-4 h-4" />
             {t.email}
           </label>
@@ -85,7 +85,7 @@ export default function ContactUpdate({ appointment, lang = 'no', onNext, onBack
         </button>
         <button
           onClick={handleSkip}
-          className="w-full py-3 bg-slate-100 text-slate-600 text-lg font-medium rounded-2xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2"
+          className="w-full py-3 bg-slate-100 text-slate-600 dark:text-slate-300 text-lg font-medium rounded-2xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2"
         >
           <SkipForward className="w-5 h-5" />
           {t.noChanges}

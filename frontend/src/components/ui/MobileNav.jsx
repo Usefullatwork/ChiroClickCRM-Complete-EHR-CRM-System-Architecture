@@ -190,7 +190,7 @@ export default function MobileNav({
                   className={`flex flex-col items-center justify-center flex-1 py-2 min-h-[56px] transition-colors ${
                     active
                       ? 'text-blue-600'
-                      : 'text-gray-500 hover:text-gray-700 active:bg-gray-100'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 active:bg-gray-100'
                   }`}
                   aria-label={item.label}
                   aria-current={active ? 'page' : undefined}
@@ -237,11 +237,13 @@ export default function MobileNav({
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
           <div className="flex-1 min-w-0">
             {userName && <p className="font-semibold text-gray-900 truncate">{userName}</p>}
-            {clinicName && <p className="text-sm text-gray-500 truncate">{clinicName}</p>}
+            {clinicName && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{clinicName}</p>
+            )}
           </div>
           <button
             onClick={() => setIsMenuOpen(false)}
-            className="p-2 -mr-2 text-gray-500 hover:bg-gray-200 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            className="p-2 -mr-2 text-gray-500 dark:text-gray-400 hover:bg-gray-200 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
             aria-label="Lukk meny"
           >
             <X className="w-6 h-6" />
@@ -253,7 +255,7 @@ export default function MobileNav({
           {/* Search (optional) */}
           <div className="px-4 py-2">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300" />
               <input
                 type="search"
                 placeholder="Sok..."
@@ -286,10 +288,10 @@ export default function MobileNav({
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 flex-shrink-0 ${active ? 'text-blue-600' : 'text-gray-500'}`}
+                    className={`w-5 h-5 flex-shrink-0 ${active ? 'text-blue-600' : 'text-gray-500 dark:text-gray-400'}`}
                   />
                   <span className="flex-1 font-medium">{item.label}</span>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                 </button>
               );
             })}
@@ -317,12 +319,12 @@ export default function MobileNav({
 
         {/* Menu Footer */}
         <div
-          className="p-4 border-t border-gray-200 bg-gray-50 text-center text-xs text-gray-500"
+          className="p-4 border-t border-gray-200 bg-gray-50 text-center text-xs text-gray-500 dark:text-gray-400"
           style={{
             paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)',
           }}
         >
-          <p>ChiroClick CRM</p>
+          <p>ChiroClick EHR</p>
         </div>
       </div>
 
@@ -376,7 +378,7 @@ export function MobileHeader({
           {showBack ? (
             <button
               onClick={handleBack}
-              className="p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              className="p-2 -ml-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Tilbake"
             >
               <ChevronRight className="w-6 h-6 rotate-180" />
@@ -389,7 +391,9 @@ export function MobileHeader({
         {/* Title */}
         <div className="flex-1 text-center min-w-0 px-2">
           <h1 className="font-semibold text-gray-900 truncate text-lg">{title}</h1>
-          {subtitle && <p className="text-xs text-gray-500 truncate">{subtitle}</p>}
+          {subtitle && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{subtitle}</p>
+          )}
         </div>
 
         {/* Right Action */}

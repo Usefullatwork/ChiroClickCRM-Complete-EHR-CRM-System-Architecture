@@ -177,7 +177,7 @@ export default function SmartTextInput({
           <button
             type="button"
             onClick={clearText}
-            className="absolute top-2 right-2 p-1 text-gray-400 hover:text-gray-600 rounded"
+            className="absolute top-2 right-2 p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded"
           >
             <X className="w-4 h-4" />
           </button>
@@ -187,7 +187,7 @@ export default function SmartTextInput({
       {/* Recent Phrases (if any) */}
       {recentPhrases.length > 0 && isFocused && (
         <div className="flex flex-wrap items-center gap-1.5 pt-1">
-          <span className="text-xs text-gray-500 flex items-center gap-1">
+          <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
             <Clock className="w-3 h-3" />
             Recent:
           </span>
@@ -196,7 +196,7 @@ export default function SmartTextInput({
               key={index}
               type="button"
               onClick={() => insertPhrase(phrase)}
-              className="px-2 py-0.5 text-xs text-gray-600 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
+              className="px-2 py-0.5 text-xs text-gray-600 dark:text-gray-300 bg-gray-100 rounded hover:bg-gray-200 transition-colors"
             >
               {phrase.length > 30 ? `${phrase.slice(0, 30)}...` : phrase}
             </button>

@@ -17,9 +17,9 @@ export default function KioskLayout({
   children,
   step = 0,
   totalSteps = 6,
-  clinicName = 'ChiroClickCRM',
+  clinicName = 'ChiroClickEHR',
   lang = 'no',
-  onReset
+  onReset,
 }) {
   const [idleTime, setIdleTime] = useState(0);
   const [showTimeoutWarning, setShowTimeoutWarning] = useState(false);
@@ -33,7 +33,7 @@ export default function KioskLayout({
   // Idle timeout logic
   useEffect(() => {
     const timer = setInterval(() => {
-      setIdleTime(prev => {
+      setIdleTime((prev) => {
         const newTime = prev + 1;
 
         // Show warning at 100 seconds
@@ -61,12 +61,12 @@ export default function KioskLayout({
   // Global event listeners for activity
   useEffect(() => {
     const events = ['mousedown', 'mousemove', 'keydown', 'touchstart', 'scroll'];
-    events.forEach(event => {
+    events.forEach((event) => {
       document.addEventListener(event, resetIdle, { passive: true });
     });
 
     return () => {
-      events.forEach(event => {
+      events.forEach((event) => {
         document.removeEventListener(event, resetIdle);
       });
     };
@@ -93,7 +93,7 @@ export default function KioskLayout({
             <h2 className="text-2xl font-bold text-slate-800 mb-2">
               {lang === 'no' ? 'Er du fortsatt der?' : 'Are you still there?'}
             </h2>
-            <p className="text-lg text-slate-600 mb-6">
+            <p className="text-lg text-slate-600 dark:text-slate-300 mb-6">
               {lang === 'no'
                 ? `Skjermen tilbakestilles om ${IDLE_TIMEOUT - idleTime} sekunder`
                 : `Screen will reset in ${IDLE_TIMEOUT - idleTime} seconds`}
@@ -103,7 +103,7 @@ export default function KioskLayout({
               className="w-full py-4 bg-teal-600 text-white text-xl font-bold rounded-2xl
                          hover:bg-teal-700 transition-colors"
             >
-              {lang === 'no' ? 'Ja, jeg er her' : 'Yes, I\'m here'}
+              {lang === 'no' ? 'Ja, jeg er her' : "Yes, I'm here"}
             </button>
           </div>
         </div>
@@ -119,11 +119,12 @@ export default function KioskLayout({
                 <div
                   className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center
                     text-lg md:text-xl font-bold transition-all duration-300
-                    ${i + 1 < step
-                      ? 'bg-white text-teal-600 shadow-lg'
-                      : i + 1 === step
-                        ? 'bg-white text-teal-600 ring-4 ring-white/50 shadow-xl scale-110'
-                        : 'bg-teal-500/30 text-white/60'
+                    ${
+                      i + 1 < step
+                        ? 'bg-white text-teal-600 shadow-lg'
+                        : i + 1 === step
+                          ? 'bg-white text-teal-600 ring-4 ring-white/50 shadow-xl scale-110'
+                          : 'bg-teal-500/30 text-white/60'
                     }`}
                 >
                   {i + 1 < step ? '✓' : i + 1}

@@ -159,7 +159,7 @@ function PatientCard({
       {/* Header: Time + Type */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <Clock className="w-3.5 h-3.5 text-gray-400" />
+          <Clock className="w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />
           <span className="text-sm font-medium text-gray-900">{formattedTime}</span>
         </div>
         <span
@@ -177,7 +177,7 @@ function PatientCard({
       {/* Patient Name */}
       <div className="flex items-center gap-2 mb-2">
         <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-          <User className="w-4 h-4 text-gray-600" />
+          <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-gray-900 truncate">
@@ -220,7 +220,7 @@ function PatientCard({
         className="absolute top-2 right-2 p-1 rounded hover:bg-gray-100
                    opacity-0 group-hover:opacity-100 transition-opacity"
       >
-        <MoreVertical className="w-4 h-4 text-gray-400" />
+        <MoreVertical className="w-4 h-4 text-gray-400 dark:text-gray-300" />
       </button>
 
       {/* Context menu dropdown */}
@@ -378,7 +378,7 @@ function FlowColumn({
             />
           ))
         ) : (
-          <div className="text-center py-8 text-gray-400">
+          <div className="text-center py-8 text-gray-400 dark:text-gray-300">
             <User className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">{t.noPatients}</p>
           </div>
@@ -453,7 +453,7 @@ export default function PatientFlowBoard({
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">{t.title}</h1>
-          <p className="text-sm text-gray-500">{t.subtitle}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
         </div>
         <div className="flex items-center gap-4">
           {/* Stats pills */}

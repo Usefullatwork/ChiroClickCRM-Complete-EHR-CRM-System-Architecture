@@ -122,7 +122,7 @@ const RetentionDashboard = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        <span className="ml-2 text-gray-600">Laster retensjonsdata...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">Laster retensjonsdata...</span>
       </div>
     );
   }
@@ -149,7 +149,7 @@ const RetentionDashboard = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Retensjonsanalyse</h2>
-          <p className="text-gray-600">Forstå og forbedre pasientbevaring</p>
+          <p className="text-gray-600 dark:text-gray-300">Forstå og forbedre pasientbevaring</p>
         </div>
         <div className="flex gap-2">
           {['7d', '30d', '90d', '1y'].map((range) => (
@@ -179,7 +179,7 @@ const RetentionDashboard = () => {
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-center gap-2 mb-2">
             <Target className="w-5 h-5 text-blue-500" />
-            <span className="text-sm text-gray-500">Retensjon</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Retensjon</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">{retentionData.currentRate}%</p>
           <div
@@ -198,55 +198,57 @@ const RetentionDashboard = () => {
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-center gap-2 mb-2">
             <UserMinus className="w-5 h-5 text-red-500" />
-            <span className="text-sm text-gray-500">Churn</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Churn</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">{retentionData.monthlyChurn}%</p>
-          <p className="text-sm text-gray-500">månedlig</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">månedlig</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-5 h-5 text-purple-500" />
-            <span className="text-sm text-gray-500">Gj.snitt Levetid</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Gj.snitt Levetid</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">{retentionData.avgLifetime}</p>
-          <p className="text-sm text-gray-500">måneder</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">måneder</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-center gap-2 mb-2">
             <Activity className="w-5 h-5 text-green-500" />
-            <span className="text-sm text-gray-500">Besøk/Pasient</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Besøk/Pasient</span>
           </div>
           <p className="text-2xl font-bold text-gray-900">{retentionData.avgVisitsPerPatient}</p>
-          <p className="text-sm text-gray-500">snitt</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">snitt</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-center gap-2 mb-2">
             <UserPlus className="w-5 h-5 text-blue-500" />
-            <span className="text-sm text-gray-500">Nye</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Nye</span>
           </div>
           <p className="text-2xl font-bold text-green-600">+{patientFlow.newPatients}</p>
-          <p className="text-sm text-gray-500">denne perioden</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">denne perioden</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-center gap-2 mb-2">
             <RefreshCw className="w-5 h-5 text-teal-500" />
-            <span className="text-sm text-gray-500">Reaktivert</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Reaktivert</span>
           </div>
           <p className="text-2xl font-bold text-teal-600">+{patientFlow.reactivated}</p>
-          <p className="text-sm text-gray-500">{retentionData.reactivationRate}% rate</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {retentionData.reactivationRate}% rate
+          </p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle className="w-5 h-5 text-orange-500" />
-            <span className="text-sm text-gray-500">I Fare</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">I Fare</span>
           </div>
           <p className="text-2xl font-bold text-orange-600">{patientFlow.atRisk}</p>
-          <p className="text-sm text-gray-500">pasienter</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">pasienter</p>
         </div>
       </div>
 
@@ -259,21 +261,39 @@ const RetentionDashboard = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className="text-left py-2 px-2 text-gray-500 font-medium">Kohort</th>
-                  <th className="text-center py-2 px-2 text-gray-500 font-medium">Pasienter</th>
-                  <th className="text-center py-2 px-2 text-gray-500 font-medium">M1</th>
-                  <th className="text-center py-2 px-2 text-gray-500 font-medium">M2</th>
-                  <th className="text-center py-2 px-2 text-gray-500 font-medium">M3</th>
-                  <th className="text-center py-2 px-2 text-gray-500 font-medium">M4</th>
-                  <th className="text-center py-2 px-2 text-gray-500 font-medium">M5</th>
-                  <th className="text-center py-2 px-2 text-gray-500 font-medium">M6</th>
+                  <th className="text-left py-2 px-2 text-gray-500 dark:text-gray-400 font-medium">
+                    Kohort
+                  </th>
+                  <th className="text-center py-2 px-2 text-gray-500 dark:text-gray-400 font-medium">
+                    Pasienter
+                  </th>
+                  <th className="text-center py-2 px-2 text-gray-500 dark:text-gray-400 font-medium">
+                    M1
+                  </th>
+                  <th className="text-center py-2 px-2 text-gray-500 dark:text-gray-400 font-medium">
+                    M2
+                  </th>
+                  <th className="text-center py-2 px-2 text-gray-500 dark:text-gray-400 font-medium">
+                    M3
+                  </th>
+                  <th className="text-center py-2 px-2 text-gray-500 dark:text-gray-400 font-medium">
+                    M4
+                  </th>
+                  <th className="text-center py-2 px-2 text-gray-500 dark:text-gray-400 font-medium">
+                    M5
+                  </th>
+                  <th className="text-center py-2 px-2 text-gray-500 dark:text-gray-400 font-medium">
+                    M6
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {cohortData.map((row) => (
                   <tr key={row.month} className="border-t border-gray-100">
                     <td className="py-2 px-2 font-medium text-gray-900">{row.month}</td>
-                    <td className="py-2 px-2 text-center text-gray-600">{row.total}</td>
+                    <td className="py-2 px-2 text-center text-gray-600 dark:text-gray-300">
+                      {row.total}
+                    </td>
                     {[row.month1, row.month2, row.month3, row.month4, row.month5, row.month6].map(
                       (val, idx) => (
                         <td key={idx} className="py-2 px-2 text-center">
@@ -327,7 +347,9 @@ const RetentionDashboard = () => {
                       style={{ width: `${seg.retention}%` }}
                     />
                   </div>
-                  <span className="text-xs text-gray-500 w-16">{seg.count} pas.</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 w-16">
+                    {seg.count} pas.
+                  </span>
                 </div>
               </div>
             ))}
@@ -347,22 +369,22 @@ const RetentionDashboard = () => {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Pasient
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Dager Siden Besøk
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Siste Besøk
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Totalt Besøk
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Risikoscore
                 </th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Handling
                 </th>
               </tr>
@@ -386,10 +408,12 @@ const RetentionDashboard = () => {
                       {patient.daysSinceVisit} dager
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
                     {new Date(patient.lastVisit).toLocaleDateString('nb-NO')}
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{patient.totalVisits}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                    {patient.totalVisits}
+                  </td>
                   <td className="px-4 py-3">
                     <span
                       className={`inline-flex px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(patient.riskScore)}`}

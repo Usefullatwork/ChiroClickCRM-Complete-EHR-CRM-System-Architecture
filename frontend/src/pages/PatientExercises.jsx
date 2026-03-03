@@ -54,7 +54,7 @@ export default function PatientExercises() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Treningsprogram</h1>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Administrer pasientens treningsprogram og ovelser
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function PatientExercises() {
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-[200px]">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Sok etter ovelser..."
@@ -111,7 +111,9 @@ export default function PatientExercises() {
         {isLoading ? (
           <div className="p-12 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-sm text-gray-500 mt-3">Laster treningsprogrammer...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+              Laster treningsprogrammer...
+            </p>
           </div>
         ) : exercisePrograms.length > 0 ? (
           <div className="divide-y divide-gray-100">
@@ -128,10 +130,12 @@ export default function PatientExercises() {
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-900">{program.name}</h3>
-                      <p className="text-sm text-gray-500">{program.exerciseCount} ovelser</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {program.exerciseCount} ovelser
+                      </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                 </div>
               </div>
             ))}
@@ -140,7 +144,7 @@ export default function PatientExercises() {
           <div className="p-12 text-center">
             <Dumbbell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <h3 className="text-lg font-medium text-gray-900 mb-1">Ingen treningsprogrammer</h3>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
               Opprett et nytt treningsprogram for denne pasienten
             </p>
             <button

@@ -135,7 +135,7 @@ export default function BatchExaminationForm({ encounterId, chiefComplaint, isOp
       case 'equivocal':
         return 'bg-yellow-100 text-yellow-800 border-yellow-300';
       default:
-        return 'bg-gray-100 text-gray-600 border-gray-300';
+        return 'bg-gray-100 text-gray-600 dark:text-gray-300 border-gray-300';
     }
   };
 
@@ -189,20 +189,26 @@ export default function BatchExaminationForm({ encounterId, chiefComplaint, isOp
                         <h5 className="text-sm font-semibold text-gray-900 group-hover:text-indigo-900">
                           {set.set_name_no || set.set_name}
                         </h5>
-                        <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
                           {set.protocol_count || 0} tester
                         </span>
                       </div>
                       {set.description_no && (
-                        <p className="text-xs text-gray-600 line-clamp-2">{set.description_no}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
+                          {set.description_no}
+                        </p>
                       )}
                     </button>
                   ))}
                 </div>
               ) : (
                 <div className="text-center py-12 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Ingen maler tilgjengelig</p>
-                  <p className="text-xs text-gray-500 mt-1">Lukk og velg enkelttest i stedet</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    Ingen maler tilgjengelig
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    Lukk og velg enkelttest i stedet
+                  </p>
                 </div>
               )}
             </div>
@@ -254,7 +260,9 @@ export default function BatchExaminationForm({ encounterId, chiefComplaint, isOp
                         />
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="text-xs font-bold text-gray-500">#{index + 1}</span>
+                            <span className="text-xs font-bold text-gray-500 dark:text-gray-400">
+                              #{index + 1}
+                            </span>
                             <h5 className="text-sm font-semibold text-gray-900">
                               {protocol.test_name_no || protocol.test_name}
                             </h5>
@@ -263,7 +271,9 @@ export default function BatchExaminationForm({ encounterId, chiefComplaint, isOp
                             )}
                           </div>
                           {protocol.description_no && (
-                            <p className="text-xs text-gray-600">{protocol.description_no}</p>
+                            <p className="text-xs text-gray-600 dark:text-gray-300">
+                              {protocol.description_no}
+                            </p>
                           )}
                         </div>
                       </div>
@@ -368,7 +378,7 @@ export default function BatchExaminationForm({ encounterId, chiefComplaint, isOp
         {/* Footer */}
         {selectedTemplateSet && (
           <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-between items-center">
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-300">
               {
                 protocols.filter(
                   (p) => findings[p.id]?.selected && findings[p.id]?.result !== 'not_tested'

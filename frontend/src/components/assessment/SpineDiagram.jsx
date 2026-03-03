@@ -317,8 +317,12 @@ export default function SpineDiagram({
             </svg>
 
             {/* Side indicators */}
-            <div className="absolute top-0 left-0 text-xs text-gray-500 font-medium">L</div>
-            <div className="absolute top-0 right-0 text-xs text-gray-500 font-medium">R</div>
+            <div className="absolute top-0 left-0 text-xs text-gray-500 dark:text-gray-400 font-medium">
+              L
+            </div>
+            <div className="absolute top-0 right-0 text-xs text-gray-500 dark:text-gray-400 font-medium">
+              R
+            </div>
           </div>
 
           {/* Sacrum/Pelvis buttons */}
@@ -354,7 +358,7 @@ export default function SpineDiagram({
                 </h4>
                 <button
                   onClick={() => setSelectedVertebra(null)}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 dark:text-gray-300 hover:text-gray-600"
                 >
                   ×
                 </button>
@@ -362,7 +366,9 @@ export default function SpineDiagram({
 
               {/* Finding Type Selection */}
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">Finding Type</label>
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                  Finding Type
+                </label>
                 <div className="grid grid-cols-2 gap-2">
                   {Object.entries(FINDING_TYPES).map(([key, type]) => (
                     <div key={key} className="space-y-1">
@@ -377,7 +383,7 @@ export default function SpineDiagram({
                               className={`px-2 py-1 text-xs rounded transition-all ${
                                 isActive
                                   ? `bg-${type.color}-500 text-white`
-                                  : `bg-gray-100 text-gray-600 hover:bg-${type.color}-100`
+                                  : `bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-${type.color}-100`
                               }`}
                               title={sideLabel}
                             >
@@ -394,7 +400,7 @@ export default function SpineDiagram({
               {/* Current findings for this vertebra */}
               {getVertebraFindings(selectedVertebra).length > 0 && (
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-2">
+                  <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                     Current Findings for {selectedVertebra}
                   </label>
                   <div className="flex flex-wrap gap-1">
@@ -406,7 +412,7 @@ export default function SpineDiagram({
                         {FINDING_TYPES[f.type].abbrev} {f.side}
                         <button
                           onClick={() => addFinding(f.vertebra, f.type, f.side)}
-                          className="text-gray-400 hover:text-red-600"
+                          className="text-gray-400 dark:text-gray-300 hover:text-red-600"
                         >
                           ×
                         </button>
@@ -418,13 +424,13 @@ export default function SpineDiagram({
             </div>
           ) : (
             <div className="h-full flex flex-col">
-              <p className="text-sm text-gray-500 mb-4">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Click a vertebra on the spine diagram to add findings
               </p>
 
               {/* Legend */}
               <div className="space-y-2">
-                <h5 className="text-xs font-medium text-gray-500">Legend</h5>
+                <h5 className="text-xs font-medium text-gray-500 dark:text-gray-400">Legend</h5>
                 <div className="grid grid-cols-2 gap-2 text-xs">
                   {Object.entries(FINDING_TYPES).map(([key, type]) => (
                     <div key={key} className="flex items-center gap-2">
@@ -438,7 +444,9 @@ export default function SpineDiagram({
               {/* Quick summary of all findings */}
               {totalFindings > 0 && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
-                  <h5 className="text-xs font-medium text-gray-500 mb-2">All Findings</h5>
+                  <h5 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                    All Findings
+                  </h5>
                   <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto">
                     {Object.values(findings).map((f) => (
                       <span
@@ -498,7 +506,9 @@ export function QuickVertebraSelect({ findings = {}, onChange }) {
     <div className="space-y-3">
       {Object.entries(SPINE_REGIONS).map(([regionKey, region]) => (
         <div key={regionKey}>
-          <label className="block text-xs font-medium text-gray-500 mb-1">{region.label}</label>
+          <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+            {region.label}
+          </label>
           <div className="flex flex-wrap gap-1">
             {region.vertebrae.map((v) => (
               <button

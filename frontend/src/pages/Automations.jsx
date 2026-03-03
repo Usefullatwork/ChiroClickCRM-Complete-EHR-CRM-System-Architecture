@@ -429,7 +429,7 @@ export default function Automations() {
             <Zap className="w-7 h-7 text-blue-600" />
             {t.title}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">{t.subtitle}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t.subtitle}</p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -462,7 +462,7 @@ export default function Automations() {
               className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
                 activeTab === tab.id
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -493,7 +493,11 @@ export default function Automations() {
       )}
 
       {activeTab === 'executions' && (
-        <Suspense fallback={<div className="text-gray-500 p-4">Loading execution history...</div>}>
+        <Suspense
+          fallback={
+            <div className="text-gray-500 dark:text-gray-400 p-4">Loading execution history...</div>
+          }
+        >
           <ExecutionHistoryTab
             executions={executions}
             executionsLoading={executionsLoading}
@@ -508,7 +512,11 @@ export default function Automations() {
       )}
 
       {activeTab === 'stats' && (
-        <Suspense fallback={<div className="text-gray-500 p-4">Loading statistics...</div>}>
+        <Suspense
+          fallback={
+            <div className="text-gray-500 dark:text-gray-400 p-4">Loading statistics...</div>
+          }
+        >
           <AutomationStatsTab
             stats={stats}
             statsLoading={statsLoading}

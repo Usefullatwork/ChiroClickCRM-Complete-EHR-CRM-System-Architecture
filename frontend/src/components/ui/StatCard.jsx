@@ -33,7 +33,7 @@ export default function StatCard({
       ? 'text-green-600 dark:text-green-400'
       : trend < 0
         ? 'text-red-600 dark:text-red-400'
-        : 'text-gray-400';
+        : 'text-gray-400 dark:text-gray-300';
 
   const Wrapper = onClick ? 'button' : 'div';
 
@@ -55,7 +55,7 @@ export default function StatCard({
               <TrendIcon className={`w-3.5 h-3.5 ${trendColor}`} />
               <span className={`text-xs font-medium ${trendColor}`}>{Math.abs(trend)}%</span>
               {trendLabel && (
-                <span className="text-xs text-gray-400 dark:text-gray-500">{trendLabel}</span>
+                <span className="text-xs text-gray-400 dark:text-gray-300">{trendLabel}</span>
               )}
             </div>
           )}

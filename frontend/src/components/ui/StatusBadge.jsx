@@ -76,7 +76,7 @@ const STATUS_CONFIG = {
   inactive: {
     icon: Pause,
     bg: 'bg-gray-50',
-    text: 'text-gray-600',
+    text: 'text-gray-600 dark:text-gray-300',
     darkBg: 'dark:bg-gray-800',
     darkText: 'dark:text-gray-400',
   },

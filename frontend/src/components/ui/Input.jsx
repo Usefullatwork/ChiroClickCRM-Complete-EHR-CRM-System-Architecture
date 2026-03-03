@@ -7,11 +7,13 @@ export const Input = ({ label, error, helperText, required = false, className = 
       </label>
     )}
     <input
-      className={`block w-full rounded-md border-slate-300 border shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm py-2 px-3 disabled:bg-slate-50 disabled:text-slate-500 ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''} ${className}`}
+      className={`block w-full rounded-md border-slate-300 border shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm py-2 px-3 disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''} ${className}`}
       {...props}
     />
     {error && <p className="text-sm text-red-600">{error}</p>}
-    {helperText && !error && <p className="text-sm text-slate-500">{helperText}</p>}
+    {helperText && !error && (
+      <p className="text-sm text-slate-500 dark:text-slate-400">{helperText}</p>
+    )}
   </div>
 );
 
@@ -33,11 +35,13 @@ export const TextArea = ({
     )}
     <textarea
       rows={rows}
-      className={`block w-full rounded-md border-slate-300 border shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm py-2 px-3 disabled:bg-slate-50 disabled:text-slate-500 ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''} ${className}`}
+      className={`block w-full rounded-md border-slate-300 border shadow-sm focus:border-teal-500 focus:ring-teal-500 sm:text-sm py-2 px-3 disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 ${error ? 'border-red-300 focus:border-red-500 focus:ring-red-500' : ''} ${className}`}
       {...props}
     />
     {error && <p className="text-sm text-red-600">{error}</p>}
-    {helperText && !error && <p className="text-sm text-slate-500">{helperText}</p>}
+    {helperText && !error && (
+      <p className="text-sm text-slate-500 dark:text-slate-400">{helperText}</p>
+    )}
   </div>
 );
 

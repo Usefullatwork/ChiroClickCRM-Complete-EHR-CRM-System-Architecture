@@ -146,9 +146,9 @@ function Section({ title, icon: Icon, children, defaultOpen = true }) {
           <span className="font-medium text-gray-900">{title}</span>
         </div>
         {isOpen ? (
-          <ChevronUp className="w-5 h-5 text-gray-500" />
+          <ChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-500" />
+          <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         )}
       </button>
       {isOpen && <div className="p-4 bg-white">{children}</div>}
@@ -368,7 +368,9 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
               <Send className="w-7 h-7 text-indigo-600" />
               {t('referral', 'title', language)}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">{t('referral', 'subtitle', language)}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {t('referral', 'subtitle', language)}
+            </p>
           </div>
           <button
             onClick={() => setShowPreview(!showPreview)}
@@ -421,7 +423,7 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
                     : option.value === 'soon'
                       ? 'bg-yellow-100 text-yellow-700 ring-1 ring-yellow-500'
                       : 'bg-gray-100 text-gray-700 ring-1 ring-gray-400'
-                  : 'bg-white text-gray-500 border border-gray-200'
+                  : 'bg-white text-gray-500 dark:text-gray-400 border border-gray-200'
               }`}
             >
               {option.value === 'urgent' && <AlertCircle className="w-3 h-3" />}

@@ -155,7 +155,7 @@ const PatientPortal = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Laster øvelser...</p>
+          <p className="text-gray-600 dark:text-gray-300">Laster øvelser...</p>
         </div>
       </div>
     );
@@ -172,8 +172,8 @@ const PatientPortal = () => {
           <h1 className="text-xl font-semibold text-gray-900 mb-2">
             Øvelsene er ikke tilgjengelige
           </h1>
-          <p className="text-gray-600 mb-6">{error}</p>
-          <p className="text-sm text-gray-500">
+          <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             Kontakt klinikken for å få en ny lenke til øvelsene dine.
           </p>
         </div>
@@ -192,7 +192,7 @@ const PatientPortal = () => {
             </div>
             <div>
               <h1 className="font-semibold text-gray-900">{prescription?.clinicName}</h1>
-              <p className="text-sm text-gray-500">Ditt øvelsesprogram</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Ditt øvelsesprogram</p>
             </div>
           </div>
         </div>
@@ -202,7 +202,7 @@ const PatientPortal = () => {
       <main className="max-w-3xl mx-auto px-4 py-6">
         {/* Prescription Info */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-          <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+          <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-300">
             <div className="flex items-center gap-2">
               <User className="w-4 h-4" />
               <span>Foreskrevet av: {prescription?.prescribedBy}</span>
@@ -248,7 +248,7 @@ const PatientPortal = () => {
                 }}
               />
             </div>
-            <span className="text-sm font-medium text-gray-600">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
               {completedExercises.size} / {prescription?.exercises?.length || 0}
             </span>
           </div>
@@ -290,7 +290,9 @@ const PatientPortal = () => {
                   <div className="flex-1 min-w-0">
                     <h3 className="font-medium text-gray-900">{exercise.name}</h3>
                     <div className="flex flex-wrap items-center gap-2 mt-1">
-                      <span className="text-xs text-gray-500">{exercise.category}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        {exercise.category}
+                      </span>
                       <span
                         className={`text-xs px-2 py-0.5 rounded ${getDifficultyColor(exercise.difficultyLevel)}`}
                       >
@@ -306,7 +308,7 @@ const PatientPortal = () => {
                   </div>
 
                   {/* Expand Button */}
-                  <div className="text-gray-400">
+                  <div className="text-gray-400 dark:text-gray-300">
                     {expandedExercise === index ? (
                       <ChevronUp className="w-5 h-5" />
                     ) : (
@@ -316,22 +318,22 @@ const PatientPortal = () => {
                 </div>
 
                 {/* Parameters */}
-                <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600">
+                <div className="flex flex-wrap items-center gap-4 mt-3 text-sm text-gray-600 dark:text-gray-300">
                   {exercise.sets && (
                     <span className="flex items-center gap-1">
-                      <Target className="w-4 h-4 text-gray-400" />
+                      <Target className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                       {exercise.sets} sett
                     </span>
                   )}
                   {exercise.reps && (
                     <span className="flex items-center gap-1">
-                      <Activity className="w-4 h-4 text-gray-400" />
+                      <Activity className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                       {exercise.reps} rep
                     </span>
                   )}
                   {exercise.holdSeconds && (
                     <span className="flex items-center gap-1">
-                      <Clock className="w-4 h-4 text-gray-400" />
+                      <Clock className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                       Hold {exercise.holdSeconds} sek
                     </span>
                   )}
@@ -370,7 +372,7 @@ const PatientPortal = () => {
                   <div className="p-4 space-y-4">
                     <div>
                       <h4 className="text-sm font-medium text-gray-700 mb-2">Instruksjoner</h4>
-                      <p className="text-sm text-gray-600 whitespace-pre-line">
+                      <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">
                         {exercise.instructions}
                       </p>
                     </div>
@@ -443,7 +445,7 @@ const PatientPortal = () => {
         </div>
 
         {/* Footer */}
-        <div className="mt-8 p-4 text-center text-sm text-gray-500">
+        <div className="mt-8 p-4 text-center text-sm text-gray-500 dark:text-gray-400">
           <p>Stopp øvelsene hvis du opplever økt smerte og kontakt klinikken.</p>
           <p className="mt-2">Dette programmet er personlig tilpasset deg.</p>
         </div>
@@ -463,7 +465,9 @@ const PatientPortal = () => {
               </button>
             </div>
 
-            <p className="text-sm text-gray-600 mb-4">{showFeedbackModal.name}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              {showFeedbackModal.name}
+            </p>
 
             <div className="space-y-4">
               {/* Sets/Reps Completed */}
@@ -528,7 +532,7 @@ const PatientPortal = () => {
                     </button>
                   ))}
                 </div>
-                <div className="flex justify-between text-xs text-gray-500 mt-1">
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
                   <span>Lett</span>
                   <span>Vanskelig</span>
                 </div>
@@ -552,7 +556,7 @@ const PatientPortal = () => {
                   min="0"
                   max="10"
                 />
-                <div className="flex justify-between text-xs text-gray-500">
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
                   <span>Ingen smerte</span>
                   <span className="font-medium">{feedbackData.painRating}</span>
                   <span>Verst tenkelig</span>

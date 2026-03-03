@@ -152,7 +152,9 @@ export default function PlanSection({
                 </span>
               ))}
               {(!consultData.icd10_codes || consultData.icd10_codes.length === 0) && (
-                <span className="text-sm text-gray-500">Ingen koder lagt til</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  Ingen koder lagt til
+                </span>
               )}
             </div>
           </div>

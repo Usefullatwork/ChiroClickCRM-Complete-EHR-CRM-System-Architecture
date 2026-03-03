@@ -33,7 +33,7 @@ export function AIAssistantPanel({
         {!aiSuggestions ? (
           <div className="text-center py-8">
             <Brain className="w-12 h-12 text-purple-300 mx-auto mb-3" />
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
               F{'\u00E5'} AI-drevne kliniske forslag basert p{'\u00E5'} SOAP-notatene
             </p>
             <button
@@ -110,7 +110,7 @@ export function AIAssistantPanel({
         )}
       </div>
       <div className="bg-gray-50 px-4 py-2 border-t border-gray-200">
-        <p className="text-xs text-gray-500 text-center">
+        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
           AI-forslag er kun veiledende. Bruk alltid klinisk skj{'\u00F8'}nn.
         </p>
       </div>

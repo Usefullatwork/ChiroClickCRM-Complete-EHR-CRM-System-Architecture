@@ -153,10 +153,14 @@ const StatsSummary = ({ stats, language = 'NO' }) => {
             <Icon size={20} />
           </div>
           <div>
-            <p className="text-xs text-slate-500 font-medium">{label}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{label}</p>
             <p className="text-lg font-bold text-slate-900">
               {value}
-              {suffix && <span className="text-sm font-normal text-slate-500">{suffix}</span>}
+              {suffix && (
+                <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
+                  {suffix}
+                </span>
+              )}
             </p>
           </div>
         </div>
@@ -283,13 +287,13 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500 hidden sm:block">
+          <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
             {formatDate(createdAt, language)}
           </span>
           {expanded ? (
-            <ChevronUp size={18} className="text-slate-400" />
+            <ChevronUp size={18} className="text-slate-400 dark:text-slate-300" />
           ) : (
-            <ChevronDown size={18} className="text-slate-400" />
+            <ChevronDown size={18} className="text-slate-400 dark:text-slate-300" />
           )}
         </div>
       </button>
@@ -299,7 +303,7 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
         <div className="px-4 py-3 space-y-3 bg-white animate-slide-down">
           {/* Original Suggestion */}
           <div>
-            <p className="text-xs font-medium text-slate-500 mb-1">
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
               {language === 'NO' ? 'Opprinnelig forslag' : 'Original Suggestion'}
             </p>
             <p className="text-sm text-slate-700 bg-slate-50 p-2 rounded">
@@ -312,7 +316,7 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
           {/* User Correction (if modified) */}
           {userCorrection && (
             <div>
-              <p className="text-xs font-medium text-slate-500 mb-1">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
                 {language === 'NO' ? 'Din korrigering' : 'Your Correction'}
               </p>
               <p className="text-sm text-slate-700 bg-blue-50 p-2 rounded border border-blue-200">
@@ -326,15 +330,15 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
           {/* Feedback Notes */}
           {feedbackNotes && (
             <div>
-              <p className="text-xs font-medium text-slate-500 mb-1">
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
                 {language === 'NO' ? 'Kommentarer' : 'Notes'}
               </p>
-              <p className="text-sm text-slate-600 italic">{feedbackNotes}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 italic">{feedbackNotes}</p>
             </div>
           )}
 
           {/* Meta Info */}
-          <div className="flex items-center gap-4 pt-2 border-t border-slate-100 text-xs text-slate-500">
+          <div className="flex items-center gap-4 pt-2 border-t border-slate-100 text-xs text-slate-500 dark:text-slate-400">
             <span className="flex items-center gap-1">
               <Clock size={12} />
               {formatDecisionTime(timeToDecision)}
@@ -423,7 +427,7 @@ export const AIFeedbackHistory = ({
         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold text-slate-900">{t.title}</h2>
-            <p className="text-sm text-slate-500">{t.subtitle}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t.subtitle}</p>
           </div>
 
           {onRefresh && (
@@ -445,7 +449,7 @@ export const AIFeedbackHistory = ({
           <div className="flex flex-wrap gap-3 mb-4">
             {/* Type Filter */}
             <div className="flex items-center gap-2">
-              <Filter size={16} className="text-slate-400" />
+              <Filter size={16} className="text-slate-400 dark:text-slate-300" />
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
@@ -462,7 +466,7 @@ export const AIFeedbackHistory = ({
 
             {/* Date Filter */}
             <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-slate-400" />
+              <Calendar size={16} className="text-slate-400 dark:text-slate-300" />
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
@@ -480,7 +484,7 @@ export const AIFeedbackHistory = ({
           {isLoading && (
             <div className="flex items-center justify-center py-12">
               <RefreshCw size={24} className="text-teal-600 animate-spin" />
-              <span className="ml-2 text-slate-600">{t.loading}</span>
+              <span className="ml-2 text-slate-600 dark:text-slate-300">{t.loading}</span>
             </div>
           )}
 
@@ -488,8 +492,8 @@ export const AIFeedbackHistory = ({
           {!isLoading && filteredFeedback.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <History size={48} className="text-slate-300 mb-4" />
-              <p className="text-slate-600 font-medium">{t.noFeedback}</p>
-              <p className="text-sm text-slate-400">{t.noFeedbackSubtitle}</p>
+              <p className="text-slate-600 dark:text-slate-300 font-medium">{t.noFeedback}</p>
+              <p className="text-sm text-slate-400 dark:text-slate-300">{t.noFeedbackSubtitle}</p>
             </div>
           )}
 

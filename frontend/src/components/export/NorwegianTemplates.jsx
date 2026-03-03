@@ -489,7 +489,7 @@ export default function NorwegianDocumentTemplates({
           <FileText className="w-5 h-5 text-blue-500" />
           {t.title}
         </h3>
-        <p className="text-sm text-gray-500">{t.subtitle}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
       </div>
 
       <div className="p-6 space-y-6">
@@ -511,7 +511,7 @@ export default function NorwegianDocumentTemplates({
                 <p className="font-medium text-gray-900">
                   {template.name[language] || template.name.no}
                 </p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {template.description[language] || template.description.no}
                 </p>
               </button>
@@ -570,7 +570,7 @@ export default function NorwegianDocumentTemplates({
               <div className="flex gap-2">
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 bg-gray-100 rounded-lg"
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 bg-gray-100 rounded-lg"
                 >
                   {copied ? (
                     <Check className="w-4 h-4 text-green-500" />

@@ -83,11 +83,13 @@ function TimeColumn({ workHours }) {
       <div className="relative">
         {hours.slice(0, -1).map((hour) => (
           <div key={hour} className="relative" style={{ height: `${HOUR_HEIGHT}px` }}>
-            <span className="absolute -top-2.5 right-2 text-xs text-gray-500 font-medium">
+            <span className="absolute -top-2.5 right-2 text-xs text-gray-500 dark:text-gray-400 font-medium">
               {String(hour).padStart(2, '0')}:00
             </span>
             {/* Half hour mark */}
-            <span className="absolute top-[29px] right-2 text-[10px] text-gray-400">:30</span>
+            <span className="absolute top-[29px] right-2 text-[10px] text-gray-400 dark:text-gray-300">
+              :30
+            </span>
           </div>
         ))}
       </div>
@@ -192,7 +194,9 @@ function DayColumn({
           isTodayDate ? 'bg-blue-50' : 'bg-white'
         }`}
       >
-        <div className="text-xs text-gray-500 uppercase tracking-wide font-medium">{dayName}</div>
+        <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-medium">
+          {dayName}
+        </div>
         <div
           className={`text-lg font-bold mt-0.5 ${
             isTodayDate
@@ -329,7 +333,7 @@ export default function WeekView({
       <div className="flex items-center justify-center h-full bg-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
-          <p className="mt-4 text-gray-500">Laster kalender...</p>
+          <p className="mt-4 text-gray-500 dark:text-gray-400">Laster kalender...</p>
         </div>
       </div>
     );

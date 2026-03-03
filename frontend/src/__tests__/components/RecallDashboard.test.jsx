@@ -57,7 +57,7 @@ describe('RecallDashboard Component', () => {
 
     it('should render the description text', async () => {
       render(<RecallDashboard />, { wrapper: createWrapper() });
-      expect(screen.getByText(/Pasienter som bor kalles inn til ny time/)).toBeInTheDocument();
+      expect(screen.getByText(/Pasienter som bør kalles inn til ny time/)).toBeInTheDocument();
     });
   });
 
@@ -118,7 +118,7 @@ describe('RecallDashboard Component', () => {
       render(<RecallDashboard />, { wrapper: createWrapper() });
 
       await waitFor(() => {
-        expect(screen.getByText('Ingen pasienter trenger recall akkurat na.')).toBeInTheDocument();
+        expect(screen.getByText('Ingen pasienter trenger recall akkurat nå.')).toBeInTheDocument();
       });
     });
   });
@@ -147,7 +147,7 @@ describe('RecallDashboard Component', () => {
       });
 
       // Search for "Kari"
-      const searchInput = screen.getByPlaceholderText('Sok pasient eller tilstand...');
+      const searchInput = screen.getByPlaceholderText('Søk pasient eller tilstand...');
       fireEvent.change(searchInput, { target: { value: 'Kari' } });
 
       await waitFor(() => {
@@ -169,11 +169,11 @@ describe('RecallDashboard Component', () => {
         expect(screen.getByText('Ola Nordmann')).toBeInTheDocument();
       });
 
-      const searchInput = screen.getByPlaceholderText('Sok pasient eller tilstand...');
+      const searchInput = screen.getByPlaceholderText('Søk pasient eller tilstand...');
       fireEvent.change(searchInput, { target: { value: 'zzzzz' } });
 
       await waitFor(() => {
-        expect(screen.getByText('Ingen pasienter matcher soket.')).toBeInTheDocument();
+        expect(screen.getByText('Ingen pasienter matcher søket.')).toBeInTheDocument();
       });
     });
   });
@@ -430,7 +430,7 @@ describe('RecallDashboard Component', () => {
       await waitFor(() => {
         // /Pasient/ matches description text and <th>, so use getAllByText
         expect(screen.getAllByText(/Pasient/).length).toBeGreaterThanOrEqual(1);
-        expect(screen.getAllByText(/Siste besok/).length).toBeGreaterThanOrEqual(1);
+        expect(screen.getAllByText(/Siste besøk/).length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText(/Tilstand/).length).toBeGreaterThanOrEqual(1);
         expect(screen.getAllByText(/Dager forfalt/).length).toBeGreaterThanOrEqual(1);
       });

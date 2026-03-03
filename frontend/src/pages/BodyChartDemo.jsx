@@ -351,7 +351,7 @@ export default function BodyChartDemo() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">{t.title}</h1>
-                <p className="text-sm text-gray-500">{t.subtitle}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
               </div>
             </div>
 
@@ -390,7 +390,7 @@ export default function BodyChartDemo() {
                 <FileText className="w-4 h-4 text-sky-500" />
                 {t.instructions}
               </h3>
-              <ol className="space-y-2 text-sm text-gray-600">
+              <ol className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 {t.instructionsList.map((instruction, i) => (
                   <li key={i} className="flex gap-2">
                     <span
@@ -417,7 +417,9 @@ export default function BodyChartDemo() {
                               border border-gray-200 hover:border-sky-300 transition-colors"
                   >
                     <span className="font-medium text-gray-800 block">{scenario.name}</span>
-                    <span className="text-xs text-gray-500">{scenario.description}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {scenario.description}
+                    </span>
                     <span className="text-xs text-sky-600 mt-1 block">
                       {scenario.markers.length} {t.markersCount}
                     </span>
@@ -504,7 +506,7 @@ export default function BodyChartDemo() {
             <Maximize2 className="w-4 h-4 text-sky-500" />
             {lang === 'no' ? 'Hurtigknapper for Regioner' : 'Quick Region Buttons'}
           </h3>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
             {lang === 'no'
               ? 'Klikk på en knapp for å raskt legge til en markør i den regionen.'
               : 'Click a button to quickly add a marker in that region.'}

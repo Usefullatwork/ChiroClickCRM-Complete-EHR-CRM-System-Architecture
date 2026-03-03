@@ -261,9 +261,9 @@ export default function SOAPTemplate({
           <h3 className={`font-semibold text-${color}-900 text-sm sm:text-base`}>{title}</h3>
         </div>
         {expandedSections[id] ? (
-          <ChevronUp className="w-5 h-5 text-gray-500 flex-shrink-0" />
+          <ChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-500 flex-shrink-0" />
+          <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400 flex-shrink-0" />
         )}
       </button>
       {expandedSections[id] && <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">{children}</div>}
@@ -283,7 +283,7 @@ export default function SOAPTemplate({
         rows={rows}
         placeholder={placeholder}
         disabled={readOnly}
-        className="w-full px-3 sm:px-4 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 resize-none text-base sm:text-sm"
+        className="w-full px-3 sm:px-4 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 dark:text-gray-400 resize-none text-base sm:text-sm"
       />
     </div>
   );
@@ -302,7 +302,7 @@ export default function SOAPTemplate({
         }
         placeholder={placeholder}
         disabled={readOnly}
-        className="w-full px-3 sm:px-4 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 text-base sm:text-sm min-h-[44px]"
+        className="w-full px-3 sm:px-4 py-2.5 sm:py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 dark:text-gray-400 text-base sm:text-sm min-h-[44px]"
         min={type === 'number' ? '0' : undefined}
         max={type === 'number' ? '10' : undefined}
       />
@@ -316,7 +316,7 @@ export default function SOAPTemplate({
         <div>
           <h2 className="text-lg font-semibold text-gray-900">SOAP Notat</h2>
           {patient && (
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {patient.firstName} {patient.lastName}
             </p>
           )}
@@ -626,7 +626,7 @@ export default function SOAPTemplate({
               <h3 className="font-semibold text-gray-900">Velg mal</h3>
               <button
                 onClick={() => setShowTemplateSelector(false)}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -642,13 +642,17 @@ export default function SOAPTemplate({
                     >
                       <h4 className="font-medium text-gray-900">{template.name}</h4>
                       {template.description && (
-                        <p className="text-sm text-gray-500 mt-1">{template.description}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                          {template.description}
+                        </p>
                       )}
                     </button>
                   ))}
                 </div>
               ) : (
-                <p className="text-center text-gray-500 py-8">Ingen maler tilgjengelig</p>
+                <p className="text-center text-gray-500 dark:text-gray-400 py-8">
+                  Ingen maler tilgjengelig
+                </p>
               )}
             </div>
 

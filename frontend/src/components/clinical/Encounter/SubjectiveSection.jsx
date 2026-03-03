@@ -18,7 +18,7 @@ export default function SubjectiveSection({
           Subjektivt
         </h3>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500">VAS Start:</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">VAS Start:</span>
           <input
             type="range"
             min="0"
@@ -44,12 +44,12 @@ export default function SubjectiveSection({
           onChange={(e) => updateField('subjective', 'chief_complaint', e.target.value)}
           disabled={isSigned}
           aria-label="Hovedklage"
-          className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+          className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
         />
         <textarea
           placeholder="Anamnese og symptombeskrivelse... (bruk .bs for makro)"
           aria-label="Anamnese og symptombeskrivelse"
-          className="w-full min-h-[100px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+          className="w-full min-h-[100px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
           value={encounterData.subjective.history}
           onChange={(e) => {
             if (!onTextInputWithMacros(e, 'subjective', 'history')) {
@@ -65,7 +65,7 @@ export default function SubjectiveSection({
               <button
                 key={phrase}
                 onClick={() => onQuickPhrase(phrase, 'subjective', 'history')}
-                className="px-2.5 py-1 text-xs rounded-full bg-slate-100 text-slate-600 hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                className="px-2.5 py-1 text-xs rounded-full bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-blue-100 hover:text-blue-700 transition-colors"
               >
                 + {phrase}
               </button>
@@ -80,7 +80,7 @@ export default function SubjectiveSection({
             onChange={(e) => updateField('subjective', 'onset', e.target.value)}
             disabled={isSigned}
             aria-label="Debut"
-            className="px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+            className="px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
           />
           <input
             type="text"
@@ -89,7 +89,7 @@ export default function SubjectiveSection({
             onChange={(e) => updateField('subjective', 'pain_description', e.target.value)}
             disabled={isSigned}
             aria-label="Smertebeskrivelse"
-            className="px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+            className="px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
           />
         </div>
       </div>

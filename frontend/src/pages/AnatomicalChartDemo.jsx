@@ -92,7 +92,7 @@ export default function AnatomicalChartDemo() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">{t.title}</h1>
-                <p className="text-sm text-gray-500">{t.subtitle}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
               </div>
             </div>
 
@@ -102,7 +102,7 @@ export default function AnatomicalChartDemo() {
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm ${
                   showInfo
                     ? 'bg-indigo-100 text-indigo-700'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
                 }`}
               >
                 <Info className="w-4 h-4" />
@@ -132,7 +132,7 @@ export default function AnatomicalChartDemo() {
                 <Layers className="w-4 h-4 text-indigo-500" />
                 {t.features}
               </h3>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 {t.featureList.map((feature, i) => (
                   <li key={i} className="flex gap-2">
                     <span className="text-indigo-500">•</span>
@@ -156,7 +156,7 @@ export default function AnatomicalChartDemo() {
                       <span className="w-4 h-4 rounded" style={{ backgroundColor: d.color }} />
                       <div>
                         <span className="text-xs font-bold text-gray-700">{id}</span>
-                        <span className="text-xs text-gray-500 ml-1">
+                        <span className="text-xs text-gray-500 dark:text-gray-400 ml-1">
                           {d[lang]?.area?.split(',')[0] || d.en?.area?.split(',')[0]}
                         </span>
                       </div>

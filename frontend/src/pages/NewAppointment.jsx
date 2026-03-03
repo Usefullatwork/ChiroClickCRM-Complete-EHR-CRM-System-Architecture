@@ -153,7 +153,7 @@ export default function NewAppointment() {
           </button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{t('newAppointment')}</h1>
-            <p className="text-gray-600">{t('scheduleNewAppointment')}</p>
+            <p className="text-gray-600 dark:text-gray-300">{t('scheduleNewAppointment')}</p>
           </div>
         </div>
       </div>
@@ -170,7 +170,7 @@ export default function NewAppointment() {
         {/* Patient & Practitioner Selection */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
-            <User className="w-5 h-5 text-gray-600" />
+            <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             <h2 className="text-lg font-semibold">{t('patientPractitioner')}</h2>
           </div>
 
@@ -202,7 +202,9 @@ export default function NewAppointment() {
                       <p className="text-sm font-medium">
                         {patient.first_name} {patient.last_name}
                       </p>
-                      <p className="text-xs text-gray-500">ID: {patient.solvit_id}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        ID: {patient.solvit_id}
+                      </p>
                     </button>
                   ))}
                 </div>
@@ -241,7 +243,7 @@ export default function NewAppointment() {
         {/* Appointment Time */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
-            <Calendar className="w-5 h-5 text-gray-600" />
+            <Calendar className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             <h2 className="text-lg font-semibold">{t('dateTime')}</h2>
           </div>
 
@@ -285,7 +287,7 @@ export default function NewAppointment() {
         {/* Appointment Details */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
-            <Clock className="w-5 h-5 text-gray-600" />
+            <Clock className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             <h2 className="text-lg font-semibold">{t('appointmentDetails')}</h2>
           </div>
 
@@ -342,7 +344,7 @@ export default function NewAppointment() {
         {/* Recurring Appointments */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
-            <Repeat className="w-5 h-5 text-gray-600" />
+            <Repeat className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             <h2 className="text-lg font-semibold">{t('recurringAppointment')}</h2>
           </div>
 

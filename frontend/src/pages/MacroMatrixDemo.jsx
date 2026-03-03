@@ -39,7 +39,7 @@ export default function MacroMatrixDemo() {
                 <Zap className="w-6 h-6 text-amber-500" />
                 {lang === 'no' ? 'MacroMatrix Demo' : 'MacroMatrix Demo'}
               </h1>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {lang === 'no'
                   ? '15-sekunders SOAP-notat med makroer'
                   : '15-second SOAP notes with macros'}
@@ -87,7 +87,7 @@ export default function MacroMatrixDemo() {
               </h3>
               <div className="space-y-4">
                 <div>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                     {lang === 'no' ? 'Justeringer' : 'Adjustments'}
                   </p>
                   <MacroMatrixInline
@@ -98,7 +98,7 @@ export default function MacroMatrixDemo() {
                   />
                 </div>
                 <div>
-                  <p className="text-xs text-gray-500 mb-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
                     {lang === 'no' ? 'Behandlinger' : 'Therapies'}
                   </p>
                   <MacroMatrixInline
@@ -132,7 +132,7 @@ export default function MacroMatrixDemo() {
                   <button
                     onClick={handleClear}
                     disabled={!noteContent}
-                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 text-gray-700 disabled:text-gray-400 rounded-lg transition-colors"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 disabled:bg-gray-50 text-gray-700 disabled:text-gray-400 dark:text-gray-300 rounded-lg transition-colors"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                     {lang === 'no' ? 'Tøm' : 'Clear'}
@@ -146,7 +146,7 @@ export default function MacroMatrixDemo() {
                     {noteContent}
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center justify-center h-[400px] text-center text-gray-400">
+                  <div className="flex flex-col items-center justify-center h-[400px] text-center text-gray-400 dark:text-gray-300">
                     <FileText className="w-12 h-12 mb-3 opacity-50" />
                     <p className="text-sm">
                       {lang === 'no'
@@ -164,7 +164,7 @@ export default function MacroMatrixDemo() {
 
               {noteContent && (
                 <div className="px-4 py-2 bg-gray-50 border-t border-gray-200">
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
                     {noteContent.length} {lang === 'no' ? 'tegn' : 'characters'} |{' '}
                     {noteContent.split(/\s+/).filter(Boolean).length}{' '}
                     {lang === 'no' ? 'ord' : 'words'}

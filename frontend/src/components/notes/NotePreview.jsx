@@ -145,7 +145,9 @@ export default function NotePreview({
 
     return (
       <div>
-        <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</dt>
+        <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+          {label}
+        </dt>
         <dd className="mt-0.5 text-sm text-gray-900 whitespace-pre-wrap">
           {Array.isArray(value) ? value.join(', ') : value}
         </dd>
@@ -189,7 +191,9 @@ export default function NotePreview({
                   </span>
                 )}
               </div>
-              <p className="text-sm text-gray-500">{formatDate(note?.note_date)}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {formatDate(note?.note_date)}
+              </p>
             </div>
           </div>
 
@@ -228,7 +232,7 @@ export default function NotePreview({
               </button>
             )}
             <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
           </div>
         </div>
@@ -238,7 +242,7 @@ export default function NotePreview({
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-3 text-gray-500">Laster notat...</span>
+              <span className="ml-3 text-gray-500 dark:text-gray-400">Laster notat...</span>
             </div>
           ) : (
             <>
@@ -247,25 +251,33 @@ export default function NotePreview({
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {note?.patient_name && (
                     <div>
-                      <dt className="text-xs font-medium text-gray-500">Pasient</dt>
+                      <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                        Pasient
+                      </dt>
                       <dd className="text-sm font-medium text-gray-900">{note.patient_name}</dd>
                     </div>
                   )}
                   {note?.practitioner_name && (
                     <div>
-                      <dt className="text-xs font-medium text-gray-500">Behandler</dt>
+                      <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                        Behandler
+                      </dt>
                       <dd className="text-sm text-gray-900">{note.practitioner_name}</dd>
                     </div>
                   )}
                   {note?.duration_minutes && (
                     <div>
-                      <dt className="text-xs font-medium text-gray-500">Varighet</dt>
+                      <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                        Varighet
+                      </dt>
                       <dd className="text-sm text-gray-900">{note.duration_minutes} minutter</dd>
                     </div>
                   )}
                   {note?.vas_pain_start !== null && note?.vas_pain_start !== undefined && (
                     <div>
-                      <dt className="text-xs font-medium text-gray-500">VAS smerte</dt>
+                      <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                        VAS smerte
+                      </dt>
                       <dd className="text-sm text-gray-900">
                         {note.vas_pain_start}/10 {'->'} {note.vas_pain_end}/10
                       </dd>
@@ -385,7 +397,7 @@ export default function NotePreview({
                 {/* Red Flags / Rode flagg */}
                 {assessment.redFlags?.length > 0 && (
                   <div>
-                    <dt className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">
+                    <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
                       Rode flagg
                     </dt>
                     <div className="space-y-1">
@@ -458,7 +470,7 @@ export default function NotePreview({
 
         {/* Footer / Bunntekst */}
         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
-          <div className="flex items-center justify-between text-xs text-gray-500">
+          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-4">
               {note?.created_at && <span>Opprettet: {formatDateTime(note.created_at)}</span>}
               {note?.updated_at && note.updated_at !== note.created_at && (

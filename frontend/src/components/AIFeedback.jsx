@@ -51,7 +51,7 @@ export const QuickFeedback = ({ suggestionId, onFeedback }) => {
 
   if (submitted) {
     return (
-      <div className="flex items-center gap-2 text-sm text-gray-500">
+      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
         <span>Takk for tilbakemelding!</span>
         {feedback ? (
           <span className="text-green-600">👍</span>
@@ -64,7 +64,7 @@ export const QuickFeedback = ({ suggestionId, onFeedback }) => {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm text-gray-600">Var dette nyttig?</span>
+      <span className="text-sm text-gray-600 dark:text-gray-300">Var dette nyttig?</span>
       <button
         onClick={() => handleFeedback(true)}
         className="p-1.5 rounded hover:bg-green-100 transition-colors"
@@ -171,7 +171,7 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
                     className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                       selectedCategories.includes(cat.id)
                         ? 'bg-green-100 border-green-400 text-green-700'
-                        : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                        : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                     }`}
                   >
                     {cat.icon} {cat.label}
@@ -192,7 +192,7 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
                     className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                       selectedCategories.includes(cat.id)
                         ? 'bg-red-100 border-red-400 text-red-700'
-                        : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                        : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                     }`}
                   >
                     {cat.icon} {cat.label}
@@ -203,7 +203,7 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
 
             {/* Neutral categories */}
             <div>
-              <span className="text-xs text-gray-600 font-medium">Nøytral</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300 font-medium">Nøytral</span>
               <div className="flex flex-wrap gap-2 mt-1">
                 {FEEDBACK_CATEGORIES.neutral.map((cat) => (
                   <button
@@ -213,7 +213,7 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
                     className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                       selectedCategories.includes(cat.id)
                         ? 'bg-blue-100 border-blue-400 text-blue-700'
-                        : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                        : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                     }`}
                   >
                     {cat.icon} {cat.label}
@@ -262,7 +262,7 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg transition-colors"
           >
             Avbryt
           </button>

@@ -1,7 +1,7 @@
 /**
  * BulkSender Component
  *
- * Bulk SMS/Email sender for ChiroClickCRM.
+ * Bulk SMS/Email sender for ChiroClickEHR.
  * Allows sending personalized messages to multiple patients at once.
  *
  * Features:
@@ -422,12 +422,12 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
               <Send className="w-5 h-5 text-blue-600" />
               {t.title}
             </h2>
-            <p className="text-sm text-gray-500 mt-0.5">{t.subtitle}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{t.subtitle}</p>
           </div>
           {onClose && (
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+              className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg hover:bg-gray-100"
             >
               <X className="w-5 h-5" />
             </button>
@@ -444,7 +444,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
                     ? 'bg-blue-600 text-white'
                     : s < step
                       ? 'bg-green-500 text-white'
-                      : 'bg-gray-200 text-gray-500'
+                      : 'bg-gray-200 text-gray-500 dark:text-gray-400'
                 }`}
               >
                 {s < step ? <CheckCircle className="w-5 h-5" /> : s}
@@ -456,7 +456,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
               )}
             </div>
           ))}
-          <span className="ml-3 text-sm text-gray-600">
+          <span className="ml-3 text-sm text-gray-600 dark:text-gray-300">
             {step === 1 && t.step1}
             {step === 2 && t.step2}
             {step === 3 && t.step3}
@@ -484,7 +484,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
                     communicationType === 'SMS'
                       ? 'bg-blue-50 border-blue-300 text-blue-700'
-                      : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                      : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   <MessageSquare className="w-4 h-4" />
@@ -498,7 +498,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
                     communicationType === 'EMAIL'
                       ? 'bg-blue-50 border-blue-300 text-blue-700'
-                      : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                      : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   <Mail className="w-4 h-4" />
@@ -578,7 +578,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
               {/* Variables Panel */}
               {showVariables && variablesData?.data && (
                 <div className="mb-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                  <p className="text-xs text-gray-500 mb-2">{t.variableHelp}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{t.variableHelp}</p>
                   <div className="flex flex-wrap gap-1">
                     {variablesData.data.map((v) => (
                       <button
@@ -603,7 +603,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
               />
 
               {/* Character count */}
-              <div className="flex items-center justify-between mt-2 text-sm text-gray-500">
+              <div className="flex items-center justify-between mt-2 text-sm text-gray-500 dark:text-gray-400">
                 <span>
                   {messageStats.charCount} {t.characterCount}
                   {communicationType === 'SMS' && ` (${messageStats.smsSegments} ${t.smsSegments})`}
@@ -620,7 +620,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
                     scheduleType === 'immediate'
                       ? 'bg-green-50 border-green-300 text-green-700'
-                      : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                      : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   <Zap className="w-4 h-4" />
@@ -631,7 +631,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
                     scheduleType === 'scheduled'
                       ? 'bg-purple-50 border-purple-300 text-purple-700'
-                      : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                      : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   <Clock className="w-4 h-4" />
@@ -641,7 +641,9 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
 
               {scheduleType === 'scheduled' && (
                 <div className="mt-3">
-                  <label className="block text-sm text-gray-600 mb-1">{t.scheduledTime}</label>
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
+                    {t.scheduledTime}
+                  </label>
                   <input
                     type="datetime-local"
                     value={scheduledDateTime}
@@ -668,7 +670,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
                     className={`px-3 py-1.5 rounded-lg border text-sm transition-colors ${
                       priority === p.value
                         ? `bg-${p.color}-50 border-${p.color}-300 text-${p.color}-700`
-                        : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                        : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                     }`}
                   >
                     {p.label}
@@ -746,7 +748,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
                 <div className="p-4">
                   {communicationType === 'EMAIL' && customSubject && (
                     <div className="mb-3">
-                      <span className="text-xs text-gray-500">{t.subject}:</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{t.subject}:</span>
                       <p className="font-medium text-gray-900">{customSubject}</p>
                     </div>
                   )}
@@ -759,7 +761,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
                   {/* Personalized Preview */}
                   {showPreview && (
                     <div className="mt-4 pt-4 border-t border-gray-200">
-                      <label className="block text-sm text-gray-600 mb-2">
+                      <label className="block text-sm text-gray-600 dark:text-gray-300 mb-2">
                         {t.selectPatientForPreview}
                       </label>
                       <select
@@ -779,7 +781,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
                       </select>
 
                       {previewLoading ? (
-                        <div className="mt-3 flex items-center gap-2 text-gray-500">
+                        <div className="mt-3 flex items-center gap-2 text-gray-500 dark:text-gray-400">
                           <RefreshCw className="w-4 h-4 animate-spin" />
                           Loading preview...
                         </div>
@@ -829,7 +831,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
             {/* Progress Bar */}
             <div>
               <div className="flex items-center justify-between mb-2 text-sm">
-                <span className="text-gray-600">{t.progress}</span>
+                <span className="text-gray-600 dark:text-gray-300">{t.progress}</span>
                 <span className="font-medium text-gray-900">{progressPercentage}%</span>
               </div>
               <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
@@ -862,7 +864,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
                   <p className="text-sm text-red-700">{t.failed}</p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4 text-center">
-                  <p className="text-3xl font-bold text-gray-600">
+                  <p className="text-3xl font-bold text-gray-600 dark:text-gray-300">
                     {batchStatus.data.stats.pending || 0}
                   </p>
                   <p className="text-sm text-gray-700">{t.pending}</p>
@@ -872,7 +874,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
 
             {/* Estimated Completion */}
             {batchStatus?.data?.estimatedCompletionTime && !isComplete && (
-              <div className="text-center text-sm text-gray-500">
+              <div className="text-center text-sm text-gray-500 dark:text-gray-400">
                 {t.estimatedCompletion}:{' '}
                 {new Date(batchStatus.data.estimatedCompletionTime).toLocaleTimeString(
                   language === 'no' ? 'nb-NO' : 'en-US'
@@ -930,7 +932,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
               {step > 1 && (
                 <button
                   onClick={() => setStep(step - 1)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg"
+                  className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 hover:bg-gray-100 rounded-lg"
                 >
                   {t.back}
                 </button>
@@ -968,7 +970,7 @@ export default function BulkSender({ clinicInfo = {}, language = 'no', className
           {onClose && step === 4 && isComplete && (
             <button
               onClick={onClose}
-              className="px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg"
+              className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800 hover:bg-gray-100 rounded-lg"
             >
               {t.close}
             </button>

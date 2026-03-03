@@ -19,9 +19,10 @@ const __dirname = path.dirname(__filename);
 
 // Configuration
 const CONFIG = {
-  inputDir: 'D:\\PROGAMMVARE - EHR - Øvelse - Behandling\\EHR  --- CMR\\Build folder EHR\\TRENINGS DATA OF UTVIKLINGSHULL',
-  outputDir: 'D:\\ChiroClickCRM-Complete-EHR-CRM-System-Architecture\\training-data-extracted',
-  supportedExtensions: ['.docx', '.doc']
+  inputDir:
+    'D:\\PROGAMMVARE - EHR - Øvelse - Behandling\\EHR  --- CMR\\Build folder EHR\\TRENINGS DATA OF UTVIKLINGSHULL',
+  outputDir: 'D:\\ChiroClickEHR-Complete-EHR-CRM-System-Architecture\\training-data-extracted',
+  supportedExtensions: ['.docx', '.doc'],
 };
 
 // Statistics tracking
@@ -30,7 +31,7 @@ const stats = {
   success: 0,
   failed: 0,
   skipped: 0,
-  files: []
+  files: [],
 };
 
 /**
@@ -71,12 +72,12 @@ async function extractDocx(inputPath) {
     return {
       success: true,
       text: result.value,
-      messages: result.messages
+      messages: result.messages,
     };
   } catch (error) {
     return {
       success: false,
-      error: error.message
+      error: error.message,
     };
   }
 }
@@ -128,13 +129,13 @@ async function processFile(inputPath) {
 
     // Add metadata header
     const header = [
-      '=' .repeat(80),
+      '='.repeat(80),
       `SOURCE: ${path.basename(inputPath)}`,
       `EXTRACTED: ${new Date().toISOString()}`,
       `CHARACTERS: ${result.text.length}`,
-      '=' .repeat(80),
+      '='.repeat(80),
       '',
-      ''
+      '',
     ].join('\n');
 
     await fs.writeFile(outputPath, header + result.text, 'utf8');
@@ -145,9 +146,8 @@ async function processFile(inputPath) {
       path: relativePath,
       status: 'success',
       outputPath: path.relative(CONFIG.outputDir, outputPath),
-      chars: result.text.length
+      chars: result.text.length,
     });
-
   } catch (error) {
     console.error(`  ✗ Error: ${error.message}`);
     stats.failed++;
@@ -167,9 +167,9 @@ async function generateReport() {
       total: stats.total,
       success: stats.success,
       failed: stats.failed,
-      skipped: stats.skipped
+      skipped: stats.skipped,
     },
-    files: stats.files
+    files: stats.files,
   };
 
   const reportPath = path.join(CONFIG.outputDir, 'extraction-report.json');
@@ -195,23 +195,59 @@ async function generateReport() {
 ## Successfully Extracted Files
 
 ${stats.files
-  .filter(f => f.status === 'success')
-  .map(f => `- \`${f.outputPath}\` (${f.chars} chars)`)
+  .filter((f) => f.status === 'success')
+  .map((f) => `- \`${f.outputPath}\` (${f.chars} chars)`)
   .join('\n')}
 
 ## Categories Found
 
 ### SOPE/SOAP Analysis
-${stats.files.filter(f => f.path.toLowerCase().includes('sope') || f.path.toLowerCase().includes('analyse')).map(f => `- ${f.path}`).join('\n') || '(none)'}
+${
+  stats.files
+    .filter(
+      (f) => f.path.toLowerCase().includes('sope') || f.path.toLowerCase().includes('analyse')
+    )
+    .map((f) => `- ${f.path}`)
+    .join('\n') || '(none)'
+}
 
 ### VNG/Vestibular
-${stats.files.filter(f => f.path.toLowerCase().includes('vng') || f.path.toLowerCase().includes('svimmel') || f.path.toLowerCase().includes('vertigo')).map(f => `- ${f.path}`).join('\n') || '(none)'}
+${
+  stats.files
+    .filter(
+      (f) =>
+        f.path.toLowerCase().includes('vng') ||
+        f.path.toLowerCase().includes('svimmel') ||
+        f.path.toLowerCase().includes('vertigo')
+    )
+    .map((f) => `- ${f.path}`)
+    .join('\n') || '(none)'
+}
 
 ### Examination Forms
-${stats.files.filter(f => f.path.toLowerCase().includes('undersøkelse') || f.path.toLowerCase().includes('undersokelse')).map(f => `- ${f.path}`).join('\n') || '(none)'}
+${
+  stats.files
+    .filter(
+      (f) =>
+        f.path.toLowerCase().includes('undersøkelse') ||
+        f.path.toLowerCase().includes('undersokelse')
+    )
+    .map((f) => `- ${f.path}`)
+    .join('\n') || '(none)'
+}
 
 ### Chiropractor Cases
-${stats.files.filter(f => f.path.includes('Ny -') || f.path.includes('Ny-') || f.path.toLowerCase().includes('kiropraktor')).map(f => `- ${f.path}`).join('\n') || '(none)'}
+${
+  stats.files
+    .filter(
+      (f) =>
+        f.path.includes('Ny -') ||
+        f.path.includes('Ny-') ||
+        f.path.toLowerCase().includes('kiropraktor')
+    )
+    .map((f) => `- ${f.path}`)
+    .join('\n') || '(none)'
+}
 `;
 
   await fs.writeFile(summaryPath, summary, 'utf8');
@@ -276,7 +312,7 @@ async function main() {
 }
 
 // Run the script
-main().catch(error => {
+main().catch((error) => {
   console.error('Fatal error:', error);
   process.exit(1);
 });

@@ -61,7 +61,7 @@ function CustomTooltip({ active, payload, label }) {
             className="w-3 h-3 rounded-full inline-block"
             style={{ backgroundColor: entry.color }}
           />
-          <span className="text-gray-600">{entry.name}:</span>
+          <span className="text-gray-600 dark:text-gray-300">{entry.name}:</span>
           <span className="font-medium">{entry.value}%</span>
         </div>
       ))}
@@ -118,7 +118,7 @@ export default function OutcomeChart({ patientId, typeFilter }) {
           <TrendingUp className="w-5 h-5 text-teal-600" />
           <h3 className="text-lg font-semibold text-gray-800">Utfallstrender</h3>
         </div>
-        <div className="flex items-center justify-center py-12 text-gray-400">
+        <div className="flex items-center justify-center py-12 text-gray-400 dark:text-gray-300">
           <div className="animate-spin rounded-full h-5 w-5 border-2 border-teal-600 border-t-transparent" />
           <span className="ml-2">Laster trenddata...</span>
         </div>
@@ -145,7 +145,7 @@ export default function OutcomeChart({ patientId, typeFilter }) {
           <TrendingUp className="w-5 h-5 text-teal-600" />
           <h3 className="text-lg font-semibold text-gray-800">Utfallstrender</h3>
         </div>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-400">
           Ingen utfallsdata registrert enna. Fyll ut sporreskjemaer ovenfor for a folge utvikling.
         </p>
       </div>
@@ -182,7 +182,7 @@ export default function OutcomeChart({ patientId, typeFilter }) {
           <h3 className="text-lg font-semibold text-gray-800">Utfallstrender</h3>
         </div>
         <div className="flex items-center gap-1">
-          <Filter className="w-4 h-4 text-gray-400" />
+          <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
           {availableTypes.map((type) => (
             <button
               key={type}
@@ -191,7 +191,7 @@ export default function OutcomeChart({ patientId, typeFilter }) {
               className={`px-2 py-1 text-xs rounded-full border transition-colors ${
                 selectedTypes.includes(type)
                   ? 'border-transparent text-white'
-                  : 'border-gray-300 text-gray-500 bg-white hover:bg-gray-50'
+                  : 'border-gray-300 text-gray-500 dark:text-gray-400 bg-white hover:bg-gray-50'
               }`}
               style={selectedTypes.includes(type) ? { backgroundColor: TYPE_COLORS[type] } : {}}
             >
@@ -242,13 +242,13 @@ export default function OutcomeChart({ patientId, typeFilter }) {
           </LineChart>
         </ResponsiveContainer>
       ) : (
-        <p className="text-sm text-gray-500 text-center py-8">
+        <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-8">
           Select at least one measure type to view trends.
         </p>
       )}
 
       {/* Severity legend */}
-      <div className="flex items-center gap-4 mt-3 text-xs text-gray-500 justify-center">
+      <div className="flex items-center gap-4 mt-3 text-xs text-gray-500 dark:text-gray-400 justify-center">
         {SEVERITY_ZONES.map((zone, idx) => (
           <div key={idx} className="flex items-center gap-1">
             <span

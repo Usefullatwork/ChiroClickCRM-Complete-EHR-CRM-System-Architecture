@@ -209,7 +209,9 @@ export default function ReferralLetters() {
               </button>
               <div>
                 <h1 className="text-xl font-semibold text-gray-900">{t('newReferral')}</h1>
-                {patient && <p className="text-sm text-gray-500">{patient.name}</p>}
+                {patient && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{patient.name}</p>
+                )}
               </div>
             </div>
 
@@ -233,7 +235,9 @@ export default function ReferralLetters() {
                 <button
                   onClick={() => setLanguage('no')}
                   className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                    language === 'no' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+                    language === 'no'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 dark:text-gray-300'
                   }`}
                 >
                   Norsk
@@ -241,7 +245,9 @@ export default function ReferralLetters() {
                 <button
                   onClick={() => setLanguage('en')}
                   className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                    language === 'en' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+                    language === 'en'
+                      ? 'bg-white text-gray-900 shadow-sm'
+                      : 'text-gray-600 dark:text-gray-300'
                   }`}
                 >
                   English
@@ -291,7 +297,7 @@ export default function ReferralLetters() {
             )}
             <div>
               <h1 className="text-xl font-semibold text-gray-900">{t('referrals')}</h1>
-              <p className="text-sm text-gray-500">{t('medicalReferrals')}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t('medicalReferrals')}</p>
             </div>
           </div>
 
@@ -301,7 +307,9 @@ export default function ReferralLetters() {
               <button
                 onClick={() => setLanguage('no')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  language === 'no' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+                  language === 'no'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300'
                 }`}
               >
                 Norsk
@@ -309,7 +317,9 @@ export default function ReferralLetters() {
               <button
                 onClick={() => setLanguage('en')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  language === 'en' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+                  language === 'en'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300'
                 }`}
               >
                 English
@@ -345,7 +355,7 @@ export default function ReferralLetters() {
       <div className="px-6 py-4">
         <div className="flex gap-4">
           <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
             <input
               type="text"
               placeholder={t('searchByPatientOrRecipient')}
@@ -367,28 +377,28 @@ export default function ReferralLetters() {
           {loading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
-              <span className="ml-2 text-gray-500">{t('loading')}</span>
+              <span className="ml-2 text-gray-500 dark:text-gray-400">{t('loading')}</span>
             </div>
           ) : (
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t('patient')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t('type')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t('recipient')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t('date')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     {t('priority')}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                     Status
                   </th>
                 </tr>
@@ -398,22 +408,22 @@ export default function ReferralLetters() {
                   <tr key={ref.id} className="hover:bg-gray-50 cursor-pointer">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <Send className="w-5 h-5 text-gray-400 mr-3" />
+                        <Send className="w-5 h-5 text-gray-400 dark:text-gray-300 mr-3" />
                         <span className="text-sm font-medium text-gray-900">
                           {ref.patient_name || ref.patientName}
                         </span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {referralTypeLabels[language][ref.referral_type || ref.referralType] ||
                         ref.referral_type ||
                         ref.referralType ||
                         '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {ref.recipient || '-'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {ref.created_at
                         ? new Date(ref.created_at).toLocaleDateString('nb-NO')
                         : ref.date || '-'}
@@ -450,7 +460,10 @@ export default function ReferralLetters() {
                 ))}
                 {filteredReferrals.length === 0 && !loading && (
                   <tr>
-                    <td colSpan="6" className="px-6 py-12 text-center text-gray-500">
+                    <td
+                      colSpan="6"
+                      className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
+                    >
                       {t('noReferrals')}
                     </td>
                   </tr>

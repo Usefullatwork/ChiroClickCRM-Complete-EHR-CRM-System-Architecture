@@ -587,7 +587,7 @@ export function ExamPanelManager({
             : null
         }
       >
-        <p className="text-sm text-gray-600 mb-3">
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
           Velg region og marker funn p\u00E5 venstre og h\u00F8yre side.
         </p>
 

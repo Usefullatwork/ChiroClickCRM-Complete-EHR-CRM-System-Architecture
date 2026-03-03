@@ -146,7 +146,7 @@ const CommunicationHistory = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        <span className="ml-2 text-gray-600">Laster kommunikasjonslogg...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">Laster kommunikasjonslogg...</span>
       </div>
     );
   }
@@ -173,7 +173,9 @@ const CommunicationHistory = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Kommunikasjonslogg</h2>
-          <p className="text-gray-600">All kommunikasjon med pasienter på ett sted</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            All kommunikasjon med pasienter på ett sted
+          </p>
         </div>
         <div className="flex gap-2">
           <button
@@ -198,11 +200,11 @@ const CommunicationHistory = () => {
         <div className="bg-white rounded-xl border border-gray-200 p-4">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-              <FileText className="w-5 h-5 text-gray-600" />
+              <FileText className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-          <p className="text-sm text-gray-600">Totalt</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Totalt</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -212,7 +214,7 @@ const CommunicationHistory = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.emails}</p>
-          <p className="text-sm text-gray-600">E-poster</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">E-poster</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -222,7 +224,7 @@ const CommunicationHistory = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.sms}</p>
-          <p className="text-sm text-gray-600">SMS</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">SMS</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -232,7 +234,7 @@ const CommunicationHistory = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.calls}</p>
-          <p className="text-sm text-gray-600">Samtaler</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Samtaler</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -242,7 +244,7 @@ const CommunicationHistory = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.thisWeek}</p>
-          <p className="text-sm text-gray-600">Denne Uken</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Denne Uken</p>
         </div>
       </div>
 
@@ -251,7 +253,7 @@ const CommunicationHistory = () => {
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex-1 min-w-64">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
               <input
                 type="text"
                 placeholder="Søk etter pasient eller emne..."
@@ -271,7 +273,7 @@ const CommunicationHistory = () => {
                   className={`px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
                     selectedType === type.id
                       ? 'bg-blue-100 text-blue-700'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
                   }`}
                 >
                   <Icon className="w-4 h-4" />
@@ -317,7 +319,7 @@ const CommunicationHistory = () => {
                         {status?.label}
                       </span>
                       {comm.campaign && (
-                        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+                        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:text-gray-300 text-xs rounded-full">
                           {comm.campaign}
                         </span>
                       )}
@@ -325,13 +327,15 @@ const CommunicationHistory = () => {
                     {comm.subject && (
                       <p className="font-medium text-gray-800 mb-1">{comm.subject}</p>
                     )}
-                    <p className="text-sm text-gray-600 line-clamp-1">{comm.content}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-1">
+                      {comm.content}
+                    </p>
                     {comm.attachments && (
                       <div className="flex gap-2 mt-2">
                         {comm.attachments.map((file) => (
                           <span
                             key={file}
-                            className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 text-xs rounded"
+                            className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-600 dark:text-gray-300 text-xs rounded"
                           >
                             <FileText className="w-3 h-3" />
                             {file}
@@ -343,20 +347,22 @@ const CommunicationHistory = () => {
 
                   {/* Metadata */}
                   <div className="text-right text-sm flex-shrink-0">
-                    <p className="text-gray-500">{formatDateTime(comm.sentAt)}</p>
-                    <p className="text-gray-400 flex items-center gap-1 justify-end">
+                    <p className="text-gray-500 dark:text-gray-400">
+                      {formatDateTime(comm.sentAt)}
+                    </p>
+                    <p className="text-gray-400 dark:text-gray-300 flex items-center gap-1 justify-end">
                       <User className="w-3 h-3" />
                       {comm.sentBy}
                     </p>
                     {comm.duration && (
-                      <p className="text-gray-400 flex items-center gap-1 justify-end">
+                      <p className="text-gray-400 dark:text-gray-300 flex items-center gap-1 justify-end">
                         <Clock className="w-3 h-3" />
                         {comm.duration}
                       </p>
                     )}
                   </div>
 
-                  <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300 flex-shrink-0" />
                 </div>
               </div>
             );
@@ -423,7 +429,7 @@ const CommunicationHistory = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Vedlegg</label>
                 <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Dra og slipp filer her, eller klikk for å velge
                   </p>
                 </div>
@@ -457,7 +463,7 @@ const CommunicationHistory = () => {
               <h3 className="text-lg font-bold text-gray-900">Meldingsdetaljer</h3>
               <button
                 onClick={() => setSelectedPatient(null)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
               >
                 ×
               </button>
@@ -481,33 +487,35 @@ const CommunicationHistory = () => {
                   <p className="font-medium text-gray-900">
                     {getTypeInfo(selectedPatient.type)?.label}
                   </p>
-                  <p className="text-sm text-gray-500">{formatDateTime(selectedPatient.sentAt)}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {formatDateTime(selectedPatient.sentAt)}
+                  </p>
                 </div>
               </div>
 
               {/* Patient */}
               <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500">Pasient</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Pasient</p>
                 <p className="font-medium text-gray-900">{selectedPatient.patientName}</p>
               </div>
 
               {/* Subject */}
               {selectedPatient.subject && (
                 <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-500">Emne</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Emne</p>
                   <p className="font-medium text-gray-900">{selectedPatient.subject}</p>
                 </div>
               )}
 
               {/* Content */}
               <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500 mb-2">Innhold</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Innhold</p>
                 <p className="text-gray-900 whitespace-pre-wrap">{selectedPatient.content}</p>
               </div>
 
               {/* Status */}
               <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500">Status</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
                 {(() => {
                   const status = statusConfig[selectedPatient.status];
                   const StatusIcon = status?.icon;
@@ -525,16 +533,16 @@ const CommunicationHistory = () => {
               {/* Attachments */}
               {selectedPatient.attachments && (
                 <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-500 mb-2">Vedlegg</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Vedlegg</p>
                   <div className="space-y-2">
                     {selectedPatient.attachments.map((file) => (
                       <button
                         key={file}
                         className="w-full flex items-center gap-2 p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
                       >
-                        <FileText className="w-4 h-4 text-gray-400" />
+                        <FileText className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                         <span className="text-sm text-gray-700">{file}</span>
-                        <Download className="w-4 h-4 text-gray-400 ml-auto" />
+                        <Download className="w-4 h-4 text-gray-400 dark:text-gray-300 ml-auto" />
                       </button>
                     ))}
                   </div>

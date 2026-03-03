@@ -125,7 +125,7 @@ const ConfidenceIndicator = ({ score, language = 'NO', size = 'md' }) => {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
-        <span className={`${s.text} font-medium text-slate-600`}>
+        <span className={`${s.text} font-medium text-slate-600 dark:text-slate-300`}>
           {t.confidence}: <span className={confidence.textColor}>{confidence.label}</span>
         </span>
         <span className={`${s.text} font-semibold ${confidence.textColor}`}>{percentage}%</span>
@@ -259,7 +259,9 @@ export const AISuggestionCard = ({
       <div className="px-4 py-3 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2 min-w-0">
           <Brain size={18} className="text-teal-600 flex-shrink-0" />
-          <span className="text-xs text-slate-500 flex-shrink-0">{t.aiGenerated}</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400 flex-shrink-0">
+            {t.aiGenerated}
+          </span>
 
           {showType && (
             <Badge variant={getTypeBadgeVariant(type)} size="sm">

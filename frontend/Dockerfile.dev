@@ -1,4 +1,4 @@
-# ChiroClickCRM Frontend Development Dockerfile
+# ChiroClickEHR Frontend Development Dockerfile
 # Optimized for hot-reload development with Vite
 
 FROM node:20-alpine

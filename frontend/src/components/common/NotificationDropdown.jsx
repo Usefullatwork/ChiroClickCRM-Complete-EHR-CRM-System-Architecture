@@ -122,7 +122,7 @@ export default function NotificationDropdown() {
               {t('notifications', 'Varsler')}
             </h3>
             {unread > 0 && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 {unread} {t('unread', 'uleste')}
               </span>
             )}
@@ -145,7 +145,7 @@ export default function NotificationDropdown() {
                     }`}
                   >
                     <Icon
-                      className={`w-4 h-4 mt-0.5 shrink-0 ${!n.read ? 'text-blue-500' : 'text-gray-400'}`}
+                      className={`w-4 h-4 mt-0.5 shrink-0 ${!n.read ? 'text-blue-500' : 'text-gray-400 dark:text-gray-300'}`}
                     />
                     <div className="min-w-0 flex-1">
                       <p
@@ -158,7 +158,7 @@ export default function NotificationDropdown() {
                           {n.message}
                         </p>
                       )}
-                      <p className="text-[10px] text-gray-400 mt-1">
+                      <p className="text-[10px] text-gray-400 dark:text-gray-300 mt-1">
                         {formatTimeAgo(n.created_at, lang)}
                       </p>
                     </div>

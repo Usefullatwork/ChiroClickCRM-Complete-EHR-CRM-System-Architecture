@@ -106,7 +106,7 @@ export default function ComplianceDashboard({ patientId }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8 text-gray-500">
+      <div className="flex items-center justify-center p-8 text-gray-500 dark:text-gray-400">
         <Loader2 className="w-5 h-5 animate-spin mr-2" />
         Loading compliance data...
       </div>
@@ -124,7 +124,7 @@ export default function ComplianceDashboard({ patientId }) {
 
   if (!prescriptions.length) {
     return (
-      <div className="text-center p-8 text-gray-500">
+      <div className="text-center p-8 text-gray-500 dark:text-gray-400">
         <Activity className="w-8 h-8 mx-auto mb-2 text-gray-300" />
         <p className="text-sm">No exercise prescriptions yet</p>
       </div>
@@ -171,7 +171,7 @@ export default function ComplianceDashboard({ patientId }) {
               {overallCompliance}%
             </span>
           </div>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 dark:text-gray-300">
             <p>
               <span className="font-medium text-gray-900">{activePrescriptions.length}</span> active
               prescription{activePrescriptions.length !== 1 ? 's' : ''}
@@ -199,7 +199,7 @@ export default function ComplianceDashboard({ patientId }) {
                     <p className="text-sm font-medium text-gray-900 truncate">
                       {p.exercise_name || p.exerciseName || p.name || 'Exercise'}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {p.sets && `${p.sets}x${p.reps || ''}`}
                       {p.frequency && ` - ${p.frequency}`}
                     </p>
@@ -217,7 +217,7 @@ export default function ComplianceDashboard({ patientId }) {
                         style={{ width: `${Math.min(compliance, 100)}%` }}
                       />
                     </div>
-                    <span className="text-xs font-medium text-gray-600 w-10 text-right">
+                    <span className="text-xs font-medium text-gray-600 dark:text-gray-300 w-10 text-right">
                       {compliance}%
                     </span>
                   </div>
@@ -239,7 +239,9 @@ export default function ComplianceDashboard({ patientId }) {
             <div
               key={day.date}
               className={`w-full aspect-square rounded-sm flex items-center justify-center text-[10px] ${
-                day.completed ? 'bg-green-500 text-white' : 'bg-gray-100 text-gray-400'
+                day.completed
+                  ? 'bg-green-500 text-white'
+                  : 'bg-gray-100 text-gray-400 dark:text-gray-300'
               }`}
               title={`${day.date}: ${day.completed ? 'Completed' : 'Missed'}`}
             >
@@ -247,7 +249,7 @@ export default function ComplianceDashboard({ patientId }) {
             </div>
           ))}
         </div>
-        <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+        <div className="flex items-center gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
           <span className="flex items-center gap-1">
             <span className="w-3 h-3 rounded-sm bg-green-500 inline-block" /> Completed
           </span>
@@ -287,7 +289,7 @@ export default function ComplianceDashboard({ patientId }) {
               );
             })}
           </div>
-          <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+          <div className="flex justify-between text-[10px] text-gray-400 dark:text-gray-300 mt-1">
             <span>{painTrend[0]?.date?.slice(5)}</span>
             <span>{painTrend[painTrend.length - 1]?.date?.slice(5)}</span>
           </div>

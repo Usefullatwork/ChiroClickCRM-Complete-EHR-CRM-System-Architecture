@@ -86,7 +86,7 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: data.color }} />
             <span className="text-sm font-medium text-gray-900">{data.name}</span>
           </div>
-          <p className="text-sm text-gray-600 mt-1">{data.value} avtaler</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">{data.value} avtaler</p>
         </div>
       );
     }
@@ -122,7 +122,7 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">Avtalestatistikk</h3>
-              <p className="text-sm text-gray-500">Denne uken</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Denne uken</p>
             </div>
           </div>
 
@@ -168,7 +168,7 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-60 flex items-center justify-center text-gray-400">
+              <div className="h-60 flex items-center justify-center text-gray-400 dark:text-gray-300">
                 <div className="text-center">
                   <Calendar size={48} className="mx-auto mb-2 opacity-50" />
                   <p>Ingen avtaler denne uken</p>
@@ -181,7 +181,7 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
               {statusPieData.map((item, index) => (
                 <div key={index} className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-xs text-gray-600">{item.name}</span>
+                  <span className="text-xs text-gray-600 dark:text-gray-300">{item.name}</span>
                 </div>
               ))}
             </div>
@@ -196,7 +196,7 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
                   <Clock size={18} className="text-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600">I dag</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">I dag</p>
                   <p className="text-2xl font-bold text-gray-900">{data.today?.total || 0}</p>
                 </div>
                 <div className="text-right text-sm">
@@ -214,12 +214,14 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
                   <CheckCircle size={18} className="text-green-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600">Fullfort denne uken</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Fullfort denne uken</p>
                   <p className="text-2xl font-bold text-gray-900">
                     {data.thisWeek?.completed || 0}
                   </p>
                 </div>
-                <div className="text-sm text-gray-500">av {data.thisWeek?.total || 0} totalt</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">
+                  av {data.thisWeek?.total || 0} totalt
+                </div>
               </div>
             </div>
 
@@ -230,7 +232,7 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
                   <TrendingUp size={18} className="text-purple-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600">Fullfort denne mnd</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Fullfort denne mnd</p>
                   <p className="text-2xl font-bold text-gray-900">{data.completedThisMonth || 0}</p>
                 </div>
               </div>
@@ -283,7 +285,7 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-900">{apt.patientName}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {apt.appointmentType || 'Konsultasjon'} ({apt.durationMinutes || 30} min)
                     </p>
                   </div>
@@ -322,15 +324,15 @@ export const AppointmentStatsCompact = ({ data = {}, loading = false }) => {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-600">I dag</span>
+        <span className="text-sm text-gray-600 dark:text-gray-300">I dag</span>
         <span className="text-lg font-bold text-gray-900">{data.today?.total || 0}</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-600">Denne uken</span>
+        <span className="text-sm text-gray-600 dark:text-gray-300">Denne uken</span>
         <span className="text-lg font-bold text-gray-900">{data.thisWeek?.total || 0}</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-600">Denne mnd</span>
+        <span className="text-sm text-gray-600 dark:text-gray-300">Denne mnd</span>
         <span className="text-lg font-bold text-gray-900">{data.completedThisMonth || 0}</span>
       </div>
     </div>

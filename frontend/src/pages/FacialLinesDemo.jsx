@@ -117,7 +117,7 @@ export default function FacialLinesDemo() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-gray-800">{t.title}</h1>
-                <p className="text-sm text-gray-500">{t.subtitle}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
               </div>
             </div>
 
@@ -127,7 +127,7 @@ export default function FacialLinesDemo() {
                 className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm ${
                   showInfo
                     ? 'bg-rose-100 text-rose-700'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
                 }`}
               >
                 <Info className="w-4 h-4" />
@@ -157,7 +157,7 @@ export default function FacialLinesDemo() {
                 <Layers className="w-4 h-4 text-rose-500" />
                 {t.features}
               </h3>
-              <ul className="space-y-2 text-sm text-gray-600">
+              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
                 {t.featureList.map((feature, i) => (
                   <li key={i} className="flex gap-2">
                     <span className="text-rose-500">•</span>
@@ -233,7 +233,7 @@ export default function FacialLinesDemo() {
                         {zone[lang]?.name || zone.en?.name}
                       </span>
                     </div>
-                    <span className="text-xs text-gray-500 ml-5">
+                    <span className="text-xs text-gray-500 dark:text-gray-400 ml-5">
                       {zone[lang]?.area || zone.en?.area}
                     </span>
                   </div>
@@ -242,14 +242,16 @@ export default function FacialLinesDemo() {
 
               {/* Common Conditions */}
               <div className="mt-4 pt-3 border-t border-gray-200">
-                <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+                <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">
                   {t.commonConditions}
                 </h4>
                 <div className="space-y-2">
                   {t.conditions.map((cond, i) => (
                     <div key={i} className="text-xs">
                       <span className="font-medium text-gray-700">{cond.name}:</span>
-                      <span className="text-gray-500 ml-1">{cond.muscles.join(', ')}</span>
+                      <span className="text-gray-500 dark:text-gray-400 ml-1">
+                        {cond.muscles.join(', ')}
+                      </span>
                     </div>
                   ))}
                 </div>

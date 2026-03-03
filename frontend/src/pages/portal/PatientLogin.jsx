@@ -84,7 +84,7 @@ const PatientLogin = () => {
             <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
           </div>
           <h1 className="text-xl font-semibold text-gray-900 mb-2">Validerer tilgang...</h1>
-          <p className="text-gray-500">Vennligst vent</p>
+          <p className="text-gray-500 dark:text-gray-400">Vennligst vent</p>
         </div>
       </div>
     );
@@ -101,8 +101,10 @@ const PatientLogin = () => {
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
             Velkommen, {tokenData.patient?.firstName}!
           </h1>
-          <p className="text-gray-600 mb-4">Du er logget inn hos {tokenData.clinic?.name}</p>
-          <div className="flex items-center justify-center gap-2 text-sm text-gray-500">
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
+            Du er logget inn hos {tokenData.clinic?.name}
+          </p>
+          <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             <Loader2 className="w-4 h-4 animate-spin" />
             <span>Laster øvelsene dine...</span>
           </div>
@@ -121,7 +123,7 @@ const PatientLogin = () => {
             <Dumbbell className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Pasientportalen</h1>
-          <p className="text-gray-500 mt-1">Logg inn for å se øvelsene dine</p>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Logg inn for å se øvelsene dine</p>
         </div>
 
         {/* Error Message */}
@@ -141,7 +143,7 @@ const PatientLogin = () => {
         {showManualEntry && (
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Skriv inn tilgangskode</h2>
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
               Du finner tilgangskoden i e-posten du fikk fra klinikken. Koden er en lang rekke med
               bokstaver og tall.
             </p>
@@ -176,15 +178,19 @@ const PatientLogin = () => {
 
         {/* Help Section */}
         <div className="mt-8 text-center">
-          <p className="text-sm text-gray-500 mb-4">Finner du ikke tilgangskoden?</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+            Finner du ikke tilgangskoden?
+          </p>
           <div className="space-y-2">
-            <p className="text-sm text-gray-600">Kontakt klinikken din for å få en ny lenke.</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Kontakt klinikken din for å få en ny lenke.
+            </p>
           </div>
         </div>
 
         {/* Footer */}
         <div className="mt-12 pt-6 border-t border-gray-200 text-center">
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-gray-400 dark:text-gray-300">
             Dette er en sikker innloggingsside. Din tilgangskode er personlig og bør ikke deles med
             andre.
           </p>

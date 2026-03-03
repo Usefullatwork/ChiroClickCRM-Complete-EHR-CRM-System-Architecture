@@ -52,7 +52,7 @@ export default function TemplatePicker({ onSelectTemplate, _soapSection, isOpen,
     if (searchQuery.length > 2 && searchResults?.data) {
       return (
         <div className="p-3 space-y-2">
-          <p className="text-xs text-gray-500 mb-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
             {searchResults.data.length} results for "{searchQuery}"
           </p>
           {searchResults.data.map((template) => (
@@ -71,12 +71,14 @@ export default function TemplatePicker({ onSelectTemplate, _soapSection, isOpen,
                       <Heart className="w-3 h-3 text-red-500 fill-red-500 flex-shrink-0" />
                     )}
                   </div>
-                  <p className="text-xs text-gray-600 line-clamp-2">{template.template_text}</p>
-                  <span className="text-xs text-gray-400 mt-1 inline-block">
+                  <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
+                    {template.template_text}
+                  </p>
+                  <span className="text-xs text-gray-400 dark:text-gray-300 mt-1 inline-block">
                     {template.category} • {template.subcategory}
                   </span>
                 </div>
-                <Copy className="w-4 h-4 text-gray-400 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+                <Copy className="w-4 h-4 text-gray-400 dark:text-gray-300 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
               </div>
             </div>
           ))}
@@ -98,13 +100,13 @@ export default function TemplatePicker({ onSelectTemplate, _soapSection, isOpen,
             >
               <span className="text-sm font-medium text-gray-900">{category}</span>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
                   {Object.values(subcategories).flat().length}
                 </span>
                 {expandedCategories[category] ? (
-                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                  <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 ) : (
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                  <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 )}
               </div>
             </button>
@@ -136,7 +138,9 @@ export default function TemplatePicker({ onSelectTemplate, _soapSection, isOpen,
                                   <Star className="w-3 h-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
                                 )}
                               </div>
-                              <p className="text-xs text-gray-600 line-clamp-2">{template.text}</p>
+                              <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2">
+                                {template.text}
+                              </p>
                             </div>
                             <button
                               onClick={(e) => {
@@ -150,7 +154,7 @@ export default function TemplatePicker({ onSelectTemplate, _soapSection, isOpen,
                                 className={`w-4 h-4 ${
                                   template.isFavorite
                                     ? 'text-red-500 fill-red-500'
-                                    : 'text-gray-400'
+                                    : 'text-gray-400 dark:text-gray-300'
                                 }`}
                               />
                             </button>
@@ -179,13 +183,13 @@ export default function TemplatePicker({ onSelectTemplate, _soapSection, isOpen,
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-gray-900">Kliniske Maler</h3>
           <button onClick={onClose} className="p-1 hover:bg-gray-200 rounded transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
           <input
             type="text"
             value={searchQuery}
@@ -209,7 +213,9 @@ export default function TemplatePicker({ onSelectTemplate, _soapSection, isOpen,
 
       {/* Footer */}
       <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
-        <p className="text-xs text-gray-500 text-center">Klikk på en mal for å sette inn teksten</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+          Klikk på en mal for å sette inn teksten
+        </p>
       </div>
     </div>
   );

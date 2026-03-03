@@ -117,7 +117,9 @@ function SectionQuestion({ section, answer, onChange, lang }) {
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
         {section.title[lang]}
         {section.optional && (
-          <span className="ml-2 text-sm font-normal text-gray-500">{t.optional}</span>
+          <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
+            {t.optional}
+          </span>
         )}
       </h3>
       <div className="space-y-2">
@@ -320,7 +322,7 @@ function ResultsDisplay({ questionnaireId, score, previousScore, lang }) {
       case 'darkred':
         return 'text-red-800 bg-red-200';
       default:
-        return 'text-gray-600 bg-gray-100';
+        return 'text-gray-600 dark:text-gray-300 bg-gray-100';
     }
   };
 
@@ -338,14 +340,14 @@ function ResultsDisplay({ questionnaireId, score, previousScore, lang }) {
             {questionnaireId === 'FABQ' ? (
               <>
                 <span className="text-3xl">PA: {score.physical.score}</span>
-                <span className="mx-2 text-gray-400">/</span>
+                <span className="mx-2 text-gray-400 dark:text-gray-300">/</span>
                 <span className="text-3xl">W: {score.work.score}</span>
               </>
             ) : (
               <>
                 {score.rawScore || score.percentage}
                 {score.percentage !== undefined && (
-                  <span className="text-2xl text-gray-500">%</span>
+                  <span className="text-2xl text-gray-500 dark:text-gray-400">%</span>
                 )}
               </>
             )}
@@ -397,7 +399,7 @@ function ResultsDisplay({ questionnaireId, score, previousScore, lang }) {
                     ? 'text-green-600'
                     : change.absoluteChange < 0
                       ? 'text-red-600'
-                      : 'text-gray-600'
+                      : 'text-gray-600 dark:text-gray-300'
                 }`}
               >
                 {change.absoluteChange > 0 ? '-' : '+'}

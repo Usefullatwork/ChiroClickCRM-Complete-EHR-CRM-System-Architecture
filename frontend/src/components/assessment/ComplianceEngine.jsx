@@ -594,7 +594,7 @@ export default function CompliancePanel({ encounterData, onApplyAutoInsert, clas
           />
           <div className="text-left">
             <h3 className="font-semibold text-gray-900">Compliance Check</h3>
-            <p className="text-xs text-gray-600">{summary}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300">{summary}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">

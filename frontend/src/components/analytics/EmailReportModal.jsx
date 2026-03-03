@@ -14,7 +14,7 @@ import { useSendKPIReport } from '../../hooks/useAnalytics';
  */
 export const EmailReportModal = ({ isOpen, onClose, kpiData, dateRange, timeRange }) => {
   const [recipients, setRecipients] = useState('');
-  const [subject, setSubject] = useState(`ChiroClick KPI Report - ${dateRange}`);
+  const [subject, setSubject] = useState(`ChiroClick EHR KPI Report - ${dateRange}`);
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
 
@@ -122,7 +122,9 @@ ${message ? `\nAdditional Notes:\n${message}` : ''}
               placeholder="email1@example.com, email2@example.com"
               error={errors.recipients}
             />
-            <p className="text-xs text-slate-500 mt-1">Separate multiple emails with commas</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Separate multiple emails with commas
+            </p>
           </div>
 
           {/* Subject */}

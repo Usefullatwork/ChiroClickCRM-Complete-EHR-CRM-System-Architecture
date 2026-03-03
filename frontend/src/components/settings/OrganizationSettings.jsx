@@ -111,7 +111,7 @@ export default function OrganizationSettings({
                     />
                   ) : (
                     <p className="text-sm text-gray-900 dark:text-white flex items-center gap-2">
-                      <Mail className="w-4 h-4 text-gray-400" />
+                      <Mail className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                       {organization.email || '-'}
                     </p>
                   )}
@@ -131,7 +131,7 @@ export default function OrganizationSettings({
                     />
                   ) : (
                     <p className="text-sm text-gray-900 dark:text-white flex items-center gap-2">
-                      <Phone className="w-4 h-4 text-gray-400" />
+                      <Phone className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                       {organization.phone || '-'}
                     </p>
                   )}
@@ -151,7 +151,7 @@ export default function OrganizationSettings({
                     />
                   ) : (
                     <p className="text-sm text-gray-900 dark:text-white flex items-center gap-2">
-                      <Globe className="w-4 h-4 text-gray-400" />
+                      <Globe className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                       {organization.website || '-'}
                     </p>
                   )}
@@ -172,7 +172,7 @@ export default function OrganizationSettings({
                   />
                 ) : (
                   <p className="text-sm text-gray-900 dark:text-white flex items-start gap-2">
-                    <MapPin className="w-4 h-4 text-gray-400 mt-0.5" />
+                    <MapPin className="w-4 h-4 text-gray-400 dark:text-gray-300 mt-0.5" />
                     {organization.address || '-'}
                   </p>
                 )}
@@ -208,10 +208,10 @@ export default function OrganizationSettings({
 
             <div className="p-6">
               <div className="space-y-4">
-                <p className="text-sm text-gray-600 dark:text-white">
+                <p className="text-sm text-gray-600 dark:text-gray-300 dark:text-white">
                   {t('kioskLaunchDescription')}
                 </p>
-                <ul className="text-sm text-gray-600 dark:text-white space-y-2 ml-4">
+                <ul className="text-sm text-gray-600 dark:text-gray-300 dark:text-white space-y-2 ml-4">
                   <li className="flex items-center gap-2">
                     <Check className="w-4 h-4 text-teal-600" />
                     {t('kioskFeature1')}

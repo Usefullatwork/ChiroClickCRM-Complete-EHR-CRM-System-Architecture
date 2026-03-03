@@ -267,7 +267,7 @@ export default function Financial() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{t('financialTracking')}</h1>
-          <p className="text-gray-600 mt-1">{t('billingPaymentsRevenue')}</p>
+          <p className="text-gray-600 dark:text-gray-300 mt-1">{t('billingPaymentsRevenue')}</p>
         </div>
 
         <div className="flex gap-3">
@@ -312,7 +312,7 @@ export default function Financial() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">{t('totalRevenue')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('totalRevenue')}</p>
               <p className="text-2xl font-bold text-gray-900 mt-1">
                 {formatCurrency(summary.totalRevenue)}
               </p>
@@ -326,7 +326,7 @@ export default function Financial() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">{t('paid')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('paid')}</p>
               <p className="text-2xl font-bold text-green-600 mt-1">
                 {formatCurrency(summary.totalPaid)}
               </p>
@@ -340,7 +340,7 @@ export default function Financial() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">{t('pending')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('pending')}</p>
               <p className="text-2xl font-bold text-yellow-600 mt-1">
                 {formatCurrency(summary.totalPending)}
               </p>
@@ -354,7 +354,7 @@ export default function Financial() {
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">{t('outstanding')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('outstanding')}</p>
               <p className="text-2xl font-bold text-red-600 mt-1">
                 {formatCurrency(summary.totalOutstanding)}
               </p>
@@ -415,7 +415,7 @@ export default function Financial() {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-64 text-gray-500">
+            <div className="flex items-center justify-center h-64 text-gray-500 dark:text-gray-400">
               {t('noPaymentData')}
             </div>
           )}
@@ -445,7 +445,7 @@ export default function Financial() {
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <div className="flex items-center gap-2 mb-3">
-          <Filter className="w-5 h-5 text-gray-600" />
+          <Filter className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           <h3 className="font-semibold">{t('filters')}</h3>
         </div>
 
@@ -524,7 +524,7 @@ export default function Financial() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold">{t('transactions')}</h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             {pagination.total} {t('transactions').toLowerCase()}
           </p>
         </div>
@@ -535,7 +535,7 @@ export default function Financial() {
           </div>
         ) : transactions.length === 0 ? (
           <div className="text-center py-12 bg-gray-50">
-            <p className="text-gray-600">{t('noTransactions')}</p>
+            <p className="text-gray-600 dark:text-gray-300">{t('noTransactions')}</p>
           </div>
         ) : (
           <>
@@ -543,28 +543,28 @@ export default function Financial() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('date')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('patient')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('type')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('amount')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('payment')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('status')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('invoice')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('actions')}
                     </th>
                   </tr>
@@ -579,7 +579,7 @@ export default function Financial() {
                         <div className="text-sm font-medium text-gray-900">
                           {transaction.patient_name || t('unknownPatient')}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
                           ID: {transaction.patient_id?.substring(0, 8)}...
                         </div>
                       </td>
@@ -591,7 +591,7 @@ export default function Financial() {
                           {formatCurrency(transaction.patient_amount)}
                         </div>
                         {transaction.insurance_amount > 0 && (
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             {t('insurance')}: {formatCurrency(transaction.insurance_amount)}
                           </div>
                         )}
@@ -680,7 +680,9 @@ export default function Financial() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h3 className="text-lg font-semibold mb-4">{t('createNewTransaction')}</h3>
-            <p className="text-gray-600 mb-4">{t('transactionFormComingSoon')}</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              {t('transactionFormComingSoon')}
+            </p>
             <button
               onClick={() => setShowCreateModal(false)}
               className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"

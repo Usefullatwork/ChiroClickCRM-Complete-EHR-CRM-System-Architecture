@@ -174,7 +174,7 @@ const SchedulerDecisions = () => {
         </div>
 
         {decisions.length === 0 ? (
-          <div className="p-6 text-center text-sm text-slate-500">
+          <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">
             {filter === 'pending'
               ? 'Ingen ventende beslutninger.'
               : `Ingen ${filter === 'approved' ? 'godkjente' : 'avviste'} beslutninger.`}
@@ -216,12 +216,12 @@ const SchedulerDecisions = () => {
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-slate-500 mt-1">
+                          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                             {decision.description || decision.reason || 'Ingen beskrivelse'}
                           </p>
 
                           {/* Patient and time info */}
-                          <div className="flex items-center gap-4 mt-2 text-xs text-slate-400">
+                          <div className="flex items-center gap-4 mt-2 text-xs text-slate-400 dark:text-slate-300">
                             {decision.patient_name && <span>Pasient: {decision.patient_name}</span>}
                             {decision.suggested_time && (
                               <span className="text-teal-600">
@@ -264,7 +264,7 @@ const SchedulerDecisions = () => {
                           <button
                             onClick={() => handleDismiss(decision.id)}
                             disabled={resolveMutation.isPending}
-                            className="px-3 py-1.5 text-xs bg-slate-100 text-slate-600 rounded hover:bg-slate-200 transition-colors disabled:opacity-50"
+                            className="px-3 py-1.5 text-xs bg-slate-100 text-slate-600 dark:text-slate-300 rounded hover:bg-slate-200 transition-colors disabled:opacity-50"
                           >
                             Avvis
                           </button>
@@ -275,7 +275,7 @@ const SchedulerDecisions = () => {
                           className={`text-xs px-2 py-1 rounded ${
                             filter === 'approved'
                               ? 'bg-green-100 text-green-700'
-                              : 'bg-slate-100 text-slate-500'
+                              : 'bg-slate-100 text-slate-500 dark:text-slate-400'
                           }`}
                         >
                           {filter === 'approved' ? 'Godkjent' : 'Avvist'}
@@ -287,7 +287,10 @@ const SchedulerDecisions = () => {
                     {isExpanded && decision.conflicts && (
                       <div className="mt-3 ml-13 pl-4 border-l-2 border-red-200 space-y-2">
                         {decision.conflicts.map((conflict, idx) => (
-                          <div key={idx} className="text-xs text-slate-600 bg-red-50 rounded p-2">
+                          <div
+                            key={idx}
+                            className="text-xs text-slate-600 dark:text-slate-300 bg-red-50 rounded p-2"
+                          >
                             <p className="font-medium">{conflict.type || 'Overlapping'}</p>
                             <p>
                               {conflict.existing_appointment ||
@@ -328,18 +331,20 @@ const SchedulerDecisions = () => {
             )}
           </div>
           {showTodaysMessages ? (
-            <ChevronUp className="w-4 h-4 text-slate-400" />
+            <ChevronUp className="w-4 h-4 text-slate-400 dark:text-slate-300" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-slate-400" />
+            <ChevronDown className="w-4 h-4 text-slate-400 dark:text-slate-300" />
           )}
         </button>
 
         {showTodaysMessages && (
           <div>
             {todaysLoading ? (
-              <div className="p-4 text-center text-sm text-slate-400">Laster meldinger...</div>
+              <div className="p-4 text-center text-sm text-slate-400 dark:text-slate-300">
+                Laster meldinger...
+              </div>
             ) : todaysMessages.length === 0 ? (
-              <div className="p-6 text-center text-sm text-slate-500">
+              <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">
                 Ingen planlagte meldinger i dag.
               </div>
             ) : (
@@ -347,7 +352,7 @@ const SchedulerDecisions = () => {
                 {/* Bulk send button */}
                 {todaysMessages.some((m) => m.status === 'approved') && (
                   <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
-                    <span className="text-xs text-slate-500">
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
                       {todaysMessages.filter((m) => m.status === 'approved').length} godkjente
                       meldinger klare
                     </span>
@@ -369,18 +374,18 @@ const SchedulerDecisions = () => {
                       <li key={msg.id} className="p-3 hover:bg-slate-50 transition-colors">
                         <div className="flex items-center justify-between gap-3">
                           <div className="flex items-center gap-3 flex-1 min-w-0">
-                            <ChannelIcon className="w-4 h-4 text-slate-400 flex-shrink-0" />
+                            <ChannelIcon className="w-4 h-4 text-slate-400 dark:text-slate-300 flex-shrink-0" />
                             <div className="min-w-0 flex-1">
                               <p className="text-sm text-slate-700 truncate">
                                 {msg.patient_name || 'Ukjent pasient'}
                               </p>
-                              <p className="text-xs text-slate-400 truncate">
+                              <p className="text-xs text-slate-400 dark:text-slate-300 truncate">
                                 {msg.message || msg.subject || 'Melding'}
                               </p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
-                            <span className="text-xs text-slate-400">
+                            <span className="text-xs text-slate-400 dark:text-slate-300">
                               {msg.scheduled_at
                                 ? new Date(msg.scheduled_at).toLocaleTimeString('no-NO', {
                                     hour: '2-digit',
@@ -411,7 +416,7 @@ const SchedulerDecisions = () => {
                               <button
                                 onClick={() => cancelMutation.mutate(msg.id)}
                                 disabled={cancelMutation.isPending}
-                                className="p-1 text-slate-400 hover:text-red-500 transition-colors disabled:opacity-50"
+                                className="p-1 text-slate-400 dark:text-slate-300 hover:text-red-500 transition-colors disabled:opacity-50"
                                 title="Avbryt"
                               >
                                 <X className="w-3.5 h-3.5" />
@@ -437,7 +442,7 @@ function StatBadge({ label, value, color }) {
   return (
     <div className={`px-3 py-2 rounded-lg bg-${color}-50 border border-${color}-200`}>
       <div className={`text-lg font-bold text-${color}-700`}>{value}</div>
-      <div className="text-xs text-slate-500">{label}</div>
+      <div className="text-xs text-slate-500 dark:text-slate-400">{label}</div>
     </div>
   );
 }

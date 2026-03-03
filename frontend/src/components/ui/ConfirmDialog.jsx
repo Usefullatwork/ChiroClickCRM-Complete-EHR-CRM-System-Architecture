@@ -60,7 +60,7 @@ export default function ConfirmDialog({
       >
         <button
           onClick={onCancel}
-          className="absolute top-4 right-4 p-1 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="absolute top-4 right-4 p-1 rounded-lg text-gray-400 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
           aria-label="Lukk"
         >
           <X className="w-4 h-4" />

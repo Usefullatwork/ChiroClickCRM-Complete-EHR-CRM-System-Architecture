@@ -457,7 +457,7 @@ export default function VCardImport({
             <Smartphone className="w-6 h-6 text-purple-600" />
             {t.title}
           </h2>
-          <p className="text-slate-500">{t.subtitle}</p>
+          <p className="text-slate-500 dark:text-slate-400">{t.subtitle}</p>
         </div>
         {contacts.length > 0 && (
           <Button variant="ghost" icon={Trash2} onClick={handleClear}>
@@ -484,9 +484,9 @@ export default function VCardImport({
           onDrop={handleDrop}
           onClick={() => document.getElementById('vcard-file-input')?.click()}
         >
-          <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+          <Upload className="w-12 h-12 text-slate-400 dark:text-slate-300 mx-auto mb-4" />
           <p className="text-lg font-medium text-slate-700 mb-2">{t.dropzone}</p>
-          <p className="text-sm text-slate-500">{t.supportedFormats}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{t.supportedFormats}</p>
           <input
             id="vcard-file-input"
             type="file"
@@ -509,7 +509,7 @@ export default function VCardImport({
                     <FileText className="w-5 h-5 text-purple-600" />
                     <span className="font-medium text-slate-900">{file?.name}</span>
                   </div>
-                  <span className="text-slate-500">
+                  <span className="text-slate-500 dark:text-slate-400">
                     {contacts.length} {t.contactsFound}
                   </span>
                 </div>
@@ -564,13 +564,13 @@ export default function VCardImport({
                         {getContactName(contact)}
                       </h4>
                       {contact.organization && (
-                        <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded">
+                        <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 dark:text-slate-300 rounded">
                           {contact.organization}
                         </span>
                       )}
                     </div>
 
-                    <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500">
+                    <div className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm text-slate-500 dark:text-slate-400">
                       {contact.email && (
                         <span className="flex items-center gap-1">
                           <Mail className="w-3.5 h-3.5" />
@@ -627,7 +627,7 @@ export default function VCardImport({
                         e.stopPropagation();
                         setPreviewContact(contact);
                       }}
-                      className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded"
+                      className="p-2 text-slate-400 dark:text-slate-300 hover:text-slate-600 hover:bg-slate-100 rounded"
                       title={t.buttons.preview}
                     >
                       <Eye className="w-4 h-4" />
@@ -637,7 +637,7 @@ export default function VCardImport({
                         e.stopPropagation();
                         handleRemoveContact(index);
                       }}
-                      className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded"
+                      className="p-2 text-slate-400 dark:text-slate-300 hover:text-red-500 hover:bg-red-50 rounded"
                       title={t.buttons.remove}
                     >
                       <X className="w-4 h-4" />
@@ -654,7 +654,7 @@ export default function VCardImport({
               {t.buttons.cancel}
             </Button>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-slate-500 dark:text-slate-400">
                 {selectedContacts.size} {t.selected}
               </span>
               <Button
@@ -689,7 +689,7 @@ export default function VCardImport({
                   {getContactName(previewContact)}
                 </h3>
                 {previewContact.organization && (
-                  <p className="text-slate-500 flex items-center gap-1">
+                  <p className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
                     <Building2 className="w-4 h-4" />
                     {previewContact.organization}
                   </p>
@@ -701,9 +701,11 @@ export default function VCardImport({
             <div className="space-y-3">
               {previewContact.email && (
                 <div className="flex items-start gap-3">
-                  <Mail className="w-5 h-5 text-slate-400 mt-0.5" />
+                  <Mail className="w-5 h-5 text-slate-400 dark:text-slate-300 mt-0.5" />
                   <div>
-                    <p className="text-xs text-slate-500 uppercase">{t.fields.email}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 uppercase">
+                      {t.fields.email}
+                    </p>
                     <p className="text-slate-900">{previewContact.email}</p>
                   </div>
                 </div>
@@ -711,9 +713,11 @@ export default function VCardImport({
 
               {previewContact.phone && (
                 <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-slate-400 mt-0.5" />
+                  <Phone className="w-5 h-5 text-slate-400 dark:text-slate-300 mt-0.5" />
                   <div>
-                    <p className="text-xs text-slate-500 uppercase">{t.fields.phone}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 uppercase">
+                      {t.fields.phone}
+                    </p>
                     <p className="text-slate-900">{previewContact.phone}</p>
                   </div>
                 </div>
@@ -721,9 +725,11 @@ export default function VCardImport({
 
               {previewContact.home_phone && (
                 <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-slate-400 mt-0.5" />
+                  <Phone className="w-5 h-5 text-slate-400 dark:text-slate-300 mt-0.5" />
                   <div>
-                    <p className="text-xs text-slate-500 uppercase">{t.fields.homePhone}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 uppercase">
+                      {t.fields.homePhone}
+                    </p>
                     <p className="text-slate-900">{previewContact.home_phone}</p>
                   </div>
                 </div>
@@ -731,9 +737,11 @@ export default function VCardImport({
 
               {previewContact.work_phone && (
                 <div className="flex items-start gap-3">
-                  <Phone className="w-5 h-5 text-slate-400 mt-0.5" />
+                  <Phone className="w-5 h-5 text-slate-400 dark:text-slate-300 mt-0.5" />
                   <div>
-                    <p className="text-xs text-slate-500 uppercase">{t.fields.workPhone}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 uppercase">
+                      {t.fields.workPhone}
+                    </p>
                     <p className="text-slate-900">{previewContact.work_phone}</p>
                   </div>
                 </div>
@@ -741,9 +749,11 @@ export default function VCardImport({
 
               {formatAddress(previewContact) && (
                 <div className="flex items-start gap-3">
-                  <MapPin className="w-5 h-5 text-slate-400 mt-0.5" />
+                  <MapPin className="w-5 h-5 text-slate-400 dark:text-slate-300 mt-0.5" />
                   <div>
-                    <p className="text-xs text-slate-500 uppercase">{t.fields.address}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 uppercase">
+                      {t.fields.address}
+                    </p>
                     <p className="text-slate-900">{formatAddress(previewContact)}</p>
                   </div>
                 </div>
@@ -751,9 +761,11 @@ export default function VCardImport({
 
               {previewContact.date_of_birth && (
                 <div className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-slate-400 mt-0.5" />
+                  <Calendar className="w-5 h-5 text-slate-400 dark:text-slate-300 mt-0.5" />
                   <div>
-                    <p className="text-xs text-slate-500 uppercase">{t.fields.birthday}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 uppercase">
+                      {t.fields.birthday}
+                    </p>
                     <p className="text-slate-900">{previewContact.date_of_birth}</p>
                   </div>
                 </div>
@@ -761,9 +773,11 @@ export default function VCardImport({
 
               {previewContact.notes && (
                 <div className="flex items-start gap-3">
-                  <FileText className="w-5 h-5 text-slate-400 mt-0.5" />
+                  <FileText className="w-5 h-5 text-slate-400 dark:text-slate-300 mt-0.5" />
                   <div>
-                    <p className="text-xs text-slate-500 uppercase">{t.fields.notes}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 uppercase">
+                      {t.fields.notes}
+                    </p>
                     <p className="text-slate-900 whitespace-pre-wrap">{previewContact.notes}</p>
                   </div>
                 </div>

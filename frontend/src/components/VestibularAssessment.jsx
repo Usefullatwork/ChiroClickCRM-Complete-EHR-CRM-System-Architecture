@@ -116,7 +116,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
               className={`flex items-center gap-2 px-6 py-3 font-medium transition-colors ${
                 activeSection === tab.id
                   ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
               }`}
             >
               <Icon className="w-4 h-4" />
@@ -321,7 +321,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                         {assessmentData.dix_hallpike_right?.nystagmus && (
                           <div className="space-y-2 ml-6">
                             <div>
-                              <label className="text-xs text-gray-600">Type</label>
+                              <label className="text-xs text-gray-600 dark:text-gray-300">
+                                Type
+                              </label>
                               <select
                                 value={assessmentData.dix_hallpike_right?.type || ''}
                                 onChange={(e) =>
@@ -337,7 +339,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               </select>
                             </div>
                             <div>
-                              <label className="text-xs text-gray-600">Intensitet</label>
+                              <label className="text-xs text-gray-600 dark:text-gray-300">
+                                Intensitet
+                              </label>
                               <select
                                 value={assessmentData.dix_hallpike_right?.intensity || ''}
                                 onChange={(e) =>
@@ -357,7 +361,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               </select>
                             </div>
                             <div>
-                              <label className="text-xs text-gray-600">Karakter</label>
+                              <label className="text-xs text-gray-600 dark:text-gray-300">
+                                Karakter
+                              </label>
                               <select
                                 value={assessmentData.dix_hallpike_right?.character || ''}
                                 onChange={(e) =>
@@ -398,7 +404,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                         {assessmentData.dix_hallpike_left?.nystagmus && (
                           <div className="space-y-2 ml-6">
                             <div>
-                              <label className="text-xs text-gray-600">Type</label>
+                              <label className="text-xs text-gray-600 dark:text-gray-300">
+                                Type
+                              </label>
                               <select
                                 value={assessmentData.dix_hallpike_left?.type || ''}
                                 onChange={(e) =>
@@ -414,7 +422,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               </select>
                             </div>
                             <div>
-                              <label className="text-xs text-gray-600">Intensitet</label>
+                              <label className="text-xs text-gray-600 dark:text-gray-300">
+                                Intensitet
+                              </label>
                               <select
                                 value={assessmentData.dix_hallpike_left?.intensity || ''}
                                 onChange={(e) =>
@@ -434,7 +444,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               </select>
                             </div>
                             <div>
-                              <label className="text-xs text-gray-600">Karakter</label>
+                              <label className="text-xs text-gray-600 dark:text-gray-300">
+                                Karakter
+                              </label>
                               <select
                                 value={assessmentData.dix_hallpike_left?.character || ''}
                                 onChange={(e) =>
@@ -481,7 +493,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                         {assessmentData.supine_roll_right?.nystagmus && (
                           <div className="space-y-2 ml-6">
                             <div>
-                              <label className="text-xs text-gray-600">Retning</label>
+                              <label className="text-xs text-gray-600 dark:text-gray-300">
+                                Retning
+                              </label>
                               <select
                                 value={assessmentData.supine_roll_right?.direction || ''}
                                 onChange={(e) =>
@@ -500,7 +514,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               </select>
                             </div>
                             <div>
-                              <label className="text-xs text-gray-600">Intensitet</label>
+                              <label className="text-xs text-gray-600 dark:text-gray-300">
+                                Intensitet
+                              </label>
                               <select
                                 value={assessmentData.supine_roll_right?.intensity || ''}
                                 onChange={(e) =>
@@ -542,7 +558,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                         {assessmentData.supine_roll_left?.nystagmus && (
                           <div className="space-y-2 ml-6">
                             <div>
-                              <label className="text-xs text-gray-600">Retning</label>
+                              <label className="text-xs text-gray-600 dark:text-gray-300">
+                                Retning
+                              </label>
                               <select
                                 value={assessmentData.supine_roll_left?.direction || ''}
                                 onChange={(e) =>
@@ -561,7 +579,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                               </select>
                             </div>
                             <div>
-                              <label className="text-xs text-gray-600">Intensitet</label>
+                              <label className="text-xs text-gray-600 dark:text-gray-300">
+                                Intensitet
+                              </label>
                               <select
                                 value={assessmentData.supine_roll_left?.intensity || ''}
                                 onChange={(e) =>
@@ -874,7 +894,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                 className="w-full p-2 border rounded-md"
               />
               {assessmentData.dhi_score !== null && (
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                   {assessmentData.dhi_score <= 30 && 'Mild funksjonsnedsettelse'}
                   {assessmentData.dhi_score > 30 &&
                     assessmentData.dhi_score <= 60 &&

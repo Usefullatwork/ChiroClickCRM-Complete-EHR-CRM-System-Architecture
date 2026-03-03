@@ -207,7 +207,7 @@ export default function ComplianceCalendar({ data = [], onDateSelect }) {
           onClick={goToPreviousMonth}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <ChevronLeft className="w-5 h-5 text-gray-600" />
+          <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </button>
         <h3 className="text-lg font-semibold text-gray-900">
           {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
@@ -216,14 +216,17 @@ export default function ComplianceCalendar({ data = [], onDateSelect }) {
           onClick={goToNextMonth}
           className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
         >
-          <ChevronRight className="w-5 h-5 text-gray-600" />
+          <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
         </button>
       </div>
 
       {/* Day Headers */}
       <div className="grid grid-cols-7 gap-1">
         {dayNames.map((day) => (
-          <div key={day} className="text-center text-xs font-medium text-gray-500 py-2">
+          <div
+            key={day}
+            className="text-center text-xs font-medium text-gray-500 dark:text-gray-400 py-2"
+          >
             {day}
           </div>
         ))}
@@ -244,7 +247,7 @@ export default function ComplianceCalendar({ data = [], onDateSelect }) {
               className={`
                 relative h-14 p-1 rounded-lg border transition-all text-center
                 ${day.isCurrentMonth ? 'cursor-pointer' : 'cursor-default'}
-                ${!day.isCurrentMonth ? 'bg-gray-50 text-gray-400 border-transparent' : ''}
+                ${!day.isCurrentMonth ? 'bg-gray-50 text-gray-400 dark:text-gray-300 border-transparent' : ''}
                 ${day.isCurrentMonth && !status ? 'bg-white border-gray-200 hover:bg-gray-50' : ''}
                 ${day.isCurrentMonth && status ? cellColor : ''}
                 ${isToday(day.date) ? 'ring-2 ring-blue-500 ring-offset-1' : ''}
@@ -255,7 +258,7 @@ export default function ComplianceCalendar({ data = [], onDateSelect }) {
               <span
                 className={`
                 text-sm font-medium
-                ${day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400'}
+                ${day.isCurrentMonth ? 'text-gray-900' : 'text-gray-400 dark:text-gray-300'}
                 ${isToday(day.date) ? 'text-blue-600' : ''}
               `}
               >
@@ -282,19 +285,19 @@ export default function ComplianceCalendar({ data = [], onDateSelect }) {
       <div className="flex items-center justify-center gap-6 pt-4 border-t border-gray-200">
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-green-100 border border-green-300" />
-          <span className="text-xs text-gray-600">Utmerket (80%+)</span>
+          <span className="text-xs text-gray-600 dark:text-gray-300">Utmerket (80%+)</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-yellow-100 border border-yellow-300" />
-          <span className="text-xs text-gray-600">Middels (50-79%)</span>
+          <span className="text-xs text-gray-600 dark:text-gray-300">Middels (50-79%)</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-orange-100 border border-orange-300" />
-          <span className="text-xs text-gray-600">Lav (1-49%)</span>
+          <span className="text-xs text-gray-600 dark:text-gray-300">Lav (1-49%)</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-4 h-4 rounded bg-gray-100 border border-gray-300" />
-          <span className="text-xs text-gray-600">Ingen</span>
+          <span className="text-xs text-gray-600 dark:text-gray-300">Ingen</span>
         </div>
       </div>
 
@@ -312,20 +315,20 @@ export default function ComplianceCalendar({ data = [], onDateSelect }) {
           {selectedDateData ? (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Ovelser fullfort</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Ovelser fullfort</p>
                 <p className="text-lg font-semibold text-gray-900">
                   {selectedDateData.exercisesDone} / {selectedDateData.totalPrescribed}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Overholdelse</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Overholdelse</p>
                 <p className="text-lg font-semibold text-gray-900">
                   {selectedDateData.completionRate}%
                 </p>
               </div>
               {selectedDateData.avgPain && (
                 <div>
-                  <p className="text-sm text-gray-500">Gjennomsnittlig smerte</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Gjennomsnittlig smerte</p>
                   <div className="flex items-center gap-2">
                     <p className="text-lg font-semibold text-gray-900">
                       {selectedDateData.avgPain}/10
@@ -336,7 +339,7 @@ export default function ComplianceCalendar({ data = [], onDateSelect }) {
               )}
               {selectedDateData.exerciseNames && selectedDateData.exerciseNames.length > 0 && (
                 <div className="col-span-2">
-                  <p className="text-sm text-gray-500 mb-1">Fullforte ovelser</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Fullforte ovelser</p>
                   <div className="flex flex-wrap gap-1">
                     {selectedDateData.exerciseNames.map((name, i) => (
                       <span
@@ -351,7 +354,9 @@ export default function ComplianceCalendar({ data = [], onDateSelect }) {
               )}
             </div>
           ) : (
-            <p className="text-sm text-gray-500">Ingen treningsdata registrert for denne dagen</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Ingen treningsdata registrert for denne dagen
+            </p>
           )}
         </div>
       )}

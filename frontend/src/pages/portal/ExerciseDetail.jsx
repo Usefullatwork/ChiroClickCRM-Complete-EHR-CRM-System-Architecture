@@ -155,7 +155,7 @@ const ExerciseDetail = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Laster ovelse...</p>
+          <p className="text-gray-600 dark:text-gray-300">Laster ovelse...</p>
         </div>
       </div>
     );
@@ -170,7 +170,7 @@ const ExerciseDetail = () => {
             <AlertTriangle className="w-8 h-8 text-red-600" />
           </div>
           <h1 className="text-xl font-semibold text-gray-900 mb-2">Kunne ikke laste øvelsen</h1>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
           <button
             onClick={handleBack}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -192,13 +192,13 @@ const ExerciseDetail = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={handleBack}
-              className="p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 -ml-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="flex-1 min-w-0">
               <h1 className="font-semibold text-gray-900 truncate">{exercise?.name || 'Ovelse'}</h1>
-              <p className="text-sm text-gray-500">{data?.clinic?.name}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{data?.clinic?.name}</p>
             </div>
           </div>
         </div>
@@ -273,22 +273,22 @@ const ExerciseDetail = () => {
           </div>
 
           {/* Parameters */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
             {exercise?.sets && (
               <span className="flex items-center gap-1">
-                <Target className="w-4 h-4 text-gray-400" />
+                <Target className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 {exercise.sets} sett
               </span>
             )}
             {exercise?.reps && (
               <span className="flex items-center gap-1">
-                <Activity className="w-4 h-4 text-gray-400" />
+                <Activity className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 {exercise.reps} rep
               </span>
             )}
             {exercise?.holdSeconds > 0 && (
               <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4 text-gray-400" />
+                <Clock className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 Hold {exercise.holdSeconds} sek
               </span>
             )}
@@ -312,7 +312,9 @@ const ExerciseDetail = () => {
           {exercise?.instructions && (
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <h3 className="font-medium text-gray-900 mb-2">Instruksjoner</h3>
-              <p className="text-sm text-gray-600 whitespace-pre-line">{exercise.instructions}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">
+                {exercise.instructions}
+              </p>
             </div>
           )}
 
@@ -320,7 +322,9 @@ const ExerciseDetail = () => {
           {exercise?.description && (
             <div className="bg-white rounded-xl p-4 shadow-sm">
               <h3 className="font-medium text-gray-900 mb-2">Beskrivelse</h3>
-              <p className="text-sm text-gray-600 whitespace-pre-line">{exercise.description}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">
+                {exercise.description}
+              </p>
             </div>
           )}
 
@@ -366,14 +370,16 @@ const ExerciseDetail = () => {
                 className="w-full flex items-center justify-between p-4"
               >
                 <div className="flex items-center gap-2">
-                  <History className="w-5 h-5 text-gray-400" />
+                  <History className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                   <span className="font-medium text-gray-900">Fremgangshistorikk</span>
-                  <span className="text-sm text-gray-500">({exercise.progressHistory.length})</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    ({exercise.progressHistory.length})
+                  </span>
                 </div>
                 {showHistory ? (
-                  <ChevronUp className="w-5 h-5 text-gray-400" />
+                  <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                  <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                 )}
               </button>
 
@@ -382,7 +388,7 @@ const ExerciseDetail = () => {
                   {exercise.progressHistory.map((entry, index) => (
                     <div key={index} className="p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
                           {new Date(entry.completedAt).toLocaleDateString('nb-NO', {
                             day: 'numeric',
                             month: 'short',
@@ -403,7 +409,7 @@ const ExerciseDetail = () => {
                           ))}
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
                         {entry.setsCompleted && <span>{entry.setsCompleted} sett</span>}
                         {entry.repsCompleted && <span>{entry.repsCompleted} rep</span>}
                         {entry.painRating > 0 && (
@@ -411,7 +417,9 @@ const ExerciseDetail = () => {
                         )}
                       </div>
                       {entry.notes && (
-                        <p className="text-sm text-gray-500 mt-2 italic">{entry.notes}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 italic">
+                          {entry.notes}
+                        </p>
                       )}
                     </div>
                   ))}
@@ -457,7 +465,7 @@ const ExerciseDetail = () => {
         </div>
 
         {/* Contact Footer */}
-        <div className="p-4 text-center text-sm text-gray-500 pb-24">
+        <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400 pb-24">
           <p>Stopp øvelsen hvis du opplever økt smerte.</p>
           {data?.clinic?.phone && (
             <a
@@ -497,7 +505,7 @@ const ExerciseDetail = () => {
 
             {/* Form */}
             <div className="p-4 space-y-5">
-              <p className="text-sm text-gray-600">{exercise?.name}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{exercise?.name}</p>
 
               {/* Sets/Reps */}
               <div className="grid grid-cols-2 gap-4">
@@ -562,7 +570,7 @@ const ExerciseDetail = () => {
                     </button>
                   ))}
                 </div>
-                <div className="flex justify-between text-xs text-gray-500 mt-1 px-1">
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1 px-1">
                   <span>Lett</span>
                   <span>Vanskelig</span>
                 </div>
@@ -586,7 +594,7 @@ const ExerciseDetail = () => {
                   min="0"
                   max="10"
                 />
-                <div className="flex justify-between text-xs text-gray-500 px-1">
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 px-1">
                   <span>Ingen smerte</span>
                   <span className="font-semibold text-gray-700">{feedbackData.painRating}</span>
                   <span>Verst tenkelig</span>

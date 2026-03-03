@@ -79,7 +79,7 @@ export const RevenueChart = ({ data = [], stats = {}, chartType = 'area', loadin
           {payload.map((entry, index) => (
             <div key={index} className="flex items-center gap-2 text-sm">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-              <span className="text-gray-600">{entry.name}:</span>
+              <span className="text-gray-600 dark:text-gray-300">{entry.name}:</span>
               <span className="font-semibold text-gray-900">{formatCurrency(entry.value)}</span>
             </div>
           ))}
@@ -114,20 +114,20 @@ export const RevenueChart = ({ data = [], stats = {}, chartType = 'area', loadin
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">Inntekter</h3>
-              <p className="text-sm text-gray-500">Siste 30 dager</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Siste 30 dager</p>
             </div>
           </div>
 
           {/* Summary stats */}
           <div className="hidden md:flex items-center gap-6">
             <div className="text-right">
-              <p className="text-xs text-gray-500">Denne maned</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Denne maned</p>
               <p className="text-lg font-bold text-gray-900">
                 {formatCurrency(stats.thisMonth?.totalRevenue || 0)}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-500">Endring</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Endring</p>
               <div
                 className={`flex items-center gap-1 justify-end ${isPositiveChange ? 'text-green-600' : 'text-red-600'}`}
               >
@@ -204,7 +204,7 @@ export const RevenueChart = ({ data = [], stats = {}, chartType = 'area', loadin
             )}
           </ResponsiveContainer>
         ) : (
-          <div className="h-64 flex items-center justify-center text-gray-400">
+          <div className="h-64 flex items-center justify-center text-gray-400 dark:text-gray-300">
             <div className="text-center">
               <DollarSign size={48} className="mx-auto mb-2 opacity-50" />
               <p>Ingen inntektsdata tilgjengelig</p>
@@ -217,25 +217,25 @@ export const RevenueChart = ({ data = [], stats = {}, chartType = 'area', loadin
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <p className="text-xs text-gray-500 mb-1">Totalt (denne mnd)</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Totalt (denne mnd)</p>
             <p className="text-xl font-bold text-gray-900">
               {formatCurrency(stats.thisMonth?.totalRevenue || 0)}
             </p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-gray-500 mb-1">Pasientandel</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Pasientandel</p>
             <p className="text-xl font-bold text-blue-600">
               {formatCurrency(stats.thisMonth?.patientRevenue || 0)}
             </p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-gray-500 mb-1">Forsikring</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Forsikring</p>
             <p className="text-xl font-bold text-purple-600">
               {formatCurrency(stats.thisMonth?.insuranceRevenue || 0)}
             </p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-gray-500 mb-1">Transaksjoner</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Transaksjoner</p>
             <p className="text-xl font-bold text-gray-900">
               {stats.thisMonth?.transactionCount || 0}
             </p>
@@ -270,7 +270,7 @@ export const RevenueCompact = ({ totalRevenue = 0, changePercent = 0, loading = 
           {changePercent >= 0 ? '+' : ''}
           {changePercent}%
         </span>
-        <span className="text-gray-500">vs forrige mnd</span>
+        <span className="text-gray-500 dark:text-gray-400">vs forrige mnd</span>
       </div>
     </div>
   );

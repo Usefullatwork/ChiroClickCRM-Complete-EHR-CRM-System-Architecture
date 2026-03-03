@@ -98,7 +98,7 @@ export default function QuickScreening({ appointment, onNext, onBack, lang = 'no
       <div className="flex flex-col items-center justify-center h-full text-center py-12">
         <div className="text-8xl mb-6 animate-bounce">👋</div>
         <h2 className="text-3xl font-bold text-slate-800 mb-3">{t.firstVisitMessage}</h2>
-        <p className="text-xl text-slate-500">{t.firstVisitSubtext}</p>
+        <p className="text-xl text-slate-500 dark:text-slate-400">{t.firstVisitSubtext}</p>
         <div className="mt-8">
           <div className="w-8 h-8 border-4 border-teal-500 border-t-transparent rounded-full animate-spin" />
         </div>
@@ -111,7 +111,7 @@ export default function QuickScreening({ appointment, onNext, onBack, lang = 'no
       {/* Back button */}
       <button
         onClick={onBack}
-        className="self-start flex items-center gap-2 text-slate-500 hover:text-slate-700
+        className="self-start flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-700
                    transition-colors mb-4"
       >
         <ArrowLeft className="w-5 h-5" />
@@ -122,7 +122,7 @@ export default function QuickScreening({ appointment, onNext, onBack, lang = 'no
       <div className="text-center mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">{t.title}</h1>
         {appointment?.lastVisitDate && (
-          <p className="text-lg text-slate-500">
+          <p className="text-lg text-slate-500 dark:text-slate-400">
             {t.lastVisit}: {formatDate(appointment.lastVisitDate)}
           </p>
         )}

@@ -179,7 +179,7 @@ export default function ProgressChart({
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-lg font-semibold text-gray-900">Fremgang</h3>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             {getMetricLabel(selectedMetric)} - {getPeriodOffsetLabel()}
           </p>
         </div>
@@ -190,7 +190,7 @@ export default function ProgressChart({
             onClick={() => handlePeriodChange('prev')}
             className="p-1 hover:bg-gray-100 rounded"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-500" />
+            <ChevronLeft className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
           <select
             value={currentPeriod}
@@ -206,7 +206,7 @@ export default function ProgressChart({
             disabled={periodOffset >= 0}
             className="p-1 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed"
           >
-            <ChevronRight className="w-5 h-5 text-gray-500" />
+            <ChevronRight className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
       </div>
@@ -220,7 +220,7 @@ export default function ProgressChart({
             className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
               selectedMetric === m
                 ? 'bg-blue-100 text-blue-700'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
             }`}
           >
             {getMetricLabel(m)}
@@ -232,7 +232,7 @@ export default function ProgressChart({
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="text-center p-3 bg-gray-50 rounded-lg">
           <p className="text-2xl font-semibold text-gray-900">{statistics.average}%</p>
-          <p className="text-xs text-gray-500 mt-1">Gjennomsnitt</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Gjennomsnitt</p>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
           <div
@@ -247,18 +247,18 @@ export default function ProgressChart({
             )}
             {Math.abs(statistics.trend)}%
           </div>
-          <p className="text-xs text-gray-500 mt-1">Trend</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Trend</p>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
           <p className="text-2xl font-semibold text-gray-900">{statistics.best}%</p>
-          <p className="text-xs text-gray-500 mt-1">Beste dag</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Beste dag</p>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
           <div className="flex items-center justify-center gap-1 text-2xl font-semibold text-orange-600">
             <Award className="w-5 h-5" />
             {statistics.streak}
           </div>
-          <p className="text-xs text-gray-500 mt-1">Rekke</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Rekke</p>
         </div>
       </div>
 
@@ -276,7 +276,7 @@ export default function ProgressChart({
                   style={{ height: `${Math.max(height, 4)}%` }}
                   title={`${item.date}: ${item.value}%`}
                 />
-                <span className="text-xs text-gray-500 mt-2 rotate-45 origin-left">
+                <span className="text-xs text-gray-500 dark:text-gray-400 mt-2 rotate-45 origin-left">
                   {item.label ||
                     new Date(item.date).toLocaleDateString('no-NO', { weekday: 'short' })}
                 </span>
@@ -287,8 +287,10 @@ export default function ProgressChart({
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <Activity className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-              <p className="text-sm text-gray-500">Ingen data tilgjengelig</p>
-              <p className="text-xs text-gray-400 mt-1">Fullfør øvelser for å se fremgangen din</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Ingen data tilgjengelig</p>
+              <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">
+                Fullfør øvelser for å se fremgangen din
+              </p>
             </div>
           </div>
         )}
@@ -298,15 +300,15 @@ export default function ProgressChart({
       <div className="flex items-center justify-center gap-6 mt-6 text-sm">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-green-500" />
-          <span className="text-gray-600">God</span>
+          <span className="text-gray-600 dark:text-gray-300">God</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-yellow-500" />
-          <span className="text-gray-600">Middels</span>
+          <span className="text-gray-600 dark:text-gray-300">Middels</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-red-500" />
-          <span className="text-gray-600">Trenger forbedring</span>
+          <span className="text-gray-600 dark:text-gray-300">Trenger forbedring</span>
         </div>
       </div>
     </div>

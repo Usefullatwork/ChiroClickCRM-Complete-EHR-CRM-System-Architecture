@@ -228,7 +228,7 @@ export default function Calendar() {
               className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
                 colorMode === 'status'
                   ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100'
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
               }`}
             >
               Status
@@ -238,7 +238,7 @@ export default function Calendar() {
               className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
                 colorMode === 'type'
                   ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100'
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
               }`}
             >
               {t('type') || 'Type'}
@@ -339,7 +339,7 @@ export default function Calendar() {
                   <div
                     className={`text-sm font-medium mb-1 ${
                       !isCurrentMonth
-                        ? 'text-gray-400 dark:text-gray-600'
+                        ? 'text-gray-400 dark:text-gray-300'
                         : isTodayDate
                           ? 'bg-blue-600 text-white rounded-full w-7 h-7 flex items-center justify-center'
                           : 'text-gray-900 dark:text-gray-100'
@@ -363,7 +363,7 @@ export default function Calendar() {
                       </div>
                     ))}
                     {dayAppointments.length > 3 && (
-                      <div className="text-xs text-gray-500 px-1.5">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 px-1.5">
                         {t('moreAppointments').replace('{count}', dayAppointments.length - 3)}
                       </div>
                     )}
@@ -452,7 +452,7 @@ export default function Calendar() {
               <AppointmentsListSkeleton items={5} />
             ) : getAppointmentsForDate(selectedDate).length === 0 ? (
               <div className="text-center py-12">
-                <CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                <CalendarIcon className="w-16 h-16 text-gray-400 dark:text-gray-300 mx-auto mb-4" />
                 <p className="text-gray-600 dark:text-gray-400">{t('noAppointmentsScheduled')}</p>
                 <button
                   onClick={() => navigate('/appointments/new')}

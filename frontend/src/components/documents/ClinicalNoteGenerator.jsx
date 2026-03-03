@@ -460,7 +460,7 @@ export default function ClinicalNoteGenerator({
           <Clipboard className="w-5 h-5 text-blue-500" />
           <h3 className="font-semibold text-gray-900">{t.title}</h3>
         </div>
-        <p className="text-sm text-gray-500 mt-1">{t.subtitle}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t.subtitle}</p>
       </div>
 
       <div className="p-6 space-y-6">
@@ -474,15 +474,17 @@ export default function ClinicalNoteGenerator({
             >
               <div className="flex items-center gap-3">
                 {selectedTypeConfig && (
-                  <selectedTypeConfig.icon className="w-5 h-5 text-gray-500" />
+                  <selectedTypeConfig.icon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 )}
                 <div className="text-left">
                   <p className="font-medium text-gray-900">{selectedTypeConfig?.name}</p>
-                  <p className="text-xs text-gray-500">{selectedTypeConfig?.description}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {selectedTypeConfig?.description}
+                  </p>
                 </div>
               </div>
               <ChevronDown
-                className={`w-5 h-5 text-gray-400 transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`}
+                className={`w-5 h-5 text-gray-400 dark:text-gray-300 transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`}
               />
             </button>
 
@@ -499,10 +501,10 @@ export default function ClinicalNoteGenerator({
                     className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg
                       ${selectedType === type.id ? 'bg-blue-50' : ''}`}
                   >
-                    <type.icon className="w-5 h-5 text-gray-500" />
+                    <type.icon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     <div className="text-left">
                       <p className="font-medium text-gray-900">{type.name}</p>
-                      <p className="text-xs text-gray-500">{type.description}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{type.description}</p>
                     </div>
                   </button>
                 ))}
@@ -604,7 +606,7 @@ export default function ClinicalNoteGenerator({
               <div className="flex gap-2">
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 bg-gray-100 rounded-lg transition-colors"
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 bg-gray-100 rounded-lg transition-colors"
                 >
                   {copied ? (
                     <>

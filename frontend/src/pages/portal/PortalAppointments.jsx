@@ -33,7 +33,7 @@ const STATUS_STYLES = {
   scheduled: { label: 'Planlagt', cls: 'bg-blue-100 text-blue-700' },
   confirmed: { label: 'Bekreftet', cls: 'bg-green-100 text-green-700' },
   checked_in: { label: 'Innsjekket', cls: 'bg-teal-100 text-teal-700' },
-  completed: { label: 'Gjennomfort', cls: 'bg-gray-100 text-gray-600' },
+  completed: { label: 'Gjennomfort', cls: 'bg-gray-100 text-gray-600 dark:text-gray-300' },
   cancelled: { label: 'Avlyst', cls: 'bg-red-100 text-red-600' },
   no_show: { label: 'Ikke mott', cls: 'bg-yellow-100 text-yellow-700' },
 };
@@ -137,7 +137,7 @@ export default function PortalAppointments() {
             onClick={() => navigate('/portal')}
             className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
           <div className="flex-1">
             <h1 className="font-bold text-gray-900">Mine timer</h1>
@@ -175,7 +175,7 @@ export default function PortalAppointments() {
                 }}
                 className="p-1 hover:bg-gray-100 rounded"
               >
-                <X className="w-5 h-5 text-gray-400" />
+                <X className="w-5 h-5 text-gray-400 dark:text-gray-300" />
               </button>
             </div>
 
@@ -183,7 +183,9 @@ export default function PortalAppointments() {
               <div className="text-center py-4">
                 <CheckCircle className="w-10 h-10 text-green-500 mx-auto mb-2" />
                 <p className="font-medium text-gray-900">Foresprsel sendt!</p>
-                <p className="text-sm text-gray-500">Klinikken tar kontakt for bekreftelse.</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Klinikken tar kontakt for bekreftelse.
+                </p>
               </div>
             ) : (
               <form onSubmit={handleRequestAppointment} className="space-y-4">
@@ -257,11 +259,13 @@ export default function PortalAppointments() {
 
         {/* Upcoming appointments */}
         <div>
-          <h2 className="text-sm font-medium text-gray-500 px-1 mb-3">Kommende timer</h2>
+          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 px-1 mb-3">
+            Kommende timer
+          </h2>
           {upcoming.length === 0 ? (
             <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-gray-100">
               <Calendar className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-              <p className="text-gray-500">Ingen kommende timer</p>
+              <p className="text-gray-500 dark:text-gray-400">Ingen kommende timer</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -281,7 +285,7 @@ export default function PortalAppointments() {
                             month: 'long',
                           })}
                         </p>
-                        <div className="flex items-center gap-2 mt-1 text-sm text-gray-500">
+                        <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400">
                           <Clock className="w-3.5 h-3.5" />
                           <span>{appt.appointment_time?.slice(0, 5)}</span>
                           <span className="text-gray-300">|</span>
@@ -323,7 +327,7 @@ export default function PortalAppointments() {
           <div>
             <button
               onClick={() => setShowPast(!showPast)}
-              className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 px-1 mb-3"
+              className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 px-1 mb-3"
             >
               <History className="w-4 h-4" />
               {showPast ? 'Skjul' : 'Vis'} tidligere timer ({past.length})
@@ -346,7 +350,7 @@ export default function PortalAppointments() {
                               year: 'numeric',
                             })}
                           </p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
                             {appt.appointment_time?.slice(0, 5)} &bull;{' '}
                             {VISIT_TYPE_LABELS[appt.visit_type] || 'Konsultasjon'}
                           </p>
@@ -367,7 +371,7 @@ export default function PortalAppointments() {
       </div>
 
       {/* Footer */}
-      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400">
+      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-300">
         <p>Ved sporsmal, kontakt din behandler</p>
       </footer>
     </div>

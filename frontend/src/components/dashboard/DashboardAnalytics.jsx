@@ -331,9 +331,9 @@ function AnalyticsPanel({
             </select>
           )}
           {expanded ? (
-            <ChevronUp className="w-4 h-4 text-gray-400" />
+            <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
           )}
         </div>
       </button>
@@ -378,9 +378,12 @@ function UtilizationHeatmap({ data }) {
       <div className="min-w-[500px]">
         {/* Header row */}
         <div className="flex items-center gap-1 mb-1">
-          <div className="w-10 text-xs text-gray-400 flex-shrink-0" />
+          <div className="w-10 text-xs text-gray-400 dark:text-gray-300 flex-shrink-0" />
           {HOURS.map((hour) => (
-            <div key={hour} className="flex-1 text-center text-[10px] text-gray-400 font-mono">
+            <div
+              key={hour}
+              className="flex-1 text-center text-[10px] text-gray-400 dark:text-gray-300 font-mono"
+            >
               {String(hour).padStart(2, '0')}
             </div>
           ))}
@@ -389,7 +392,9 @@ function UtilizationHeatmap({ data }) {
         {/* Day rows (Mon-Fri, skip Sun=0 and Sat=6) */}
         {[1, 2, 3, 4, 5].map((dow) => (
           <div key={dow} className="flex items-center gap-1 mb-1">
-            <div className="w-10 text-xs text-gray-500 flex-shrink-0">{DAY_LABELS[dow]}</div>
+            <div className="w-10 text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+              {DAY_LABELS[dow]}
+            </div>
             {HOURS.map((hour) => {
               const item = lookup[`${dow}-${hour}`];
               const count = item?.count || 0;
@@ -405,7 +410,7 @@ function UtilizationHeatmap({ data }) {
         ))}
 
         {/* Legend */}
-        <div className="flex items-center gap-2 mt-3 justify-end text-[10px] text-gray-400">
+        <div className="flex items-center gap-2 mt-3 justify-end text-[10px] text-gray-400 dark:text-gray-300">
           <span>Lav</span>
           <div className="w-4 h-4 rounded bg-gray-100" />
           <div className="w-4 h-4 rounded bg-teal-100" />
@@ -438,7 +443,7 @@ function ChartSkeleton() {
 
 function EmptyChart({ message }) {
   return (
-    <div className="flex items-center justify-center h-[200px] text-sm text-gray-400">
+    <div className="flex items-center justify-center h-[200px] text-sm text-gray-400 dark:text-gray-300">
       {message}
     </div>
   );

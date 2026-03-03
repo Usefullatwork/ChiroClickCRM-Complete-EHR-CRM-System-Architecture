@@ -70,7 +70,7 @@ function AppointmentListItem({ appointment, typeColors, statusColors, onClick })
       className={`p-3 rounded-lg border-l-4 bg-white cursor-pointer hover:shadow-md transition-all ${typeColor.border}`}
     >
       <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-1 text-sm text-gray-600">
+        <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300">
           <Clock className="w-4 h-4" />
           <span className="font-medium">
             {format(startTime, 'HH:mm')} - {format(endTime, 'HH:mm')}
@@ -83,12 +83,14 @@ function AppointmentListItem({ appointment, typeColors, statusColors, onClick })
         </span>
       </div>
       <div className="flex items-center gap-2">
-        <User className="w-4 h-4 text-gray-400" />
+        <User className="w-4 h-4 text-gray-400 dark:text-gray-300" />
         <span className="font-semibold text-gray-900">{appointment.patient_name}</span>
       </div>
       <div className={`text-xs mt-1 ${typeColor.text}`}>{typeColor.label}</div>
       {appointment.patient_notes && (
-        <p className="text-xs text-gray-500 mt-2 line-clamp-2">{appointment.patient_notes}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">
+          {appointment.patient_notes}
+        </p>
       )}
     </div>
   );
@@ -206,7 +208,7 @@ export default function DayView({
       <div className="flex items-center justify-center h-full bg-white">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
-          <p className="mt-4 text-gray-500">Laster dag...</p>
+          <p className="mt-4 text-gray-500 dark:text-gray-400">Laster dag...</p>
         </div>
       </div>
     );
@@ -225,7 +227,7 @@ export default function DayView({
           >
             {format(date, 'EEEE d. MMMM yyyy', { locale: nb })}
           </h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             {appointments.length} {appointments.length === 1 ? 'avtale' : 'avtaler'}
           </p>
         </div>
@@ -239,7 +241,7 @@ export default function DayView({
                 const hour = workHours.start + i;
                 return (
                   <div key={hour} className="relative" style={{ height: `${HOUR_HEIGHT}px` }}>
-                    <span className="absolute top-0 right-3 -translate-y-1/2 text-sm text-gray-500 font-medium">
+                    <span className="absolute top-0 right-3 -translate-y-1/2 text-sm text-gray-500 dark:text-gray-400 font-medium">
                       {String(hour).padStart(2, '0')}:00
                     </span>
                   </div>
@@ -344,7 +346,7 @@ export default function DayView({
           {appointments.length === 0 ? (
             <div className="text-center py-12">
               <CalendarIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 mb-4">Ingen avtaler denne dagen</p>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">Ingen avtaler denne dagen</p>
               <button
                 onClick={() => onSlotClick(date, 9, 0)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"

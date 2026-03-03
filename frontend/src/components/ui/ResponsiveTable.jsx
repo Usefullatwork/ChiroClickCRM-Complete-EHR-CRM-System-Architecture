@@ -101,7 +101,7 @@ export default function ResponsiveTable({
       <div className={`bg-white rounded-lg border border-gray-200 ${className}`}>
         <div className="p-8 text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-          <p className="mt-2 text-gray-500">Laster data...</p>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">Laster data...</p>
         </div>
       </div>
     );
@@ -111,7 +111,7 @@ export default function ResponsiveTable({
   if (data.length === 0) {
     return (
       <div className={`bg-white rounded-lg border border-gray-200 ${className}`}>
-        <div className="p-8 text-center text-gray-500">{emptyMessage}</div>
+        <div className="p-8 text-center text-gray-500 dark:text-gray-400">{emptyMessage}</div>
       </div>
     );
   }
@@ -144,7 +144,7 @@ export default function ResponsiveTable({
                     </div>
                   )}
                   {secondaryColumn && (
-                    <div className="text-sm text-gray-500 truncate mt-0.5">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 truncate mt-0.5">
                       {secondaryColumn.render
                         ? secondaryColumn.render(row[secondaryColumn.key], row)
                         : row[secondaryColumn.key]}
@@ -153,13 +153,13 @@ export default function ResponsiveTable({
                 </div>
 
                 {onRowClick ? (
-                  <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300 flex-shrink-0" />
                 ) : (
                   <div className="flex-shrink-0">
                     {isExpanded ? (
-                      <ChevronUp className="w-5 h-5 text-gray-400" />
+                      <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-gray-400" />
+                      <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                     )}
                   </div>
                 )}
@@ -171,7 +171,7 @@ export default function ResponsiveTable({
                   <dl className="space-y-2">
                     {visibleColumns.slice(2).map((col) => (
                       <div key={col.key} className="flex justify-between text-sm">
-                        <dt className="text-gray-500">{col.label}</dt>
+                        <dt className="text-gray-500 dark:text-gray-400">{col.label}</dt>
                         <dd className="text-gray-900 font-medium text-right">
                           {col.render ? col.render(row[col.key], row) : row[col.key] || '-'}
                         </dd>
@@ -253,7 +253,7 @@ export default function ResponsiveTable({
               {visibleColumns.map((col, _index) => (
                 <th
                   key={col.key}
-                  className={`px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap ${
+                  className={`px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
                     col.sticky ? 'sticky left-0 z-20 bg-gray-50' : ''
                   }`}
                   style={{
@@ -265,7 +265,7 @@ export default function ResponsiveTable({
                 </th>
               ))}
               {hasActions && (
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider w-24 sm:w-32">
+                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider w-24 sm:w-32">
                   <span className="sr-only">Handlinger</span>
                 </th>
               )}
@@ -301,7 +301,7 @@ export default function ResponsiveTable({
                             e.stopPropagation();
                             onView(row);
                           }}
-                          className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
                           title="Vis"
                         >
                           <Eye className="w-4 h-4" />
@@ -313,7 +313,7 @@ export default function ResponsiveTable({
                             e.stopPropagation();
                             onEdit(row);
                           }}
-                          className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
                           title="Rediger"
                         >
                           <Edit className="w-4 h-4" />
@@ -325,7 +325,7 @@ export default function ResponsiveTable({
                             e.stopPropagation();
                             onDelete(row);
                           }}
-                          className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
+                          className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
                           title="Slett"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -366,7 +366,7 @@ export function ResponsiveDataList({
   if (items.length === 0) {
     return (
       <div
-        className={`bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-500 ${className}`}
+        className={`bg-white rounded-lg border border-gray-200 p-8 text-center text-gray-500 dark:text-gray-400 ${className}`}
       >
         {emptyMessage}
       </div>

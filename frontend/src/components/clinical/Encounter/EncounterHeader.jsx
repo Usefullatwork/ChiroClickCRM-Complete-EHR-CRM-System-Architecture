@@ -15,7 +15,7 @@ export default function EncounterHeader({
     <header className="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center flex-shrink-0">
       <div className="flex items-center space-x-4">
         <span
-          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full ${isSigned ? 'bg-slate-100 text-slate-500' : 'bg-teal-50 text-teal-700'} text-sm font-medium border ${isSigned ? 'border-slate-200' : 'border-teal-200'}`}
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full ${isSigned ? 'bg-slate-100 text-slate-500 dark:text-slate-400' : 'bg-teal-50 text-teal-700'} text-sm font-medium border ${isSigned ? 'border-slate-200' : 'border-teal-200'}`}
         >
           <Calendar className="h-3.5 w-3.5" />
           <input
@@ -30,14 +30,14 @@ export default function EncounterHeader({
           value={encounterData.encounter_type}
           onChange={(e) => onUpdateField('encounter_type', e.target.value, true)}
           disabled={isSigned}
-          className="text-sm text-slate-600 bg-transparent border border-slate-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="text-sm text-slate-600 dark:text-slate-300 bg-transparent border border-slate-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <option value="INITIAL">Førstegangs</option>
           <option value="FOLLOWUP">Oppfølging</option>
           <option value="REEXAM">Re-undersøkelse</option>
           <option value="EMERGENCY">Akutt</option>
         </select>
-        <span className="text-sm text-slate-500 flex items-center gap-1">
+        <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
           <Clock className="h-3.5 w-3.5" />
           <input
             type="number"
@@ -66,7 +66,7 @@ export default function EncounterHeader({
         {/* Keyboard shortcuts help */}
         <button
           onClick={onShowKeyboardHelp}
-          className="text-xs px-2 py-1 rounded bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors"
+          className="text-xs px-2 py-1 rounded bg-slate-100 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-colors"
           title="Tastatursnarveier (F1)"
         >
           ⌨️
@@ -74,7 +74,7 @@ export default function EncounterHeader({
         {/* Auto-save indicator with timestamp */}
         <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700">
           {autoSaveStatus === 'saving' && (
-            <span className="text-xs text-slate-500 flex items-center gap-1.5">
+            <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
               <Loader2 className="h-3 w-3 animate-spin" />
               Lagrer...
             </span>

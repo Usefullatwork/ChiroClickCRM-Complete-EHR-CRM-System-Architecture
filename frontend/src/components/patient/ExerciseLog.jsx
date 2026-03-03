@@ -166,7 +166,9 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Treningslogg</h3>
-            <p className="text-sm text-gray-500 mt-0.5">Historikk over fullforte ovelser</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              Historikk over fullforte ovelser
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -182,8 +184,8 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
         {/* Filters / Filtre */}
         <div className="flex items-center gap-4 mt-4">
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-400" />
-            <span className="text-sm text-gray-600">Vis:</span>
+            <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+            <span className="text-sm text-gray-600 dark:text-gray-300">Vis:</span>
           </div>
           <div className="flex gap-2">
             {[
@@ -198,7 +200,7 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
                 className={`px-3 py-1 text-sm rounded-lg transition-colors ${
                   filter === option.value
                     ? 'bg-blue-100 text-blue-700'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
                 }`}
               >
                 {option.label}
@@ -213,7 +215,7 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
         {isLoading ? (
           <div className="p-12 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-sm text-gray-500 mt-3">Laster treningslogg...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">Laster treningslogg...</p>
           </div>
         ) : Object.keys(groupedLogs).length > 0 ? (
           Object.entries(groupedLogs)
@@ -225,9 +227,9 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
                 {/* Date Header / Datooverskrift */}
                 <div className="px-6 py-3 bg-gray-50">
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-gray-500" />
+                    <Calendar className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                     <span className="font-medium text-gray-700 capitalize">{formatDate(date)}</span>
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       ({dayLogs.length} {dayLogs.length === 1 ? 'ovelse' : 'ovelser'})
                     </span>
                   </div>
@@ -263,7 +265,7 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
                             <h4 className="font-medium text-gray-900">
                               {log.exerciseName || 'Ukjent ovelse'}
                             </h4>
-                            <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+                            <div className="flex items-center gap-4 mt-1 text-sm text-gray-500 dark:text-gray-400">
                               <span className="flex items-center gap-1">
                                 <Clock className="w-3 h-3" />
                                 {formatTime(log.completedAt)}
@@ -292,9 +294,9 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
                             </span>
                           )}
                           {expandedEntry === log.id ? (
-                            <ChevronUp className="w-5 h-5 text-gray-400" />
+                            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                           ) : (
-                            <ChevronDown className="w-5 h-5 text-gray-400" />
+                            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                           )}
                         </div>
                       </div>
@@ -307,7 +309,9 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
                           {/* Difficulty Rating / Vanskelighetsgrad */}
                           {log.difficultyRating !== undefined && (
                             <div>
-                              <p className="text-sm text-gray-500 mb-1">Vanskelighetsgrad</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                                Vanskelighetsgrad
+                              </p>
                               <div className="flex items-center gap-1">
                                 {getDifficultyStars(log.difficultyRating)}
                               </div>
@@ -317,7 +321,9 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
                           {/* Pain Level / Smerteniva */}
                           {log.painRating !== undefined && (
                             <div>
-                              <p className="text-sm text-gray-500 mb-1">Smerteniva</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                                Smerteniva
+                              </p>
                               <div className="flex items-center gap-2">
                                 <div className="flex-1 h-2 bg-gray-200 rounded-full">
                                   <div
@@ -338,7 +344,9 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
 
                           {/* Sets/Reps Completed / Sett/Rep fullfort */}
                           <div>
-                            <p className="text-sm text-gray-500 mb-1">Fullfort</p>
+                            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                              Fullfort
+                            </p>
                             <p className="font-medium">
                               {log.setsCompleted || 0} sett, {log.repsCompleted || 0} repetisjoner
                             </p>
@@ -347,7 +355,9 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
                           {/* Duration / Varighet */}
                           {log.duration && (
                             <div>
-                              <p className="text-sm text-gray-500 mb-1">Varighet</p>
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                                Varighet
+                              </p>
                               <p className="font-medium">{log.duration} minutter</p>
                             </div>
                           )}
@@ -357,9 +367,11 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
                         {log.notes && (
                           <div className="mt-4 pt-4 border-t border-gray-200">
                             <div className="flex items-start gap-2">
-                              <MessageSquare className="w-4 h-4 text-gray-400 mt-0.5" />
+                              <MessageSquare className="w-4 h-4 text-gray-400 dark:text-gray-300 mt-0.5" />
                               <div>
-                                <p className="text-sm text-gray-500 mb-1">Pasientens notater</p>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
+                                  Pasientens notater
+                                </p>
                                 <p className="text-sm text-gray-700">{log.notes}</p>
                               </div>
                             </div>
@@ -375,7 +387,9 @@ export default function ExerciseLog({ logs = [], isLoading = false, onLoadMore, 
           <div className="p-12 text-center">
             <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <h3 className="text-lg font-medium text-gray-900 mb-1">Ingen treningslogg</h3>
-            <p className="text-sm text-gray-500">Pasienten har ikke fullfort noen ovelser enna</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Pasienten har ikke fullfort noen ovelser enna
+            </p>
           </div>
         )}
       </div>

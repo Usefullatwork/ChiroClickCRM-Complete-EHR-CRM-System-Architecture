@@ -46,7 +46,7 @@ function StatCard({ label, value, color = 'gray' }) {
   return (
     <div className="border rounded-lg p-4 text-center">
       <div className={`text-2xl font-bold ${colorClasses[color]}`}>{value}</div>
-      <div className="text-xs text-gray-500 mt-1">{label}</div>
+      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{label}</div>
     </div>
   );
 }
@@ -203,7 +203,7 @@ export default function AnalyticsTab() {
   const isLoading = performanceQuery.isLoading || usageQuery.isLoading;
 
   if (isLoading) {
-    return <div className="text-gray-500 p-6">Laster analysedata...</div>;
+    return <div className="text-gray-500 dark:text-gray-400 p-6">Laster analysedata...</div>;
   }
 
   return (
@@ -212,7 +212,7 @@ export default function AnalyticsTab() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">AI-analyse</h2>
         <div className="flex items-center gap-2">
-          <label className="text-sm text-gray-600">Periode:</label>
+          <label className="text-sm text-gray-600 dark:text-gray-300">Periode:</label>
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
@@ -236,7 +236,7 @@ export default function AnalyticsTab() {
           {comparison.length > 0 && (
             <button
               onClick={exportComparisonCSV}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Download className="w-4 h-4" />
               CSV
@@ -244,7 +244,7 @@ export default function AnalyticsTab() {
           )}
         </div>
         {comparison.length === 0 ? (
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             Ingen data enna. AI-forslag vil vises her etter bruk.
           </p>
         ) : (
@@ -284,16 +284,22 @@ export default function AnalyticsTab() {
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b bg-gray-50">
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Modell</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Totale forslag</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">
+                  <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Modell
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Totale forslag
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
                     Godkjenningsrate
                   </th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
                     Gj.sn. vurdering
                   </th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Gj.sn. latens</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Gj.sn. latens
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
                     Tilbakemeldinger
                   </th>
                 </tr>
@@ -317,7 +323,7 @@ export default function AnalyticsTab() {
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right">{c.avg_user_rating || '-'}</td>
-                    <td className="py-3 px-4 text-right text-gray-600">
+                    <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
                       {c.avg_latency_ms ? `${c.avg_latency_ms}ms` : '-'}
                     </td>
                     <td className="py-3 px-4 text-right">
@@ -355,7 +361,7 @@ export default function AnalyticsTab() {
             Daglig bruk
           </h2>
           {usage.daily.length === 0 ? (
-            <p className="text-gray-500 text-sm">Ingen data enna.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">Ingen data enna.</p>
           ) : (
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={[...usage.daily].reverse()}>
@@ -388,7 +394,7 @@ export default function AnalyticsTab() {
             Oppgavefordeling
           </h2>
           {usage.taskTypes.length === 0 ? (
-            <p className="text-gray-500 text-sm">Ingen data enna.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">Ingen data enna.</p>
           ) : (
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -422,7 +428,9 @@ export default function AnalyticsTab() {
         </h2>
         {!redFlag.summary?.total_red_flag_checks ||
         parseInt(redFlag.summary.total_red_flag_checks) === 0 ? (
-          <p className="text-gray-500 text-sm">Ingen red flag-analyser registrert enna.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Ingen red flag-analyser registrert enna.
+          </p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard label="Totale analyser" value={redFlag.summary.total_red_flag_checks} />
@@ -452,7 +460,7 @@ export default function AnalyticsTab() {
           {suggestions.length > 0 && (
             <button
               onClick={exportSuggestionsCSV}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               <Download className="w-4 h-4" />
               CSV
@@ -460,24 +468,36 @@ export default function AnalyticsTab() {
           )}
         </div>
         {suggestions.length === 0 ? (
-          <p className="text-gray-500 text-sm">Ingen forslag registrert enna.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Ingen forslag registrert enna.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left py-2 px-3 font-medium text-gray-600">Tidspunkt</th>
-                  <th className="text-left py-2 px-3 font-medium text-gray-600">Type</th>
-                  <th className="text-left py-2 px-3 font-medium text-gray-600">Modell</th>
-                  <th className="text-left py-2 px-3 font-medium text-gray-600">Konfidens</th>
-                  <th className="text-left py-2 px-3 font-medium text-gray-600">Latens</th>
-                  <th className="text-left py-2 px-3 font-medium text-gray-600">Status</th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                    Tidspunkt
+                  </th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                    Type
+                  </th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                    Modell
+                  </th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                    Konfidens
+                  </th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                    Latens
+                  </th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {suggestions.map((s) => (
                   <tr key={s.id} className="border-b hover:bg-gray-50">
-                    <td className="py-2 px-3 text-gray-600">
+                    <td className="py-2 px-3 text-gray-600 dark:text-gray-300">
                       {new Date(s.created_at).toLocaleString('nb-NO', {
                         month: 'short',
                         day: 'numeric',
@@ -492,7 +512,7 @@ export default function AnalyticsTab() {
                     <td className="py-2 px-3">
                       {s.confidence_score ? `${(s.confidence_score * 100).toFixed(0)}%` : '-'}
                     </td>
-                    <td className="py-2 px-3 text-gray-600">
+                    <td className="py-2 px-3 text-gray-600 dark:text-gray-300">
                       {s.latency_ms ? `${s.latency_ms}ms` : '-'}
                     </td>
                     <td className="py-2 px-3">
@@ -507,7 +527,7 @@ export default function AnalyticsTab() {
                         </span>
                       )}
                       {s.accepted === null && (
-                        <span className="text-gray-500 bg-gray-50 px-2 py-0.5 rounded text-xs">
+                        <span className="text-gray-500 dark:text-gray-400 bg-gray-50 px-2 py-0.5 rounded text-xs">
                           Venter
                         </span>
                       )}
@@ -527,7 +547,7 @@ export default function AnalyticsTab() {
           A/B-testing konfigurasjon
         </h2>
         {Object.keys(abTesting).length === 0 ? (
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             Ingen A/B-tester konfigurert. Sett miljovariabler som AB_SPLIT_V6=50 for a aktivere.
           </p>
         ) : (
@@ -540,12 +560,12 @@ export default function AnalyticsTab() {
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-mono text-sm font-medium">{model}</span>
                   <span
-                    className={`px-2 py-0.5 rounded text-xs font-medium ${config.enabled ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-500'}`}
+                    className={`px-2 py-0.5 rounded text-xs font-medium ${config.enabled ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-500 dark:text-gray-400'}`}
                   >
                     {config.enabled ? 'Aktiv' : 'Inaktiv'}
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-300">
                   <div>
                     Modell B: <span className="font-mono">{config.loraModel}</span>
                   </div>
@@ -594,7 +614,9 @@ export default function AnalyticsTab() {
           Kostnad per forslag
         </h2>
         {costData.length === 0 ? (
-          <p className="text-gray-500 text-sm">Ingen kostnadsdata tilgjengelig.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Ingen kostnadsdata tilgjengelig.
+          </p>
         ) : (
           <div className="space-y-2">
             {costData.map((item) => {
@@ -605,7 +627,9 @@ export default function AnalyticsTab() {
               const barWidth = ((parseFloat(item.avg_cost_usd) || 0) / maxCost) * 100;
               return (
                 <div key={item.task_type} className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600 w-36 shrink-0">{item.task_type}</span>
+                  <span className="text-sm text-gray-600 dark:text-gray-300 w-36 shrink-0">
+                    {item.task_type}
+                  </span>
                   <div className="flex-1 bg-gray-100 rounded-full h-5 relative">
                     <div
                       className="bg-blue-500 h-5 rounded-full"
@@ -615,7 +639,9 @@ export default function AnalyticsTab() {
                   <span className="text-sm font-mono text-gray-700 w-24 text-right">
                     ${parseFloat(item.avg_cost_usd || 0).toFixed(4)}
                   </span>
-                  <span className="text-xs text-gray-400 w-16 text-right">{item.count} stk</span>
+                  <span className="text-xs text-gray-400 dark:text-gray-300 w-16 text-right">
+                    {item.count} stk
+                  </span>
                 </div>
               );
             })}
@@ -630,18 +656,30 @@ export default function AnalyticsTab() {
           Leverandorsammenligning
         </h2>
         {providerData.length === 0 ? (
-          <p className="text-gray-500 text-sm">Ingen leverandordata tilgjengelig.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Ingen leverandordata tilgjengelig.
+          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b bg-gray-50">
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Leverandor</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Forslag</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Gj.sn. latens</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Godkjent %</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Total kostnad</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">
+                  <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Leverandor
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Forslag
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Gj.sn. latens
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Godkjent %
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Total kostnad
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
                     Kostnad/forslag
                   </th>
                 </tr>
@@ -651,7 +689,7 @@ export default function AnalyticsTab() {
                   <tr key={p.provider} className="border-b hover:bg-gray-50">
                     <td className="py-3 px-4 font-medium capitalize">{p.provider}</td>
                     <td className="py-3 px-4 text-right">{p.total_suggestions}</td>
-                    <td className="py-3 px-4 text-right text-gray-600">
+                    <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
                       {p.avg_latency_ms ? `${p.avg_latency_ms}ms` : '-'}
                     </td>
                     <td className="py-3 px-4 text-right">
@@ -678,7 +716,7 @@ export default function AnalyticsTab() {
           Cache-trender
         </h2>
         {cacheData.length === 0 ? (
-          <p className="text-gray-500 text-sm">Ingen cache-data tilgjengelig.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Ingen cache-data tilgjengelig.</p>
         ) : (
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={[...cacheData].reverse()}>

@@ -1,7 +1,7 @@
 /**
  * GoogleContactsService - Integration with Google People API
  *
- * Provides two-way synchronization between ChiroClickCRM patients
+ * Provides two-way synchronization between ChiroClickEHR patients
  * and Google Contacts for seamless contact management.
  *
  * Requires Google Cloud Console setup:
@@ -25,8 +25,8 @@ const GOOGLE_CONFIG = {
   discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/people/v1/rest'],
 };
 
-// Contact group name for ChiroClickCRM contacts
-const CRM_CONTACT_GROUP = 'ChiroClickCRM Patients';
+// Contact group name for ChiroClickEHR contacts
+const CRM_CONTACT_GROUP = 'ChiroClickEHR Patients';
 
 class GoogleContactsService {
   constructor() {
@@ -164,7 +164,7 @@ class GoogleContactsService {
   }
 
   /**
-   * Get or create the ChiroClickCRM contact group
+   * Get or create the ChiroClickEHR contact group
    */
   async getOrCreateContactGroup() {
     if (this.contactGroupId) {
@@ -220,7 +220,7 @@ class GoogleContactsService {
       biographies: [],
       userDefined: [
         {
-          key: 'ChiroClickCRM_PatientID',
+          key: 'ChiroClickEHR_PatientID',
           value: String(patient.id),
         },
       ],
@@ -341,8 +341,8 @@ class GoogleContactsService {
     // Extract notes
     patient.notes = contact.biographies?.[0]?.value || '';
 
-    // Extract ChiroClickCRM patient ID if exists
-    const crmId = contact.userDefined?.find((u) => u.key === 'ChiroClickCRM_PatientID');
+    // Extract ChiroClickEHR patient ID if exists
+    const crmId = contact.userDefined?.find((u) => u.key === 'ChiroClickEHR_PatientID');
     if (crmId) {
       patient.crm_patient_id = parseInt(crmId.value, 10);
     }
@@ -380,7 +380,7 @@ class GoogleContactsService {
           resource: contactData,
         });
 
-        // Add to ChiroClickCRM contact group
+        // Add to ChiroClickEHR contact group
         await this.gapi.client.people.contactGroups.members.modify({
           resourceName: contactGroupId,
           resource: {
@@ -416,7 +416,7 @@ class GoogleContactsService {
       // Search by patient ID in user defined fields
       const allContacts = await this.getAllGoogleContacts();
       return allContacts.find((c) => {
-        const crmId = c.userDefined?.find((u) => u.key === 'ChiroClickCRM_PatientID');
+        const crmId = c.userDefined?.find((u) => u.key === 'ChiroClickEHR_PatientID');
         return crmId && parseInt(crmId.value, 10) === patient.id;
       });
     } catch (error) {
@@ -426,7 +426,7 @@ class GoogleContactsService {
   }
 
   /**
-   * Get all contacts from Google (from ChiroClickCRM group)
+   * Get all contacts from Google (from ChiroClickEHR group)
    */
   async getAllGoogleContacts() {
     if (!this.isAuthenticated()) {
@@ -445,7 +445,7 @@ class GoogleContactsService {
 
       const contacts = response.result.connections || [];
 
-      // Filter to only contacts in the ChiroClickCRM group
+      // Filter to only contacts in the ChiroClickEHR group
       return contacts.filter((contact) =>
         contact.memberships?.some(
           (m) => m.contactGroupMembership?.contactGroupResourceName === contactGroupId
@@ -458,7 +458,7 @@ class GoogleContactsService {
   }
 
   /**
-   * Import contacts from Google to ChiroClickCRM
+   * Import contacts from Google to ChiroClickEHR
    */
   async importFromGoogle() {
     const googleContacts = await this.getAllGoogleContacts();

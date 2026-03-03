@@ -163,7 +163,7 @@ const SurveyManager = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        <span className="ml-2 text-gray-600">Laster undersøkelser...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">Laster undersøkelser...</span>
       </div>
     );
   }
@@ -190,7 +190,9 @@ const SurveyManager = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Undersøkelser & NPS</h2>
-          <p className="text-gray-600">Mål kundetilfredshet og samle tilbakemeldinger</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Mål kundetilfredshet og samle tilbakemeldinger
+          </p>
         </div>
         <button
           onClick={() => setShowNewSurvey(true)}
@@ -264,7 +266,7 @@ const SurveyManager = () => {
             className={`px-4 py-2 border-b-2 transition-colors ${
               activeTab === tab.id
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900'
             }`}
           >
             {tab.label}
@@ -297,15 +299,15 @@ const SurveyManager = () => {
                   </div>
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-500">Sendt</p>
+                      <p className="text-gray-500 dark:text-gray-400">Sendt</p>
                       <p className="font-medium">{survey.sentCount}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Svar</p>
+                      <p className="text-gray-500 dark:text-gray-400">Svar</p>
                       <p className="font-medium">{survey.responseCount}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Svarrate</p>
+                      <p className="text-gray-500 dark:text-gray-400">Svarrate</p>
                       <p className="font-medium text-blue-600">{survey.responseRate}%</p>
                     </div>
                   </div>
@@ -352,9 +354,13 @@ const SurveyManager = () => {
                             {response.score}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500">{response.surveyName}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {response.surveyName}
+                        </p>
                         {response.comment && (
-                          <p className="text-sm text-gray-600 mt-1 italic">"{response.comment}"</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 italic">
+                            "{response.comment}"
+                          </p>
                         )}
                       </div>
                     </div>
@@ -368,7 +374,7 @@ const SurveyManager = () => {
           <div className="bg-white rounded-xl border border-gray-200 p-6 lg:col-span-2">
             <h3 className="font-bold text-gray-900 mb-4">NPS Utvikling</h3>
             <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-              <div className="text-center text-gray-500">
+              <div className="text-center text-gray-500 dark:text-gray-400">
                 <BarChart2 className="w-12 h-12 mx-auto mb-2 opacity-50" />
                 <p>Graf vises her med NPS-utvikling over tid</p>
               </div>
@@ -384,16 +390,18 @@ const SurveyManager = () => {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-lg font-bold text-gray-900">{survey.name}</h3>
-                  <p className="text-sm text-gray-500">Sist sendt: {formatDate(survey.lastSent)}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Sist sendt: {formatDate(survey.lastSent)}
+                  </p>
                 </div>
                 <div className="flex gap-2">
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
+                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
                     <Edit className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
+                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
                     <Send className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
+                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
                     <BarChart2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -403,17 +411,17 @@ const SurveyManager = () => {
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <Send className="w-5 h-5 text-blue-500 mx-auto mb-1" />
                   <p className="text-xl font-bold text-gray-900">{survey.sentCount}</p>
-                  <p className="text-xs text-gray-500">Sendt</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Sendt</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <MessageSquare className="w-5 h-5 text-green-500 mx-auto mb-1" />
                   <p className="text-xl font-bold text-gray-900">{survey.responseCount}</p>
-                  <p className="text-xs text-gray-500">Svar</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Svar</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <Users className="w-5 h-5 text-purple-500 mx-auto mb-1" />
                   <p className="text-xl font-bold text-gray-900">{survey.responseRate}%</p>
-                  <p className="text-xs text-gray-500">Svarrate</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Svarrate</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <Star className="w-5 h-5 text-yellow-500 mx-auto mb-1" />
@@ -424,7 +432,9 @@ const SurveyManager = () => {
                   >
                     {survey.npsScore || survey.avgRating}
                   </p>
-                  <p className="text-xs text-gray-500">{survey.npsScore ? 'NPS' : 'Snitt'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {survey.npsScore ? 'NPS' : 'Snitt'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -453,25 +463,25 @@ const SurveyManager = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Pasient
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Undersøkelse
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Score
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Kategori
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Kommentar
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Dato
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Handling
                 </th>
               </tr>
@@ -485,7 +495,9 @@ const SurveyManager = () => {
                     <td className="px-4 py-3">
                       <span className="font-medium text-gray-900">{response.patientName}</span>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{response.surveyName}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                      {response.surveyName}
+                    </td>
                     <td className="px-4 py-3">
                       <span
                         className={`text-lg font-bold ${
@@ -510,27 +522,29 @@ const SurveyManager = () => {
                     <td className="px-4 py-3">
                       {response.comment ? (
                         <p
-                          className="text-sm text-gray-600 max-w-xs truncate"
+                          className="text-sm text-gray-600 dark:text-gray-300 max-w-xs truncate"
                           title={response.comment}
                         >
                           {response.comment}
                         </p>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span className="text-gray-400 dark:text-gray-300">-</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{formatDate(response.date)}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                      {formatDate(response.date)}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1">
                         <button
-                          className="p-2 text-gray-400 hover:text-blue-500 rounded-lg"
+                          className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 rounded-lg"
                           title="Vis detaljer"
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         {response.category === 'DETRACTOR' && (
                           <button
-                            className="p-2 text-gray-400 hover:text-orange-500 rounded-lg"
+                            className="p-2 text-gray-400 dark:text-gray-300 hover:text-orange-500 rounded-lg"
                             title="Følg opp"
                           >
                             <Mail className="w-4 h-4" />
@@ -556,7 +570,9 @@ const SurveyManager = () => {
                 const percent = (count / responses.length) * 100;
                 return (
                   <div key={score} className="flex items-center gap-3">
-                    <span className="w-6 text-sm font-medium text-gray-600">{score}</span>
+                    <span className="w-6 text-sm font-medium text-gray-600 dark:text-gray-300">
+                      {score}
+                    </span>
                     <div className="flex-1 h-6 bg-gray-100 rounded overflow-hidden">
                       <div
                         className={`h-full rounded transition-all ${
@@ -565,7 +581,7 @@ const SurveyManager = () => {
                         style={{ width: `${percent}%` }}
                       />
                     </div>
-                    <span className="w-8 text-sm text-gray-500">{count}</span>
+                    <span className="w-8 text-sm text-gray-500 dark:text-gray-400">{count}</span>
                   </div>
                 );
               })}
@@ -622,7 +638,9 @@ const SurveyManager = () => {
                       }`}
                     >
                       <p className="font-medium text-gray-900">{template.name}</p>
-                      <p className="text-sm text-gray-500">{template.description}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {template.description}
+                      </p>
                     </button>
                   ))}
                 </div>

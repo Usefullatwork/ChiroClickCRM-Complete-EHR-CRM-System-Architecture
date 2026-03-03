@@ -45,7 +45,9 @@ export function AmendmentSection({
         <div className="bg-white rounded-lg border border-amber-200 p-4 mb-4">
           <div className="flex gap-4 mb-3">
             <div className="flex-1">
-              <label className="block text-xs font-medium text-slate-600 mb-1">Type</label>
+              <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+                Type
+              </label>
               <select
                 value={amendmentType}
                 onChange={(e) => setAmendmentType(e.target.value)}
@@ -59,7 +61,7 @@ export function AmendmentSection({
             </div>
             {amendmentType === 'CORRECTION' && (
               <div className="flex-1">
-                <label className="block text-xs font-medium text-slate-600 mb-1">
+                <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
                   Begrunnelse for rettelse *
                 </label>
                 <input
@@ -73,7 +75,9 @@ export function AmendmentSection({
             )}
           </div>
           <div className="mb-3">
-            <label className="block text-xs font-medium text-slate-600 mb-1">Innhold</label>
+            <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+              Innhold
+            </label>
             <textarea
               value={amendmentContent}
               onChange={(e) => setAmendmentContent(e.target.value)}
@@ -135,7 +139,7 @@ export function AmendmentSection({
                     {amendment.amendment_type === 'CLARIFICATION' && 'Avklaring'}
                     {amendment.amendment_type === 'LATE_ENTRY' && 'Sen registrering'}
                   </span>
-                  <span className="text-xs text-slate-500">
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
                     #{index + 1} - {new Date(amendment.created_at).toLocaleDateString('no-NO')}{' '}
                     {new Date(amendment.created_at).toLocaleTimeString('no-NO', {
                       hour: '2-digit',
@@ -160,12 +164,12 @@ export function AmendmentSection({
                 </div>
               </div>
               {amendment.reason && (
-                <p className="text-xs text-slate-500 mb-2 italic">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mb-2 italic">
                   Begrunnelse: {amendment.reason}
                 </p>
               )}
               <p className="text-sm text-slate-700 whitespace-pre-wrap">{amendment.content}</p>
-              <p className="text-xs text-slate-400 mt-2">
+              <p className="text-xs text-slate-400 dark:text-slate-300 mt-2">
                 Skrevet av: {amendment.author_name || 'Ukjent'}
                 {amendment.signed_by_name && ` | Signert av: ${amendment.signed_by_name}`}
               </p>

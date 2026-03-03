@@ -176,7 +176,9 @@ export default function ProblemList({
               <div className="max-h-48 overflow-y-auto space-y-2">
                 {Object.entries(groupedConditions).map(([category, conditions]) => (
                   <div key={category}>
-                    <div className="text-xs font-medium text-gray-500 mb-1">{category}</div>
+                    <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                      {category}
+                    </div>
                     <div className="space-y-1">
                       {conditions.map((c) => (
                         <button
@@ -193,7 +195,7 @@ export default function ProblemList({
                   </div>
                 ))}
                 {filteredConditions.length === 0 && (
-                  <p className="text-sm text-gray-500 text-center py-2">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-2">
                     Ingen matchende tilstander funnet
                   </p>
                 )}
@@ -207,7 +209,7 @@ export default function ProblemList({
                     className="text-left px-2 py-1.5 text-xs bg-white rounded border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
                   >
                     <div className="font-medium text-blue-600">{c.code}</div>
-                    <div className="text-gray-600 truncate">{c.name}</div>
+                    <div className="text-gray-600 dark:text-gray-300 truncate">{c.name}</div>
                   </button>
                 ))}
               </div>
@@ -215,7 +217,9 @@ export default function ProblemList({
 
             {/* Custom Entry */}
             <div className="pt-3 border-t border-blue-200">
-              <div className="text-xs font-medium text-gray-500 mb-2">Or add custom:</div>
+              <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                Or add custom:
+              </div>
               <div className="grid grid-cols-3 gap-2">
                 <input
                   type="text"
@@ -266,7 +270,7 @@ export default function ProblemList({
       {/* Problems List */}
       <div className="divide-y divide-gray-100">
         {activeProblems.length === 0 && !showAddForm ? (
-          <div className="p-6 text-center text-gray-500">
+          <div className="p-6 text-center text-gray-500 dark:text-gray-400">
             <AlertCircle className="w-8 h-8 mx-auto mb-2 text-gray-300" />
             <p className="text-sm">No active problems documented</p>
             <button
@@ -293,7 +297,7 @@ export default function ProblemList({
                   </div>
                   <h4 className="font-medium text-gray-900 mt-1">{problem.name}</h4>
                   {problem.onsetDate && (
-                    <div className="flex items-center gap-1 text-xs text-gray-500 mt-1">
+                    <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 mt-1">
                       <Calendar className="w-3 h-3" />
                       Onset: {new Date(problem.onsetDate).toLocaleDateString('nb-NO')}
                     </div>
@@ -316,7 +320,7 @@ export default function ProblemList({
 
                   <button
                     onClick={() => removeProblem(problem.id)}
-                    className="p-1 text-gray-400 hover:text-red-600"
+                    className="p-1 text-gray-400 dark:text-gray-300 hover:text-red-600"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -325,7 +329,7 @@ export default function ProblemList({
 
               {/* Notes */}
               {problem.notes && (
-                <p className="text-sm text-gray-600 mt-2 pl-2 border-l-2 border-gray-200">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 pl-2 border-l-2 border-gray-200">
                   {problem.notes}
                 </p>
               )}
@@ -339,7 +343,7 @@ export default function ProblemList({
         <div className="border-t border-gray-200">
           <button
             onClick={() => setExpandedId(expandedId === 'resolved' ? null : 'resolved')}
-            className="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-500 hover:bg-gray-50"
+            className="w-full flex items-center justify-between px-4 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50"
           >
             <span>Resolved Problems ({resolvedProblems.length})</span>
             {expandedId === 'resolved' ? (
@@ -354,7 +358,7 @@ export default function ProblemList({
               {resolvedProblems.map((problem) => (
                 <div
                   key={problem.id}
-                  className="flex items-center justify-between text-sm text-gray-500"
+                  className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400"
                 >
                   <span className="line-through">{problem.name}</span>
                   <button
@@ -378,7 +382,11 @@ export function ProblemListCompact({ problems = [], className = '' }) {
   const activeProblems = problems.filter((p) => p.status !== 'resolved');
 
   if (activeProblems.length === 0) {
-    return <div className={`text-sm text-gray-500 ${className}`}>No active problems</div>;
+    return (
+      <div className={`text-sm text-gray-500 dark:text-gray-400 ${className}`}>
+        No active problems
+      </div>
+    );
   }
 
   return (
@@ -395,7 +403,9 @@ export function ProblemListCompact({ problems = [], className = '' }) {
             }`}
           ></span>
           <span className="text-gray-700 truncate">{problem.name}</span>
-          <span className="text-xs text-gray-400">- {CONDITION_STATUS[problem.status].label}</span>
+          <span className="text-xs text-gray-400 dark:text-gray-300">
+            - {CONDITION_STATUS[problem.status].label}
+          </span>
         </div>
       ))}
     </div>

@@ -313,7 +313,7 @@ export default function PortalOutcomes() {
             }}
             className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
           <h1 className="font-bold text-gray-900">
             {activeQuestionnaire ? questionnaire?.label : 'Sporreskjemaer'}
@@ -332,7 +332,9 @@ export default function PortalOutcomes() {
         {/* Questionnaire form */}
         {activeQuestionnaire && !submitted && (
           <div className="space-y-4">
-            <p className="text-sm text-gray-600 px-1">{questionnaire.description}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300 px-1">
+              {questionnaire.description}
+            </p>
 
             {questionnaire.questions.map((q, idx) => (
               <div key={q.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
@@ -354,14 +356,14 @@ export default function PortalOutcomes() {
                                 : val <= 6
                                   ? 'bg-yellow-500 text-white'
                                   : 'bg-red-500 text-white'
-                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                              : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
                           }`}
                         >
                           {val}
                         </button>
                       ))}
                     </div>
-                    <div className="flex justify-between text-xs text-gray-400 mt-1 px-1">
+                    <div className="flex justify-between text-xs text-gray-400 dark:text-gray-300 mt-1 px-1">
                       <span>{q.minLabel}</span>
                       <span>{q.maxLabel}</span>
                     </div>
@@ -413,7 +415,7 @@ export default function PortalOutcomes() {
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
             <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-gray-900 mb-2">Takk!</h2>
-            <p className="text-gray-600 mb-6">Svarene dine er registrert.</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-6">Svarene dine er registrert.</p>
             <button
               onClick={() => {
                 setActiveQuestionnaire(null);
@@ -429,7 +431,9 @@ export default function PortalOutcomes() {
         {/* Questionnaire list (when no active form) */}
         {!activeQuestionnaire && (
           <>
-            <h2 className="text-sm font-medium text-gray-500 px-1">Tilgjengelige skjemaer</h2>
+            <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 px-1">
+              Tilgjengelige skjemaer
+            </h2>
             {pendingTypes.map((type) => {
               const qt = QUESTIONNAIRE_TYPES[type];
               if (!qt) {
@@ -446,7 +450,7 @@ export default function PortalOutcomes() {
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{qt.label}</p>
-                    <p className="text-sm text-gray-500">{qt.description}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{qt.description}</p>
                   </div>
                 </button>
               );
@@ -457,7 +461,7 @@ export default function PortalOutcomes() {
               <div className="mt-6">
                 <button
                   onClick={() => setShowHistory(!showHistory)}
-                  className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 px-1 mb-3"
+                  className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 px-1 mb-3"
                 >
                   <TrendingUp className="w-4 h-4" />
                   {showHistory ? (
@@ -482,7 +486,7 @@ export default function PortalOutcomes() {
                                 QUESTIONNAIRE_TYPES[result.type]?.label ||
                                 result.type}
                             </p>
-                            <p className="text-xs text-gray-500">
+                            <p className="text-xs text-gray-500 dark:text-gray-400">
                               {new Date(result.completed_at).toLocaleDateString('nb-NO', {
                                 day: 'numeric',
                                 month: 'short',
@@ -502,7 +506,7 @@ export default function PortalOutcomes() {
         )}
       </div>
 
-      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400">
+      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-300">
         <p>Dine svar er konfidensielle og deles kun med din behandler</p>
       </footer>
     </div>

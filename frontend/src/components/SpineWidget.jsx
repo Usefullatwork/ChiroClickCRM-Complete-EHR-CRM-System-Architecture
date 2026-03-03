@@ -128,7 +128,7 @@ const SpineRegion = ({
 }) => {
   return (
     <div className="mb-4">
-      <div className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">
+      <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2 uppercase tracking-wide">
         {region.label}
       </div>
       <div className={`flex flex-wrap gap-1 ${compact ? 'gap-0.5' : 'gap-2'}`}>
@@ -177,7 +177,7 @@ const FindingEditor = ({ segment, finding, onSave, onDelete, onCancel }) => {
         <h4 className="font-medium">
           {segment.label} - {segment.fullName}
         </h4>
-        <button onClick={onCancel} className="text-gray-400 hover:text-gray-600">
+        <button onClick={onCancel} className="text-gray-400 dark:text-gray-300 hover:text-gray-600">
           ✕
         </button>
       </div>
@@ -277,7 +277,7 @@ const FindingEditor = ({ segment, finding, onSave, onDelete, onCancel }) => {
         )}
         <button
           onClick={onCancel}
-          className="px-3 py-1.5 text-gray-600 hover:bg-gray-100 rounded-lg text-sm"
+          className="px-3 py-1.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg text-sm"
         >
           Avbryt
         </button>
@@ -502,7 +502,9 @@ export const SpineWidget = ({
                             style={{ backgroundColor: type?.color }}
                           />
                           <span className="font-medium text-sm">{f.segmentLabel}</span>
-                          <span className="text-xs text-gray-500">{type?.label}</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {type?.label}
+                          </span>
                         </div>
                       </div>
                     );
@@ -516,7 +518,7 @@ export const SpineWidget = ({
               </div>
             </div>
           ) : (
-            <div className="text-center text-gray-500 text-sm p-8">
+            <div className="text-center text-gray-500 dark:text-gray-400 text-sm p-8">
               <p>Klikk på et segment for å legge til funn</p>
             </div>
           )}
@@ -529,7 +531,7 @@ export const SpineWidget = ({
           {FINDING_TYPES.map((type) => (
             <div key={type.id} className="flex items-center gap-1">
               <span className="w-2.5 h-2.5 rounded" style={{ backgroundColor: type.color }} />
-              <span className="text-gray-600">{type.label}</span>
+              <span className="text-gray-600 dark:text-gray-300">{type.label}</span>
             </div>
           ))}
         </div>

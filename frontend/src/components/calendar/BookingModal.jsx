@@ -113,7 +113,7 @@ function PatientSearch({ _value, _onChange, selectedPatient, onSelect, onClear }
   return (
     <div className="relative">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300" />
         <input
           type="text"
           value={searchTerm}
@@ -122,7 +122,7 @@ function PatientSearch({ _value, _onChange, selectedPatient, onSelect, onClear }
           className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
         {isLoading && (
-          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 animate-spin" />
+          <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300 animate-spin" />
         )}
       </div>
 
@@ -130,7 +130,7 @@ function PatientSearch({ _value, _onChange, selectedPatient, onSelect, onClear }
       {isOpen && (
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
           {patients.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
+            <div className="p-4 text-center text-gray-500 dark:text-gray-400">
               {searchTerm.length < 2 ? 'Skriv minst 2 tegn for a soke' : 'Ingen pasienter funnet'}
             </div>
           ) : (
@@ -142,12 +142,12 @@ function PatientSearch({ _value, _onChange, selectedPatient, onSelect, onClear }
                     onClick={() => handleSelect(patient)}
                     className="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3"
                   >
-                    <User className="w-5 h-5 text-gray-400" />
+                    <User className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                     <div>
                       <div className="font-medium text-gray-900">
                         {patient.first_name} {patient.last_name}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
                         {patient.phone || patient.email || 'Ingen kontaktinfo'}
                       </div>
                     </div>
@@ -381,14 +381,14 @@ export default function BookingModal({
               {editingAppointment ? 'Rediger avtale' : 'Ny avtale'}
             </h2>
             {appointmentDate && (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {format(parseISO(appointmentDate), 'EEEE d. MMMM yyyy', { locale: nb })}
               </p>
             )}
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -491,7 +491,7 @@ export default function BookingModal({
 
             {/* End time display */}
             {appointmentTime && endTime && (
-              <div className="flex items-center gap-2 text-sm text-gray-600 bg-gray-50 px-4 py-2 rounded-lg">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 px-4 py-2 rounded-lg">
                 <Clock className="w-4 h-4" />
                 <span>
                   Avtalen varer fra <strong>{appointmentTime}</strong> til{' '}

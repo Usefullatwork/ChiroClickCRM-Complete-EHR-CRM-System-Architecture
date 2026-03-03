@@ -231,14 +231,14 @@ export default function AnatomicalSpine({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowLayers((l) => ({ ...l, discs: !l.discs }))}
-            className={`p-1.5 rounded ${showLayers.discs ? 'bg-blue-100 text-blue-700' : 'text-gray-400 hover:bg-gray-100'}`}
+            className={`p-1.5 rounded ${showLayers.discs ? 'bg-blue-100 text-blue-700' : 'text-gray-400 dark:text-gray-300 hover:bg-gray-100'}`}
             title="Vis/skjul discer"
           >
             <Circle className="w-4 h-4" />
           </button>
           <button
             onClick={() => setShowLayers((l) => ({ ...l, nerves: !l.nerves }))}
-            className={`p-1.5 rounded ${showLayers.nerves ? 'bg-yellow-100 text-yellow-700' : 'text-gray-400 hover:bg-gray-100'}`}
+            className={`p-1.5 rounded ${showLayers.nerves ? 'bg-yellow-100 text-yellow-700' : 'text-gray-400 dark:text-gray-300 hover:bg-gray-100'}`}
             title="Vis/skjul nerver"
           >
             <Zap className="w-4 h-4" />
@@ -485,7 +485,9 @@ export default function AnatomicalSpine({
           {/* Finding type selector */}
           {!readOnly && (
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">Funntype</label>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                Funntype
+              </label>
               <div className="grid grid-cols-2 gap-1">
                 {Object.entries(FINDING_TYPES).map(([key, type]) => (
                   <button
@@ -511,7 +513,7 @@ export default function AnatomicalSpine({
           {/* Listing selector */}
           {!readOnly && (
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                 Listing/Retning
               </label>
               <div className="flex flex-wrap gap-1">
@@ -536,7 +538,7 @@ export default function AnatomicalSpine({
           {/* Current findings */}
           {totalFindings > 0 && (
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-2">
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                 Registrerte funn ({totalFindings})
               </label>
               <div className="space-y-1 max-h-40 overflow-y-auto">
@@ -548,7 +550,7 @@ export default function AnatomicalSpine({
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full" style={{ backgroundColor: f.color }} />
                       <span className="font-medium">{f.elementLabel}</span>
-                      <span className="text-gray-500">
+                      <span className="text-gray-500 dark:text-gray-400">
                         {f.typeLabel}
                         {f.listing !== 'none' && ` (${f.listing})`}
                       </span>
@@ -560,7 +562,7 @@ export default function AnatomicalSpine({
                           delete newFindings[key];
                           onChange?.(newFindings);
                         }}
-                        className="text-gray-400 hover:text-red-600"
+                        className="text-gray-400 dark:text-gray-300 hover:text-red-600"
                       >
                         ×
                       </button>
@@ -573,7 +575,9 @@ export default function AnatomicalSpine({
 
           {/* Quick region selectors */}
           <div>
-            <label className="block text-xs font-medium text-gray-500 mb-2">Hurtigvalg</label>
+            <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+              Hurtigvalg
+            </label>
             <div className="grid grid-cols-4 gap-1">
               {['cervical', 'thoracic', 'lumbar', 'sacral'].map((region) => (
                 <div key={region} className="space-y-0.5">

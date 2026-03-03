@@ -422,7 +422,7 @@ export default function ExercisePrescription() {
               <h1 className="text-xl font-semibold text-gray-900">
                 {isEditing ? 'Rediger treningsprogram' : 'Nytt treningsprogram'}
               </h1>
-              <div className="flex items-center gap-3 text-sm text-gray-500 mt-0.5">
+              <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                 {patientId && (
                   <span className="flex items-center gap-1">
                     <User className="w-3.5 h-3.5" />
@@ -538,7 +538,7 @@ export default function ExercisePrescription() {
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-            <span className="ml-3 text-gray-500">Laster...</span>
+            <span className="ml-3 text-gray-500 dark:text-gray-400">Laster...</span>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -659,7 +659,7 @@ export default function ExercisePrescription() {
                   className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                     rightPanelView === 'selector'
                       ? 'bg-blue-600 text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                   }`}
                 >
                   Ovelsebibliotek
@@ -669,7 +669,7 @@ export default function ExercisePrescription() {
                   className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                     rightPanelView === 'templates'
                       ? 'bg-purple-600 text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                   }`}
                 >
                   Maler
@@ -679,7 +679,7 @@ export default function ExercisePrescription() {
                   className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                     rightPanelView === 'schedule'
                       ? 'bg-green-600 text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                   }`}
                 >
                   Ukeoversikt

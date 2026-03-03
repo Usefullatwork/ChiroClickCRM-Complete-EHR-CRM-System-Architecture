@@ -446,7 +446,7 @@ export default function CRM() {
             />
           </div>
           <div className="mt-4 pt-3 border-t border-gray-100">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {overviewStats.pendingReferrals}{' '}
               {t({ no: 'ventende belønninger', en: 'pending rewards' })}
             </p>
@@ -510,7 +510,7 @@ export default function CRM() {
           </div>
           <div className="text-center py-4">
             <p className="text-3xl font-bold text-amber-600">{overviewStats.waitlistCount}</p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {t({ no: 'pasienter venter', en: 'patients waiting' })}
             </p>
           </div>
@@ -565,7 +565,7 @@ export default function CRM() {
             <h1 className="text-2xl font-bold text-gray-900">
               {t({ no: 'Kunderelasjonshåndtering', en: 'Customer Relationship Management' })}
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {t({
                 no: 'Administrer pasienter, leads, kampanjer og kommunikasjon',
                 en: 'Manage patients, leads, campaigns and communication',
@@ -603,11 +603,11 @@ export default function CRM() {
                     ${
                       isActive
                         ? `bg-${module.color}-50 text-${module.color}-700 border border-${module.color}-200`
-                        : 'text-gray-600 hover:bg-gray-50'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                     }`}
                 >
                   <Icon
-                    className={`w-5 h-5 ${isActive ? `text-${module.color}-500` : 'text-gray-400'}`}
+                    className={`w-5 h-5 ${isActive ? `text-${module.color}-500` : 'text-gray-400 dark:text-gray-300'}`}
                   />
                   <span className="text-sm font-medium">{t(module.name)}</span>
                 </button>
@@ -618,7 +618,9 @@ export default function CRM() {
 
         {/* Main Content */}
         <div className="flex-1 p-6">
-          <Suspense fallback={<div className="p-6 text-gray-500">Laster modul...</div>}>
+          <Suspense
+            fallback={<div className="p-6 text-gray-500 dark:text-gray-400">Laster modul...</div>}
+          >
             {renderModuleContent()}
           </Suspense>
         </div>
@@ -646,7 +648,7 @@ function StatCard({ icon: Icon, label, value, color, suffix = '', trend, alert }
         {value}
         {suffix}
       </p>
-      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
       {trend && <p className="text-xs text-green-600 mt-1">{trend}</p>}
     </div>
   );
@@ -657,7 +659,7 @@ function PipelineBar({ label, count, total, color }) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-xs text-gray-500 w-20">{label}</span>
+      <span className="text-xs text-gray-500 dark:text-gray-400 w-20">{label}</span>
       <div className="flex-1 bg-gray-100 rounded-full h-2">
         <div className={`h-2 rounded-full bg-${color}-500`} style={{ width: `${percentage}%` }} />
       </div>
@@ -674,9 +676,9 @@ function MessagePreview({ name, message, time, type }) {
       />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-gray-900">{name}</p>
-        <p className="text-xs text-gray-500 truncate">{message}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{message}</p>
       </div>
-      <span className="text-xs text-gray-400">{time}</span>
+      <span className="text-xs text-gray-400 dark:text-gray-300">{time}</span>
     </div>
   );
 }
@@ -692,11 +694,11 @@ function ReferralPreview({ referrer, referred, status, reward }) {
     <div className="flex items-center justify-between">
       <div>
         <p className="text-sm font-medium text-gray-900">{referred}</p>
-        <p className="text-xs text-gray-500">fra {referrer}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">fra {referrer}</p>
       </div>
       <div className="text-right">
         <span className={`px-2 py-0.5 text-xs rounded-full ${statusColors[status]}`}>{status}</span>
-        <p className="text-xs text-gray-500 mt-1">{reward}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{reward}</p>
       </div>
     </div>
   );
@@ -709,11 +711,11 @@ function CampaignPreview({ name, type, sent, responded }) {
     <div>
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-gray-900">{name}</p>
-        <span className="text-xs text-gray-500">{type}</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">{type}</span>
       </div>
       <div className="flex items-center gap-4 mt-1">
-        <span className="text-xs text-gray-500">Sendt: {sent}</span>
-        <span className="text-xs text-gray-500">Svart: {responded}</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">Sendt: {sent}</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">Svart: {responded}</span>
         <span className="text-xs text-green-600">{responseRate}% respons</span>
       </div>
     </div>
@@ -729,7 +731,7 @@ function WorkflowStatus({ name, status, runsToday }) {
         />
         <p className="text-sm text-gray-700">{name}</p>
       </div>
-      <span className="text-xs text-gray-500">{runsToday} i dag</span>
+      <span className="text-xs text-gray-500 dark:text-gray-400">{runsToday} i dag</span>
     </div>
   );
 }

@@ -44,7 +44,7 @@ export default function SMSComposer({ recipientPhone, recipientName, onSend, onC
         recipient_phone: recipientPhone,
         content: message,
         method: 'manual',
-        status: 'PENDING' // Will be marked as sent after user confirmation
+        status: 'PENDING', // Will be marked as sent after user confirmation
       });
 
       // Reset form
@@ -66,7 +66,7 @@ export default function SMSComposer({ recipientPhone, recipientName, onSend, onC
       await onSend({
         recipient_phone: recipientPhone,
         content: message,
-        method: 'phonelink'
+        method: 'phonelink',
       });
 
       // Reset form
@@ -92,7 +92,7 @@ export default function SMSComposer({ recipientPhone, recipientName, onSend, onC
           </div>
           <div>
             <h3 className="text-lg font-semibold text-gray-900">Send SMS</h3>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               To: {recipientName} ({recipientPhone})
             </p>
           </div>
@@ -112,7 +112,9 @@ export default function SMSComposer({ recipientPhone, recipientName, onSend, onC
 
         {/* Character count */}
         <div className="flex items-center justify-between mt-2 text-sm">
-          <span className={`${charCount > MAX_SMS_EXTENDED - 50 ? 'text-red-600' : 'text-gray-500'}`}>
+          <span
+            className={`${charCount > MAX_SMS_EXTENDED - 50 ? 'text-red-600' : 'text-gray-500 dark:text-gray-400'}`}
+          >
             {charCount} / {MAX_SMS_EXTENDED} characters
             {messageSegments > 1 && ` (${messageSegments} SMS segments)`}
           </span>
@@ -127,9 +129,7 @@ export default function SMSComposer({ recipientPhone, recipientName, onSend, onC
       {/* Manual Send Instructions */}
       {manualSendConfirmation && (
         <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <p className="text-sm text-blue-900 mb-3">
-            ✓ Message copied to clipboard! Now:
-          </p>
+          <p className="text-sm text-blue-900 mb-3">✓ Message copied to clipboard! Now:</p>
           <ol className="text-sm text-blue-800 space-y-1 ml-4 list-decimal">
             <li>Open your phone's messaging app</li>
             <li>Create a new message to {recipientPhone}</li>
@@ -205,9 +205,9 @@ export default function SMSComposer({ recipientPhone, recipientName, onSend, onC
 
       {/* Help Text */}
       <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-        <p className="text-xs text-gray-600">
-          <strong>Tip:</strong> Use "Copy Message" to send manually from your phone, or "Send via Phone Link"
-          if you have Windows Phone Link app installed and connected.
+        <p className="text-xs text-gray-600 dark:text-gray-300">
+          <strong>Tip:</strong> Use "Copy Message" to send manually from your phone, or "Send via
+          Phone Link" if you have Windows Phone Link app installed and connected.
         </p>
       </div>
     </div>

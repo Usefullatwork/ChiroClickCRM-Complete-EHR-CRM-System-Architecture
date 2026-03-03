@@ -101,7 +101,7 @@ export default function PlaygroundTab() {
 
         {/* Preset Prompts */}
         <div className="mb-4">
-          <p className="text-sm text-gray-600 mb-2">Hurtigvalg:</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Hurtigvalg:</p>
           <div className="flex flex-wrap gap-2">
             {PRESET_PROMPTS.map((p) => (
               <button
@@ -131,7 +131,9 @@ export default function PlaygroundTab() {
             <button
               onClick={() => setSideBySide(false)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                !sideBySide ? 'bg-white shadow-sm text-blue-700' : 'text-gray-600'
+                !sideBySide
+                  ? 'bg-white shadow-sm text-blue-700'
+                  : 'text-gray-600 dark:text-gray-300'
               }`}
             >
               <Monitor className="w-4 h-4" />
@@ -140,7 +142,7 @@ export default function PlaygroundTab() {
             <button
               onClick={() => setSideBySide(true)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                sideBySide ? 'bg-white shadow-sm text-blue-700' : 'text-gray-600'
+                sideBySide ? 'bg-white shadow-sm text-blue-700' : 'text-gray-600 dark:text-gray-300'
               }`}
             >
               <Columns className="w-4 h-4" />
@@ -163,7 +165,7 @@ export default function PlaygroundTab() {
             </select>
             {sideBySide && (
               <>
-                <span className="text-gray-400 text-sm">vs</span>
+                <span className="text-gray-400 dark:text-gray-300 text-sm">vs</span>
                 <select
                   value={modelB}
                   onChange={(e) => setModelB(e.target.value)}
@@ -237,7 +239,7 @@ function ResultCard({ model, result, loading, error }) {
       <div className="px-4 py-3 bg-gray-50 border-b flex items-center justify-between">
         <span className="font-medium text-sm font-mono">{model}</span>
         {result && (
-          <div className="flex items-center gap-3 text-xs text-gray-500">
+          <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
             {result.latency_ms && (
               <span className="flex items-center gap-1">
                 <Zap className="w-3 h-3" />
@@ -250,7 +252,7 @@ function ResultCard({ model, result, loading, error }) {
       </div>
       <div className="p-4">
         {loading ? (
-          <div className="flex items-center gap-2 text-gray-500">
+          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
             <Clock className="w-4 h-4 animate-spin" />
             <span className="text-sm">Genererer svar...</span>
           </div>
@@ -261,14 +263,16 @@ function ResultCard({ model, result, loading, error }) {
         ) : result ? (
           <div>
             {result.prompt && (
-              <div className="text-xs text-gray-500 mb-2">Prompt: {result.prompt}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                Prompt: {result.prompt}
+              </div>
             )}
             <div className="whitespace-pre-wrap text-sm font-mono bg-gray-50 rounded-lg p-3 max-h-96 overflow-y-auto">
               {result.response}
             </div>
           </div>
         ) : (
-          <p className="text-gray-400 text-sm">Ingen resultat enna.</p>
+          <p className="text-gray-400 dark:text-gray-300 text-sm">Ingen resultat enna.</p>
         )}
       </div>
     </div>

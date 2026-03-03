@@ -17,9 +17,9 @@
 import logger from '../utils/logger';
 
 const STORAGE_KEYS = {
-  CONFIG: 'chiroclick_messaging_config',
-  CONVERSATIONS: 'chiroclick_conversations',
-  TEMPLATES: 'chiroclick_message_templates',
+  CONFIG: 'chiroclickehr_messaging_config',
+  CONVERSATIONS: 'chiroclickehr_conversations',
+  TEMPLATES: 'chiroclickehr_message_templates',
 };
 
 // Default configuration

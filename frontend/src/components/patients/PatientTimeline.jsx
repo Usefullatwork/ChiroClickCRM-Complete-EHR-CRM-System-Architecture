@@ -125,7 +125,7 @@ export default function PatientTimeline({ patientId, encounters = [], onNavigate
 
       {/* Timeline */}
       {filteredItems.length === 0 ? (
-        <p className="text-center text-sm text-gray-400 dark:text-gray-500 py-8">
+        <p className="text-center text-sm text-gray-400 dark:text-gray-300 py-8">
           {t('noEvents', 'Ingen hendelser')}
         </p>
       ) : (

@@ -57,7 +57,9 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
             )}
           </div>
           {protocol.description_no && (
-            <p className="text-xs text-gray-600 line-clamp-2 ml-6">{protocol.description_no}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 ml-6">
+              {protocol.description_no}
+            </p>
           )}
           {protocol.positive_indication_no && (
             <p className="text-xs text-blue-600 mt-1 ml-6">
@@ -77,7 +79,7 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
     return (
       <div className="divide-y divide-gray-200">
         <div className="p-3 bg-gray-50 border-b border-gray-200">
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-gray-600 dark:text-gray-300">
             {searchResults.data.length} resultater for "{searchQuery}"
           </p>
         </div>
@@ -105,11 +107,11 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
             >
               <span className="text-sm font-medium text-gray-900">{category}</span>
               <div className="flex items-center gap-2">
-                <span className="text-xs text-gray-500">{protocols.length}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">{protocols.length}</span>
                 {expandedCategories[category] ? (
-                  <ChevronDown className="w-4 h-4 text-gray-400" />
+                  <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 ) : (
-                  <ChevronRight className="w-4 h-4 text-gray-400" />
+                  <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 )}
               </div>
             </button>
@@ -144,7 +146,7 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
             }`}
           >
             <span className="text-sm font-medium text-gray-900">{region}</span>
-            <ChevronRight className="w-4 h-4 text-gray-400" />
+            <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-300" />
           </button>
         ))}
       </div>
@@ -168,7 +170,7 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
 
         {/* Search */}
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
           <input
             type="text"
             value={searchQuery}
@@ -188,7 +190,7 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
           >
             ← Tilbake til regioner
           </button>
-          <span className="text-gray-400">/</span>
+          <span className="text-gray-400 dark:text-gray-300">/</span>
           <span className="text-gray-900">{selectedRegion}</span>
         </div>
       )}
@@ -210,7 +212,7 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
 
       {/* Footer */}
       <div className="px-4 py-3 border-t border-gray-200 bg-gray-50">
-        <p className="text-xs text-gray-500 text-center">
+        <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
           Velg en undersøkelse for å legge til funn
         </p>
       </div>

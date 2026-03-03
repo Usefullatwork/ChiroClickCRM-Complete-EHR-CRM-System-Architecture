@@ -64,7 +64,7 @@ const getStatusConfig = (status) => {
     },
     cancelled: {
       label: 'Kansellert',
-      color: 'bg-gray-100 text-gray-500',
+      color: 'bg-gray-100 text-gray-500 dark:text-gray-400',
       icon: XCircle,
     },
     credited: {
@@ -228,7 +228,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-[200px]">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
               <input
                 type="text"
                 placeholder="Sok etter pasient eller fakturanummer..."
@@ -288,44 +288,44 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('invoice_number')}
                 >
                   Faktura
                   {sortBy === 'invoice_number' && (sortOrder === 'ASC' ? ' ▲' : ' ▼')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Pasient
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('patient_amount')}
                 >
                   Belop
                   {sortBy === 'patient_amount' && (sortOrder === 'ASC' ? ' ▲' : ' ▼')}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('status')}
                 >
                   Status
                   {sortBy === 'status' && (sortOrder === 'ASC' ? ' ▲' : ' ▼')}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('invoice_date')}
                 >
                   Dato
                   {sortBy === 'invoice_date' && (sortOrder === 'ASC' ? ' ▲' : ' ▼')}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('due_date')}
                 >
                   Forfall
                   {sortBy === 'due_date' && (sortOrder === 'ASC' ? ' ▲' : ' ▼')}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Handlinger
                 </th>
               </tr>
@@ -335,7 +335,9 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                 <tr>
                   <td colSpan="7" className="px-6 py-12 text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="text-sm text-gray-500 mt-3">Laster fakturaer...</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+                      Laster fakturaer...
+                    </p>
                   </td>
                 </tr>
               ) : invoices.length > 0 ? (
@@ -365,7 +367,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                             {formatCurrency(invoice.patient_amount)}
                           </span>
                           {invoice.amount_paid > 0 && invoice.status !== 'paid' && (
-                            <span className="text-sm text-gray-500 block">
+                            <span className="text-sm text-gray-500 dark:text-gray-400 block">
                               Betalt: {formatCurrency(invoice.amount_paid)}
                             </span>
                           )}
@@ -379,11 +381,11 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                           {statusConfig.label}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
                         {formatDate(invoice.invoice_date)}
                       </td>
                       <td
-                        className={`px-6 py-4 whitespace-nowrap ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-500'}`}
+                        className={`px-6 py-4 whitespace-nowrap ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-500 dark:text-gray-400'}`}
                       >
                         {formatDate(invoice.due_date)}
                         {isOverdue &&
@@ -399,7 +401,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                               e.stopPropagation();
                               setActiveDropdown(activeDropdown === invoice.id ? null : invoice.id);
                             }}
-                            className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+                            className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                           >
                             <MoreVertical className="w-4 h-4" />
                           </button>
@@ -478,7 +480,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                   <td colSpan="7" className="px-6 py-12 text-center">
                     <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                     <h3 className="text-lg font-medium text-gray-900 mb-1">Ingen fakturaer</h3>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {searchTerm || statusFilter
                         ? 'Ingen fakturaer matcher soket ditt'
                         : 'Opprett din forste faktura for a komme i gang'}
@@ -493,7 +495,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
         {/* Pagination */}
         {pagination.pages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Viser {(page - 1) * limit + 1}-{Math.min(page * limit, pagination.total)} av{' '}
               {pagination.total} fakturaer
             </p>

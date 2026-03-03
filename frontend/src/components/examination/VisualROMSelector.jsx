@@ -457,7 +457,7 @@ function _ROMInput({ value, onChange, normal, readOnly }) {
                    }`}
         placeholder="—"
       />
-      <span className="text-xs text-gray-400">°</span>
+      <span className="text-xs text-gray-400 dark:text-gray-300">°</span>
       {isRestricted && <AlertTriangle className="w-4 h-4 text-red-500" />}
       {percentage !== null && percentage >= 90 && (
         <CheckCircle className="w-4 h-4 text-green-500" />
@@ -533,16 +533,16 @@ function RegionROMPanel({ _regionId, regionData, values = {}, onChange, onRemove
                 e.stopPropagation();
                 onRemove();
               }}
-              className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded"
+              className="p-1 text-gray-400 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 rounded"
               title="Fjern region"
             >
               <Trash2 className="w-4 h-4" />
             </button>
           )}
           {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-500" />
+            <ChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-500" />
+            <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           )}
         </div>
       </div>
@@ -573,7 +573,7 @@ function RegionROMPanel({ _regionId, regionData, values = {}, onChange, onRemove
                              }`}
                 >
                   {/* Movement name */}
-                  <div className="text-xs font-medium text-gray-600 text-center mb-2">
+                  <div className="text-xs font-medium text-gray-600 dark:text-gray-300 text-center mb-2">
                     {movement.nameNo}
                   </div>
 
@@ -597,7 +597,7 @@ function RegionROMPanel({ _regionId, regionData, values = {}, onChange, onRemove
                                  ${
                                    mv.pain
                                      ? 'bg-red-500 text-white'
-                                     : 'bg-gray-100 text-gray-500 hover:bg-red-100'
+                                     : 'bg-gray-100 text-gray-500 dark:text-gray-400 hover:bg-red-100'
                                  }`}
                     >
                       {mv.pain ? '⚡ Smerte' : '+ Smerte'}
@@ -676,7 +676,7 @@ function BodyDiagram({ selectedRegions, onSelectRegion, availableRegions }) {
                            ? 'bg-teal-500 text-white scale-110 ring-2 ring-teal-300'
                            : isAvailable
                              ? 'bg-white border-2 border-teal-400 text-teal-600 hover:bg-teal-50 hover:scale-110'
-                             : 'bg-gray-100 border border-gray-300 text-gray-400 cursor-not-allowed'
+                             : 'bg-gray-100 border border-gray-300 text-gray-400 dark:text-gray-300 cursor-not-allowed'
                        }`}
             style={{ top: region.position.top, left: region.position.left }}
             title={region.nameNo}
@@ -818,7 +818,9 @@ export default function VisualROMSelector({
       <div className="flex items-center justify-between">
         <div>
           <h3 className="text-lg font-semibold text-gray-800">Leddutslag (ROM)</h3>
-          <p className="text-sm text-gray-500">Klikk på kroppen for å legge til regioner</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Klikk på kroppen for å legge til regioner
+          </p>
         </div>
         <div className="flex items-center gap-2">
           {!readOnly && (
@@ -846,7 +848,7 @@ export default function VisualROMSelector({
       {/* Summary stats */}
       {summary.totalMeasured > 0 && (
         <div className="flex items-center gap-4 text-sm">
-          <span className="text-gray-600">{summary.totalMeasured} målinger</span>
+          <span className="text-gray-600 dark:text-gray-300">{summary.totalMeasured} målinger</span>
           {summary.totalRestricted > 0 && (
             <span className="text-red-600 flex items-center gap-1">
               <AlertTriangle className="w-4 h-4" />
@@ -867,13 +869,13 @@ export default function VisualROMSelector({
               <h4 className="text-lg font-semibold">Velg kroppsregion</h4>
               <button
                 onClick={() => setShowBodySelector(false)}
-                className="p-1 text-gray-400 hover:text-gray-600"
+                className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <p className="text-sm text-gray-500 mb-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
               Klikk på + for å legge til en region, eller ✓ for å fjerne
             </p>
 
@@ -920,7 +922,7 @@ export default function VisualROMSelector({
       )}
 
       {/* Legend */}
-      <div className="flex items-center gap-4 text-xs text-gray-500 bg-gray-50 p-2 rounded-lg">
+      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 p-2 rounded-lg">
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 bg-red-100 border border-red-400 rounded" />
           <span>&lt;70% = Betydelig redusert</span>
@@ -937,7 +939,7 @@ export default function VisualROMSelector({
 
       {/* Selected Region Panels */}
       {selectedRegions.length === 0 ? (
-        <div className="text-center py-8 text-gray-500 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
+        <div className="text-center py-8 text-gray-500 dark:text-gray-400 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
           <p className="mb-2">Ingen regioner valgt</p>
           <p className="text-sm">Klikk "Legg til region" for å starte</p>
         </div>

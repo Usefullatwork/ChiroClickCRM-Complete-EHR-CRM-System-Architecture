@@ -1,4 +1,4 @@
-# ChiroClickCRM Frontend Dockerfile
+# ChiroClickEHR Frontend Dockerfile
 # Multi-stage build for optimized production image
 
 # ============================================

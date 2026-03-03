@@ -55,7 +55,7 @@ function ClusterTestItem({ test, value, onChange, readOnly = false }) {
             className={`p-1 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
               value === true
                 ? 'bg-amber-500 text-white'
-                : 'bg-gray-200 text-gray-500 hover:bg-amber-200'
+                : 'bg-gray-200 text-gray-500 dark:text-gray-400 hover:bg-amber-200'
             }`}
             title="Positiv"
           >
@@ -67,7 +67,7 @@ function ClusterTestItem({ test, value, onChange, readOnly = false }) {
             className={`p-1 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
               value === false
                 ? 'bg-green-500 text-white'
-                : 'bg-gray-200 text-gray-500 hover:bg-green-200'
+                : 'bg-gray-200 text-gray-500 dark:text-gray-400 hover:bg-green-200'
             }`}
             title="Negativ"
           >
@@ -81,7 +81,7 @@ function ClusterTestItem({ test, value, onChange, readOnly = false }) {
           >
             {test.name}
           </h4>
-          <p className="text-xs text-gray-500 mt-0.5">{test.criteria}</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{test.criteria}</p>
           {value === true && test.interpretation && (
             <p className="text-xs text-amber-600 mt-1 italic">→ {test.interpretation}</p>
           )}
@@ -186,7 +186,11 @@ function ClusterPanel({
           {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
           <Icon
             className={`w-5 h-5 ${
-              isPositive ? (cluster.critical ? 'text-red-500' : 'text-amber-500') : 'text-gray-500'
+              isPositive
+                ? cluster.critical
+                  ? 'text-red-500'
+                  : 'text-amber-500'
+                : 'text-gray-500 dark:text-gray-400'
             }`}
           />
           <div className="text-left">
@@ -201,7 +205,7 @@ function ClusterPanel({
             >
               {lang === 'no' ? cluster.name : cluster.nameEn}
             </h3>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               {lang === 'no' ? 'Terskel' : 'Threshold'}: ≥{cluster.threshold}/{cluster.total}
               {cluster.sensitivity &&
                 ` | Sens: ${cluster.sensitivity}%, Spes: ${cluster.specificity}%`}
@@ -272,7 +276,9 @@ function ClusterPanel({
                 {assessment.message}
               </p>
               {assessment.action && (
-                <p className="text-xs mt-1 text-gray-600">→ {assessment.action}</p>
+                <p className="text-xs mt-1 text-gray-600 dark:text-gray-300">
+                  → {assessment.action}
+                </p>
               )}
             </div>
           )}
@@ -316,7 +322,10 @@ function ClusterPanel({
               </h4>
               <ul className="mt-2 space-y-1">
                 {cluster.differentials.map((diff, idx) => (
-                  <li key={idx} className="text-xs text-gray-600 flex items-start gap-2">
+                  <li
+                    key={idx}
+                    className="text-xs text-gray-600 dark:text-gray-300 flex items-start gap-2"
+                  >
                     <span>•</span>
                     <span>{diff}</span>
                   </li>
@@ -488,7 +497,7 @@ export default function ClusterTestPanel({
           <h2 className="text-lg font-semibold text-gray-800">
             {lang === 'no' ? 'Diagnostiske kluster-tester' : 'Diagnostic Cluster Tests'}
           </h2>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {lang === 'no'
               ? 'Kombiner flere tester for økt diagnostisk nøyaktighet'
               : 'Combine multiple tests for improved diagnostic accuracy'}
@@ -497,7 +506,7 @@ export default function ClusterTestPanel({
         <div className="flex gap-2">
           <button
             onClick={handleReset}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300
                       border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />

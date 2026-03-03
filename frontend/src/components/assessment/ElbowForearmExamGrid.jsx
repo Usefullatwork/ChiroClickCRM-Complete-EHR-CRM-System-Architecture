@@ -235,7 +235,7 @@ export default function ElbowForearmExamGrid({
             <span className="text-2xl">💪</span>
             <div>
               <h2 className="font-semibold text-gray-900">Elbow & Forearm Examination</h2>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {side === 'bilateral'
                   ? 'Bilateral'
                   : `${side.charAt(0).toUpperCase() + side.slice(1)} side`}
@@ -246,7 +246,7 @@ export default function ElbowForearmExamGrid({
 
           {/* Side selector */}
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">Side:</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Side:</span>
             <div className="flex rounded-lg overflow-hidden border border-gray-300">
               {['left', 'right', 'bilateral'].map((s) => (
                 <button
@@ -255,7 +255,7 @@ export default function ElbowForearmExamGrid({
                   className={`px-3 py-1 text-sm ${
                     side === s
                       ? 'bg-green-600 text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
+                      : 'bg-white text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   {s === 'bilateral' ? 'Both' : s.charAt(0).toUpperCase() + s.slice(1)}
@@ -272,7 +272,7 @@ export default function ElbowForearmExamGrid({
             className={`px-3 py-1 text-sm font-medium rounded-md ${
               activeTab === 'exam'
                 ? 'bg-white text-green-700 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
             }`}
           >
             Examination
@@ -282,7 +282,7 @@ export default function ElbowForearmExamGrid({
             className={`px-3 py-1 text-sm font-medium rounded-md flex items-center gap-1 ${
               activeTab === 'narrative'
                 ? 'bg-white text-green-700 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -358,9 +358,9 @@ export default function ElbowForearmExamGrid({
                     )}
                   </div>
                   {isExpanded ? (
-                    <ChevronUp className="w-5 h-5 text-gray-400" />
+                    <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                   ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-400" />
+                    <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                   )}
                 </button>
 
@@ -405,7 +405,9 @@ export default function ElbowForearmExamGrid({
       {totalSelected > 0 && (
         <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">{totalSelected} findings documented</span>
+            <span className="text-gray-600 dark:text-gray-300">
+              {totalSelected} findings documented
+            </span>
             <div className="flex items-center gap-4">
               {suggestedDiagnoses.length > 0 && (
                 <span

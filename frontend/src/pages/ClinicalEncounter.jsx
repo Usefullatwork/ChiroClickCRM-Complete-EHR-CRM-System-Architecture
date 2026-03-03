@@ -897,7 +897,7 @@ export default function ClinicalEncounter() {
                 const next = current === 'soap' ? 'asoap' : 'soap';
                 updatePreference('soapSectionOrder', next);
               }}
-              className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full border border-slate-300 text-slate-600 hover:bg-slate-100 transition-colors"
+              className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-medium rounded-full border border-slate-300 text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition-colors"
               title={
                 (clinicalPrefs.soapSectionOrder || 'soap') === 'soap'
                   ? t('switchToASOAP')
@@ -907,8 +907,8 @@ export default function ClinicalEncounter() {
               <span className="font-bold">
                 {(clinicalPrefs.soapSectionOrder || 'soap') === 'soap' ? 'SOAP' : 'ASOAP'}
               </span>
-              <span className="text-slate-400">|</span>
-              <span className="text-slate-400">
+              <span className="text-slate-400 dark:text-slate-300">|</span>
+              <span className="text-slate-400 dark:text-slate-300">
                 {(clinicalPrefs.soapSectionOrder || 'soap') === 'soap' ? 'ASOAP' : 'SOAP'}
               </span>
             </button>

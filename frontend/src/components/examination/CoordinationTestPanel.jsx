@@ -23,7 +23,7 @@ const FINDING_STATES = [
     value: 'NT',
     label: 'Not Tested',
     labelNo: 'Ikke testet',
-    color: 'bg-gray-100 text-gray-500',
+    color: 'bg-gray-100 text-gray-500 dark:text-gray-400',
     icon: MinusCircle,
   },
   {
@@ -331,7 +331,7 @@ function TestItem({ test, values, onChange, lang, showFindings = false }) {
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
           <h5 className="font-medium text-gray-700">{lang === 'no' ? test.nameNo : test.name}</h5>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {lang === 'no' ? test.techniqueNo : test.technique}
           </p>
           {showFindings && (
@@ -350,7 +350,7 @@ function TestItem({ test, values, onChange, lang, showFindings = false }) {
           {test.bilateral ? (
             <>
               <div className="text-center">
-                <span className="text-[10px] text-gray-400 block mb-1">
+                <span className="text-[10px] text-gray-400 dark:text-gray-300 block mb-1">
                   {lang === 'no' ? 'V' : 'L'}
                 </span>
                 <FindingToggle
@@ -360,7 +360,7 @@ function TestItem({ test, values, onChange, lang, showFindings = false }) {
                 />
               </div>
               <div className="text-center">
-                <span className="text-[10px] text-gray-400 block mb-1">
+                <span className="text-[10px] text-gray-400 dark:text-gray-300 block mb-1">
                   {lang === 'no' ? 'H' : 'R'}
                 </span>
                 <FindingToggle
@@ -442,9 +442,9 @@ function CategorySection({
             </span>
           )}
           {expanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
+            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           )}
         </div>
       </button>
@@ -516,7 +516,7 @@ function QuickScreening({ values, onChange, lang }) {
                              ? 'bg-green-100 text-green-700'
                              : isAbnormal
                                ? 'bg-red-100 text-red-700'
-                               : 'bg-gray-100 text-gray-600'
+                               : 'bg-gray-100 text-gray-600 dark:text-gray-300'
                          }`}
             >
               {lang === 'no' ? test.labelNo : test.label}
@@ -638,7 +638,7 @@ export default function CoordinationTestPanel({
               : 'Coordination & Cerebellar Function'}
           </h3>
           {summary.tested > 0 && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {summary.tested} {lang === 'no' ? 'tester' : 'tests'}
               {summary.abnormal > 0 && (
                 <span className="text-red-600 ml-2">

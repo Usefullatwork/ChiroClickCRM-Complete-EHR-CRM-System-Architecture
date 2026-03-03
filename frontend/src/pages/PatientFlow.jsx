@@ -200,7 +200,7 @@ export default function PatientFlow() {
               className="w-12 h-12 border-4 border-teal-500 border-t-transparent
                            rounded-full animate-spin mx-auto mb-4"
             />
-            <p className="text-gray-500">{t('loadingPatientFlow')}</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('loadingPatientFlow')}</p>
           </div>
         </div>
       ) : appointments.length === 0 ? (
@@ -209,7 +209,7 @@ export default function PatientFlow() {
           <div className="text-center">
             <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-700 mb-2">{t('noAppointments')}</h2>
-            <p className="text-gray-500 mb-4">
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
               {t('noAppointmentsScheduledFor').replace(
                 '{date}',
                 isToday ? t('today').toLowerCase() : formattedDate

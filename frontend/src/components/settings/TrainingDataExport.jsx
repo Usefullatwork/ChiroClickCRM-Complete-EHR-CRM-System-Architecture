@@ -69,7 +69,7 @@ export default function TrainingDataExport() {
       <div className="p-6 space-y-5">
         {/* Stats */}
         {isLoading && (
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             <Loader2 className="w-4 h-4 animate-spin" />
             Laster statistikk...
           </div>

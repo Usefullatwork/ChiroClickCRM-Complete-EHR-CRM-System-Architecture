@@ -174,7 +174,7 @@ const Setup = ({ onComplete }) => {
         {/* Step 0: Welcome */}
         {step === 0 && (
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">ChiroClickCRM</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">ChiroClickEHR</h1>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
               Velkommen til ditt nye journalsystem. La oss sette opp klinikken din.
             </p>
@@ -301,7 +301,7 @@ const Setup = ({ onComplete }) => {
               AI-assistent
             </h2>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              ChiroClickCRM bruker lokale AI-modeller via Ollama for klinisk dokumentasjon.
+              ChiroClickEHR bruker lokale AI-modeller via Ollama for klinisk dokumentasjon.
             </p>
 
             {/* Ollama status indicator */}
@@ -362,7 +362,7 @@ const Setup = ({ onComplete }) => {
             <div className="text-5xl mb-4 text-teal-600">&#10003;</div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Alt klart!</h2>
             <p className="text-gray-600 dark:text-gray-300 mb-2">
-              ChiroClickCRM er konfigurert og klar til bruk.
+              ChiroClickEHR er konfigurert og klar til bruk.
             </p>
             {submitError && <p className="text-red-500 text-sm mb-4">{submitError}</p>}
           </div>
@@ -383,7 +383,7 @@ const Setup = ({ onComplete }) => {
               <button
                 onClick={handleSkip}
                 disabled={submitting}
-                className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50"
+                className="text-sm text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50"
               >
                 Hopp over oppsett
               </button>
@@ -406,7 +406,7 @@ const Setup = ({ onComplete }) => {
               {submitting && (
                 <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
               )}
-              Start ChiroClickCRM
+              Start ChiroClickEHR
             </button>
           )}
         </div>

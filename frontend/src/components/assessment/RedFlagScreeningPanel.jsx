@@ -150,7 +150,9 @@ function RedFlagCard({ flag, isAcknowledged, onAcknowledge, lang = 'en' }) {
                 <span className={`px-2 py-0.5 text-xs font-bold rounded ${styles.badge}`}>
                   {t.severityLabels[flag.severity]}
                 </span>
-                <span className="text-xs text-gray-500">{flag.categoryLabel}</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {flag.categoryLabel}
+                </span>
               </div>
               <p className={`mt-1 font-medium ${styles.text}`}>{flag.description}</p>
             </div>
@@ -185,7 +187,9 @@ function RedFlagCard({ flag, isAcknowledged, onAcknowledge, lang = 'en' }) {
           <div className="mt-3 pt-3 border-t border-gray-200">
             <div className="space-y-2">
               <div>
-                <span className="text-xs font-medium text-gray-600">{t.action}:</span>
+                <span className="text-xs font-medium text-gray-600 dark:text-gray-300">
+                  {t.action}:
+                </span>
                 <p className={`text-sm mt-1 p-2 bg-white rounded border ${styles.border}`}>
                   {flag.action}
                 </p>
@@ -193,7 +197,10 @@ function RedFlagCard({ flag, isAcknowledged, onAcknowledge, lang = 'en' }) {
               {flag.matchedKeywords?.length > 0 && (
                 <div className="flex flex-wrap gap-1">
                   {flag.matchedKeywords.map((kw, i) => (
-                    <span key={i} className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
+                    <span
+                      key={i}
+                      className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 dark:text-gray-300 rounded"
+                    >
                       "{kw}"
                     </span>
                   ))}
@@ -412,7 +419,7 @@ export default function RedFlagScreeningPanel({
               .length > 0 && (
               <button
                 onClick={() => setShowAll(true)}
-                className="w-full py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+                className="w-full py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50 rounded-lg transition-colors"
               >
                 {t.viewDetails} ({summary.medium + summary.low} {lang === 'no' ? 'flere' : 'more'})
               </button>
@@ -455,7 +462,7 @@ export default function RedFlagScreeningPanel({
           <ShieldCheck className="w-12 h-12 text-green-500 mx-auto mb-2" />
           <p className="text-green-700 font-medium">{t.noFlags}</p>
           {lastScreened && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {t.lastScreened}:{' '}
               {new Date(lastScreened).toLocaleTimeString(lang === 'no' ? 'nb-NO' : 'en-US')}
             </p>

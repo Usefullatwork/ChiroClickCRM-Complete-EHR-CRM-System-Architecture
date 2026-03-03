@@ -115,7 +115,7 @@ export default function AITextarea({
           w-full p-3 rounded-lg border border-slate-200
           focus:ring-2 focus:ring-emerald-500 focus:border-transparent
           resize-none text-sm
-          disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed
+          disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed
           ${className}
         `}
         {...props}
@@ -128,13 +128,13 @@ export default function AITextarea({
           style={{ color: 'transparent' }}
         >
           <span>{value}</span>
-          <span className="text-gray-400">{suggestion}</span>
+          <span className="text-gray-400 dark:text-gray-300">{suggestion}</span>
         </div>
       )}
 
       {/* Loading indicator */}
       {isLoading && (
-        <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-gray-400">
+        <div className="absolute top-2 right-2 flex items-center gap-1 text-xs text-gray-400 dark:text-gray-300">
           <Loader2 className="w-3 h-3 animate-spin" />
           AI tenker...
         </div>
@@ -142,7 +142,7 @@ export default function AITextarea({
 
       {/* Tab hint */}
       {suggestion && (
-        <div className="absolute bottom-2 right-2 text-xs text-gray-400 bg-gray-100 px-1.5 py-0.5 rounded">
+        <div className="absolute bottom-2 right-2 text-xs text-gray-400 dark:text-gray-300 bg-gray-100 px-1.5 py-0.5 rounded">
           Tab for å akseptere
         </div>
       )}

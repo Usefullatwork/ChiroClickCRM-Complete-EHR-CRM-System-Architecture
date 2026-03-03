@@ -14,7 +14,7 @@ const STATUS_STYLES = {
   pending: { label: 'Venter', className: 'bg-amber-100 text-amber-700' },
   read: { label: 'Lest', className: 'bg-teal-100 text-teal-700' },
   approved: { label: 'Godkjent', className: 'bg-green-100 text-green-700' },
-  cancelled: { label: 'Avbrutt', className: 'bg-slate-100 text-slate-500' },
+  cancelled: { label: 'Avbrutt', className: 'bg-slate-100 text-slate-500 dark:text-slate-400' },
 };
 
 const TYPE_LABELS = {
@@ -118,7 +118,7 @@ const TodaysMessages = () => {
               className={`text-xs px-2.5 py-1 rounded transition-colors ${
                 typeFilter === key
                   ? 'bg-teal-600 text-white'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
               }`}
             >
               {label}
@@ -156,11 +156,13 @@ const TodaysMessages = () => {
       )}
 
       {messages.length === 0 ? (
-        <div className="p-6 text-center text-sm text-slate-500">Ingen meldinger i dag.</div>
+        <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">
+          Ingen meldinger i dag.
+        </div>
       ) : (
         <>
           {/* Summary Bar */}
-          <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 flex gap-4 text-xs text-slate-600">
+          <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 flex gap-4 text-xs text-slate-600 dark:text-slate-300">
             <span>
               Totalt: <strong>{messages.length}</strong>
             </span>
@@ -199,18 +201,18 @@ const TodaysMessages = () => {
                       )}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 uppercase font-medium">
+                          <span className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-500 dark:text-slate-400 uppercase font-medium">
                             {msg.type || 'sms'}
                           </span>
                           <span className="text-sm font-medium text-slate-800 truncate">
                             {msg.recipient_name || msg.recipient || 'Ukjent'}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500 mt-1 truncate">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">
                           {msg.subject || msg.message || msg.content || 'Ingen innhold'}
                         </p>
                         {msg.sent_at && (
-                          <p className="text-xs text-slate-400 mt-0.5">
+                          <p className="text-xs text-slate-400 dark:text-slate-300 mt-0.5">
                             {new Date(msg.sent_at).toLocaleTimeString('no-NO', {
                               hour: '2-digit',
                               minute: '2-digit',

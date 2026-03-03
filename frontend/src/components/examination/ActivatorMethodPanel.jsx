@@ -68,7 +68,7 @@ const PALPATION_FINDINGS = [
     value: 'NT',
     label: 'Not Tested',
     labelNo: 'Ikke testet',
-    color: 'bg-gray-100 text-gray-500',
+    color: 'bg-gray-100 text-gray-500 dark:text-gray-400',
     icon: MinusCircle,
   },
   {
@@ -279,7 +279,7 @@ function LegLengthSelector({ value, onChange, lang }) {
           className={`px-3 py-1.5 text-xs rounded border transition-colors ${
             value === opt.value
               ? `${opt.color} border-current`
-              : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              : 'bg-white text-gray-600 dark:text-gray-300 border-gray-200 hover:bg-gray-50'
           }`}
         >
           {lang === 'no' ? opt.labelNo : opt.label}
@@ -303,7 +303,7 @@ function DynamicResponseSelector({ value, onChange, lang }) {
           className={`px-2 py-1 text-xs rounded border transition-colors ${
             value === opt.value
               ? `${opt.color} border-current`
-              : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+              : 'bg-white text-gray-600 dark:text-gray-300 border-gray-200 hover:bg-gray-50'
           }`}
         >
           {lang === 'no' ? opt.labelNo : opt.label}
@@ -353,7 +353,7 @@ function TestItem({ test, values, onChange, lang, showDetails }) {
           <div className="flex-1">
             <h5 className="font-medium text-gray-700">{lang === 'no' ? test.nameNo : test.name}</h5>
             {showDetails && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {lang === 'no' ? test.techniqueNo : test.technique}
               </p>
             )}
@@ -367,7 +367,7 @@ function TestItem({ test, values, onChange, lang, showDetails }) {
           />
           {(values[resultKey] === 'right_short' || values[resultKey] === 'left_short') && (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-600">
+              <span className="text-xs text-gray-600 dark:text-gray-300">
                 {lang === 'no' ? 'Differanse:' : 'Difference:'}
               </span>
               <input
@@ -377,7 +377,7 @@ function TestItem({ test, values, onChange, lang, showDetails }) {
                 placeholder="mm"
                 className="w-16 px-2 py-1 text-xs border border-gray-200 rounded"
               />
-              <span className="text-xs text-gray-500">mm</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">mm</span>
             </div>
           )}
         </div>
@@ -396,7 +396,7 @@ function TestItem({ test, values, onChange, lang, showDetails }) {
           <div className="flex-1">
             <h5 className="font-medium text-gray-700">{lang === 'no' ? test.nameNo : test.name}</h5>
             {showDetails && (
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {lang === 'no' ? test.techniqueNo : test.technique}
               </p>
             )}
@@ -488,9 +488,9 @@ function CategorySection({
             </span>
           )}
           {expanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
+            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           )}
         </div>
       </button>
@@ -498,7 +498,7 @@ function CategorySection({
       {expanded && (
         <div className="p-3 space-y-2 bg-gray-50">
           {category.description && (
-            <p className="text-xs text-gray-500 mb-2">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
               {lang === 'no' ? category.descriptionNo : category.description}
             </p>
           )}
@@ -631,13 +631,13 @@ export default function ActivatorMethodPanel({
           <h3 className="text-lg font-semibold text-gray-800">
             {lang === 'no' ? 'Aktivator Metode' : 'Activator Method'}
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {lang === 'no'
               ? 'Benlengdeanalyse og spinal screening'
               : 'Leg length analysis and spinal screening'}
           </p>
           {summary.tested > 0 && (
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {summary.tested} {lang === 'no' ? 'segmenter testet' : 'segments tested'}
               {summary.restrictions > 0 && (
                 <span className="text-red-600 ml-2">

@@ -80,7 +80,7 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
           {payload.map((entry, index) => (
             <div key={index} className="flex items-center gap-2 text-sm">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-              <span className="text-gray-600">{entry.name}:</span>
+              <span className="text-gray-600 dark:text-gray-300">{entry.name}:</span>
               <span className="font-semibold text-gray-900">
                 {entry.name === 'Etterlevelse' ? `${entry.value}%` : entry.value}
               </span>
@@ -132,7 +132,9 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">Pasientetterlevelse</h3>
-              <p className="text-sm text-gray-500">Ovelsesforeskrivninger (90 dager)</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Ovelsesforeskrivninger (90 dager)
+              </p>
             </div>
           </div>
 
@@ -230,7 +232,7 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-60 flex items-center justify-center text-gray-400">
+            <div className="h-60 flex items-center justify-center text-gray-400 dark:text-gray-300">
               <div className="text-center">
                 <Activity size={48} className="mx-auto mb-2 opacity-50" />
                 <p>Ingen trenddata tilgjengelig</p>
@@ -244,7 +246,9 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
         <div className="flex items-center justify-between">
           <h4 className="text-sm font-semibold text-gray-700">Statusfordeling</h4>
-          <span className="text-sm text-gray-500">Totalt: {data.totalPrescriptions || 0}</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            Totalt: {data.totalPrescriptions || 0}
+          </span>
         </div>
 
         <div className="mt-3 grid grid-cols-4 gap-3">
@@ -252,7 +256,7 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
               <CheckCircle size={14} className="text-green-500" />
-              <span className="text-xs text-gray-600">Fullfort</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300">Fullfort</span>
             </div>
             <p className="text-lg font-bold text-green-600">{data.completed || 0}</p>
           </div>
@@ -261,7 +265,7 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
               <Activity size={14} className="text-blue-500" />
-              <span className="text-xs text-gray-600">Aktiv</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300">Aktiv</span>
             </div>
             <p className="text-lg font-bold text-blue-600">{data.active || 0}</p>
           </div>
@@ -270,7 +274,7 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
               <PauseCircle size={14} className="text-yellow-500" />
-              <span className="text-xs text-gray-600">Pause</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300">Pause</span>
             </div>
             <p className="text-lg font-bold text-yellow-600">{data.paused || 0}</p>
           </div>
@@ -279,7 +283,7 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
               <XCircle size={14} className="text-red-500" />
-              <span className="text-xs text-gray-600">Avbrutt</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300">Avbrutt</span>
             </div>
             <p className="text-lg font-bold text-red-600">{data.cancelled || 0}</p>
           </div>

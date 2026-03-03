@@ -93,7 +93,7 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
           {payload.map((entry, index) => (
             <div key={index} className="flex items-center gap-2 text-sm">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-              <span className="text-gray-600">{entry.name}:</span>
+              <span className="text-gray-600 dark:text-gray-300">{entry.name}:</span>
               <span className="font-semibold text-gray-900">
                 {entry.name.includes('%') ? `${entry.value}%` : entry.value}
               </span>
@@ -130,13 +130,15 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">Pasientetterlevelse</h3>
-              <p className="text-sm text-gray-500">Ovelsesprogrammer siste 90 dager</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Ovelsesprogrammer siste 90 dager
+              </p>
             </div>
           </div>
 
           {/* Main compliance rate */}
           <div className="text-right">
-            <p className="text-xs text-gray-500">Etterlevelsesrate</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">Etterlevelsesrate</p>
             <p
               className={`text-2xl font-bold ${
                 completionRate >= 70
@@ -184,7 +186,7 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-48 flex items-center justify-center text-gray-400">
+              <div className="h-48 flex items-center justify-center text-gray-400 dark:text-gray-300">
                 <p>Ingen data</p>
               </div>
             )}
@@ -221,7 +223,7 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
                 </LineChart>
               </ResponsiveContainer>
             ) : (
-              <div className="h-48 flex items-center justify-center text-gray-400">
+              <div className="h-48 flex items-center justify-center text-gray-400 dark:text-gray-300">
                 <p>Ingen trenddata</p>
               </div>
             )}
@@ -233,7 +235,7 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="text-center">
-            <div className="flex items-center justify-center gap-1 text-gray-500 mb-1">
+            <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 mb-1">
               <Activity size={14} />
               <span className="text-xs">Totalt</span>
             </div>
@@ -261,7 +263,7 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
             <p className="text-lg font-bold text-amber-600">{data.paused || 0}</p>
           </div>
           <div className="text-center">
-            <div className="flex items-center justify-center gap-1 text-gray-500 mb-1">
+            <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 mb-1">
               <TrendingUp size={14} />
               <span className="text-xs">Gj.snitt progresjon</span>
             </div>
@@ -327,7 +329,7 @@ export const ComplianceGauge = ({ rate = 0, label = 'Etterlevelse', loading = fa
 
       <div>
         <p className="text-sm font-medium text-gray-900">{label}</p>
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
           {rate >= 70 ? 'Utmerket' : rate >= 50 ? 'Middels' : 'Lav'}
         </p>
       </div>

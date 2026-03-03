@@ -26,7 +26,7 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
 
   if (!chartData || chartData.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-slate-400">
+      <div className="flex items-center justify-center h-64 text-slate-400 dark:text-slate-300">
         <p>Ingen data tilgjengelig</p>
       </div>
     );
@@ -58,7 +58,9 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
                   </div>
                 </div>
               </div>
-              <span className="text-xs text-slate-600 font-medium">{item.label}</span>
+              <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">
+                {item.label}
+              </span>
             </div>
           ))}
         </div>
@@ -67,7 +69,7 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
         <div className="flex items-center justify-between pt-4 border-t border-slate-200">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded" style={{ backgroundColor: color }}></div>
-            <span className="text-sm text-slate-600">{label}</span>
+            <span className="text-sm text-slate-600 dark:text-slate-300">{label}</span>
           </div>
           <span className="text-sm font-semibold text-slate-700">Max: {maxValue}</span>
         </div>
@@ -143,7 +145,7 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
           {chartData.map((item, index) => (
             <span
               key={index}
-              className="text-xs text-slate-600 font-medium"
+              className="text-xs text-slate-600 dark:text-slate-300 font-medium"
               style={{ width: `${100 / chartData.length}%`, textAlign: 'center' }}
             >
               {item.label}
@@ -156,7 +158,7 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
       <div className="flex items-center justify-between pt-4 border-t border-slate-200">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
-          <span className="text-sm text-slate-600">{label}</span>
+          <span className="text-sm text-slate-600 dark:text-slate-300">{label}</span>
         </div>
         <span className="text-sm font-semibold text-slate-700">Max: {maxValue}</span>
       </div>

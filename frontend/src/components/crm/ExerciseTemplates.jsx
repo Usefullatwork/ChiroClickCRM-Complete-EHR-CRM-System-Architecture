@@ -151,7 +151,7 @@ const ExerciseTemplates = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-        <span className="ml-2 text-gray-600">Laster øvelsesmaler...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">Laster øvelsesmaler...</span>
       </div>
     );
   }
@@ -179,7 +179,9 @@ const ExerciseTemplates = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Øvelsesmaler</h2>
-          <p className="text-gray-600">Send øvelser med PDF-vedlegg til pasienter</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Send øvelser med PDF-vedlegg til pasienter
+          </p>
         </div>
         <button
           onClick={() => setShowCreateTemplate(true)}
@@ -199,7 +201,7 @@ const ExerciseTemplates = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.totalTemplates}</p>
-          <p className="text-sm text-gray-600">Maler</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Maler</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -209,7 +211,7 @@ const ExerciseTemplates = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.totalSent}</p>
-          <p className="text-sm text-gray-600">Sendt Totalt</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Sendt Totalt</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -219,7 +221,9 @@ const ExerciseTemplates = () => {
             </div>
           </div>
           <p className="text-lg font-bold text-gray-900">{stats.mostUsed?.name}</p>
-          <p className="text-sm text-gray-600">Mest Brukt ({stats.mostUsed?.usageCount}x)</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            Mest Brukt ({stats.mostUsed?.usageCount}x)
+          </p>
         </div>
       </div>
 
@@ -235,7 +239,7 @@ const ExerciseTemplates = () => {
             className={`px-4 py-2 border-b-2 transition-colors ${
               activeTab === tab.id
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900'
             }`}
           >
             {tab.label}
@@ -250,7 +254,7 @@ const ExerciseTemplates = () => {
             <div className="flex flex-wrap gap-4 items-center">
               <div className="flex-1 min-w-64">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
                   <input
                     type="text"
                     placeholder="Søk etter mal..."
@@ -268,7 +272,7 @@ const ExerciseTemplates = () => {
                     className={`px-3 py-1 rounded-full text-sm transition-colors ${
                       selectedCategory === cat.id
                         ? 'bg-blue-100 text-blue-700'
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
                     }`}
                   >
                     {cat.label}
@@ -292,19 +296,24 @@ const ExerciseTemplates = () => {
                     </div>
                     <div>
                       <h4 className="font-bold text-gray-900">{template.name}</h4>
-                      <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
+                      <span className="text-xs px-2 py-0.5 bg-gray-100 text-gray-600 dark:text-gray-300 rounded-full">
                         {categories.find((c) => c.id === template.category)?.label}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{template.description}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+                  {template.description}
+                </p>
 
                 {/* Attachments */}
                 <div className="mb-3">
                   {template.attachments.map((file) => (
-                    <div key={file.name} className="flex items-center gap-2 text-sm text-gray-500">
+                    <div
+                      key={file.name}
+                      className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400"
+                    >
                       <Paperclip className="w-3 h-3" />
                       <span className="truncate">{file.name}</span>
                       <span className="text-xs">({file.size})</span>
@@ -317,7 +326,7 @@ const ExerciseTemplates = () => {
                   {template.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs"
+                      className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:text-gray-300 rounded text-xs"
                     >
                       {tag}
                     </span>
@@ -325,7 +334,7 @@ const ExerciseTemplates = () => {
                 </div>
 
                 {/* Stats */}
-                <div className="flex items-center justify-between text-sm text-gray-500 mb-4 pt-3 border-t border-gray-100">
+                <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400 mb-4 pt-3 border-t border-gray-100">
                   <span className="flex items-center gap-1">
                     <Send className="w-3 h-3" />
                     {template.usageCount} sendt
@@ -350,14 +359,14 @@ const ExerciseTemplates = () => {
                   </button>
                   <button
                     onClick={() => setSelectedTemplate(template)}
-                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
                   >
                     <Eye className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
+                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
                     <Edit className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
+                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
                     <Copy className="w-4 h-4" />
                   </button>
                 </div>
@@ -372,16 +381,16 @@ const ExerciseTemplates = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Mal
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Pasient
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Sendt
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Status
                 </th>
               </tr>
@@ -392,8 +401,10 @@ const ExerciseTemplates = () => {
                   <td className="px-4 py-3">
                     <span className="font-medium text-gray-900">{item.templateName}</span>
                   </td>
-                  <td className="px-4 py-3 text-gray-600">{item.patientName}</td>
-                  <td className="px-4 py-3 text-gray-600">{formatDateTime(item.sentAt)}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{item.patientName}</td>
+                  <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                    {formatDateTime(item.sentAt)}
+                  </td>
                   <td className="px-4 py-3">
                     <span
                       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${
@@ -492,7 +503,7 @@ const ExerciseTemplates = () => {
                   placeholder="Skriv e-postinnholdet her... Bruk {name} for pasientnavn."
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   Tilgjengelige variabler: {'{name}'}, {'{first_name}'}, {'{clinic_name}'}
                 </p>
               </div>
@@ -500,8 +511,8 @@ const ExerciseTemplates = () => {
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">PDF Vedlegg</label>
                 <div className="border-2 border-dashed border-gray-200 rounded-lg p-6 text-center">
-                  <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm text-gray-500">
+                  <Upload className="w-8 h-8 mx-auto mb-2 text-gray-400 dark:text-gray-300" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     Dra og slipp PDF-filer her, eller klikk for å velge
                   </p>
                   <input type="file" accept=".pdf" multiple className="hidden" />
@@ -560,9 +571,9 @@ const ExerciseTemplates = () => {
                 <p className="text-sm font-medium text-gray-700 mb-2">Vedlegg:</p>
                 {selectedTemplate.attachments.map((file) => (
                   <div key={file.name} className="flex items-center gap-2 text-sm">
-                    <Paperclip className="w-4 h-4 text-gray-400" />
+                    <Paperclip className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                     <span>{file.name}</span>
-                    <span className="text-gray-400">({file.size})</span>
+                    <span className="text-gray-400 dark:text-gray-300">({file.size})</span>
                   </div>
                 ))}
               </div>
@@ -618,7 +629,7 @@ const ExerciseTemplates = () => {
               <h3 className="text-lg font-bold text-gray-900">{selectedTemplate.name}</h3>
               <button
                 onClick={() => setSelectedTemplate(null)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -645,9 +656,11 @@ const ExerciseTemplates = () => {
                     <div className="flex items-center gap-2">
                       <FileText className="w-5 h-5 text-red-500" />
                       <span>{file.name}</span>
-                      <span className="text-gray-400 text-sm">({file.size})</span>
+                      <span className="text-gray-400 dark:text-gray-300 text-sm">
+                        ({file.size})
+                      </span>
                     </div>
-                    <button className="p-1 text-gray-400 hover:text-blue-500">
+                    <button className="p-1 text-gray-400 dark:text-gray-300 hover:text-blue-500">
                       <Download className="w-4 h-4" />
                     </button>
                   </div>

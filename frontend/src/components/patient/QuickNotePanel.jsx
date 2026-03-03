@@ -217,9 +217,9 @@ export default function QuickNotePanel({
           <span className="font-medium text-gray-900">Hurtignotater</span>
         </div>
         {isExpanded ? (
-          <ChevronUp className="w-4 h-4 text-gray-400" />
+          <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
         ) : (
-          <ChevronDown className="w-4 h-4 text-gray-400" />
+          <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
         )}
       </button>
 
@@ -237,7 +237,7 @@ export default function QuickNotePanel({
                   className={`flex-1 flex items-center justify-center gap-1.5 px-2 py-2 text-xs font-medium rounded-lg transition-colors ${
                     isActive
                       ? `bg-${config.color}-100 text-${config.color}-700 border border-${config.color}-300`
-                      : 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-transparent'
+                      : 'bg-gray-50 text-gray-600 dark:text-gray-300 hover:bg-gray-100 border border-transparent'
                   }`}
                 >
                   <Icon className="w-3.5 h-3.5" />
@@ -253,7 +253,7 @@ export default function QuickNotePanel({
               <button
                 key={idx}
                 onClick={() => handleQuickTemplate(template)}
-                className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full hover:bg-gray-200 transition-colors"
+                className="px-2 py-1 text-xs bg-gray-100 text-gray-600 dark:text-gray-300 rounded-full hover:bg-gray-200 transition-colors"
               >
                 {template.label}
               </button>
@@ -275,7 +275,9 @@ export default function QuickNotePanel({
           <div className="grid grid-cols-2 gap-3">
             {/* Priority */}
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Prioritet</label>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                Prioritet
+              </label>
               <select
                 value={priority}
                 onChange={(e) => setPriority(e.target.value)}
@@ -291,7 +293,9 @@ export default function QuickNotePanel({
 
             {/* Due date */}
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Forfallsdato</label>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                Forfallsdato
+              </label>
               <input
                 type="date"
                 value={dueDate}
@@ -334,7 +338,7 @@ export default function QuickNotePanel({
                       }}
                       className="rounded text-blue-600"
                     />
-                    <Phone className="w-4 h-4 text-gray-400" />
+                    <Phone className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                     SMS
                   </label>
                 )}
@@ -351,7 +355,7 @@ export default function QuickNotePanel({
                       }}
                       className="rounded text-blue-600"
                     />
-                    <Mail className="w-4 h-4 text-gray-400" />
+                    <Mail className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                     E-post
                   </label>
                 )}
@@ -388,7 +392,7 @@ export default function QuickNotePanel({
             {content && (
               <button
                 onClick={resetForm}
-                className="px-3 py-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-3 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -398,7 +402,7 @@ export default function QuickNotePanel({
           {/* History toggle */}
           <button
             onClick={() => setShowHistory(!showHistory)}
-            className="w-full text-xs text-gray-500 hover:text-gray-700 py-2"
+            className="w-full text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 py-2"
           >
             {showHistory ? 'Skjul historikk' : 'Vis tidligere notater'}
           </button>
@@ -411,7 +415,9 @@ export default function QuickNotePanel({
                   <div className="animate-spin w-5 h-5 border-2 border-blue-500 border-t-transparent rounded-full" />
                 </div>
               ) : notes.length === 0 ? (
-                <p className="text-sm text-gray-400 text-center py-4">Ingen notater ennå</p>
+                <p className="text-sm text-gray-400 dark:text-gray-300 text-center py-4">
+                  Ingen notater ennå
+                </p>
               ) : (
                 notes.map((note) => {
                   const TypeConfig = NOTE_TYPES[note.note_type] || NOTE_TYPES.note;
@@ -431,11 +437,11 @@ export default function QuickNotePanel({
                         />
                         <div className="flex-1 min-w-0">
                           <p
-                            className={`text-sm ${isCompleted ? 'text-gray-400 line-through' : 'text-gray-700'}`}
+                            className={`text-sm ${isCompleted ? 'text-gray-400 dark:text-gray-300 line-through' : 'text-gray-700'}`}
                           >
                             {note.content}
                           </p>
-                          <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
+                          <div className="flex items-center gap-2 mt-1 text-xs text-gray-400 dark:text-gray-300">
                             <span>
                               {format(new Date(note.created_at), 'dd.MM.yy', { locale: nb })}
                             </span>
@@ -456,7 +462,7 @@ export default function QuickNotePanel({
                         {note.note_type === 'task' && !isCompleted && (
                           <button
                             onClick={() => handleToggleComplete(note.id)}
-                            className="p-1 text-gray-400 hover:text-green-500"
+                            className="p-1 text-gray-400 dark:text-gray-300 hover:text-green-500"
                           >
                             <Check className="w-4 h-4" />
                           </button>
@@ -478,7 +484,7 @@ export default function QuickNotePanel({
 export function QuickNoteInline({ _patientId, _encounterId, onAction }) {
   return (
     <div className="flex items-center gap-2 text-sm">
-      <span className="text-gray-500">Hurtighandlinger:</span>
+      <span className="text-gray-500 dark:text-gray-400">Hurtighandlinger:</span>
       <button
         onClick={() => onAction?.('sms')}
         className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"

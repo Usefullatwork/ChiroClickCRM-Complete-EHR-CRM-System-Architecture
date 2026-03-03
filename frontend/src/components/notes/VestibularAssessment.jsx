@@ -210,9 +210,9 @@ export default function VestibularAssessment({
           <h3 className={`font-semibold text-${color}-900`}>{title}</h3>
         </div>
         {expandedSections[id] ? (
-          <ChevronUp className="w-5 h-5 text-gray-500" />
+          <ChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-500" />
+          <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         )}
       </button>
       {expandedSections[id] && <div className="p-4 space-y-4">{children}</div>}
@@ -235,7 +235,7 @@ export default function VestibularAssessment({
             className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
               value === opt
                 ? getResultColor(opt)
-                : 'bg-white border-gray-300 text-gray-600 hover:border-gray-400'
+                : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:border-gray-400'
             } ${readOnly ? 'cursor-default' : 'cursor-pointer'}`}
           >
             {opt === 'normal' && 'Normal'}
@@ -259,7 +259,7 @@ export default function VestibularAssessment({
         <h4 className="font-medium text-gray-900">{label}</h4>
         {helpText && (
           <div className="group relative">
-            <HelpCircle className="w-4 h-4 text-gray-400 cursor-help" />
+            <HelpCircle className="w-4 h-4 text-gray-400 dark:text-gray-300 cursor-help" />
             <div className="hidden group-hover:block absolute right-0 top-6 w-64 p-2 bg-gray-900 text-white text-xs rounded-lg z-10">
               {helpText}
             </div>
@@ -324,7 +324,7 @@ export default function VestibularAssessment({
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Vestibular Vurdering</h2>
           {patient && (
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {patient.firstName} {patient.lastName}
             </p>
           )}
@@ -433,7 +433,7 @@ export default function VestibularAssessment({
                   className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
                     isSelected
                       ? 'bg-blue-100 text-blue-800 border-blue-300'
-                      : 'bg-white border-gray-300 text-gray-600 hover:border-gray-400'
+                      : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:border-gray-400'
                   }`}
                 >
                   {trigger}
@@ -468,7 +468,7 @@ export default function VestibularAssessment({
                   className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
                     isSelected
                       ? 'bg-purple-100 text-purple-800 border-purple-300'
-                      : 'bg-white border-gray-300 text-gray-600 hover:border-gray-400'
+                      : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:border-gray-400'
                   }`}
                 >
                   {symptom}

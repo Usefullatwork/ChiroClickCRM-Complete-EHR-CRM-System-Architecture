@@ -143,7 +143,7 @@ export default function AuditLogs() {
       case 'EXPORT':
         return <Download className="w-4 h-4 text-purple-600" />;
       default:
-        return <Database className="w-4 h-4 text-gray-600" />;
+        return <Database className="w-4 h-4 text-gray-600 dark:text-gray-300" />;
     }
   };
 
@@ -187,7 +187,7 @@ export default function AuditLogs() {
             <Shield className="w-8 h-8 text-blue-600" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{t('auditLogs')}</h1>
-              <p className="text-gray-600">{t('auditLogsSubtitle')}</p>
+              <p className="text-gray-600 dark:text-gray-300">{t('auditLogsSubtitle')}</p>
             </div>
           </div>
           <button
@@ -291,7 +291,7 @@ export default function AuditLogs() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('search')}</label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
               <input
                 type="text"
                 placeholder={t('searchLogs')}
@@ -310,22 +310,22 @@ export default function AuditLogs() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('timestamp')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('user')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('action')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('resource')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('ipAddress')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('details')}
                 </th>
               </tr>
@@ -335,14 +335,16 @@ export default function AuditLogs() {
                 <tr>
                   <td colSpan="6" className="px-6 py-12 text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="text-sm text-gray-500 mt-3">{t('loadingAuditLogs')}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+                      {t('loadingAuditLogs')}
+                    </p>
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="px-6 py-12 text-center">
                     <Shield className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-sm text-gray-500">{t('noAuditLogs')}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('noAuditLogs')}</p>
                   </td>
                 </tr>
               ) : (
@@ -351,17 +353,19 @@ export default function AuditLogs() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="flex flex-col">
                         <span>{format(new Date(log.created_at), 'MMM d, yyyy')}</span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
                           {format(new Date(log.created_at), 'HH:mm:ss')}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-gray-400" />
+                        <User className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                         <div>
                           <div className="text-sm font-medium text-gray-900">{log.user_name}</div>
-                          <div className="text-xs text-gray-500">{log.user_role}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {log.user_role}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -375,11 +379,11 @@ export default function AuditLogs() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{log.resource_type}</div>
-                      <div className="text-xs text-gray-500 truncate max-w-[200px]">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
                         {log.resource_name || log.resource_id}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {log.ip_address}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -417,13 +421,17 @@ export default function AuditLogs() {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('timestamp')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('timestamp')}
+                  </label>
                   <p className="mt-1 text-sm text-gray-900">
                     {format(new Date(selectedLog.created_at), 'PPpp')}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('action')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('action')}
+                  </label>
                   <p className="mt-1">
                     <span
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${getActionColor(selectedLog.action)}`}
@@ -434,28 +442,42 @@ export default function AuditLogs() {
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('user')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('user')}
+                  </label>
                   <p className="mt-1 text-sm text-gray-900">{selectedLog.user_name}</p>
-                  <p className="text-xs text-gray-500">{selectedLog.user_email}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {selectedLog.user_email}
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('role')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('role')}
+                  </label>
                   <p className="mt-1 text-sm text-gray-900">{selectedLog.user_role}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('resourceType')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('resourceType')}
+                  </label>
                   <p className="mt-1 text-sm text-gray-900">{selectedLog.resource_type}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Resource ID</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Resource ID
+                  </label>
                   <p className="mt-1 text-sm text-gray-900 font-mono">{selectedLog.resource_id}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('ipAddress')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('ipAddress')}
+                  </label>
                   <p className="mt-1 text-sm text-gray-900">{selectedLog.ip_address}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('userAgent')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('userAgent')}
+                  </label>
                   <p className="mt-1 text-xs text-gray-900 truncate" title={selectedLog.user_agent}>
                     {selectedLog.user_agent}
                   </p>
@@ -464,7 +486,9 @@ export default function AuditLogs() {
 
               {selectedLog.reason && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('reason')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('reason')}
+                  </label>
                   <p className="mt-1 text-sm text-gray-900 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
                     {selectedLog.reason}
                   </p>
@@ -473,7 +497,7 @@ export default function AuditLogs() {
 
               {selectedLog.changes && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500 mb-2 block">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 block">
                     {t('changes')}
                   </label>
                   <pre className="text-xs bg-gray-50 p-3 rounded-lg border border-gray-200 overflow-x-auto">

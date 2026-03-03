@@ -256,7 +256,7 @@ export default function Kiosk() {
       step={stepNumber}
       totalSteps={STEP_ORDER.length}
       lang={lang}
-      clinicName="ChiroClickCRM"
+      clinicName="ChiroClickEHR"
       onReset={reset}
     >
       {renderStep()}

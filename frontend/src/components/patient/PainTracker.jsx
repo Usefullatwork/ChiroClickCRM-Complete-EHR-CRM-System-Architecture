@@ -113,9 +113,9 @@ export default function PainTracker({ data = [], trend = 'stable', currentAvg = 
         };
       default:
         return {
-          icon: <Minus className="w-5 h-5 text-gray-500" />,
+          icon: <Minus className="w-5 h-5 text-gray-500 dark:text-gray-400" />,
           label: 'Stabilt',
-          color: 'text-gray-600 bg-gray-50',
+          color: 'text-gray-600 dark:text-gray-300 bg-gray-50',
         };
     }
   };
@@ -137,7 +137,7 @@ export default function PainTracker({ data = [], trend = 'stable', currentAvg = 
               <p className="font-semibold" style={{ color: painInfo.color }}>
                 {painLevel.toFixed(1)} / 10
               </p>
-              <p className="text-xs text-gray-500">{painInfo.label}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{painInfo.label}</p>
             </div>
           </div>
         </div>
@@ -180,7 +180,7 @@ export default function PainTracker({ data = [], trend = 'stable', currentAvg = 
               <p className="text-2xl font-bold" style={{ color: currentPainInfo.color }}>
                 {currentAvg} / 10
               </p>
-              <p className="text-sm text-gray-500">{currentPainInfo.label}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{currentPainInfo.label}</p>
             </div>
           </div>
         )}
@@ -234,8 +234,12 @@ export default function PainTracker({ data = [], trend = 'stable', currentAvg = 
         <div className="h-48 flex items-center justify-center bg-gray-50 rounded-lg">
           <div className="text-center">
             <Activity className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-            <p className="text-sm text-gray-500">Ingen smertedata tilgjengelig</p>
-            <p className="text-xs text-gray-400 mt-1">Registrer smerteniva for a se fremgang</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Ingen smertedata tilgjengelig
+            </p>
+            <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">
+              Registrer smerteniva for a se fremgang
+            </p>
           </div>
         </div>
       )}
@@ -244,19 +248,19 @@ export default function PainTracker({ data = [], trend = 'stable', currentAvg = 
       <div className="grid grid-cols-4 gap-4">
         <div className="text-center p-3 bg-gray-50 rounded-lg">
           <p className="text-lg font-semibold text-gray-900">{statistics.average || '-'}</p>
-          <p className="text-xs text-gray-500">Gjennomsnitt</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Gjennomsnitt</p>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
           <p className="text-lg font-semibold text-green-600">{statistics.min || '-'}</p>
-          <p className="text-xs text-gray-500">Laveste</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Laveste</p>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
           <p className="text-lg font-semibold text-red-600">{statistics.max || '-'}</p>
-          <p className="text-xs text-gray-500">Hoyeste</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Hoyeste</p>
         </div>
         <div className="text-center p-3 bg-gray-50 rounded-lg">
           <p className="text-lg font-semibold text-gray-900">{statistics.entries}</p>
-          <p className="text-xs text-gray-500">Registreringer</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400">Registreringer</p>
         </div>
       </div>
 
@@ -294,7 +298,7 @@ export default function PainTracker({ data = [], trend = 'stable', currentAvg = 
       )}
 
       {/* Pain Scale Legend */}
-      <div className="flex items-center justify-between text-xs text-gray-500 pt-2">
+      <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2">
         <div className="flex items-center gap-1">
           <span className="text-lg">{painEmojis[0].emoji}</span>
           <span>Ingen smerte</span>
@@ -324,7 +328,9 @@ export default function PainTracker({ data = [], trend = 'stable', currentAvg = 
                 >
                   {selectedPainLevel}
                 </p>
-                <p className="text-sm text-gray-500">{getPainInfo(selectedPainLevel).label}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {getPainInfo(selectedPainLevel).label}
+                </p>
               </div>
             </div>
 

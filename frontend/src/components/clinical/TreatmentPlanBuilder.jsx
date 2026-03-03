@@ -32,14 +32,16 @@ function StepIndicator({ currentStep }) {
                   ? 'bg-teal-600 text-white'
                   : idx === currentStep
                     ? 'bg-teal-100 text-teal-700 border-2 border-teal-600'
-                    : 'bg-gray-100 text-gray-400'
+                    : 'bg-gray-100 text-gray-400 dark:text-gray-300'
               }`}
             >
               {idx < currentStep ? <Check className="w-4 h-4" /> : idx + 1}
             </div>
             <span
               className={`text-sm hidden sm:inline ${
-                idx === currentStep ? 'text-teal-700 font-medium' : 'text-gray-400'
+                idx === currentStep
+                  ? 'text-teal-700 font-medium'
+                  : 'text-gray-400 dark:text-gray-300'
               }`}
             >
               {step}
@@ -286,7 +288,9 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
       case 2: // Goals
         return (
           <div className="space-y-4">
-            <p className="text-sm text-gray-600">Define treatment goals for this plan:</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Define treatment goals for this plan:
+            </p>
             <div className="flex gap-2">
               <input
                 type="text"
@@ -312,7 +316,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
                     <button
                       type="button"
                       onClick={() => removeGoal(idx)}
-                      className="text-gray-400 hover:text-red-500"
+                      className="text-gray-400 dark:text-gray-300 hover:text-red-500"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -320,7 +324,9 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-400 italic">No goals added yet (optional)</p>
+              <p className="text-sm text-gray-400 dark:text-gray-300 italic">
+                No goals added yet (optional)
+              </p>
             )}
           </div>
         );
@@ -328,7 +334,9 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
       case 3: // Milestones
         return (
           <div className="space-y-4">
-            <p className="text-sm text-gray-600">Add measurable milestones to track progress:</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              Add measurable milestones to track progress:
+            </p>
             <div className="grid grid-cols-2 gap-2">
               <input
                 type="text"
@@ -385,7 +393,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
                   <li key={idx} className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg">
                     <div className="flex-1">
                       <div className="text-sm font-medium">{ms.title}</div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
                         {ms.targetDate && `By ${ms.targetDate}`}
                         {ms.outcomeMeasure && ` | ${ms.outcomeMeasure}`}
                         {ms.targetScore && ` <= ${ms.targetScore}`}
@@ -394,7 +402,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
                     <button
                       type="button"
                       onClick={() => removeMilestone(idx)}
-                      className="text-gray-400 hover:text-red-500"
+                      className="text-gray-400 dark:text-gray-300 hover:text-red-500"
                     >
                       <X className="w-4 h-4" />
                     </button>
@@ -402,7 +410,9 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
                 ))}
               </ul>
             ) : (
-              <p className="text-sm text-gray-400 italic">No milestones added yet (optional)</p>
+              <p className="text-sm text-gray-400 dark:text-gray-300 italic">
+                No milestones added yet (optional)
+              </p>
             )}
           </div>
         );
@@ -413,33 +423,40 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
             <h4 className="font-semibold text-gray-800">Plan Summary</h4>
             <div className="grid grid-cols-2 gap-3 p-3 bg-gray-50 rounded-lg">
               <div>
-                <span className="text-gray-500">Title:</span>{' '}
+                <span className="text-gray-500 dark:text-gray-400">Title:</span>{' '}
                 <span className="font-medium">{form.title}</span>
               </div>
               <div>
-                <span className="text-gray-500">Diagnosis:</span> {form.diagnosisCode || 'N/A'}
+                <span className="text-gray-500 dark:text-gray-400">Diagnosis:</span>{' '}
+                {form.diagnosisCode || 'N/A'}
               </div>
               <div>
-                <span className="text-gray-500">Frequency:</span> {form.frequency}
+                <span className="text-gray-500 dark:text-gray-400">Frequency:</span>{' '}
+                {form.frequency}
               </div>
               <div>
-                <span className="text-gray-500">Sessions:</span> {form.totalSessions}
+                <span className="text-gray-500 dark:text-gray-400">Sessions:</span>{' '}
+                {form.totalSessions}
               </div>
               <div>
-                <span className="text-gray-500">Start:</span> {form.startDate}
+                <span className="text-gray-500 dark:text-gray-400">Start:</span> {form.startDate}
               </div>
               <div>
-                <span className="text-gray-500">Target End:</span> {form.targetEndDate || 'N/A'}
+                <span className="text-gray-500 dark:text-gray-400">Target End:</span>{' '}
+                {form.targetEndDate || 'N/A'}
               </div>
             </div>
             {form.conditionDescription && (
               <div className="p-3 bg-gray-50 rounded-lg">
-                <span className="text-gray-500">Condition:</span> {form.conditionDescription}
+                <span className="text-gray-500 dark:text-gray-400">Condition:</span>{' '}
+                {form.conditionDescription}
               </div>
             )}
             {form.goals.length > 0 && (
               <div>
-                <span className="text-gray-500 font-medium">Goals ({form.goals.length}):</span>
+                <span className="text-gray-500 dark:text-gray-400 font-medium">
+                  Goals ({form.goals.length}):
+                </span>
                 <ul className="mt-1 list-disc list-inside">
                   {form.goals.map((g, i) => (
                     <li key={i}>{g}</li>
@@ -449,7 +466,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
             )}
             {form.milestones.length > 0 && (
               <div>
-                <span className="text-gray-500 font-medium">
+                <span className="text-gray-500 dark:text-gray-400 font-medium">
                   Milestones ({form.milestones.length}):
                 </span>
                 <ul className="mt-1 list-disc list-inside">
@@ -494,7 +511,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel })
             <button
               type="button"
               onClick={onCancel}
-              className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800"
+              className="px-3 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800"
             >
               Cancel
             </button>

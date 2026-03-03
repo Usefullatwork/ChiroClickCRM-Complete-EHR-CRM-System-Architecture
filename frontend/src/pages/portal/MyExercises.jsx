@@ -192,7 +192,7 @@ const MyExercises = () => {
       <div className="min-h-screen min-h-[100dvh] bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 text-base sm:text-lg">Laster øvelser...</p>
+          <p className="text-gray-600 dark:text-gray-300 text-base sm:text-lg">Laster øvelser...</p>
         </div>
       </div>
     );
@@ -209,7 +209,7 @@ const MyExercises = () => {
           <h1 className="text-xl sm:text-2xl font-semibold text-gray-900 mb-2">
             Kunne ikke laste øvelsene
           </h1>
-          <p className="text-gray-600 mb-6 text-sm sm:text-base">{error}</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm sm:text-base">{error}</p>
           <button
             onClick={handleRefresh}
             className="w-full sm:w-auto px-8 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 active:bg-blue-800 transition-colors font-medium min-h-[48px] touch-manipulation"
@@ -263,7 +263,7 @@ const MyExercises = () => {
                 <h1 className="font-semibold text-gray-900 text-sm sm:text-base truncate">
                   {data?.clinic?.name || 'Pasientportalen'}
                 </h1>
-                <p className="text-xs sm:text-sm text-gray-500 truncate">
+                <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
                   {data?.patient?.firstName ? `Hei, ${data.patient.firstName}!` : 'Mine øvelser'}
                 </p>
               </div>
@@ -273,7 +273,7 @@ const MyExercises = () => {
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="p-2.5 sm:p-3 text-gray-500 hover:bg-gray-100 active:bg-gray-200 rounded-xl transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
+                className="p-2.5 sm:p-3 text-gray-500 dark:text-gray-400 hover:bg-gray-100 active:bg-gray-200 rounded-xl transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
                 title="Oppdater"
                 aria-label="Oppdater"
               >
@@ -281,7 +281,7 @@ const MyExercises = () => {
               </button>
               <button
                 onClick={handleLogout}
-                className="p-2.5 sm:p-3 text-gray-500 hover:bg-gray-100 active:bg-gray-200 rounded-xl transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
+                className="p-2.5 sm:p-3 text-gray-500 dark:text-gray-400 hover:bg-gray-100 active:bg-gray-200 rounded-xl transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
                 title="Logg ut"
                 aria-label="Logg ut"
               >
@@ -312,7 +312,7 @@ const MyExercises = () => {
                   className="w-full flex items-center justify-between p-3 sm:p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-300 active:bg-gray-50 hover:shadow-md transition-all text-left min-h-[72px] touch-manipulation"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 mb-1">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1">
                       <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0" />
                       <span className="truncate">
                         {new Date(prescription.prescribedAt).toLocaleDateString('nb-NO', {
@@ -326,7 +326,7 @@ const MyExercises = () => {
                       {prescription.exerciseCount} øvelser
                     </p>
                     {prescription.prescribedBy && (
-                      <p className="text-xs sm:text-sm text-gray-500 truncate">
+                      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
                         Av: {prescription.prescribedBy}
                       </p>
                     )}
@@ -336,9 +336,9 @@ const MyExercises = () => {
                       <p className="text-sm sm:text-base font-medium text-gray-900">
                         {prescription.completedToday}/{prescription.exerciseCount}
                       </p>
-                      <p className="text-xs text-gray-500">i dag</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">i dag</p>
                     </div>
-                    <ChevronRight className="w-5 h-5 text-gray-400" />
+                    <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                   </div>
                 </button>
               ))}
@@ -385,14 +385,14 @@ const MyExercises = () => {
                       style={{ width: `${dailySummary.completionPercentage}%` }}
                     />
                   </div>
-                  <span className="text-sm font-medium text-gray-600 whitespace-nowrap">
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300 whitespace-nowrap">
                     {dailySummary.exercisesCompleted} / {dailySummary.totalExercises}
                   </span>
                 </div>
 
                 {/* Stats - Stack on very small screens */}
                 {(dailySummary.totalSets > 0 || dailySummary.totalReps > 0) && (
-                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs sm:text-sm text-gray-500">
+                  <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                     {dailySummary.totalSets > 0 && (
                       <span>{dailySummary.totalSets} sett fullført</span>
                     )}
@@ -417,17 +417,17 @@ const MyExercises = () => {
             {/* Prescription Info */}
             <div className="bg-white rounded-xl shadow-sm p-3 sm:p-4 mb-4 sm:mb-6">
               {/* Stack info items on mobile */}
-              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-sm text-gray-600">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 sm:gap-4 text-sm text-gray-600 dark:text-gray-300">
                 {selectedPrescription.prescription.prescribedBy && (
                   <div className="flex items-center gap-2">
-                    <User className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                    <User className="w-4 h-4 text-gray-400 dark:text-gray-300 flex-shrink-0" />
                     <span className="truncate">
                       Foreskrevet av: {selectedPrescription.prescription.prescribedBy}
                     </span>
                   </div>
                 )}
                 <div className="flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                  <Calendar className="w-4 h-4 text-gray-400 dark:text-gray-300 flex-shrink-0" />
                   <span>
                     {new Date(selectedPrescription.prescription.prescribedAt).toLocaleDateString(
                       'nb-NO',
@@ -469,7 +469,7 @@ const MyExercises = () => {
               {selectedPrescription.exercises?.length === 0 ? (
                 <div className="text-center py-12 bg-white rounded-xl">
                   <Dumbbell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                  <p className="text-gray-500">Ingen øvelser funnet</p>
+                  <p className="text-gray-500 dark:text-gray-400">Ingen øvelser funnet</p>
                 </div>
               ) : (
                 <div className="space-y-2 sm:space-y-3">
@@ -491,12 +491,12 @@ const MyExercises = () => {
         {data?.prescriptions?.length === 0 && (
           <div className="text-center py-12 px-4">
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Dumbbell className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400" />
+              <Dumbbell className="w-8 h-8 sm:w-10 sm:h-10 text-gray-400 dark:text-gray-300" />
             </div>
             <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
               Ingen øvelsesprogrammer
             </h2>
-            <p className="text-gray-500 mb-6 text-sm sm:text-base">
+            <p className="text-gray-500 dark:text-gray-400 mb-6 text-sm sm:text-base">
               Du har ingen aktive ovelsesprogrammer for øyeblikket.
             </p>
             {data?.clinic?.phone && (
@@ -512,7 +512,7 @@ const MyExercises = () => {
         )}
 
         {/* Footer */}
-        <div className="mt-8 p-4 text-center text-xs sm:text-sm text-gray-500">
+        <div className="mt-8 p-4 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
           <p>Stopp øvelsene hvis du opplever økt smerte og kontakt klinikken.</p>
           <p className="mt-2">Dette programmet er personlig tilpasset deg.</p>
         </div>

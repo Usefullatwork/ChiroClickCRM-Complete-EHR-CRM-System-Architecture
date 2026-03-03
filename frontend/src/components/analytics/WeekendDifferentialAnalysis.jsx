@@ -92,7 +92,7 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
           <Calendar size={24} className="text-teal-600" />
           Weekend Differential Analysis
         </h2>
-        <p className="text-sm text-slate-600 mt-1">
+        <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">
           Understanding how Saturday visits and non-Oslo patients affect your metrics
         </p>
       </div>
@@ -128,9 +128,11 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
           <Card.Body>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">Saturday Visits</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  Saturday Visits
+                </p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">{analysis.saturdayVisits}</p>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                   {analysis.saturdayPercentage}% of total visits
                 </p>
               </div>
@@ -146,9 +148,11 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
           <Card.Body>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">Weekday Visits</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  Weekday Visits
+                </p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">{analysis.weekdayVisits}</p>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                   {(
                     100 -
                     analysis.saturdayPercentage -
@@ -169,11 +173,13 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
           <Card.Body>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">Non-Oslo Patients</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  Non-Oslo Patients
+                </p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">
                   {analysis.nonOsloPatients.visits}
                 </p>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                   {analysis.nonOsloPercentage}% of total visits
                 </p>
               </div>
@@ -189,11 +195,13 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
           <Card.Body>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">Sat + Non-Oslo</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  Sat + Non-Oslo
+                </p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">
                   {analysis.saturdayNonOsloVisits}
                 </p>
-                <p className="text-sm text-slate-500 mt-1">
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
                   {analysis.saturdayNonOsloPercentage}% of Saturdays
                 </p>
               </div>
@@ -216,7 +224,9 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
               <p className="text-4xl font-bold text-slate-900">
                 {analysis.overallPVA ? analysis.overallPVA.toFixed(2) : '0.00'}
               </p>
-              <p className="text-sm text-slate-600 mt-2">visits per active patient</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
+                visits per active patient
+              </p>
             </div>
           </Card.Body>
         </Card>
@@ -230,7 +240,7 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
               <p className="text-4xl font-bold text-teal-600">
                 {analysis.weekdayPVA ? analysis.weekdayPVA.toFixed(2) : '0.00'}
               </p>
-              <p className="text-sm text-slate-600 mt-2">Mon-Fri average</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">Mon-Fri average</p>
             </div>
           </Card.Body>
         </Card>
@@ -248,7 +258,7 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
               >
                 {analysis.saturdayPVA ? analysis.saturdayPVA.toFixed(2) : '0.00'}
               </p>
-              <p className="text-sm text-slate-600 mt-2">
+              <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
                 {analysis.pvaImpact > 0 ? '+' : ''}
                 {analysis.pvaImpactPercentage}% vs weekday
               </p>
@@ -275,7 +285,7 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
                   <span className="font-semibold text-slate-900">
                     {analysis.osloPatients.visits} visits
                   </span>
-                  <span className="text-sm text-slate-500 ml-2">
+                  <span className="text-sm text-slate-500 dark:text-slate-400 ml-2">
                     ({analysis.osloPatients.uniquePatients} patients)
                   </span>
                 </div>
@@ -301,7 +311,7 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
                   <span className="font-semibold text-slate-900">
                     {analysis.nonOsloPatients.visits} visits
                   </span>
-                  <span className="text-sm text-slate-500 ml-2">
+                  <span className="text-sm text-slate-500 dark:text-slate-400 ml-2">
                     ({analysis.nonOsloPatients.uniquePatients} patients)
                   </span>
                 </div>
@@ -322,21 +332,25 @@ export const WeekendDifferentialAnalysis = ({ timeRange, selectedDate }) => {
             <h4 className="font-semibold text-slate-900 mb-3">Saturday Visit Breakdown</h4>
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-slate-50 rounded-lg p-4">
-                <p className="text-sm text-slate-600">Oslo Patients on Saturday</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">
+                  Oslo Patients on Saturday
+                </p>
                 <p className="text-2xl font-bold text-slate-900 mt-1">
                   {analysis.saturdayVisits - analysis.saturdayNonOsloVisits}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   {((1 - analysis.saturdayNonOsloPercentage / 100) * 100).toFixed(1)}% of Saturday
                   visits
                 </p>
               </div>
               <div className="bg-orange-50 rounded-lg p-4">
-                <p className="text-sm text-slate-600">Non-Oslo Patients on Saturday</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300">
+                  Non-Oslo Patients on Saturday
+                </p>
                 <p className="text-2xl font-bold text-orange-900 mt-1">
                   {analysis.saturdayNonOsloVisits}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                   {analysis.saturdayNonOsloPercentage}% of Saturday visits
                 </p>
               </div>

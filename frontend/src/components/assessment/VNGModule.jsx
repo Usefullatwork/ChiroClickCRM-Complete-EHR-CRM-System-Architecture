@@ -39,7 +39,7 @@ import {
 const RESULT_OPTIONS = {
   normal: { value: 'normal', icon: CheckCircle2, color: 'text-green-600' },
   abnormal: { value: 'abnormal', icon: XCircle, color: 'text-red-600' },
-  notTested: { value: 'not_tested', icon: AlertCircle, color: 'text-gray-400' },
+  notTested: { value: 'not_tested', icon: AlertCircle, color: 'text-gray-400 dark:text-gray-300' },
 };
 
 // Default VNG data structure
@@ -183,7 +183,7 @@ function ResultButton({ value, currentValue, onChange, language }) {
         ${
           isSelected
             ? `${option.color} bg-gray-100 ring-1 ring-current`
-            : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+            : 'text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-50'
         }
       `}
     >
@@ -232,9 +232,9 @@ function Section({ title, icon: Icon, children, defaultOpen = true, _language })
           <span className="font-medium text-gray-900">{title}</span>
         </div>
         {isOpen ? (
-          <ChevronUp className="w-5 h-5 text-gray-500" />
+          <ChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-500" />
+          <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         )}
       </button>
       {isOpen && <div className="p-4 bg-white">{children}</div>}
@@ -371,9 +371,11 @@ export default function VNGModule({
               <Eye className="w-7 h-7 text-blue-600" />
               {t('vng', 'title', language)}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">{t('vng', 'subtitle', language)}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {t('vng', 'subtitle', language)}
+            </p>
           </div>
-          <div className="text-right text-sm text-gray-600">
+          <div className="text-right text-sm text-gray-600 dark:text-gray-300">
             {patientName && <div className="font-medium">{patientName}</div>}
             <div>{examDate}</div>
           </div>
@@ -386,7 +388,7 @@ export default function VNGModule({
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'assessment'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
             }`}
           >
             {t('vng', 'protocol', language)}
@@ -396,7 +398,7 @@ export default function VNGModule({
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'report'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
             }`}
           >
             {t('vng', 'results', language)}
@@ -429,7 +431,7 @@ export default function VNGModule({
               </div>
               {data.spontaneousNystagmus.present && (
                 <div className="mt-2">
-                  <label className="block text-sm text-gray-600 mb-1">
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
                     {language === 'no' ? 'Retning/Karakteristikk' : 'Direction/Characteristics'}
                   </label>
                   <select
@@ -607,7 +609,7 @@ export default function VNGModule({
                   </h4>
                   <div className="space-y-2">
                     <div>
-                      <label className="text-xs text-gray-500">
+                      <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('vng', 'latency', language)} ({t('vng', 'ms', language)})
                       </label>
                       <input
@@ -619,7 +621,7 @@ export default function VNGModule({
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">
+                      <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('vng', 'velocity', language)} ({t('vng', 'degPerSec', language)})
                       </label>
                       <input
@@ -631,7 +633,7 @@ export default function VNGModule({
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">
+                      <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('vng', 'accuracy', language)} ({t('vng', 'percent', language)})
                       </label>
                       <input
@@ -652,7 +654,7 @@ export default function VNGModule({
                   </h4>
                   <div className="space-y-2">
                     <div>
-                      <label className="text-xs text-gray-500">
+                      <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('vng', 'latency', language)} ({t('vng', 'ms', language)})
                       </label>
                       <input
@@ -664,7 +666,7 @@ export default function VNGModule({
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">
+                      <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('vng', 'velocity', language)} ({t('vng', 'degPerSec', language)})
                       </label>
                       <input
@@ -676,7 +678,7 @@ export default function VNGModule({
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">
+                      <label className="text-xs text-gray-500 dark:text-gray-400">
                         {t('vng', 'accuracy', language)} ({t('vng', 'percent', language)})
                       </label>
                       <input
@@ -796,7 +798,7 @@ export default function VNGModule({
                 <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-gray-600 mb-1">
+                      <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
                         {language === 'no' ? 'Påvirket buegang' : 'Affected Canal'}
                       </label>
                       <select
@@ -811,7 +813,7 @@ export default function VNGModule({
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-600 mb-1">
+                      <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
                         {language === 'no' ? 'Type' : 'Type'}
                       </label>
                       <select
@@ -840,7 +842,7 @@ export default function VNGModule({
             >
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
                     {t('vng', 'bloodPressure', language)} ({t('vng', 'left', language)})
                   </label>
                   <input
@@ -852,7 +854,7 @@ export default function VNGModule({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
                     {t('vng', 'bloodPressure', language)} ({t('vng', 'right', language)})
                   </label>
                   <input
@@ -864,7 +866,7 @@ export default function VNGModule({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
                     {t('vng', 'pulse', language)} ({t('vng', 'left', language)})
                   </label>
                   <input
@@ -876,7 +878,7 @@ export default function VNGModule({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
                     {t('vng', 'pulse', language)} ({t('vng', 'right', language)})
                   </label>
                   <input

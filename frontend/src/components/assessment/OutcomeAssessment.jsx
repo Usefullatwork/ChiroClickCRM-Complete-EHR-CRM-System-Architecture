@@ -107,7 +107,7 @@ export default function OutcomeAssessment({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="font-medium text-gray-900">{questionnaire.name}</h3>
-            <p className="text-sm text-gray-500">{questionnaire.description}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{questionnaire.description}</p>
           </div>
 
           {/* Score badge */}
@@ -120,7 +120,7 @@ export default function OutcomeAssessment({
               >
                 {score.percentage}%
               </div>
-              <div className="text-xs text-gray-500 mt-1">
+              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {score.answered}/{score.total} answered
               </div>
             </div>
@@ -153,14 +153,14 @@ export default function OutcomeAssessment({
                     <div className="w-5 h-5 rounded-full border-2 border-gray-300" />
                   )}
                   <span className="font-medium text-gray-900">{section.title}</span>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     ({sectionAnswered}/{section.questions.length})
                   </span>
                 </div>
                 {isExpanded ? (
-                  <ChevronUp className="w-5 h-5 text-gray-400" />
+                  <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                  <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                 )}
               </button>
 
@@ -213,7 +213,7 @@ export default function OutcomeAssessment({
                 {getScoreInterpretation(score.percentage).text}
               </span>
             </div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
               Raw score: {score.raw} / {score.answered * 5}
             </div>
           </div>

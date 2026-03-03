@@ -140,7 +140,7 @@ export default function ExerciseCard({
           <h3 className="font-medium text-gray-900 truncate">
             {exercise?.name || 'Ukjent øvelse'}
           </h3>
-          <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-500">
+          <div className="flex items-center gap-2 mt-0.5 text-xs text-gray-500 dark:text-gray-400">
             {exercise?.sets && <span>{exercise.sets} sett</span>}
             {exercise?.sets && exercise?.reps && <span>-</span>}
             {exercise?.reps && <span>{exercise.reps} rep</span>}
@@ -159,7 +159,7 @@ export default function ExerciseCard({
             <Check className="w-4 h-4 text-white" />
           </div>
         ) : (
-          <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
+          <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300 flex-shrink-0" />
         )}
       </button>
     );
@@ -210,7 +210,7 @@ export default function ExerciseCard({
 
           <div className="flex flex-wrap items-center gap-2 mb-3">
             {exercise?.category && (
-              <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
+              <span className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:text-gray-300 rounded text-xs">
                 {exercise.category}
               </span>
             )}
@@ -223,22 +223,22 @@ export default function ExerciseCard({
             )}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+          <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
             {exercise?.sets && (
               <span className="flex items-center gap-1">
-                <Target className="w-4 h-4 text-gray-400" />
+                <Target className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 {exercise.sets} sett
               </span>
             )}
             {exercise?.reps && (
               <span className="flex items-center gap-1">
-                <Activity className="w-4 h-4 text-gray-400" />
+                <Activity className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 {exercise.reps} rep
               </span>
             )}
             {exercise?.holdSeconds > 0 && (
               <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4 text-gray-400" />
+                <Clock className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 {exercise.holdSeconds}s
               </span>
             )}
@@ -288,26 +288,26 @@ export default function ExerciseCard({
 
             {/* Category / Kategori */}
             {exercise?.category && (
-              <p className="text-sm text-gray-500 mt-0.5">{exercise.category}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{exercise.category}</p>
             )}
 
             {/* Parameters / Parametere */}
-            <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-600">
+            <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-600 dark:text-gray-300">
               {exercise?.sets && (
                 <span className="flex items-center gap-1">
-                  <Target className="w-4 h-4 text-gray-400" />
+                  <Target className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                   {exercise.sets} sett
                 </span>
               )}
               {exercise?.reps && (
                 <span className="flex items-center gap-1">
-                  <Activity className="w-4 h-4 text-gray-400" />
+                  <Activity className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                   {exercise.reps} rep
                 </span>
               )}
               {exercise?.holdSeconds > 0 && (
                 <span className="flex items-center gap-1">
-                  <Clock className="w-4 h-4 text-gray-400" />
+                  <Clock className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                   Hold {exercise.holdSeconds} sek
                 </span>
               )}
@@ -316,7 +316,7 @@ export default function ExerciseCard({
           </div>
 
           {/* Expand Button / Utvid-knapp */}
-          <div className="text-gray-400">
+          <div className="text-gray-400 dark:text-gray-300">
             {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
           </div>
         </div>
@@ -346,7 +346,9 @@ export default function ExerciseCard({
             {exercise?.instructions && (
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-2">Instruksjoner</h4>
-                <p className="text-sm text-gray-600 whitespace-pre-line">{exercise.instructions}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">
+                  {exercise.instructions}
+                </p>
               </div>
             )}
 

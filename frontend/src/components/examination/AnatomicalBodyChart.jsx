@@ -3361,7 +3361,7 @@ export default function AnatomicalBodyChart({
                   className={`px-3 py-1.5 text-sm font-medium transition-colors ${
                     view === v
                       ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
+                      : 'bg-white text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   {t[v]}
@@ -3413,7 +3413,7 @@ export default function AnatomicalBodyChart({
                     className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-sm transition-colors ${
                       layers[key]
                         ? 'bg-blue-100 text-blue-700'
-                        : 'bg-white text-gray-600 hover:bg-gray-100'
+                        : 'bg-white text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                     }`}
                   >
                     {layers[key] ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
@@ -3427,7 +3427,7 @@ export default function AnatomicalBodyChart({
 
           {/* Symptom selector */}
           <div className="p-3 border-b border-gray-200">
-            <p className="text-xs font-medium text-gray-500 mb-2">Symptom</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Symptom</p>
             <div className="grid grid-cols-2 gap-1">
               {Object.entries(SYMPTOM_COLORS)
                 .slice(0, 6)
@@ -3452,9 +3452,11 @@ export default function AnatomicalBodyChart({
           <div className="p-3">
             {selectedDermatome && (
               <div className="bg-white rounded-lg p-3 border border-gray-200">
-                <p className="text-xs font-medium text-gray-500">{t.selectedDermatome}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  {t.selectedDermatome}
+                </p>
                 <p className="font-bold text-gray-900">{selectedDermatome}</p>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                   {DERMATOMES[selectedDermatome]?.[lang]?.area ||
                     DERMATOMES[selectedDermatome]?.en?.area}
                 </p>
@@ -3463,12 +3465,14 @@ export default function AnatomicalBodyChart({
 
             {selectedTriggerPoint && (
               <div className="bg-white rounded-lg p-3 border border-gray-200">
-                <p className="text-xs font-medium text-gray-500">{t.selectedMuscle}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  {t.selectedMuscle}
+                </p>
                 <p className="font-bold text-gray-900">
                   {MUSCLES[selectedTriggerPoint.muscle]?.[lang]?.name ||
                     MUSCLES[selectedTriggerPoint.muscle]?.en?.name}
                 </p>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                   {typeof selectedTriggerPoint.triggerPoint.referral === 'object'
                     ? selectedTriggerPoint.triggerPoint.referral[lang] ||
                       selectedTriggerPoint.triggerPoint.referral.en
@@ -3478,7 +3482,9 @@ export default function AnatomicalBodyChart({
             )}
 
             {!selectedDermatome && !selectedTriggerPoint && (
-              <p className="text-sm text-gray-500 text-center">{t.noSelection}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                {t.noSelection}
+              </p>
             )}
           </div>
         </div>
@@ -3588,7 +3594,7 @@ export default function AnatomicalBodyChart({
           <h4 className="font-medium text-gray-700 mb-3">{t.triggerPoints}</h4>
 
           {currentMarkers.length === 0 ? (
-            <p className="text-sm text-gray-500">{t.clickToMark}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t.clickToMark}</p>
           ) : (
             <div className="space-y-2 max-h-80 overflow-y-auto">
               {currentMarkers.map((marker) => (
@@ -3603,11 +3609,11 @@ export default function AnatomicalBodyChart({
                         ? MUSCLES[marker.muscle]?.[lang]?.name || marker.muscle
                         : marker.regionId}
                     </p>
-                    <p className="text-xs text-gray-500">{marker.description}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{marker.description}</p>
                   </div>
                   <button
                     onClick={() => removeMarker(marker.id)}
-                    className="text-gray-400 hover:text-red-500"
+                    className="text-gray-400 dark:text-gray-300 hover:text-red-500"
                   >
                     &times;
                   </button>

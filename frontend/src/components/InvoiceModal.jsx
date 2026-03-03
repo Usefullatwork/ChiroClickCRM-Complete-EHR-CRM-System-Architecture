@@ -56,7 +56,7 @@ export default function InvoiceModal({ transaction, onClose }) {
             <FileText className="w-6 h-6 text-blue-600" />
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Invoice</h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {transaction.patient_name} - {transaction.invoice_number}
               </p>
             </div>
@@ -70,47 +70,49 @@ export default function InvoiceModal({ transaction, onClose }) {
         <div className="flex-1 overflow-y-auto p-6">
           {!invoiceData ? (
             <div className="text-center py-12">
-              <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <FileText className="w-16 h-16 text-gray-400 dark:text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 Ready to Generate Invoice
               </h3>
-              <p className="text-gray-600 mb-6">Generate a PDF invoice for this transaction</p>
+              <p className="text-gray-600 dark:text-gray-300 mb-6">
+                Generate a PDF invoice for this transaction
+              </p>
 
               {/* Transaction Details */}
               <div className="bg-gray-50 rounded-lg p-6 max-w-md mx-auto text-left mb-6">
                 <h4 className="font-semibold text-gray-900 mb-3">Transaction Details</h4>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Invoice Number:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Invoice Number:</span>
                     <span className="font-medium">{transaction.invoice_number}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Patient:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Patient:</span>
                     <span className="font-medium">{transaction.patient_name}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Date:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Date:</span>
                     <span className="font-medium">
                       {new Date(transaction.created_at).toLocaleDateString('no-NO')}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Total Amount:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Total Amount:</span>
                     <span className="font-medium">{transaction.gross_amount} kr</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Patient Amount:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Patient Amount:</span>
                     <span className="font-semibold text-lg">{transaction.patient_amount} kr</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-600">Status:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Status:</span>
                     <span
                       className={`font-medium ${
                         transaction.payment_status === 'PAID'
                           ? 'text-green-600'
                           : transaction.payment_status === 'PENDING'
                             ? 'text-yellow-600'
-                            : 'text-gray-600'
+                            : 'text-gray-600 dark:text-gray-300'
                       }`}
                     >
                       {transaction.payment_status}

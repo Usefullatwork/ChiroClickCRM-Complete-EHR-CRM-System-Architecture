@@ -149,7 +149,7 @@ export default function ClinicalEncounterDemo() {
         <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center text-sm text-slate-500 hover:text-slate-700 mb-3"
+            className="flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 mb-3"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
             Tilbake
@@ -160,7 +160,7 @@ export default function ClinicalEncounterDemo() {
             </div>
             <div>
               <h2 className="font-semibold text-lg text-slate-800">{mockPatient.name}</h2>
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 {mockPatient.age} år • Fnr: {mockPatient.fnr.substring(0, 6)}-*****
               </p>
             </div>
@@ -168,11 +168,11 @@ export default function ClinicalEncounterDemo() {
 
           {/* Quick Contact */}
           <div className="flex gap-2 mt-3">
-            <button className="flex-1 flex items-center justify-center gap-1 text-xs py-1.5 px-2 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
+            <button className="flex-1 flex items-center justify-center gap-1 text-xs py-1.5 px-2 rounded-md bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors">
               <Phone className="h-3 w-3" />
               Ring
             </button>
-            <button className="flex-1 flex items-center justify-center gap-1 text-xs py-1.5 px-2 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
+            <button className="flex-1 flex items-center justify-center gap-1 text-xs py-1.5 px-2 rounded-md bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors">
               <Mail className="h-3 w-3" />
               SMS
             </button>
@@ -224,10 +224,12 @@ export default function ClinicalEncounterDemo() {
                 <Activity className="h-4 w-4 text-teal-600" />
                 Forrige Konsultasjon
               </h3>
-              <p className="text-xs text-slate-500 mt-0.5">{mockPatient.lastVisit.date}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                {mockPatient.lastVisit.date}
+              </p>
             </div>
             <div className="p-3">
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                 {mockPatient.lastVisit.summary}
               </p>
             </div>
@@ -258,16 +260,16 @@ export default function ClinicalEncounterDemo() {
               <Calendar className="h-3.5 w-3.5" />
               {currentDate}
             </span>
-            <span className="text-sm text-slate-500 flex items-center gap-1">
+            <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
               <User className="h-3.5 w-3.5" />
               Dr. Hansen
             </span>
-            <span className="text-sm text-slate-500 flex items-center gap-1">
+            <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
               <Clock className="h-3.5 w-3.5" />
               Oppfølging
             </span>
           </div>
-          <div className="flex items-center gap-2 text-sm text-slate-500">
+          <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded bg-amber-50 text-amber-600 text-xs">
               <Activity className="h-3 w-3" />
               Utkast
@@ -292,7 +294,7 @@ export default function ClinicalEncounterDemo() {
                   Subjektivt
                 </h3>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-slate-500">VAS Start:</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">VAS Start:</span>
                   <input
                     type="range"
                     min="0"
@@ -316,7 +318,7 @@ export default function ClinicalEncounterDemo() {
                     <button
                       key={phrase}
                       onClick={() => handleQuickPhrase(phrase, setSubjectiveNotes)}
-                      className="px-2.5 py-1 text-xs rounded-full bg-slate-100 text-slate-600 hover:bg-blue-100 hover:text-blue-700 transition-colors"
+                      className="px-2.5 py-1 text-xs rounded-full bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-blue-100 hover:text-blue-700 transition-colors"
                     >
                       + {phrase}
                     </button>
@@ -456,7 +458,7 @@ export default function ClinicalEncounterDemo() {
                     <button
                       key={phrase}
                       onClick={() => handleQuickPhrase(phrase, setObjectiveNotes)}
-                      className="px-2.5 py-1 text-xs rounded-full bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-700 transition-colors"
+                      className="px-2.5 py-1 text-xs rounded-full bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-emerald-100 hover:text-emerald-700 transition-colors"
                     >
                       + {phrase}
                     </button>
@@ -481,7 +483,7 @@ export default function ClinicalEncounterDemo() {
                 {/* Diagnosis Search */}
                 <div className="relative">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-300" />
                     <input
                       type="text"
                       placeholder="Søk ICPC-2 kode eller diagnose (f.eks. L02, rygg)..."
@@ -509,7 +511,9 @@ export default function ClinicalEncounterDemo() {
                               <span className="font-mono font-medium text-amber-600">
                                 {diagnosis.code}
                               </span>
-                              <span className="text-slate-600 ml-2">- {diagnosis.label}</span>
+                              <span className="text-slate-600 dark:text-slate-300 ml-2">
+                                - {diagnosis.label}
+                              </span>
                             </span>
                             {selectedDiagnoses.find((d) => d.value === diagnosis.value) && (
                               <Check className="h-4 w-4 text-amber-600" />
@@ -517,7 +521,9 @@ export default function ClinicalEncounterDemo() {
                           </button>
                         ))
                       ) : (
-                        <p className="px-4 py-3 text-sm text-slate-500">Ingen diagnose funnet</p>
+                        <p className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
+                          Ingen diagnose funnet
+                        </p>
                       )}
                     </div>
                   )}
@@ -566,7 +572,7 @@ export default function ClinicalEncounterDemo() {
                   Plan & Behandling
                 </h3>
                 <div className="flex items-center gap-3">
-                  <span className="text-xs text-slate-500">VAS Slutt:</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">VAS Slutt:</span>
                   <input
                     type="range"
                     min="0"
@@ -589,7 +595,9 @@ export default function ClinicalEncounterDemo() {
                       className={`h-4 w-4 transition-transform ${showTakster ? 'rotate-180' : ''}`}
                     />
                     Takster (behandlingskoder)
-                    <span className="text-xs text-slate-400 font-normal">(Kun for behandlere)</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-300 font-normal">
+                      (Kun for behandlere)
+                    </span>
                   </button>
 
                   {showTakster && (
@@ -625,10 +633,12 @@ export default function ClinicalEncounterDemo() {
                               </div>
                               <div>
                                 <p className="font-semibold text-slate-800">{takst.code}</p>
-                                <p className="text-xs text-slate-500">{takst.name}</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                  {takst.name}
+                                </p>
                               </div>
                             </div>
-                            <span className="text-sm font-medium text-slate-600">
+                            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
                               {takst.price} kr
                             </span>
                           </button>
@@ -658,9 +668,9 @@ export default function ClinicalEncounterDemo() {
                       onChange={(e) => setFollowUpWeeks(parseInt(e.target.value))}
                       className="w-16 px-3 py-1.5 text-center rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 text-sm"
                     />
-                    <span className="text-sm text-slate-600">uker</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">uker</span>
                   </div>
-                  <button className="ml-auto px-3 py-1.5 text-sm rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200">
+                  <button className="ml-auto px-3 py-1.5 text-sm rounded-lg bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-slate-200">
                     + Book time nå
                   </button>
                 </div>
@@ -681,11 +691,11 @@ export default function ClinicalEncounterDemo() {
             ═══════════════════════════════════════════════════════════════════ */}
         <footer className="bg-white border-t border-slate-200 px-6 py-3 flex justify-between items-center flex-shrink-0 shadow-[0_-2px_10px_rgba(0,0,0,0.03)]">
           <div className="flex items-center gap-4">
-            <span className="text-sm text-slate-500 flex items-center gap-1">
+            <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
               <Activity className="h-4 w-4 text-amber-500" />
               Utkast lagret automatisk
             </span>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs text-slate-400 dark:text-slate-300">
               Sist oppdatert:{' '}
               {new Date().toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
             </span>

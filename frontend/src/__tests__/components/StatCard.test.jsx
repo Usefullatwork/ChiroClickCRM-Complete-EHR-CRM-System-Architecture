@@ -73,7 +73,7 @@ describe('StatCard Component', () => {
       render(<StatCard {...defaultProps} trend={0} />);
       expect(screen.getByText('0%')).toBeInTheDocument();
       const trendEl = screen.getByText('0%');
-      expect(trendEl).toHaveClass('text-gray-400');
+      expect(trendEl).toHaveClass('text-gray-400 dark:text-gray-300');
     });
 
     it('should not show trend section when trend is undefined', () => {

@@ -70,7 +70,7 @@ const PrescriptionCard = ({
         ? 'text-yellow-600 bg-yellow-50'
         : exercise.difficulty_level === 'advanced'
           ? 'text-red-600 bg-red-50'
-          : 'text-gray-600 bg-gray-50';
+          : 'text-gray-600 dark:text-gray-300 bg-gray-50';
 
   const difficultyLabel = getDifficultyLabel
     ? getDifficultyLabel(exercise.difficulty_level)
@@ -88,7 +88,7 @@ const PrescriptionCard = ({
       <div className="p-4">
         <div className="flex items-start gap-3">
           {/* Drag Handle */}
-          <div className="text-gray-400 cursor-grab hover:text-gray-600 pt-1">
+          <div className="text-gray-400 dark:text-gray-300 cursor-grab hover:text-gray-600 pt-1">
             <GripVertical className="w-5 h-5" />
           </div>
 
@@ -105,7 +105,9 @@ const PrescriptionCard = ({
                   {exercise.name_norwegian || exercise.name}
                 </h4>
                 <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <span className="text-xs text-gray-500">{exercise.category}</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {exercise.category}
+                  </span>
                   <span className={`px-2 py-0.5 rounded text-xs font-medium ${difficultyColor}`}>
                     {difficultyLabel}
                   </span>
@@ -138,14 +140,14 @@ const PrescriptionCard = ({
                 </button>
                 <button
                   onClick={onToggleExpand}
-                  className={`p-1.5 rounded transition-colors ${isExpanded ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 text-gray-500'}`}
+                  className={`p-1.5 rounded transition-colors ${isExpanded ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 text-gray-500 dark:text-gray-400'}`}
                   title="Rediger"
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={onRemove}
-                  className="p-1.5 hover:bg-red-50 rounded text-gray-400 hover:text-red-500"
+                  className="p-1.5 hover:bg-red-50 rounded text-gray-400 dark:text-gray-300 hover:text-red-500"
                   title="Fjern"
                 >
                   <Trash2 className="w-4 h-4" />
@@ -157,11 +159,11 @@ const PrescriptionCard = ({
             <div className="flex items-center gap-4 mt-3 flex-wrap">
               {/* Sets */}
               <div className="flex items-center gap-1.5">
-                <Target className="w-4 h-4 text-gray-400" />
+                <Target className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                   <button
                     onClick={() => adjustValue('sets', exercise.sets, -1, 1, 10)}
-                    className="px-2 py-1 hover:bg-gray-100 text-gray-500"
+                    className="px-2 py-1 hover:bg-gray-100 text-gray-500 dark:text-gray-400"
                   >
                     <Minus className="w-3 h-3" />
                   </button>
@@ -175,21 +177,21 @@ const PrescriptionCard = ({
                   />
                   <button
                     onClick={() => adjustValue('sets', exercise.sets, 1, 1, 10)}
-                    className="px-2 py-1 hover:bg-gray-100 text-gray-500"
+                    className="px-2 py-1 hover:bg-gray-100 text-gray-500 dark:text-gray-400"
                   >
                     <Plus className="w-3 h-3" />
                   </button>
                 </div>
-                <span className="text-xs text-gray-500">sett</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">sett</span>
               </div>
 
               {/* Reps */}
               <div className="flex items-center gap-1.5">
-                <Activity className="w-4 h-4 text-gray-400" />
+                <Activity className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                   <button
                     onClick={() => adjustValue('reps', exercise.reps, -1, 1, 100)}
-                    className="px-2 py-1 hover:bg-gray-100 text-gray-500"
+                    className="px-2 py-1 hover:bg-gray-100 text-gray-500 dark:text-gray-400"
                   >
                     <Minus className="w-3 h-3" />
                   </button>
@@ -203,22 +205,22 @@ const PrescriptionCard = ({
                   />
                   <button
                     onClick={() => adjustValue('reps', exercise.reps, 1, 1, 100)}
-                    className="px-2 py-1 hover:bg-gray-100 text-gray-500"
+                    className="px-2 py-1 hover:bg-gray-100 text-gray-500 dark:text-gray-400"
                   >
                     <Plus className="w-3 h-3" />
                   </button>
                 </div>
-                <span className="text-xs text-gray-500">rep</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">rep</span>
               </div>
 
               {/* Hold Seconds (only if exercise has hold) */}
               {(exercise.hold_seconds > 0 || exercise.holdSeconds > 0) && (
                 <div className="flex items-center gap-1.5">
-                  <Clock className="w-4 h-4 text-gray-400" />
+                  <Clock className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                   <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                     <button
                       onClick={() => adjustValue('holdSeconds', exercise.holdSeconds, -5, 0, 300)}
-                      className="px-2 py-1 hover:bg-gray-100 text-gray-500"
+                      className="px-2 py-1 hover:bg-gray-100 text-gray-500 dark:text-gray-400"
                     >
                       <Minus className="w-3 h-3" />
                     </button>
@@ -232,18 +234,18 @@ const PrescriptionCard = ({
                     />
                     <button
                       onClick={() => adjustValue('holdSeconds', exercise.holdSeconds, 5, 0, 300)}
-                      className="px-2 py-1 hover:bg-gray-100 text-gray-500"
+                      className="px-2 py-1 hover:bg-gray-100 text-gray-500 dark:text-gray-400"
                     >
                       <Plus className="w-3 h-3" />
                     </button>
                   </div>
-                  <span className="text-xs text-gray-500">sek</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">sek</span>
                 </div>
               )}
 
               {/* Frequency */}
               <div className="flex items-center gap-1.5">
-                <span className="text-xs text-gray-500">x</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">x</span>
                 <select
                   value={exercise.frequencyPerDay || 1}
                   onChange={(e) => onUpdate('frequencyPerDay', parseInt(e.target.value))}
@@ -265,7 +267,7 @@ const PrescriptionCard = ({
           {/* Instructions */}
           {(exercise.instructions_norwegian || exercise.instructions) && (
             <div className="pt-4">
-              <h5 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+              <h5 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                 Standard instruksjoner
               </h5>
               <p className="text-sm text-gray-700 bg-white p-3 rounded-lg border border-gray-200">
@@ -276,7 +278,7 @@ const PrescriptionCard = ({
 
           {/* Custom Instructions */}
           <div>
-            <h5 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+            <h5 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
               Spesielle instruksjoner til pasienten
             </h5>
             <textarea
@@ -290,7 +292,7 @@ const PrescriptionCard = ({
 
           {/* Weekly Frequency */}
           <div>
-            <h5 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+            <h5 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
               Ukentlig frekvens
             </h5>
             <div className="flex items-center gap-2 flex-wrap">
@@ -301,13 +303,13 @@ const PrescriptionCard = ({
                   className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
                     (exercise.frequencyPerWeek || 7) >= day
                       ? 'bg-blue-600 text-white'
-                      : 'bg-white border border-gray-200 text-gray-400'
+                      : 'bg-white border border-gray-200 text-gray-400 dark:text-gray-300'
                   }`}
                 >
                   {day}
                 </button>
               ))}
-              <span className="text-sm text-gray-500 ml-2">dager per uke</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">dager per uke</span>
             </div>
           </div>
 
@@ -336,7 +338,7 @@ const PrescriptionCard = ({
           {/* Video Preview */}
           {exercise.video_url && (
             <div>
-              <h5 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-2">
+              <h5 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
                 Instruksjonsvideo
               </h5>
               <a

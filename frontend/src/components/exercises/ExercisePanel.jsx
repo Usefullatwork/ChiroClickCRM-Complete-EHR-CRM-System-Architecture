@@ -272,7 +272,7 @@ const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSa
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Øvelsesprogram</h2>
               {patient && (
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {patient.first_name} {patient.last_name}
                 </p>
               )}

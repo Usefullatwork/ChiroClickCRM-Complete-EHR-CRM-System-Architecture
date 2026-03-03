@@ -73,10 +73,12 @@ export function TaksterPanel({
                   </div>
                   <div>
                     <p className="font-semibold text-slate-800">{takst.code}</p>
-                    <p className="text-xs text-slate-500">{takst.name}</p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">{takst.name}</p>
                   </div>
                 </div>
-                <span className="text-sm font-medium text-slate-600">{takst.price} kr</span>
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  {takst.price} kr
+                </span>
               </button>
             ))}
           </div>

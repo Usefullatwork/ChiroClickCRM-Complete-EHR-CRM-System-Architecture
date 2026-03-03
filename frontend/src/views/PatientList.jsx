@@ -63,7 +63,7 @@ export const PatientList = () => {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-slate-900">Pasienter</h1>
-              <p className="text-sm text-slate-600 mt-1">{totalCount} totalt</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{totalCount} totalt</p>
             </div>
 
             <Button variant="primary" onClick={() => navigate('/patients/new')} icon={Plus}>
@@ -83,7 +83,7 @@ export const PatientList = () => {
                 <div className="relative">
                   <Search
                     size={18}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400"
+                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 dark:text-slate-300"
                   />
                   <Input
                     type="text"
@@ -100,7 +100,7 @@ export const PatientList = () => {
 
               {/* Status Filter */}
               <div className="flex items-center gap-2">
-                <Filter size={18} className="text-slate-400" />
+                <Filter size={18} className="text-slate-400 dark:text-slate-300" />
                 <select
                   value={statusFilter}
                   onChange={(e) => {
@@ -136,7 +136,7 @@ export const PatientList = () => {
         ) : patients.length === 0 ? (
           <Card>
             <Card.Body>
-              <div className="text-center py-12 text-slate-500">
+              <div className="text-center py-12 text-slate-500 dark:text-slate-400">
                 <User size={48} className="mx-auto mb-3 text-slate-300" />
                 <p className="font-medium">Ingen pasienter funnet</p>
                 <p className="text-sm mt-1">
@@ -189,14 +189,18 @@ export const PatientList = () => {
                             <Badge variant={getStatusColor(patient.status)}>{patient.status}</Badge>
                           </div>
 
-                          <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-slate-600">
+                          <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-slate-600 dark:text-slate-300">
                             {patient.fodselsnummer && (
                               <div className="flex items-center gap-1">
                                 <User size={14} />
                                 <span className="font-mono">
                                   {maskFodselsnummer(patient.fodselsnummer, 6, 0)}
                                 </span>
-                                {age !== null && <span className="text-slate-400">({age} ar)</span>}
+                                {age !== null && (
+                                  <span className="text-slate-400 dark:text-slate-300">
+                                    ({age} ar)
+                                  </span>
+                                )}
                               </div>
                             )}
 
@@ -228,7 +232,7 @@ export const PatientList = () => {
                       </div>
 
                       {/* Arrow */}
-                      <ChevronRight size={20} className="text-slate-400" />
+                      <ChevronRight size={20} className="text-slate-400 dark:text-slate-300" />
                     </div>
                   </Card.Body>
                 </Card>
@@ -240,7 +244,7 @@ export const PatientList = () => {
         {/* Pagination */}
         {totalPages > 1 && (
           <div className="flex items-center justify-between mt-6">
-            <div className="text-sm text-slate-600">
+            <div className="text-sm text-slate-600 dark:text-slate-300">
               Viser {(page - 1) * limit + 1} til {Math.min(page * limit, totalCount)} av{' '}
               {totalCount} pasienter
             </div>

@@ -230,7 +230,7 @@ export default function WaitlistManager({
               <Clock className="w-5 h-5 text-blue-500" />
               {t.title}
             </h3>
-            <p className="text-sm text-gray-500">{t.subtitle}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
           </div>
           <button
             onClick={() => setShowAddForm(true)}
@@ -244,7 +244,7 @@ export default function WaitlistManager({
         {/* Search and Filters */}
         <div className="mt-4 flex items-center gap-3">
           <div className="flex-1 relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300" />
             <input
               type="text"
               value={searchTerm}
@@ -389,7 +389,7 @@ export default function WaitlistManager({
             <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowAddForm(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800"
               >
                 {t.cancel}
               </button>
@@ -408,7 +408,7 @@ export default function WaitlistManager({
       {/* Waitlist */}
       <div className="divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
         {filteredWaitlist.length === 0 ? (
-          <div className="px-6 py-8 text-center text-gray-500">
+          <div className="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
             <Clock className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p>{t.noPatients}</p>
           </div>
@@ -429,7 +429,7 @@ export default function WaitlistManager({
                       <p className="font-medium text-gray-900">
                         {patient ? `${patient.first_name} ${patient.last_name}` : 'Unknown'}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
                         {t.waitingSince} {formatDate(entry.dateAdded)} ({daysWaiting}{' '}
                         {language === 'no' ? 'dager' : 'days'})
                       </p>
@@ -460,7 +460,7 @@ export default function WaitlistManager({
 
                     <button
                       onClick={() => setExpandedId(isExpanded ? null : entry.id)}
-                      className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
+                      className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded"
                     >
                       {isExpanded ? (
                         <ChevronUp className="w-4 h-4" />
@@ -471,7 +471,7 @@ export default function WaitlistManager({
 
                     <button
                       onClick={() => onRemove?.(entry.id)}
-                      className="p-1.5 text-gray-400 hover:text-red-500 rounded"
+                      className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-red-500 rounded"
                       title={t.remove}
                     >
                       <Trash2 className="w-4 h-4" />
@@ -483,7 +483,7 @@ export default function WaitlistManager({
                 {isExpanded && (
                   <div className="mt-3 pl-5 space-y-2 text-sm">
                     <div className="flex gap-4">
-                      <span className="text-gray-500">{t.timePreference}:</span>
+                      <span className="text-gray-500 dark:text-gray-400">{t.timePreference}:</span>
                       <span>
                         {entry.timePreferences
                           ?.map((p) => TIME_PREFERENCES[p.toUpperCase()]?.label[language] || p)
@@ -491,7 +491,7 @@ export default function WaitlistManager({
                       </span>
                     </div>
                     <div className="flex gap-4">
-                      <span className="text-gray-500">{t.dayPreference}:</span>
+                      <span className="text-gray-500 dark:text-gray-400">{t.dayPreference}:</span>
                       <span>
                         {entry.dayPreferences
                           ?.map((p) => DAY_PREFERENCES[p.toUpperCase()]?.label[language] || p)
@@ -500,13 +500,13 @@ export default function WaitlistManager({
                     </div>
                     {entry.notes && (
                       <div className="flex gap-4">
-                        <span className="text-gray-500">{t.notes}:</span>
+                        <span className="text-gray-500 dark:text-gray-400">{t.notes}:</span>
                         <span>{entry.notes}</span>
                       </div>
                     )}
                     {patient?.phone && (
                       <div className="flex gap-4">
-                        <span className="text-gray-500">
+                        <span className="text-gray-500 dark:text-gray-400">
                           <Phone className="w-4 h-4 inline" />
                         </span>
                         <span>{patient.phone}</span>
@@ -549,7 +549,7 @@ export function WaitlistCompact({
           <Clock className="w-4 h-4 text-blue-500" />
           {t.title}
         </h4>
-        <span className="text-sm text-gray-500">
+        <span className="text-sm text-gray-500 dark:text-gray-400">
           {waitlist.length} {t.count}
           {urgentCount > 0 && <span className="ml-1 text-red-500">({urgentCount} urgent)</span>}
         </span>

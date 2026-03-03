@@ -91,7 +91,7 @@ export default function Appointments() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 dark:text-gray-300 mt-1">
             {t('appointmentsOnDate')
               .replace('{count}', appointments.length)
               .replace('{date}', formatDate(selectedDate, lang))}
@@ -104,7 +104,7 @@ export default function Appointments() {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'list'
                   ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
               }`}
             >
               <List className="w-4 h-4" />
@@ -115,7 +115,7 @@ export default function Appointments() {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'board'
                   ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
               }`}
             >
               <LayoutGrid className="w-4 h-4" />
@@ -175,9 +175,9 @@ export default function Appointments() {
             </div>
           ) : appointments.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 text-lg">{t('noAppointmentsFound')}</p>
-              <p className="text-gray-500 mt-2">{t('tryDifferentFilter')}</p>
+              <Calendar className="w-16 h-16 text-gray-400 dark:text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-600 dark:text-gray-300 text-lg">{t('noAppointmentsFound')}</p>
+              <p className="text-gray-500 dark:text-gray-400 mt-2">{t('tryDifferentFilter')}</p>
             </div>
           ) : (
             <div
@@ -203,7 +203,7 @@ export default function Appointments() {
                             <h3 className="text-lg font-semibold text-gray-900">
                               {appointment.patient_name}
                             </h3>
-                            <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+                            <div className="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-300">
                               <div className="flex items-center gap-1">
                                 <Clock className="w-4 h-4" />
                                 {formatTime(appointment.start_time, lang)} -{' '}
@@ -215,7 +215,9 @@ export default function Appointments() {
                               </div>
                             </div>
                             {appointment.notes && (
-                              <p className="mt-2 text-sm text-gray-600">{appointment.notes}</p>
+                              <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                                {appointment.notes}
+                              </p>
                             )}
                           </div>
                         </div>

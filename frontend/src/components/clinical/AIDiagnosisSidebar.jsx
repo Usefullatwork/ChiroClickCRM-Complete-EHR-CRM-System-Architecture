@@ -117,14 +117,14 @@ export default function AIDiagnosisSidebar({
           <button
             onClick={fetchSuggestions}
             disabled={isLoading}
-            className="p-1.5 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
+            className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
             title="Oppdater forslag"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
           <button
             onClick={onToggle}
-            className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
+            className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
             title="Skjul panel"
           >
             <ChevronRight className="w-4 h-4" />
@@ -135,7 +135,7 @@ export default function AIDiagnosisSidebar({
       {/* Content */}
       <div className="flex-1 overflow-y-auto p-3">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center py-8 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-8 text-gray-500 dark:text-gray-400">
             <Loader2 className="w-6 h-6 animate-spin mb-2" />
             <p className="text-sm">Analyserer kliniske funn...</p>
           </div>
@@ -147,7 +147,7 @@ export default function AIDiagnosisSidebar({
             </button>
           </div>
         ) : suggestions.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             <Brain className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">
               Skriv hovedklage eller vurdering for å få diagnosekode-forslag.
@@ -155,7 +155,9 @@ export default function AIDiagnosisSidebar({
           </div>
         ) : (
           <div className="space-y-3">
-            <p className="text-xs text-gray-500 font-medium">Foreslåtte ICPC-2 koder:</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+              Foreslåtte ICPC-2 koder:
+            </p>
 
             {suggestions.map((suggestion, _index) => (
               <div
@@ -187,19 +189,21 @@ export default function AIDiagnosisSidebar({
                 <p className="text-sm font-medium text-gray-800 mb-1">{suggestion.description}</p>
 
                 {suggestion.explanation && (
-                  <p className="text-xs text-gray-500">{suggestion.explanation}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {suggestion.explanation}
+                  </p>
                 )}
 
                 {/* Feedback buttons */}
                 {!feedback[suggestion.code] && (
                   <div className="flex items-center gap-2 mt-2 pt-2 border-t border-gray-100">
-                    <span className="text-xs text-gray-400">Riktig?</span>
+                    <span className="text-xs text-gray-400 dark:text-gray-300">Riktig?</span>
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         handleFeedback(suggestion.code, true);
                       }}
-                      className="p-1 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                      className="p-1 text-gray-400 dark:text-gray-300 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
                       title="Riktig forslag"
                     >
                       <ThumbsUp className="w-3.5 h-3.5" />
@@ -209,7 +213,7 @@ export default function AIDiagnosisSidebar({
                         e.stopPropagation();
                         handleFeedback(suggestion.code, false);
                       }}
-                      className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                      className="p-1 text-gray-400 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                       title="Feil forslag"
                     >
                       <ThumbsDown className="w-3.5 h-3.5" />
@@ -224,7 +228,7 @@ export default function AIDiagnosisSidebar({
 
       {/* Footer hint */}
       <div className="border-t border-gray-200 p-3 bg-gray-50">
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
           Klikk på en kode for å legge til i konsultasjonen. AI-forslag skal alltid verifiseres
           klinisk.
         </p>

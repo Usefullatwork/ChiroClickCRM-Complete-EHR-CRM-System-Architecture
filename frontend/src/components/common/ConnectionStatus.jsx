@@ -173,14 +173,16 @@ export default function ConnectionStatus({
 
             {lastSyncTime && (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Sist synkronisert</span>
-                <span className="text-xs text-gray-500">{formatRelativeTime(lastSyncTime)}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">Sist synkronisert</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {formatRelativeTime(lastSyncTime)}
+                </span>
               </div>
             )}
 
             {pendingChanges > 0 && (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Ventende endringer</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">Ventende endringer</span>
                 <span className="text-xs font-medium text-blue-600">{pendingChanges}</span>
               </div>
             )}
@@ -195,7 +197,7 @@ export default function ConnectionStatus({
             )}
 
             <div className="pt-2 border-t border-gray-100">
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {isOnline
                   ? 'Alle endringer synkroniseres automatisk.'
                   : 'Endringer lagres lokalt og synkroniseres når du er online igjen.'}

@@ -1,13 +1,5 @@
-import { useState, useEffect } from 'react'
-import {
-  X,
-  Save,
-  Loader2,
-  Video,
-  Image,
-  AlertCircle,
-  Plus
-} from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { X, Save, Loader2, Video, Image, AlertCircle, Plus } from 'lucide-react';
 
 /**
  * ExerciseEditor - Modal component for creating and editing exercises
@@ -26,7 +18,7 @@ export default function ExerciseEditor({
   onSave,
   onClose,
   isSaving = false,
-  lang = 'no'
+  lang = 'no',
 }) {
   // Form state
   const [formData, setFormData] = useState({
@@ -46,10 +38,10 @@ export default function ExerciseEditor({
     video_url: '',
     image_url: '',
     equipment_needed: [],
-    tags: []
-  })
+    tags: [],
+  });
 
-  const [tagInput, setTagInput] = useState('')
+  const [tagInput, setTagInput] = useState('');
 
   // Initialize form data when exercise prop changes
   useEffect(() => {
@@ -71,10 +63,10 @@ export default function ExerciseEditor({
         video_url: exercise.video_url || '',
         image_url: exercise.image_url || '',
         equipment_needed: exercise.equipment_needed || [],
-        tags: exercise.tags || []
-      })
+        tags: exercise.tags || [],
+      });
     }
-  }, [exercise])
+  }, [exercise]);
 
   // Category and body region labels
   const categoryLabels = {
@@ -85,8 +77,8 @@ export default function ExerciseEditor({
     posture: { no: 'Holdning', en: 'Posture' },
     breathing: { no: 'Pust', en: 'Breathing' },
     nerve_glide: { no: 'Nervegliding', en: 'Nerve Glide' },
-    vestibular: { no: 'Vestibulær', en: 'Vestibular' }
-  }
+    vestibular: { no: 'Vestibulær', en: 'Vestibular' },
+  };
 
   const bodyRegionLabels = {
     cervical: { no: 'Nakke', en: 'Cervical' },
@@ -100,8 +92,8 @@ export default function ExerciseEditor({
     core: { no: 'Kjerne', en: 'Core' },
     upper_extremity: { no: 'Overekstremitet', en: 'Upper Extremity' },
     lower_extremity: { no: 'Underekstremitet', en: 'Lower Extremity' },
-    full_body: { no: 'Helkropp', en: 'Full Body' }
-  }
+    full_body: { no: 'Helkropp', en: 'Full Body' },
+  };
 
   const equipmentOptions = [
     { value: 'none', label: { no: 'Ingen', en: 'None' } },
@@ -113,57 +105,59 @@ export default function ExerciseEditor({
     { value: 'doorway', label: { no: 'Døråpning', en: 'Doorway' } },
     { value: 'marbles', label: { no: 'Kuler', en: 'Marbles' } },
     { value: 'dumbbell', label: { no: 'Manualer', en: 'Dumbbells' } },
-    { value: 'balance_board', label: { no: 'Balansebrett', en: 'Balance Board' } }
-  ]
+    { value: 'balance_board', label: { no: 'Balansebrett', en: 'Balance Board' } },
+  ];
 
   // Helper to extract YouTube video ID
   const getYouTubeVideoId = (url) => {
     if (!url) {
-      return null
+      return null;
     }
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&?/]+)/)
-    return match ? match[1] : null
-  }
+    const match = url.match(
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&?/]+)/
+    );
+    return match ? match[1] : null;
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!formData.name_no) {
-      return
+      return;
     }
-    onSave(formData)
-  }
+    onSave(formData);
+  };
 
   const handleAddTag = () => {
     if (tagInput.trim() && !formData.tags.includes(tagInput.trim().toLowerCase())) {
       setFormData({
         ...formData,
-        tags: [...formData.tags, tagInput.trim().toLowerCase()]
-      })
-      setTagInput('')
+        tags: [...formData.tags, tagInput.trim().toLowerCase()],
+      });
+      setTagInput('');
     }
-  }
+  };
 
   const handleRemoveTag = (tagToRemove) => {
     setFormData({
       ...formData,
-      tags: formData.tags.filter(tag => tag !== tagToRemove)
-    })
-  }
+      tags: formData.tags.filter((tag) => tag !== tagToRemove),
+    });
+  };
 
   const handleToggleEquipment = (equipment) => {
-    const current = formData.equipment_needed || []
+    const current = formData.equipment_needed || [];
     if (current.includes(equipment)) {
       setFormData({
         ...formData,
-        equipment_needed: current.filter(e => e !== equipment)
-      })
+        equipment_needed: current.filter((e) => e !== equipment),
+      });
     } else {
       setFormData({
         ...formData,
-        equipment_needed: [...current, equipment]
-      })
+        equipment_needed: [...current, equipment],
+      });
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -172,12 +166,16 @@ export default function ExerciseEditor({
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
           <h3 className="text-lg font-semibold text-gray-900">
             {mode === 'create'
-              ? (lang === 'no' ? 'Ny øvelse' : 'New Exercise')
-              : (lang === 'no' ? 'Rediger øvelse' : 'Edit Exercise')}
+              ? lang === 'no'
+                ? 'Ny øvelse'
+                : 'New Exercise'
+              : lang === 'no'
+                ? 'Rediger øvelse'
+                : 'Edit Exercise'}
           </h3>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+            className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg hover:bg-gray-100"
           >
             <X className="w-5 h-5" />
           </button>
@@ -197,7 +195,9 @@ export default function ExerciseEditor({
                   value={formData.name_no}
                   onChange={(e) => setFormData({ ...formData, name_no: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={lang === 'no' ? 'f.eks. Kne til bryst tøyning' : 'e.g. Knee to Chest Stretch'}
+                  placeholder={
+                    lang === 'no' ? 'f.eks. Kne til bryst tøyning' : 'e.g. Knee to Chest Stretch'
+                  }
                   required
                 />
               </div>
@@ -227,7 +227,9 @@ export default function ExerciseEditor({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   {Object.entries(categoryLabels).map(([key, labels]) => (
-                    <option key={key} value={key}>{labels[lang] || key}</option>
+                    <option key={key} value={key}>
+                      {labels[lang] || key}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -241,7 +243,9 @@ export default function ExerciseEditor({
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
                   {Object.entries(bodyRegionLabels).map(([key, labels]) => (
-                    <option key={key} value={key}>{labels[lang] || key}</option>
+                    <option key={key} value={key}>
+                      {labels[lang] || key}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -302,7 +306,7 @@ export default function ExerciseEditor({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="https://raw.githubusercontent.com/yuhonas/free-exercise-db/..."
               />
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {lang === 'no'
                   ? 'Tips: Bruk bilder fra Free Exercise DB eller last opp til egen server'
                   : 'Tip: Use images from Free Exercise DB or upload to your own server'}
@@ -313,7 +317,9 @@ export default function ExerciseEditor({
                     src={formData.image_url}
                     alt="Preview"
                     className="max-h-40 rounded-lg border border-gray-200"
-                    onError={(e) => { e.target.style.display = 'none' }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
                   />
                 </div>
               )}
@@ -330,7 +336,11 @@ export default function ExerciseEditor({
                   onChange={(e) => setFormData({ ...formData, instructions_no: e.target.value })}
                   rows={5}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={lang === 'no' ? 'Detaljerte trinn-for-trinn instruksjoner...' : 'Detailed step-by-step instructions...'}
+                  placeholder={
+                    lang === 'no'
+                      ? 'Detaljerte trinn-for-trinn instruksjoner...'
+                      : 'Detailed step-by-step instructions...'
+                  }
                 />
               </div>
               <div>
@@ -359,7 +369,11 @@ export default function ExerciseEditor({
                   onChange={(e) => setFormData({ ...formData, contraindications: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={lang === 'no' ? 'Når øvelsen IKKE bør utføres...' : 'When the exercise should NOT be performed...'}
+                  placeholder={
+                    lang === 'no'
+                      ? 'Når øvelsen IKKE bør utføres...'
+                      : 'When the exercise should NOT be performed...'
+                  }
                 />
               </div>
               <div>
@@ -372,7 +386,11 @@ export default function ExerciseEditor({
                   onChange={(e) => setFormData({ ...formData, precautions: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={lang === 'no' ? 'Viktige hensyn og advarsler...' : 'Important considerations and warnings...'}
+                  placeholder={
+                    lang === 'no'
+                      ? 'Viktige hensyn og advarsler...'
+                      : 'Important considerations and warnings...'
+                  }
                 />
               </div>
             </div>
@@ -384,39 +402,48 @@ export default function ExerciseEditor({
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     {lang === 'no' ? 'Sett' : 'Sets'}
                   </label>
                   <input
                     type="number"
                     value={formData.default_sets}
-                    onChange={(e) => setFormData({ ...formData, default_sets: parseInt(e.target.value) || 3 })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, default_sets: parseInt(e.target.value) || 3 })
+                    }
                     min={1}
                     max={10}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     {lang === 'no' ? 'Reps' : 'Reps'}
                   </label>
                   <input
                     type="number"
                     value={formData.default_reps}
-                    onChange={(e) => setFormData({ ...formData, default_reps: parseInt(e.target.value) || 10 })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, default_reps: parseInt(e.target.value) || 10 })
+                    }
                     min={1}
                     max={100}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     {lang === 'no' ? 'Hold (sek)' : 'Hold (sec)'}
                   </label>
                   <input
                     type="number"
                     value={formData.default_hold_seconds || ''}
-                    onChange={(e) => setFormData({ ...formData, default_hold_seconds: e.target.value ? parseInt(e.target.value) : null })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        default_hold_seconds: e.target.value ? parseInt(e.target.value) : null,
+                      })
+                    }
                     min={0}
                     max={300}
                     placeholder="-"
@@ -424,12 +451,14 @@ export default function ExerciseEditor({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                     {lang === 'no' ? 'Frekvens' : 'Frequency'}
                   </label>
                   <select
                     value={formData.default_frequency}
-                    onChange={(e) => setFormData({ ...formData, default_frequency: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, default_frequency: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option value="daily">{lang === 'no' ? 'Daglig' : 'Daily'}</option>
@@ -457,7 +486,7 @@ export default function ExerciseEditor({
                     className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
                       (formData.equipment_needed || []).includes(equip.value)
                         ? 'bg-green-100 border-green-500 text-green-700'
-                        : 'bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100'
+                        : 'bg-gray-50 border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                     }`}
                   >
                     {equip.label[lang] || equip.value}
@@ -540,5 +569,5 @@ export default function ExerciseEditor({
         </form>
       </div>
     </div>
-  )
+  );
 }

@@ -122,7 +122,7 @@ export default function PipelineTab() {
                   : 'Pipeline ledig'}
             </p>
             {status?.lastRunAt && (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Sist kjort: {new Date(status.lastRunAt).toLocaleString('nb-NO')}
               </p>
             )}
@@ -148,7 +148,7 @@ export default function PipelineTab() {
                             ? 'bg-blue-500 text-white animate-pulse'
                             : stepStatus === 'failed'
                               ? 'bg-red-500 text-white'
-                              : 'bg-gray-200 text-gray-500'
+                              : 'bg-gray-200 text-gray-500 dark:text-gray-400'
                       }`}
                     >
                       {stepStatus === 'done' ? (
@@ -161,7 +161,9 @@ export default function PipelineTab() {
                         i + 1
                       )}
                     </div>
-                    <span className="text-xs mt-1 text-gray-600">{step.label}</span>
+                    <span className="text-xs mt-1 text-gray-600 dark:text-gray-300">
+                      {step.label}
+                    </span>
                   </div>
                   {i < PIPELINE_STEPS.length - 1 && (
                     <div
@@ -242,23 +244,35 @@ export default function PipelineTab() {
           Treningshistorikk
         </h3>
         {history.length === 0 ? (
-          <p className="text-gray-500 text-sm">Ingen tidligere treningskjoringer.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Ingen tidligere treningskjoringer.
+          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
                 <tr className="border-b bg-gray-50">
-                  <th className="py-2 px-3 text-left font-medium text-gray-600">Dato</th>
-                  <th className="py-2 px-3 text-left font-medium text-gray-600">Trigger</th>
-                  <th className="py-2 px-3 text-right font-medium text-gray-600">Eksempler</th>
-                  <th className="py-2 px-3 text-left font-medium text-gray-600">Status</th>
-                  <th className="py-2 px-3 text-left font-medium text-gray-600">Detaljer</th>
+                  <th className="py-2 px-3 text-left font-medium text-gray-600 dark:text-gray-300">
+                    Dato
+                  </th>
+                  <th className="py-2 px-3 text-left font-medium text-gray-600 dark:text-gray-300">
+                    Trigger
+                  </th>
+                  <th className="py-2 px-3 text-right font-medium text-gray-600 dark:text-gray-300">
+                    Eksempler
+                  </th>
+                  <th className="py-2 px-3 text-left font-medium text-gray-600 dark:text-gray-300">
+                    Status
+                  </th>
+                  <th className="py-2 px-3 text-left font-medium text-gray-600 dark:text-gray-300">
+                    Detaljer
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {history.map((event) => (
                   <tr key={event.id} className="border-b hover:bg-gray-50">
-                    <td className="py-2 px-3 text-gray-600">
+                    <td className="py-2 px-3 text-gray-600 dark:text-gray-300">
                       {new Date(event.created_at).toLocaleString('nb-NO', {
                         month: 'short',
                         day: 'numeric',
@@ -312,7 +326,9 @@ export default function PipelineTab() {
               <div key={v.id} className="flex items-center justify-between border rounded-lg p-3">
                 <div>
                   <span className="font-medium text-sm">{v.model_name}</span>
-                  <span className="ml-2 text-xs text-gray-500">v{v.version}</span>
+                  <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                    v{v.version}
+                  </span>
                   {v.is_active && (
                     <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">
                       Aktiv
@@ -343,13 +359,15 @@ export default function PipelineTab() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
           <div className="border rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-blue-700">{rlaifStats?.totalPairs || 0}</div>
-            <div className="text-xs text-gray-500 mt-1">Preferansepar generert</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Preferansepar generert
+            </div>
           </div>
           <div className="border rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-green-700">
               {rlaifStats?.totalEvaluations || 0}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Evalueringer</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Evalueringer</div>
           </div>
           <div className="border rounded-lg p-4 text-center">
             <div className="text-2xl font-bold text-purple-700">
@@ -357,7 +375,9 @@ export default function PipelineTab() {
                 ? `${(rlaifStats.avgQualityScore * 100).toFixed(0)}%`
                 : '-'}
             </div>
-            <div className="text-xs text-gray-500 mt-1">Gj.sn. kvalitetsscore</div>
+            <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Gj.sn. kvalitetsscore
+            </div>
           </div>
         </div>
         <button

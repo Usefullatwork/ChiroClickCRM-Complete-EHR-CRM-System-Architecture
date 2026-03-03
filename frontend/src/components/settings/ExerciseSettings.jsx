@@ -254,7 +254,7 @@ export default function ExerciseSettings({ lang }) {
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
               <input
                 type="text"
                 value={exerciseSearch}
@@ -278,7 +278,7 @@ export default function ExerciseSettings({ lang }) {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300 pointer-events-none" />
             </div>
 
             {/* Body Region Filter */}
@@ -295,7 +295,7 @@ export default function ExerciseSettings({ lang }) {
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300 pointer-events-none" />
             </div>
           </div>
         </div>
@@ -329,7 +329,7 @@ export default function ExerciseSettings({ lang }) {
                           }}
                         />
                       ) : (
-                        <Dumbbell className="w-6 h-6 text-gray-400" />
+                        <Dumbbell className="w-6 h-6 text-gray-400 dark:text-gray-300" />
                       )}
                     </div>
 
@@ -360,7 +360,7 @@ export default function ExerciseSettings({ lang }) {
                         </div>
                       ) : (
                         <div
-                          className="flex items-center gap-1 text-gray-400"
+                          className="flex items-center gap-1 text-gray-400 dark:text-gray-300"
                           title={lang === 'no' ? 'Mangler bilde' : 'No image'}
                         >
                           <Image className="w-4 h-4" />
@@ -378,7 +378,7 @@ export default function ExerciseSettings({ lang }) {
                         </div>
                       ) : (
                         <div
-                          className="flex items-center gap-1 text-gray-400"
+                          className="flex items-center gap-1 text-gray-400 dark:text-gray-300"
                           title={lang === 'no' ? 'Mangler video' : 'No video'}
                         >
                           <Video className="w-4 h-4" />
@@ -453,7 +453,7 @@ export default function ExerciseSettings({ lang }) {
               </h3>
               <button
                 onClick={handleCloseExerciseModal}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 dark:bg-gray-700"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 dark:bg-gray-700"
               >
                 <X className="w-5 h-5" />
               </button>

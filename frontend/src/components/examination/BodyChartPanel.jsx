@@ -418,7 +418,7 @@ export default function BodyChartPanel({
                   className={`px-3 py-1.5 text-sm font-medium transition-colors ${
                     view === v
                       ? 'bg-blue-600 text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-50'
+                      : 'bg-white text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                   }`}
                 >
                   {t[v === 'front' ? 'front' : 'back']}
@@ -476,7 +476,7 @@ export default function BodyChartPanel({
               onChange={(e) => setIntensity(parseInt(e.target.value))}
               className="w-full h-2 bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 rounded-lg appearance-none cursor-pointer"
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
               <span>0</span>
               <span>5</span>
               <span>10</span>
@@ -554,7 +554,7 @@ export default function BodyChartPanel({
           <h4 className="text-sm font-medium text-gray-700">{t.markerLegend}</h4>
 
           {currentMarkers.length === 0 ? (
-            <p className="text-sm text-gray-500 italic">{t.noMarkers}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 italic">{t.noMarkers}</p>
           ) : (
             <div className="space-y-2 max-h-[300px] overflow-y-auto">
               {currentMarkers.map((marker) => (
@@ -568,7 +568,7 @@ export default function BodyChartPanel({
                       <span className="text-sm font-medium text-gray-800">
                         {t.regions[marker.regionId] || marker.regionId}
                       </span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {t.symptoms[marker.symptom]} ({marker.intensity}/10)
                       </span>
                     </div>
@@ -582,7 +582,7 @@ export default function BodyChartPanel({
                   </div>
                   <button
                     onClick={() => removeMarker(marker.id)}
-                    className="p-1 text-gray-400 hover:text-red-500 transition-colors"
+                    className="p-1 text-gray-400 dark:text-gray-300 hover:text-red-500 transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -653,7 +653,7 @@ export function BodyChartCompact({
           );
         })}
       </svg>
-      <p className="text-xs text-center text-gray-500 mt-1">
+      <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">
         {t[view]} ({viewMarkers.length})
       </p>
     </div>

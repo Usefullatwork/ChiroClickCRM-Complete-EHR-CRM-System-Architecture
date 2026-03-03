@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 
-const AUTOSAVE_PREFIX = 'chiroclickcrm_autosave_';
+const AUTOSAVE_PREFIX = 'chiroclickehr_autosave_';
 const DEFAULT_DEBOUNCE = 2000; // 2 seconds
 
 export const useAutoSave = (key, _initialData = {}, options = {}) => {

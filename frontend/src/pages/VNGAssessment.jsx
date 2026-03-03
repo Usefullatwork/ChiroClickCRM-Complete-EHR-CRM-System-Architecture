@@ -72,9 +72,11 @@ export default function VNGAssessment() {
             <div>
               <h1 className="text-xl font-semibold text-gray-900">{t('vngAssessment')}</h1>
               {isLoadingPatient ? (
-                <p className="text-sm text-gray-400">{t('loading')}</p>
+                <p className="text-sm text-gray-400 dark:text-gray-300">{t('loading')}</p>
               ) : (
-                patient && <p className="text-sm text-gray-500">{patient.name}</p>
+                patient && (
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{patient.name}</p>
+                )
               )}
             </div>
           </div>
@@ -87,7 +89,7 @@ export default function VNGAssessment() {
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                   language === 'no'
                     ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
                 }`}
               >
                 Norsk
@@ -97,7 +99,7 @@ export default function VNGAssessment() {
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                   language === 'en'
                     ? 'bg-white text-gray-900 shadow-sm'
-                    : 'text-gray-600 hover:text-gray-900'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
                 }`}
               >
                 English

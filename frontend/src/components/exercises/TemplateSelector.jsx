@@ -150,7 +150,7 @@ const TemplateSelector = ({
 
         {/* Search */}
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
           <input
             type="text"
             value={searchTerm}
@@ -163,7 +163,7 @@ const TemplateSelector = ({
               onClick={() => setSearchTerm('')}
               className="absolute right-3 top-1/2 transform -translate-y-1/2"
             >
-              <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+              <X className="w-4 h-4 text-gray-400 dark:text-gray-300 hover:text-gray-600" />
             </button>
           )}
         </div>
@@ -175,7 +175,7 @@ const TemplateSelector = ({
             className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               selectedCategory === 'all'
                 ? 'bg-purple-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
             }`}
           >
             Alle maler
@@ -187,7 +187,7 @@ const TemplateSelector = ({
               className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === cat
                   ? 'bg-purple-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
               }`}
             >
               {cat}
@@ -201,13 +201,13 @@ const TemplateSelector = ({
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
-            <span className="ml-2 text-gray-500">Laster maler...</span>
+            <span className="ml-2 text-gray-500 dark:text-gray-400">Laster maler...</span>
           </div>
         ) : filteredTemplates.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4">
             <FolderOpen className="w-12 h-12 text-gray-300 mb-3" />
-            <p className="font-medium text-gray-600">Ingen maler funnet</p>
-            <p className="text-sm text-gray-400 text-center mt-1">
+            <p className="font-medium text-gray-600 dark:text-gray-300">Ingen maler funnet</p>
+            <p className="text-sm text-gray-400 dark:text-gray-300 text-center mt-1">
               {searchTerm
                 ? 'Prøv å endre søkekriteriene'
                 : 'Lag et program og lagre det som mal for å komme i gang'}
@@ -231,11 +231,11 @@ const TemplateSelector = ({
                       )}
                     </div>
                     {template.description && (
-                      <p className="text-sm text-gray-500 mt-1 line-clamp-1">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
                         {template.description}
                       </p>
                     )}
-                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
                       <span className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded">
                         {template.category || 'Generell'}
                       </span>
@@ -249,7 +249,7 @@ const TemplateSelector = ({
                       </span>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors flex-shrink-0 ml-2" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300 group-hover:text-purple-500 transition-colors flex-shrink-0 ml-2" />
                 </div>
               </button>
             ))}
@@ -323,7 +323,7 @@ const TemplateSelector = ({
               </div>
 
               <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   <strong>{currentExercises.length}</strong> øvelser vil bli lagret i denne malen.
                 </p>
               </div>

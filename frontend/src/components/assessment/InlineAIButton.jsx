@@ -218,7 +218,7 @@ export default function InlineAIButton({
       </button>
 
       {showLabel && (
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-gray-500 dark:text-gray-400">
           {isGenerating ? l.generating : wasCached ? l.cached : l.generate}
         </span>
       )}

@@ -455,9 +455,9 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
                       {regionConfig.segments.length} {lang === 'no' ? 'segmenter' : 'segments'}
                     </span>
                     {expandedSpineRegions[regionKey] ? (
-                      <ChevronUp className="w-4 h-4 text-gray-400" />
+                      <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                     ) : (
-                      <ChevronDown className="w-4 h-4 text-gray-400" />
+                      <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                     )}
                   </div>
                 </button>
@@ -521,12 +521,12 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
                                   </div>
                                 ) : (
                                   <>
-                                    <span className="flex-1 text-gray-600 dark:text-white truncate">
+                                    <span className="flex-1 text-gray-600 dark:text-gray-300 dark:text-white truncate">
                                       {template.text_template}
                                     </span>
                                     <button
                                       onClick={() => handleEditTemplate(template)}
-                                      className="p-1 text-gray-400 hover:text-orange-600 hover:bg-orange-50 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                                      className="p-1 text-gray-400 dark:text-gray-300 hover:text-orange-600 hover:bg-orange-50 rounded opacity-0 group-hover:opacity-100 transition-opacity"
                                       title={lang === 'no' ? 'Rediger' : 'Edit'}
                                     >
                                       <Edit3 className="w-3.5 h-3.5" />
@@ -536,7 +536,7 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
                               </div>
                             ))}
                             {segmentTemplates.length === 0 && (
-                              <p className="text-xs text-gray-400 italic">
+                              <p className="text-xs text-gray-400 dark:text-gray-300 italic">
                                 {lang === 'no' ? 'Ingen maler funnet' : 'No templates found'}
                               </p>
                             )}

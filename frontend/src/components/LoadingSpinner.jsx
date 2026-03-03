@@ -18,7 +18,7 @@ export const LoadingSpinner = ({
 
   const colorClasses = {
     blue: 'text-blue-600',
-    gray: 'text-gray-600',
+    gray: 'text-gray-600 dark:text-gray-300',
     white: 'text-white',
     green: 'text-green-600',
     red: 'text-red-600',
@@ -63,7 +63,7 @@ export const PageLoader = ({ message = 'Laster inn...' }) => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <LoadingSpinner size="xl" />
-      <p className="mt-4 text-gray-600">{message}</p>
+      <p className="mt-4 text-gray-600 dark:text-gray-300">{message}</p>
     </div>
   );
 };

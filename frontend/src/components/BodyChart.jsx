@@ -350,7 +350,7 @@ export const BodyChart = ({
             </div>
 
             {markers.length === 0 ? (
-              <p className="text-sm text-gray-500 italic">
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic">
                 Klikk på et område for å markere smerte
               </p>
             ) : (
@@ -366,14 +366,14 @@ export const BodyChart = ({
                         style={{ backgroundColor: marker.color }}
                       />
                       <span className="text-sm font-medium">{marker.regionLabel}</span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {marker.painTypeLabel}, {marker.intensity}/5
                       </span>
                     </div>
                     {!readOnly && (
                       <button
                         onClick={() => handleRemoveMarker(marker.id)}
-                        className="text-gray-400 hover:text-red-500 text-sm"
+                        className="text-gray-400 dark:text-gray-300 hover:text-red-500 text-sm"
                       >
                         ✕
                       </button>
@@ -399,7 +399,7 @@ export const BodyChart = ({
       {/* Legend */}
       {showLegend && (
         <div className="mt-4 pt-4 border-t">
-          <div className="flex flex-wrap gap-4 text-xs text-gray-500">
+          <div className="flex flex-wrap gap-4 text-xs text-gray-500 dark:text-gray-400">
             {PAIN_TYPES.map((type) => (
               <div key={type.id} className="flex items-center gap-1">
                 <span style={{ color: type.color }}>{type.icon}</span>

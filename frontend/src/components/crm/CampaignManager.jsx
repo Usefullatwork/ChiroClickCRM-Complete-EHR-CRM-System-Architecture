@@ -181,7 +181,7 @@ const CampaignManager = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        <span className="ml-2 text-gray-600">Laster kampanjer...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">Laster kampanjer...</span>
       </div>
     );
   }
@@ -208,7 +208,9 @@ const CampaignManager = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Kampanjer</h2>
-          <p className="text-gray-600">Opprett og administrer markedsføringskampanjer</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Opprett og administrer markedsføringskampanjer
+          </p>
         </div>
         <button
           onClick={() => setShowNewCampaign(true)}
@@ -230,7 +232,7 @@ const CampaignManager = () => {
           <p className="text-2xl font-bold text-gray-900">
             {overallStats.totalSent.toLocaleString('nb-NO')}
           </p>
-          <p className="text-sm text-gray-600">Totalt Sendt</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Totalt Sendt</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -240,7 +242,7 @@ const CampaignManager = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{overallStats.avgOpenRate}%</p>
-          <p className="text-sm text-gray-600">Gj.snitt Åpningsrate</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Gj.snitt Åpningsrate</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -250,7 +252,7 @@ const CampaignManager = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{overallStats.avgClickRate}%</p>
-          <p className="text-sm text-gray-600">Gj.snitt Klikkrate</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Gj.snitt Klikkrate</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -260,7 +262,7 @@ const CampaignManager = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{overallStats.avgConversionRate}%</p>
-          <p className="text-sm text-gray-600">Gj.snitt Konvertering</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Gj.snitt Konvertering</p>
         </div>
       </div>
 
@@ -295,11 +297,11 @@ const CampaignManager = () => {
             className={`px-4 py-2 border-b-2 transition-colors flex items-center gap-2 ${
               activeTab === tab.id
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900'
             }`}
           >
             {tab.label}
-            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:text-gray-300 text-xs rounded-full">
               {tab.count}
             </span>
           </button>
@@ -341,7 +343,7 @@ const CampaignManager = () => {
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
                     <span className="flex items-center gap-1">
                       {campaign.channel === 'EMAIL' ? (
                         <Mail className="w-4 h-4" />
@@ -368,23 +370,23 @@ const CampaignManager = () => {
                   <div className="flex gap-6 text-center">
                     <div>
                       <p className="text-lg font-bold text-gray-900">{campaign.sent}</p>
-                      <p className="text-xs text-gray-500">Sendt</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Sendt</p>
                     </div>
                     {metrics?.openRate !== null && (
                       <div>
                         <p className="text-lg font-bold text-green-600">{metrics.openRate}%</p>
-                        <p className="text-xs text-gray-500">Åpnet</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Åpnet</p>
                       </div>
                     )}
                     {metrics?.clickRate !== null && (
                       <div>
                         <p className="text-lg font-bold text-purple-600">{metrics.clickRate}%</p>
-                        <p className="text-xs text-gray-500">Klikket</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Klikket</p>
                       </div>
                     )}
                     <div>
                       <p className="text-lg font-bold text-orange-600">{campaign.converted}</p>
-                      <p className="text-xs text-gray-500">Konvertert</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Konvertert</p>
                     </div>
                   </div>
                 )}
@@ -393,7 +395,7 @@ const CampaignManager = () => {
                 <div className="flex gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                   {campaign.status === 'DRAFT' && (
                     <button
-                      className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg"
+                      className="p-2 text-gray-400 dark:text-gray-300 hover:text-green-500 hover:bg-green-50 rounded-lg"
                       title="Start"
                     >
                       <Play className="w-4 h-4" />
@@ -401,27 +403,27 @@ const CampaignManager = () => {
                   )}
                   {campaign.status === 'ACTIVE' && !campaign.isAutomated && (
                     <button
-                      className="p-2 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg"
+                      className="p-2 text-gray-400 dark:text-gray-300 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg"
                       title="Pause"
                     >
                       <Pause className="w-4 h-4" />
                     </button>
                   )}
                   <button
-                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
                     title="Rediger"
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
-                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
                     title="Kopier"
                   >
                     <Copy className="w-4 h-4" />
                   </button>
                   {campaign.status === 'DRAFT' && (
                     <button
-                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg"
+                      className="p-2 text-gray-400 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg"
                       title="Slett"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -434,7 +436,7 @@ const CampaignManager = () => {
               {campaign.sent > 0 && campaign.audienceSize && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-gray-600">Fremgang</span>
+                    <span className="text-gray-600 dark:text-gray-300">Fremgang</span>
                     <span className="font-medium">
                       {Math.round((campaign.sent / campaign.audienceSize) * 100)}%
                     </span>
@@ -469,7 +471,7 @@ const CampaignManager = () => {
                         key={type.id}
                         className="p-3 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 text-center"
                       >
-                        <Icon className="w-5 h-5 mx-auto mb-1 text-gray-600" />
+                        <Icon className="w-5 h-5 mx-auto mb-1 text-gray-600 dark:text-gray-300" />
                         <span className="text-xs text-gray-700">{type.label}</span>
                       </button>
                     );
@@ -567,13 +569,13 @@ const CampaignManager = () => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">{selectedCampaign.name}</h3>
-                <p className="text-gray-500">
+                <p className="text-gray-500 dark:text-gray-400">
                   {campaignTypes.find((t) => t.id === selectedCampaign.type)?.label}
                 </p>
               </div>
               <button
                 onClick={() => setSelectedCampaign(null)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
               >
                 ×
               </button>
@@ -584,27 +586,27 @@ const CampaignManager = () => {
               <div className="grid grid-cols-5 gap-4 mb-6">
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <p className="text-2xl font-bold text-gray-900">{selectedCampaign.sent}</p>
-                  <p className="text-sm text-gray-500">Sendt</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Sendt</p>
                 </div>
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <p className="text-2xl font-bold text-blue-600">{selectedCampaign.delivered}</p>
-                  <p className="text-sm text-gray-500">Levert</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Levert</p>
                 </div>
                 {selectedCampaign.opened !== null && (
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
                     <p className="text-2xl font-bold text-green-600">{selectedCampaign.opened}</p>
-                    <p className="text-sm text-gray-500">Åpnet</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Åpnet</p>
                   </div>
                 )}
                 {selectedCampaign.clicked !== null && (
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
                     <p className="text-2xl font-bold text-purple-600">{selectedCampaign.clicked}</p>
-                    <p className="text-sm text-gray-500">Klikket</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Klikket</p>
                   </div>
                 )}
                 <div className="text-center p-4 bg-gray-50 rounded-lg">
                   <p className="text-2xl font-bold text-orange-600">{selectedCampaign.converted}</p>
-                  <p className="text-sm text-gray-500">Konvertert</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Konvertert</p>
                 </div>
               </div>
             )}
@@ -626,7 +628,9 @@ const CampaignManager = () => {
                     },
                   ].map((step, _index) => (
                     <div key={step.label} className="flex items-center gap-3">
-                      <span className="w-24 text-sm text-gray-600">{step.label}</span>
+                      <span className="w-24 text-sm text-gray-600 dark:text-gray-300">
+                        {step.label}
+                      </span>
                       <div className="flex-1 h-6 bg-gray-100 rounded overflow-hidden">
                         <div
                           className={`h-full ${step.color} transition-all`}
@@ -645,19 +649,19 @@ const CampaignManager = () => {
             {/* Details */}
             <div className="grid grid-cols-2 gap-4">
               <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500">Kanal</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Kanal</p>
                 <p className="font-medium">{selectedCampaign.channel}</p>
               </div>
               <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500">Målgruppe</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Målgruppe</p>
                 <p className="font-medium">{selectedCampaign.audience}</p>
               </div>
               <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500">Opprettet</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Opprettet</p>
                 <p className="font-medium">{formatDate(selectedCampaign.createdAt)}</p>
               </div>
               <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500">Status</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
                 <span
                   className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusConfig[selectedCampaign.status].color}`}
                 >

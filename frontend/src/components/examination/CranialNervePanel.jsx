@@ -25,7 +25,12 @@ import {
 
 // Finding states
 const FINDING_STATES = {
-  NOT_TESTED: { value: 'NT', label: 'NT', labelNo: 'IT', color: 'bg-gray-100 text-gray-500' },
+  NOT_TESTED: {
+    value: 'NT',
+    label: 'NT',
+    labelNo: 'IT',
+    color: 'bg-gray-100 text-gray-500 dark:text-gray-400',
+  },
   NORMAL: {
     value: 'normal',
     label: 'Normal',
@@ -674,7 +679,7 @@ function TestItem({ test, nerve, values, onChange, lang, showDescription = true 
           {lang === 'no' ? test.nameNo : test.name}
         </p>
         {showDescription && (
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {lang === 'no' ? test.descriptionNo : test.description}
           </p>
         )}
@@ -684,7 +689,7 @@ function TestItem({ test, nerve, values, onChange, lang, showDescription = true 
         {nerve.bilateral ? (
           <>
             <div className="text-center">
-              <span className="text-[10px] text-gray-400 block mb-0.5">
+              <span className="text-[10px] text-gray-400 dark:text-gray-300 block mb-0.5">
                 {lang === 'no' ? 'V' : 'L'}
               </span>
               <FindingToggle
@@ -694,7 +699,7 @@ function TestItem({ test, nerve, values, onChange, lang, showDescription = true 
               />
             </div>
             <div className="text-center">
-              <span className="text-[10px] text-gray-400 block mb-0.5">
+              <span className="text-[10px] text-gray-400 dark:text-gray-300 block mb-0.5">
                 {lang === 'no' ? 'H' : 'R'}
               </span>
               <FindingToggle
@@ -782,7 +787,7 @@ function CranialNerveSection({
                 {lang === 'no' ? nerve.nameNo : nerve.name}
               </span>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               {lang === 'no' ? nerve.functionNo : nerve.function}
             </p>
           </div>
@@ -790,7 +795,7 @@ function CranialNerveSection({
 
         <div className="flex items-center gap-3">
           {testedCount > 0 && (
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-gray-500 dark:text-gray-400">
               {testedCount} {lang === 'no' ? 'testet' : 'tested'}
             </span>
           )}
@@ -800,9 +805,9 @@ function CranialNerveSection({
             </span>
           )}
           {expanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
+            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           )}
         </div>
       </button>
@@ -920,7 +925,7 @@ function QuickScreeningPanel({ values, onChange, lang }) {
                              ? 'bg-green-100 text-green-700'
                              : isAbnormal
                                ? 'bg-red-100 text-red-700'
-                               : 'bg-gray-100 text-gray-600'
+                               : 'bg-gray-100 text-gray-600 dark:text-gray-300'
                          }`}
             >
               {lang === 'no' ? labelNo : label}
@@ -1057,7 +1062,7 @@ export default function CranialNervePanel({
               : 'Cranial Nerve Examination (CN I-XII)'}
           </h3>
           {summary.tested > 0 && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {summary.tested} {lang === 'no' ? 'tester' : 'tests'}
               {summary.normal > 0 && (
                 <span className="text-green-600 ml-2">
@@ -1082,7 +1087,7 @@ export default function CranialNervePanel({
           <button
             type="button"
             onClick={handleExpandAll}
-            className="px-3 py-1.5 text-sm text-gray-600 border border-gray-300 rounded-lg
+            className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 border border-gray-300 rounded-lg
                       hover:bg-gray-50 transition-colors"
           >
             {expandAll
@@ -1110,7 +1115,7 @@ export default function CranialNervePanel({
       <QuickScreeningPanel values={values} onChange={onChange} lang={lang} />
 
       {/* Legend */}
-      <div className="flex items-center gap-4 text-xs text-gray-500">
+      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
         <div className="flex items-center gap-1">
           <CheckCircle className="w-3 h-3 text-green-500" />
           <span>{lang === 'no' ? 'Normal' : 'Normal'}</span>
@@ -1124,7 +1129,7 @@ export default function CranialNervePanel({
           <span>{lang === 'no' ? 'Usikker' : 'Equivocal'}</span>
         </div>
         <div className="flex items-center gap-1">
-          <MinusCircle className="w-3 h-3 text-gray-400" />
+          <MinusCircle className="w-3 h-3 text-gray-400 dark:text-gray-300" />
           <span>{lang === 'no' ? 'Ikke testet' : 'Not Tested'}</span>
         </div>
       </div>

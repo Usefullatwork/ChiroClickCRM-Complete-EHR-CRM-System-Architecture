@@ -660,7 +660,7 @@ export default function WorkflowBuilder({
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               placeholder={language === 'no' ? 'Hei {firstName}...' : 'Hi {firstName}...'}
             />
-            <p className="mt-1 text-xs text-gray-500">{t.variables}</p>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t.variables}</p>
           </div>
         )}
 
@@ -683,7 +683,7 @@ export default function WorkflowBuilder({
                 rows={4}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
-              <p className="mt-1 text-xs text-gray-500">{t.variables}</p>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t.variables}</p>
             </div>
           </>
         )}
@@ -848,7 +848,9 @@ export default function WorkflowBuilder({
         </h2>
         <div className="flex items-center gap-3">
           <label className="flex items-center gap-2 text-sm">
-            <span className={isActive ? 'text-green-600' : 'text-gray-500'}>{t.enabled}</span>
+            <span className={isActive ? 'text-green-600' : 'text-gray-500 dark:text-gray-400'}>
+              {t.enabled}
+            </span>
             <button
               onClick={() => setIsActive(!isActive)}
               className={`relative w-12 h-6 rounded-full transition-colors ${
@@ -906,13 +908,13 @@ export default function WorkflowBuilder({
               </div>
               <div>
                 <h3 className="font-medium text-gray-900">{t.trigger}</h3>
-                <p className="text-sm text-gray-500">{t.triggerSection}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t.triggerSection}</p>
               </div>
             </div>
             {activeSection === 'trigger' ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
+              <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
+              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             )}
           </button>
 
@@ -938,7 +940,9 @@ export default function WorkflowBuilder({
                     >
                       <Icon
                         className={`w-5 h-5 mb-2 ${
-                          isSelected ? `text-${trigger.color}-600` : 'text-gray-400'
+                          isSelected
+                            ? `text-${trigger.color}-600`
+                            : 'text-gray-400 dark:text-gray-300'
                         }`}
                       />
                       <p
@@ -948,7 +952,7 @@ export default function WorkflowBuilder({
                       >
                         {trigger.label[language] || trigger.label.en}
                       </p>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                         {trigger.description[language] || trigger.description.en}
                       </p>
                     </button>
@@ -975,7 +979,7 @@ export default function WorkflowBuilder({
               </div>
               <div>
                 <h3 className="font-medium text-gray-900">{t.conditions}</h3>
-                <p className="text-sm text-gray-500">{t.conditionsSection}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t.conditionsSection}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -985,9 +989,9 @@ export default function WorkflowBuilder({
                 </span>
               )}
               {activeSection === 'conditions' ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
+                <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
               )}
             </div>
           </button>
@@ -998,7 +1002,9 @@ export default function WorkflowBuilder({
                 {conditions.map((condition, index) => (
                   <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     {index > 0 && (
-                      <span className="text-xs font-medium text-gray-500">{t.and}</span>
+                      <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                        {t.and}
+                      </span>
                     )}
                     <select
                       value={condition.field}
@@ -1034,7 +1040,7 @@ export default function WorkflowBuilder({
                     )}
                     <button
                       onClick={() => removeCondition(index)}
-                      className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                      className="p-2 text-gray-400 dark:text-gray-300 hover:text-red-600 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -1065,7 +1071,7 @@ export default function WorkflowBuilder({
               </div>
               <div>
                 <h3 className="font-medium text-gray-900">{t.actions}</h3>
-                <p className="text-sm text-gray-500">{t.actionsSection}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t.actionsSection}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -1075,9 +1081,9 @@ export default function WorkflowBuilder({
                 </span>
               )}
               {activeSection === 'actions' ? (
-                <ChevronUp className="w-5 h-5 text-gray-400" />
+                <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
               )}
             </div>
           </button>
@@ -1097,18 +1103,18 @@ export default function WorkflowBuilder({
                     <div key={index} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
-                          <div className="flex items-center gap-1 text-gray-400">
+                          <div className="flex items-center gap-1 text-gray-400 dark:text-gray-300">
                             <button
                               onClick={() => moveAction(index, -1)}
                               disabled={index === 0}
-                              className="p-1 hover:text-gray-600 disabled:opacity-30"
+                              className="p-1 hover:text-gray-600 dark:text-gray-300 disabled:opacity-30"
                             >
                               <ChevronUp className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => moveAction(index, 1)}
                               disabled={index === actions.length - 1}
-                              className="p-1 hover:text-gray-600 disabled:opacity-30"
+                              className="p-1 hover:text-gray-600 dark:text-gray-300 disabled:opacity-30"
                             >
                               <ChevronDown className="w-4 h-4" />
                             </button>
@@ -1123,7 +1129,7 @@ export default function WorkflowBuilder({
                               {index + 1}. {actionType.label[language] || actionType.label.en}
                             </span>
                             {action.delay_hours > 0 && (
-                              <span className="ml-2 text-xs text-gray-500">
+                              <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
                                 (+{action.delay_hours}h)
                               </span>
                             )}
@@ -1131,7 +1137,7 @@ export default function WorkflowBuilder({
                         </div>
                         <button
                           onClick={() => removeAction(index)}
-                          className="p-2 text-gray-400 hover:text-red-600 transition-colors"
+                          className="p-2 text-gray-400 dark:text-gray-300 hover:text-red-600 transition-colors"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -1143,7 +1149,7 @@ export default function WorkflowBuilder({
                 })}
 
                 {actions.length === 0 && (
-                  <p className="text-center text-gray-500 py-4">{t.noActions}</p>
+                  <p className="text-center text-gray-500 dark:text-gray-400 py-4">{t.noActions}</p>
                 )}
               </div>
 
@@ -1187,9 +1193,9 @@ export default function WorkflowBuilder({
               </div>
             </div>
             {activeSection === 'settings' ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
+              <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
+              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             )}
           </button>
 
@@ -1204,7 +1210,7 @@ export default function WorkflowBuilder({
                   className="w-32 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   min="0"
                 />
-                <p className="mt-1 text-xs text-gray-500">{t.maxRunsHelp}</p>
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t.maxRunsHelp}</p>
               </div>
             </div>
           )}
@@ -1222,7 +1228,10 @@ export default function WorkflowBuilder({
         </button>
 
         <div className="flex items-center gap-3">
-          <button onClick={onCancel} className="px-4 py-2 text-gray-600 hover:text-gray-800">
+          <button
+            onClick={onCancel}
+            className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800"
+          >
             {t.cancel}
           </button>
           <button
@@ -1247,7 +1256,7 @@ export default function WorkflowBuilder({
                   setShowTestModal(false);
                   setTestResult(null);
                 }}
-                className="p-2 text-gray-400 hover:text-gray-600"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600"
               >
                 <XCircle className="w-5 h-5" />
               </button>
@@ -1304,7 +1313,7 @@ export default function WorkflowBuilder({
                         {testResult.actions.map((action, idx) => (
                           <div
                             key={idx}
-                            className="text-sm text-gray-600 pl-4 border-l-2 border-gray-200"
+                            className="text-sm text-gray-600 dark:text-gray-300 pl-4 border-l-2 border-gray-200"
                           >
                             <strong>{action.type}</strong>
                             {action.delay_hours > 0 && ` (+${action.delay_hours}h)`}
@@ -1328,7 +1337,7 @@ export default function WorkflowBuilder({
                   setShowTestModal(false);
                   setTestResult(null);
                 }}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800"
               >
                 {t.cancel}
               </button>

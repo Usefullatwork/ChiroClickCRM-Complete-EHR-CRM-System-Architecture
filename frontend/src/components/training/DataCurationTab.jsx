@@ -176,7 +176,7 @@ export default function DataCurationTab() {
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-4">
         <div className="flex flex-wrap items-center gap-3">
-          <Filter className="w-4 h-4 text-gray-400" />
+          <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
           <select
             value={filters.type}
             onChange={(e) => handleFilterChange('type', e.target.value)}
@@ -252,9 +252,9 @@ export default function DataCurationTab() {
       {/* Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {feedbackQuery.isLoading ? (
-          <div className="p-6 text-gray-500">Laster...</div>
+          <div className="p-6 text-gray-500 dark:text-gray-400">Laster...</div>
         ) : feedback.length === 0 ? (
-          <div className="p-6 text-gray-500 text-center">
+          <div className="p-6 text-gray-500 dark:text-gray-400 text-center">
             <Database className="w-8 h-8 mx-auto mb-2 text-gray-300" />
             Ingen tilbakemeldinger funnet med valgte filtre.
           </div>
@@ -271,13 +271,27 @@ export default function DataCurationTab() {
                       className="rounded"
                     />
                   </th>
-                  <th className="py-3 px-3 text-left font-medium text-gray-600">Type</th>
-                  <th className="py-3 px-3 text-left font-medium text-gray-600">Original</th>
-                  <th className="py-3 px-3 text-left font-medium text-gray-600">Korreksjon</th>
-                  <th className="py-3 px-3 text-right font-medium text-gray-600">Vurdering</th>
-                  <th className="py-3 px-3 text-right font-medium text-gray-600">Konfidens</th>
-                  <th className="py-3 px-3 text-left font-medium text-gray-600">Dato</th>
-                  <th className="py-3 px-3 text-right font-medium text-gray-600">Handlinger</th>
+                  <th className="py-3 px-3 text-left font-medium text-gray-600 dark:text-gray-300">
+                    Type
+                  </th>
+                  <th className="py-3 px-3 text-left font-medium text-gray-600 dark:text-gray-300">
+                    Original
+                  </th>
+                  <th className="py-3 px-3 text-left font-medium text-gray-600 dark:text-gray-300">
+                    Korreksjon
+                  </th>
+                  <th className="py-3 px-3 text-right font-medium text-gray-600 dark:text-gray-300">
+                    Vurdering
+                  </th>
+                  <th className="py-3 px-3 text-right font-medium text-gray-600 dark:text-gray-300">
+                    Konfidens
+                  </th>
+                  <th className="py-3 px-3 text-left font-medium text-gray-600 dark:text-gray-300">
+                    Dato
+                  </th>
+                  <th className="py-3 px-3 text-right font-medium text-gray-600 dark:text-gray-300">
+                    Handlinger
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -320,7 +334,7 @@ export default function DataCurationTab() {
           >
             Forrige
           </button>
-          <span className="text-sm text-gray-600">
+          <span className="text-sm text-gray-600 dark:text-gray-300">
             Side {page} av {totalPages}
           </span>
           <button
@@ -378,7 +392,7 @@ function FeedbackRow({
         <td className="py-3 px-3 text-right text-sm">
           {item.confidence_score ? `${(item.confidence_score * 100).toFixed(0)}%` : '-'}
         </td>
-        <td className="py-3 px-3 text-sm text-gray-600">
+        <td className="py-3 px-3 text-sm text-gray-600 dark:text-gray-300">
           {new Date(item.created_at).toLocaleDateString('nb-NO', {
             month: 'short',
             day: 'numeric',
@@ -419,26 +433,34 @@ function FeedbackRow({
           <td colSpan={8} className="p-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Original forslag</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  Original forslag
+                </p>
                 <div className="p-3 bg-white rounded border text-sm whitespace-pre-wrap">
                   {item.original_suggestion}
                 </div>
               </div>
               <div>
-                <p className="text-xs font-medium text-gray-500 mb-1">Brukerens korreksjon</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                  Brukerens korreksjon
+                </p>
                 <div className="p-3 bg-white rounded border text-sm whitespace-pre-wrap">
-                  {item.user_correction || <span className="text-gray-400">Ingen korreksjon</span>}
+                  {item.user_correction || (
+                    <span className="text-gray-400 dark:text-gray-300">Ingen korreksjon</span>
+                  )}
                 </div>
               </div>
             </div>
             {item.feedback_notes && (
               <div className="mt-3">
-                <p className="text-xs font-medium text-gray-500 mb-1">Notater</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Notater</p>
                 <p className="text-sm">{item.feedback_notes}</p>
               </div>
             )}
             {item.model_name && (
-              <p className="mt-2 text-xs text-gray-500">Modell: {item.model_name}</p>
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                Modell: {item.model_name}
+              </p>
             )}
           </td>
         </tr>
@@ -448,7 +470,7 @@ function FeedbackRow({
       {editing && (
         <tr className="bg-blue-50 border-b">
           <td colSpan={8} className="p-4">
-            <p className="text-xs font-medium text-gray-600 mb-2">
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
               Rediger tekst for treningsdata:
             </p>
             <textarea

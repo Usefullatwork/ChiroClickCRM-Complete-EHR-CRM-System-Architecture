@@ -358,7 +358,7 @@ const CRMSettings = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-        <span className="ml-2 text-gray-600">Laster innstillinger...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">Laster innstillinger...</span>
       </div>
     );
   }
@@ -369,7 +369,9 @@ const CRMSettings = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">CRM Innstillinger</h2>
-          <p className="text-gray-600">Konfigurer automatisering og pasientoppfølging</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Konfigurer automatisering og pasientoppfølging
+          </p>
         </div>
         {hasChanges && (
           <button
@@ -422,13 +424,15 @@ const CRMSettings = () => {
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 mt-0.5 ${isActive ? 'text-blue-600' : 'text-gray-400'}`}
+                    className={`w-5 h-5 mt-0.5 ${isActive ? 'text-blue-600' : 'text-gray-400 dark:text-gray-300'}`}
                   />
                   <div>
                     <p className={`font-medium ${isActive ? 'text-blue-600' : 'text-gray-900'}`}>
                       {section.label}
                     </p>
-                    <p className="text-xs text-gray-500">{section.description}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {section.description}
+                    </p>
                   </div>
                 </button>
               );
@@ -451,7 +455,7 @@ const CRMSettings = () => {
                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                   <div>
                     <p className="font-medium text-gray-900">Aktiver automatisk innsjekking</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       Send automatisk melding til pasienter som ikke har vært her på en stund
                     </p>
                   </div>
@@ -495,9 +499,9 @@ const CRMSettings = () => {
                         max={180}
                         className="w-24 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                       />
-                      <span className="text-gray-500">dager</span>
+                      <span className="text-gray-500 dark:text-gray-400">dager</span>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Pasienter som ikke har besøkt klinikken på {checkinSettings.inactiveDays}{' '}
                       dager vil motta en melding
                     </p>
@@ -566,7 +570,7 @@ const CRMSettings = () => {
                       rows={3}
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Tilgjengelige variabler: {'{name}'}, {'{first_name}'}, {'{booking_link}'},{' '}
                       {'{clinic_name}'}
                     </p>
@@ -652,7 +656,7 @@ const CRMSettings = () => {
                 </button>
               </div>
 
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
                 Planlegg når du vil sende ut informasjon til pasientene dine. Perfekt for
                 nyhetsbrev, sesongbaserte tips, eller helligdagshilsener.
               </p>
@@ -682,11 +686,11 @@ const CRMSettings = () => {
                         </button>
                         <div>
                           <p
-                            className={`font-medium ${schedule.enabled ? 'text-gray-900' : 'text-gray-500'}`}
+                            className={`font-medium ${schedule.enabled ? 'text-gray-900' : 'text-gray-500 dark:text-gray-400'}`}
                           >
                             {schedule.name}
                           </p>
-                          <div className="flex items-center gap-3 text-sm text-gray-500">
+                          <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
                             <span className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
                               {new Date(schedule.date).toLocaleDateString('nb-NO')}
@@ -715,13 +719,13 @@ const CRMSettings = () => {
                       <div className="flex gap-1">
                         <button
                           onClick={() => setEditingSchedule(schedule)}
-                          className="p-2 text-gray-400 hover:text-blue-500 rounded-lg"
+                          className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 rounded-lg"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteSchedule(schedule.id)}
-                          className="p-2 text-gray-400 hover:text-red-500 rounded-lg"
+                          className="p-2 text-gray-400 dark:text-gray-300 hover:text-red-500 rounded-lg"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -731,7 +735,7 @@ const CRMSettings = () => {
                 ))}
 
                 {scheduledDates.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     <Calendar className="w-12 h-12 mx-auto mb-2 opacity-50" />
                     <p>Ingen planlagte utsendelser</p>
                     <button
@@ -862,7 +866,7 @@ const CRMSettings = () => {
                 Livssyklusdefinisjoner
               </h3>
 
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
                 Definer når pasienter automatisk flyttes mellom livssyklusstadier basert på
                 aktivitet.
               </p>
@@ -885,7 +889,7 @@ const CRMSettings = () => {
                       }}
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Pasient regnes som "ny" i {lifecycleSettings.newPatientDays} dager
                     </p>
                   </div>
@@ -905,7 +909,7 @@ const CRMSettings = () => {
                       }}
                       className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                       Onboarding varer til {lifecycleSettings.onboardingVisits} besøk
                     </p>
                   </div>
@@ -972,23 +976,23 @@ const CRMSettings = () => {
                     <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full">
                       Ny ({lifecycleSettings.newPatientDays}d)
                     </span>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                     <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full">
                       Onboarding ({lifecycleSettings.onboardingVisits} besøk)
                     </span>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                     <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full">
                       Aktiv
                     </span>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                     <span className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full">
                       I Fare ({lifecycleSettings.atRiskDays}d)
                     </span>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                     <span className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full">
                       Inaktiv ({lifecycleSettings.inactiveDays}d)
                     </span>
-                    <ChevronRight className="w-4 h-4 text-gray-400" />
+                    <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                     <span className="px-3 py-1 bg-red-100 text-red-700 rounded-full">
                       Tapt ({lifecycleSettings.lostDays}d)
                     </span>
@@ -1012,7 +1016,9 @@ const CRMSettings = () => {
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="font-medium text-gray-900">Timepåminnelse</p>
-                      <p className="text-sm text-gray-500">Send påminnelse før avtalt time</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        Send påminnelse før avtalt time
+                      </p>
                     </div>
                     <button
                       onClick={() => {
@@ -1037,7 +1043,7 @@ const CRMSettings = () => {
                   </div>
                   {notificationSettings.appointmentReminder && (
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600">Send</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Send</span>
                       <input
                         type="number"
                         value={notificationSettings.appointmentReminderHours}
@@ -1050,7 +1056,9 @@ const CRMSettings = () => {
                         }}
                         className="w-20 px-3 py-1 border border-gray-200 rounded-lg text-sm"
                       />
-                      <span className="text-sm text-gray-600">timer før timen</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        timer før timen
+                      </span>
                     </div>
                   )}
                 </div>
@@ -1060,7 +1068,7 @@ const CRMSettings = () => {
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="font-medium text-gray-900">Oppfølging etter besøk</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Send melding for å sjekke hvordan det går
                       </p>
                     </div>
@@ -1087,7 +1095,7 @@ const CRMSettings = () => {
                   </div>
                   {notificationSettings.followUpAfterVisit && (
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600">Send</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">Send</span>
                       <input
                         type="number"
                         value={notificationSettings.followUpHours}
@@ -1100,7 +1108,9 @@ const CRMSettings = () => {
                         }}
                         className="w-20 px-3 py-1 border border-gray-200 rounded-lg text-sm"
                       />
-                      <span className="text-sm text-gray-600">timer etter besøk</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        timer etter besøk
+                      </span>
                     </div>
                   )}
                 </div>
@@ -1110,7 +1120,7 @@ const CRMSettings = () => {
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="font-medium text-gray-900">Bursdagshilsen</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Send automatisk hilsen på pasientens bursdag
                       </p>
                     </div>
@@ -1142,7 +1152,7 @@ const CRMSettings = () => {
                   <div className="flex items-center justify-between mb-3">
                     <div>
                       <p className="font-medium text-gray-900">NPS undersøkelse</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         Send tilfredshetundersøkelse etter behandlingsserier
                       </p>
                     </div>
@@ -1167,7 +1177,9 @@ const CRMSettings = () => {
                   </div>
                   {notificationSettings.npsAfterVisit && (
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600">Send etter hver</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">
+                        Send etter hver
+                      </span>
                       <input
                         type="number"
                         value={notificationSettings.npsAfterVisits}
@@ -1180,7 +1192,7 @@ const CRMSettings = () => {
                         }}
                         className="w-20 px-3 py-1 border border-gray-200 rounded-lg text-sm"
                       />
-                      <span className="text-sm text-gray-600">besøk</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">besøk</span>
                     </div>
                   )}
                 </div>

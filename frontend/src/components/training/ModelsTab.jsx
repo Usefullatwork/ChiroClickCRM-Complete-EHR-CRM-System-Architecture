@@ -42,7 +42,7 @@ function ActionCard({
         <div className="p-2 bg-gray-100 rounded-lg">{icon}</div>
         <h3 className="font-bold">{title}</h3>
       </div>
-      <p className="text-sm text-gray-600 mb-4">{description}</p>
+      <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{description}</p>
       <button
         onClick={onClick}
         disabled={disabled}
@@ -115,7 +115,7 @@ export default function ModelsTab({
         </div>
 
         {statusQuery.isLoading ? (
-          <div className="text-gray-500">Laster...</div>
+          <div className="text-gray-500 dark:text-gray-400">Laster...</div>
         ) : statusQuery.isError ? (
           <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
             <div className="text-red-700 font-medium">Feil ved henting av status</div>
@@ -151,7 +151,7 @@ export default function ModelsTab({
                       )}
                       <span className="font-medium text-sm">{name}</span>
                     </div>
-                    <p className="text-xs text-gray-600">
+                    <p className="text-xs text-gray-600 dark:text-gray-300">
                       {info.exists ? info.size || 'Installert' : 'Mangler'}
                     </p>
                   </div>
@@ -216,14 +216,14 @@ export default function ModelsTab({
         </h2>
 
         {dataQuery.isLoading ? (
-          <div className="text-gray-500">Laster...</div>
+          <div className="text-gray-500 dark:text-gray-400">Laster...</div>
         ) : (
           <>
             <div className="mb-4">
               <span className="text-2xl font-bold text-blue-600">
                 {trainingData?.totalExamples || 0}
               </span>
-              <span className="text-gray-600 ml-2">totale eksempler</span>
+              <span className="text-gray-600 dark:text-gray-300 ml-2">totale eksempler</span>
             </div>
 
             <div className="space-y-2 mb-6">
@@ -233,10 +233,10 @@ export default function ModelsTab({
                   className="flex items-center justify-between border rounded-lg p-3"
                 >
                   <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-gray-500" />
+                    <FileText className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                     <span className="text-sm font-medium">{file.name}</span>
                   </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
+                  <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
                     <span>{file.examples} eksempler</span>
                     <span>{file.sizeKB} KB</span>
                   </div>
@@ -259,7 +259,7 @@ export default function ModelsTab({
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
               />
               <div className="flex items-center justify-between mt-2">
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   En JSON-linje per eksempel. Felt: prompt, response/completion.
                 </p>
                 <button
@@ -334,7 +334,7 @@ export default function ModelsTab({
 
         {testResult && (
           <div className="mt-4 border rounded-lg p-4 bg-gray-50">
-            <div className="text-xs text-gray-500 mb-1">
+            <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">
               Modell: {testResult.model} | Prompt: {testResult.prompt}
             </div>
             <div className="whitespace-pre-wrap text-sm font-mono">{testResult.response}</div>

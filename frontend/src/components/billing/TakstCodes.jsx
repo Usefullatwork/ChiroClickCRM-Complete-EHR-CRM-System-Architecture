@@ -189,7 +189,7 @@ export default function TakstCodes({
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-3 text-gray-600">Laster takstkoder...</span>
+        <span className="ml-3 text-gray-600 dark:text-gray-300">Laster takstkoder...</span>
       </div>
     );
   }
@@ -207,7 +207,7 @@ export default function TakstCodes({
       {/* Search and Category Filter */}
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
           <input
             type="text"
             placeholder="Sok etter takst eller beskrivelse..."
@@ -251,7 +251,9 @@ export default function TakstCodes({
       {/* Takst Codes List */}
       <div className="border border-gray-200 rounded-lg divide-y divide-gray-100 max-h-96 overflow-y-auto">
         {filteredCodes.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">Ingen takstkoder funnet</div>
+          <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+            Ingen takstkoder funnet
+          </div>
         ) : (
           filteredCodes.map((code) => {
             const IconComponent = getCategoryIcon(code.category);
@@ -269,7 +271,7 @@ export default function TakstCodes({
                       className={`p-2 rounded-lg ${quantity > 0 ? 'bg-blue-100' : 'bg-gray-100'}`}
                     >
                       <IconComponent
-                        className={`w-5 h-5 ${quantity > 0 ? 'text-blue-600' : 'text-gray-600'}`}
+                        className={`w-5 h-5 ${quantity > 0 ? 'text-blue-600' : 'text-gray-600 dark:text-gray-300'}`}
                       />
                     </div>
                     <div className="flex-1">
@@ -277,13 +279,15 @@ export default function TakstCodes({
                         <span className="font-bold text-blue-600">{code.code}</span>
                         <span className="font-medium text-gray-900">{code.name}</span>
                         {code.duration && (
-                          <span className="text-xs text-gray-500 flex items-center gap-1">
+                          <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                             <Clock className="w-3 h-3" />
                             {code.duration} min
                           </span>
                         )}
                       </div>
-                      <p className="text-sm text-gray-600 mt-1">{code.description}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                        {code.description}
+                      </p>
 
                       {/* Price breakdown */}
                       <div className="flex flex-wrap gap-4 mt-2 text-sm">
@@ -313,7 +317,9 @@ export default function TakstCodes({
                               <strong>Kan kombineres med:</strong> {code.canCombineWith.join(', ')}
                             </p>
                           )}
-                          {code.notes && <p className="text-gray-600 italic">{code.notes}</p>}
+                          {code.notes && (
+                            <p className="text-gray-600 dark:text-gray-300 italic">{code.notes}</p>
+                          )}
                           {code.helfoCode && (
                             <p>
                               <strong>HELFO-kode:</strong> {code.helfoCode}
@@ -328,7 +334,7 @@ export default function TakstCodes({
                     {/* Info toggle */}
                     <button
                       onClick={() => setExpandedCode(isExpanded ? null : code.code)}
-                      className="p-1 text-gray-400 hover:text-gray-600 rounded"
+                      className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded"
                       title="Vis detaljer"
                     >
                       {isExpanded ? (
@@ -390,7 +396,7 @@ export default function TakstCodes({
 
           <div className="border-t border-gray-200 pt-3 space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Brutto:</span>
+              <span className="text-gray-600 dark:text-gray-300">Brutto:</span>
               <span className="font-medium">{formatCurrency(totals.grossAmount)}</span>
             </div>
             <div className="flex justify-between text-sm text-green-600">

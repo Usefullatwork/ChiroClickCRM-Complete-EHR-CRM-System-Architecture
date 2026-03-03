@@ -21,7 +21,7 @@ export default function PosturalAssessment({ onTextInputWithMacros }) {
             }
           }}
           disabled={isSigned}
-          className="min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+          className="min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
         />
         <textarea
           aria-label="Palpasjon"
@@ -33,7 +33,7 @@ export default function PosturalAssessment({ onTextInputWithMacros }) {
             }
           }}
           disabled={isSigned}
-          className="min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+          className="min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
         />
       </div>
 
@@ -44,7 +44,7 @@ export default function PosturalAssessment({ onTextInputWithMacros }) {
         value={encounterData.objective.rom}
         onChange={(e) => updateField('objective', 'rom', e.target.value)}
         disabled={isSigned}
-        className="w-full min-h-[60px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+        className="w-full min-h-[60px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
       />
     </>
   );

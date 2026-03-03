@@ -765,7 +765,7 @@ export default function CSVColumnMapper({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-900">{t.title}</h2>
-          <p className="text-slate-500">{t.subtitle}</p>
+          <p className="text-slate-500 dark:text-slate-400">{t.subtitle}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="secondary" icon={FolderOpen} onClick={() => setShowTemplateModal(true)}>
@@ -807,9 +807,11 @@ export default function CSVColumnMapper({
               onDrop={handleDrop}
               onClick={() => fileInputRef.current?.click()}
             >
-              <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+              <Upload className="w-12 h-12 text-slate-400 dark:text-slate-300 mx-auto mb-4" />
               <p className="text-lg font-medium text-slate-700 mb-2">{t.dropHere}</p>
-              <p className="text-sm text-slate-500 mb-4">{t.supportedFormats}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                {t.supportedFormats}
+              </p>
               <input
                 ref={fileInputRef}
                 type="file"
@@ -836,7 +838,7 @@ export default function CSVColumnMapper({
                   <FileSpreadsheet className="w-8 h-8 text-teal-600" />
                   <div>
                     <p className="font-medium text-slate-900">{file?.name}</p>
-                    <p className="text-sm text-slate-500">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
                       {parsedData.rowCount} {t.rows} | {parsedData.headers.length}{' '}
                       {t.csvColumn.toLowerCase()}s
                     </p>
@@ -871,7 +873,7 @@ export default function CSVColumnMapper({
             <CardHeader>
               <div className="flex items-center justify-between">
                 <h3 className="font-semibold text-slate-900">{t.preview}</h3>
-                <span className="text-sm text-slate-500">
+                <span className="text-sm text-slate-500 dark:text-slate-400">
                   {t.showing} 5 {t.of} {parsedData.rowCount} {t.rows}
                 </span>
               </div>
@@ -902,7 +904,10 @@ export default function CSVColumnMapper({
                     {parsedData.rows.slice(0, 5).map((row, rowIdx) => (
                       <tr key={rowIdx} className="hover:bg-slate-50">
                         {parsedData.headers.map((header, colIdx) => (
-                          <td key={colIdx} className="px-4 py-3 text-slate-600 whitespace-nowrap">
+                          <td
+                            key={colIdx}
+                            className="px-4 py-3 text-slate-600 dark:text-slate-300 whitespace-nowrap"
+                          >
                             {row[header] || '-'}
                           </td>
                         ))}
@@ -920,7 +925,7 @@ export default function CSVColumnMapper({
             <Card>
               <CardHeader>
                 <h3 className="font-semibold text-slate-900">{t.csvColumn}s</h3>
-                <p className="text-sm text-slate-500">{t.dragDrop}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{t.dragDrop}</p>
               </CardHeader>
               <CardBody className="space-y-2">
                 {parsedData.headers.map((header) => (
@@ -939,13 +944,13 @@ export default function CSVColumnMapper({
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <GripVertical className="w-4 h-4 text-slate-400" />
+                        <GripVertical className="w-4 h-4 text-slate-400 dark:text-slate-300" />
                         <span className="font-medium text-slate-700">{header}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         {mappings[header] ? (
                           <>
-                            <ArrowRight className="w-4 h-4 text-slate-400" />
+                            <ArrowRight className="w-4 h-4 text-slate-400 dark:text-slate-300" />
                             <span className="text-sm text-teal-700 font-medium">
                               {getFieldLabel(mappings[header])}
                             </span>
@@ -953,7 +958,7 @@ export default function CSVColumnMapper({
                               onClick={() => handleMappingChange(header, null)}
                               className="p-1 hover:bg-slate-100 rounded"
                             >
-                              <X className="w-4 h-4 text-slate-400" />
+                              <X className="w-4 h-4 text-slate-400 dark:text-slate-300" />
                             </button>
                           </>
                         ) : (
@@ -982,7 +987,7 @@ export default function CSVColumnMapper({
                       </div>
                     </div>
                     {/* Sample data */}
-                    <div className="mt-2 text-xs text-slate-500 truncate">
+                    <div className="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">
                       {t.sampleData}: {parsedData.rows[0]?.[header] || '-'}
                     </div>
                   </div>
@@ -998,7 +1003,7 @@ export default function CSVColumnMapper({
               <CardBody className="space-y-4">
                 {Object.entries(groupedFields).map(([group, fields]) => (
                   <div key={group}>
-                    <h4 className="text-sm font-medium text-slate-500 mb-2">
+                    <h4 className="text-sm font-medium text-slate-500 dark:text-slate-400 mb-2">
                       {getGroupLabel(group)}
                     </h4>
                     <div className="space-y-1">
@@ -1038,7 +1043,9 @@ export default function CSVColumnMapper({
                                 </span>
                               </div>
                               {isMapped && (
-                                <span className="text-xs text-slate-500">{mappedFromColumn}</span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400">
+                                  {mappedFromColumn}
+                                </span>
                               )}
                             </div>
                           </div>
@@ -1082,7 +1089,9 @@ export default function CSVColumnMapper({
                   <p className="text-sm text-teal-700">{t.mappedFields}</p>
                 </div>
                 <div className="p-4 bg-slate-50 rounded-lg">
-                  <p className="text-2xl font-bold text-slate-600">{unmappedColumns.length}</p>
+                  <p className="text-2xl font-bold text-slate-600 dark:text-slate-300">
+                    {unmappedColumns.length}
+                  </p>
                   <p className="text-sm text-slate-700">{t.unmappedColumns}</p>
                 </div>
               </div>
@@ -1144,7 +1153,7 @@ export default function CSVColumnMapper({
 
           {/* Saved templates list */}
           {savedTemplates.length === 0 ? (
-            <div className="text-center py-8 text-slate-500">
+            <div className="text-center py-8 text-slate-500 dark:text-slate-400">
               <FolderOpen className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p>{t.noTemplates}</p>
             </div>
@@ -1157,7 +1166,7 @@ export default function CSVColumnMapper({
                 >
                   <div>
                     <p className="font-medium text-slate-900">{template.name}</p>
-                    <p className="text-xs text-slate-500">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       {Object.keys(template.mappings).length} mappings |{' '}
                       {new Date(template.createdAt).toLocaleDateString('nb-NO')}
                     </p>
@@ -1249,11 +1258,16 @@ export default function CSVColumnMapper({
                     <tbody className="divide-y divide-slate-100">
                       {validation.valid.slice(0, 20).map((patient, idx) => (
                         <tr key={idx} className="hover:bg-slate-50">
-                          <td className="px-3 py-2 text-slate-500">{patient._sourceRowIndex}</td>
+                          <td className="px-3 py-2 text-slate-500 dark:text-slate-400">
+                            {patient._sourceRowIndex}
+                          </td>
                           {PATIENT_FIELDS.filter((f) =>
                             Object.values(mappings).includes(f.field)
                           ).map((f) => (
-                            <td key={f.field} className="px-3 py-2 text-slate-600">
+                            <td
+                              key={f.field}
+                              className="px-3 py-2 text-slate-600 dark:text-slate-300"
+                            >
                               {patient[f.field] || '-'}
                             </td>
                           ))}

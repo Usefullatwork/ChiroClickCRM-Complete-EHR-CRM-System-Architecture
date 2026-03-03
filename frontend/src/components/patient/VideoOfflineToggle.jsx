@@ -174,7 +174,7 @@ export function VideoOfflineToggle({
             ${
               isCached
                 ? 'bg-green-100 text-green-600 hover:bg-green-200'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
             }
             ${isLoading ? 'opacity-50 cursor-wait' : ''}
             ${!isOnline && !isCached ? 'opacity-50 cursor-not-allowed' : ''}
@@ -213,7 +213,9 @@ export function VideoOfflineToggle({
                 ${isCached ? 'translate-x-5' : 'translate-x-0'}
               `}
             >
-              {isLoading && <Loader2 className="w-4 h-4 m-0.5 text-gray-400 animate-spin" />}
+              {isLoading && (
+                <Loader2 className="w-4 h-4 m-0.5 text-gray-400 dark:text-gray-300 animate-spin" />
+              )}
             </span>
           </button>
         </label>
@@ -375,7 +377,7 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
           </div>
           <div>
             <h3 className="font-medium text-gray-900">Frakoblet video</h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {cachedUrls.size > 0 ? (
                 <>
                   {cachedUrls.size} {cachedUrls.size === 1 ? t.videoCached : t.videosCached}
@@ -403,7 +405,7 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
       {/* Progress bar when processing */}
       {isProcessing && (
         <div className="mb-4">
-          <div className="flex justify-between text-sm text-gray-500 mb-1">
+          <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-1">
             <span>
               {progress.current} / {progress.total}
             </span>
@@ -429,7 +431,7 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
               ${
                 isOnline
                   ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-gray-100 text-gray-400 dark:text-gray-300 cursor-not-allowed'
               }
               ${isProcessing ? 'opacity-50 cursor-wait' : ''}
             `}
@@ -465,7 +467,7 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
 
       {/* Storage info */}
       {cachedVideoSize > 0 && (
-        <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
+        <div className="mt-3 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
           <HardDrive className="w-3 h-3" />
           <span>
             {formatSize(cachedVideoSize)} {t.storageUsed}

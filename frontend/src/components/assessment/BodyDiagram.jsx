@@ -132,7 +132,9 @@ export default function BodyDiagram({
             <button
               onClick={() => setView('front')}
               className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                view === 'front' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                view === 'front'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
               }`}
             >
               Front
@@ -140,7 +142,9 @@ export default function BodyDiagram({
             <button
               onClick={() => setView('back')}
               className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                view === 'back' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                view === 'back'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
               }`}
             >
               Back

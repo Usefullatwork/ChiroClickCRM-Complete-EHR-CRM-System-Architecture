@@ -183,7 +183,7 @@ export default function OrthopedicTemplatePicker({
               ))}
             <span className="text-sm font-medium">{cat.name_no}</span>
             {cat.template_count > 0 && (
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+              <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full">
                 {cat.template_count}
               </span>
             )}
@@ -214,14 +214,16 @@ export default function OrthopedicTemplatePicker({
             )}
           </div>
           {template.category_name_no && (
-            <p className="text-xs text-gray-500">{template.category_name_no}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{template.category_name_no}</p>
           )}
         </div>
         <div className="flex items-center gap-1">
           {template.is_user_favorite && (
             <Star size={14} className="text-yellow-500 fill-yellow-500" />
           )}
-          {template.usage_count > 10 && <Clock size={14} className="text-gray-400" />}
+          {template.usage_count > 10 && (
+            <Clock size={14} className="text-gray-400 dark:text-gray-300" />
+          )}
         </div>
       </div>
 
@@ -256,13 +258,17 @@ export default function OrthopedicTemplatePicker({
             </span>
           </div>
           {test.body_region && (
-            <p className="text-xs text-gray-500 capitalize">{test.body_region}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">
+              {test.body_region}
+            </p>
           )}
         </div>
-        <Bone size={16} className="text-gray-400" />
+        <Bone size={16} className="text-gray-400 dark:text-gray-300" />
       </div>
 
-      {test.description_no && <p className="text-sm text-gray-600 mb-2">{test.description_no}</p>}
+      {test.description_no && (
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">{test.description_no}</p>
+      )}
 
       {test.indicates_conditions && test.indicates_conditions.length > 0 && (
         <div className="flex gap-1 mt-2 flex-wrap">
@@ -286,8 +292,10 @@ export default function OrthopedicTemplatePicker({
       onClick={() => handlePhraseClick(phrase)}
     >
       <div className="flex items-center justify-between mb-2">
-        <span className="text-xs text-gray-500 uppercase">{phrase.category}</span>
-        <Copy size={14} className="text-gray-400" />
+        <span className="text-xs text-gray-500 dark:text-gray-400 uppercase">
+          {phrase.category}
+        </span>
+        <Copy size={14} className="text-gray-400 dark:text-gray-300" />
       </div>
       <p className="text-sm text-gray-700">{phrase.phrase_no}</p>
     </div>
@@ -301,7 +309,7 @@ export default function OrthopedicTemplatePicker({
           <div className="border-b p-4 flex items-center justify-between">
             <div>
               <h2 className="text-xl font-bold">Kliniske Maler</h2>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {soapSection
                   ? `${SOAP_SECTIONS.find((s) => s.value === soapSection)?.label} - `
                   : ''}
@@ -323,7 +331,7 @@ export default function OrthopedicTemplatePicker({
               className={`px-4 py-3 font-medium text-sm transition-colors ${
                 activeTab === 'templates'
                   ? 'border-b-2 border-blue-500 text-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
               }`}
             >
               <BookOpen size={16} className="inline mr-2" />
@@ -334,7 +342,7 @@ export default function OrthopedicTemplatePicker({
               className={`px-4 py-3 font-medium text-sm transition-colors ${
                 activeTab === 'tests'
                   ? 'border-b-2 border-green-500 text-green-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
               }`}
             >
               <Bone size={16} className="inline mr-2" />
@@ -345,7 +353,7 @@ export default function OrthopedicTemplatePicker({
               className={`px-4 py-3 font-medium text-sm transition-colors ${
                 activeTab === 'phrases'
                   ? 'border-b-2 border-purple-500 text-purple-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
               }`}
             >
               <Copy size={16} className="inline mr-2" />
@@ -356,7 +364,7 @@ export default function OrthopedicTemplatePicker({
               className={`px-4 py-3 font-medium text-sm transition-colors ${
                 activeTab === 'favorites'
                   ? 'border-b-2 border-yellow-500 text-yellow-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
               }`}
             >
               <Star size={16} className="inline mr-2" />
@@ -370,7 +378,7 @@ export default function OrthopedicTemplatePicker({
               <div className="flex-1 relative">
                 <Search
                   size={18}
-                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300"
                 />
                 <input
                   type="text"
@@ -403,7 +411,9 @@ export default function OrthopedicTemplatePicker({
             {activeTab === 'templates' && categories && (
               <div className="w-64 border-r overflow-y-auto bg-gray-50">
                 <div className="p-3">
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Kategorier</h3>
+                  <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">
+                    Kategorier
+                  </h3>
                   {renderCategoryTree(categories.data)}
                 </div>
               </div>
@@ -414,11 +424,15 @@ export default function OrthopedicTemplatePicker({
               {activeTab === 'templates' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {templatesLoading ? (
-                    <p className="text-gray-500 col-span-2 text-center py-8">Laster maler...</p>
+                    <p className="text-gray-500 dark:text-gray-400 col-span-2 text-center py-8">
+                      Laster maler...
+                    </p>
                   ) : templates?.data && templates.data.length > 0 ? (
                     templates.data.map(renderTemplate)
                   ) : (
-                    <p className="text-gray-500 col-span-2 text-center py-8">Ingen maler funnet</p>
+                    <p className="text-gray-500 dark:text-gray-400 col-span-2 text-center py-8">
+                      Ingen maler funnet
+                    </p>
                   )}
                 </div>
               )}
@@ -426,11 +440,15 @@ export default function OrthopedicTemplatePicker({
               {activeTab === 'tests' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {testsLoading ? (
-                    <p className="text-gray-500 col-span-2 text-center py-8">Laster tester...</p>
+                    <p className="text-gray-500 dark:text-gray-400 col-span-2 text-center py-8">
+                      Laster tester...
+                    </p>
                   ) : tests?.data && tests.data.length > 0 ? (
                     tests.data.map(renderTest)
                   ) : (
-                    <p className="text-gray-500 col-span-2 text-center py-8">Ingen tester funnet</p>
+                    <p className="text-gray-500 dark:text-gray-400 col-span-2 text-center py-8">
+                      Ingen tester funnet
+                    </p>
                   )}
                 </div>
               )}
@@ -438,11 +456,15 @@ export default function OrthopedicTemplatePicker({
               {activeTab === 'phrases' && (
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {phrasesLoading ? (
-                    <p className="text-gray-500 col-span-3 text-center py-8">Laster fraser...</p>
+                    <p className="text-gray-500 dark:text-gray-400 col-span-3 text-center py-8">
+                      Laster fraser...
+                    </p>
                   ) : phrases?.data && phrases.data.length > 0 ? (
                     phrases.data.map(renderPhrase)
                   ) : (
-                    <p className="text-gray-500 col-span-3 text-center py-8">Ingen fraser funnet</p>
+                    <p className="text-gray-500 dark:text-gray-400 col-span-3 text-center py-8">
+                      Ingen fraser funnet
+                    </p>
                   )}
                 </div>
               )}
@@ -450,13 +472,13 @@ export default function OrthopedicTemplatePicker({
               {activeTab === 'favorites' && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {templatesLoading ? (
-                    <p className="text-gray-500 col-span-2 text-center py-8">
+                    <p className="text-gray-500 dark:text-gray-400 col-span-2 text-center py-8">
                       Laster favoritter...
                     </p>
                   ) : templates?.data && templates.data.length > 0 ? (
                     templates.data.map(renderTemplate)
                   ) : (
-                    <p className="text-gray-500 col-span-2 text-center py-8">
+                    <p className="text-gray-500 dark:text-gray-400 col-span-2 text-center py-8">
                       Ingen favoritter ennå. Klikk på stjerne-ikonet på en mal for å legge til
                       favoritter.
                     </p>
@@ -468,7 +490,7 @@ export default function OrthopedicTemplatePicker({
 
           {/* Footer */}
           <div className="border-t p-4 bg-gray-50 flex items-center justify-between">
-            <div className="text-sm text-gray-500">
+            <div className="text-sm text-gray-500 dark:text-gray-400">
               {activeTab === 'templates' &&
                 templates?.pagination &&
                 `Viser ${templates.data.length} av ${templates.pagination.total} maler`}

@@ -1,10 +1,11 @@
-# ChiroClickCRM Frontend
+# ChiroClickEHR Frontend
 
-Production-ready React frontend for ChiroClickCRM - Norwegian Healthcare EHR/CRM System.
+Production-ready React frontend for ChiroClickEHR - Norwegian Healthcare EHR/CRM System.
 
 ## 🚀 Features
 
 ### ✅ Security (Production-Ready)
+
 - **CSRF Protection** - Automatic token handling in all API requests
 - **Clerk Authentication** - OAuth 2.0 with 2FA enforcement
 - **Multi-Tenant Isolation** - Organization ID in all requests
@@ -15,6 +16,7 @@ Production-ready React frontend for ChiroClickCRM - Norwegian Healthcare EHR/CRM
 - **Audit Logging** - Patient access tracking
 
 ### ✅ Norwegian Compliance
+
 - **Fødselsnummer Validation** - Complete Mod11 checksum validation
 - **ICPC-2 Codes** - Comprehensive diagnosis code database
 - **Norwegian Language** - UI elements and formats
@@ -22,6 +24,7 @@ Production-ready React frontend for ChiroClickCRM - Norwegian Healthcare EHR/CRM
 - **Date/Time** - Europe/Oslo timezone
 
 ### ✅ Clinical Features
+
 - **SOAP Notes** - Structured clinical documentation
 - **Quick Text Presets** - Efficiency tools for common phrases
 - **Pain Scale (VAS)** - Visual analog scale 0-10
@@ -31,6 +34,7 @@ Production-ready React frontend for ChiroClickCRM - Norwegian Healthcare EHR/CRM
 - **Clinical Validation** - Backend AI validation integration
 
 ### ✅ Performance
+
 - **React Query** - Data caching and optimization
 - **Lazy Loading** - Code splitting for faster initial load
 - **Debounced Search** - Optimized API calls
@@ -235,7 +239,7 @@ if (error) return <Alert variant="danger">{error.message}</Alert>;
 
 return (
   <div>
-    {data.patients.map(patient => (
+    {data.patients.map((patient) => (
       <PatientCard key={patient.id} patient={patient} />
     ))}
   </div>
@@ -258,7 +262,7 @@ const handleSave = async (noteData) => {
       assessment: noteData.assessment,
       plan: noteData.plan,
       diagnosisCodes: noteData.diagnosisCodes,
-      treatmentCodes: noteData.treatmentCodes
+      treatmentCodes: noteData.treatmentCodes,
     });
     alert('Encounter saved successfully!');
   } catch (error) {

@@ -409,15 +409,17 @@ export default function EnhancedSpineDiagram({
           {/* Zoom controls */}
           <button
             onClick={() => setZoom((z) => Math.max(0.5, z - 0.1))}
-            className="p-1 text-gray-400 hover:text-gray-600"
+            className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600"
             title="Zoom ut"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
-          <span className="text-xs text-gray-500">{Math.round(zoom * 100)}%</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {Math.round(zoom * 100)}%
+          </span>
           <button
             onClick={() => setZoom((z) => Math.min(2, z + 0.1))}
-            className="p-1 text-gray-400 hover:text-gray-600"
+            className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600"
             title="Zoom inn"
           >
             <ZoomIn className="w-4 h-4" />
@@ -595,7 +597,7 @@ export default function EnhancedSpineDiagram({
                   </h4>
                   <button
                     onClick={() => setSelectedVertebra(null)}
-                    className="text-gray-400 hover:text-gray-600 text-xl"
+                    className="text-gray-400 dark:text-gray-300 hover:text-gray-600 text-xl"
                   >
                     ×
                   </button>
@@ -619,7 +621,7 @@ export default function EnhancedSpineDiagram({
                               className={`px-2 py-1 text-xs rounded transition-all ${
                                 isActive
                                   ? 'text-white'
-                                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                  : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
                               }`}
                               style={isActive ? { backgroundColor: type.color } : {}}
                             >
@@ -640,14 +642,16 @@ export default function EnhancedSpineDiagram({
               </div>
             ) : (
               <div>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                   Klikk på en vertebra for å legge til funn
                 </p>
 
                 {/* Legend */}
                 {showLegend && (
                   <div className="space-y-2">
-                    <h5 className="text-xs font-medium text-gray-500">Fargekoder</h5>
+                    <h5 className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                      Fargekoder
+                    </h5>
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       {Object.entries(FINDING_TYPES).map(([key, type]) => (
                         <div key={key} className="flex items-center gap-2">
@@ -665,7 +669,9 @@ export default function EnhancedSpineDiagram({
                 {/* All findings summary */}
                 {totalFindings > 0 && (
                   <div className="mt-4 pt-4 border-t border-gray-200">
-                    <h5 className="text-xs font-medium text-gray-500 mb-2">Alle funn</h5>
+                    <h5 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                      Alle funn
+                    </h5>
                     <div className="flex flex-wrap gap-1 max-h-40 overflow-y-auto">
                       {Object.values(findings).map((f) => (
                         <span

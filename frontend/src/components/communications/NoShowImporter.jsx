@@ -259,12 +259,12 @@ export default function NoShowImporter({
             </div>
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Importer No-Shows</h2>
-              <p className="text-sm text-gray-500">Steg {step} av 4</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Steg {step} av 4</p>
             </div>
           </div>
           <button
             onClick={handleClose}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+            className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
           >
             <X className="w-5 h-5" />
           </button>
@@ -288,9 +288,11 @@ export default function NoShowImporter({
                 onClick={() => fileInputRef.current?.click()}
                 className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-red-400 hover:bg-red-50/50 transition-colors"
               >
-                <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                <Upload className="w-10 h-10 text-gray-400 dark:text-gray-300 mx-auto mb-3" />
                 <p className="font-medium text-gray-700">Dra fil hit eller klikk for å laste opp</p>
-                <p className="text-sm text-gray-500 mt-1">CSV eller tekstfil med telefonnumre</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  CSV eller tekstfil med telefonnumre
+                </p>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -302,7 +304,7 @@ export default function NoShowImporter({
 
               <div className="flex items-center gap-4">
                 <div className="flex-1 h-px bg-gray-200" />
-                <span className="text-sm text-gray-400">eller</span>
+                <span className="text-sm text-gray-400 dark:text-gray-300">eller</span>
                 <div className="flex-1 h-px bg-gray-200" />
               </div>
 
@@ -346,7 +348,7 @@ export default function NoShowImporter({
                 </h3>
                 <button
                   onClick={() => setStep(1)}
-                  className="text-sm text-gray-500 hover:text-gray-700"
+                  className="text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700"
                 >
                   ← Tilbake
                 </button>
@@ -370,7 +372,7 @@ export default function NoShowImporter({
                       )}
                       <div>
                         <p className="font-medium text-gray-900">{entry.identifier || entry.raw}</p>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                           {entry.date && <span>{entry.date}</span>}
                           {entry.time && <span>{entry.time}</span>}
                           {entry.error && <span className="text-red-500">{entry.error}</span>}
@@ -445,8 +447,10 @@ export default function NoShowImporter({
                       />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{template.label}</p>
-                        <p className="text-xs text-gray-500 mb-2">{template.description}</p>
-                        <p className="text-sm text-gray-600 bg-white/50 p-2 rounded border border-gray-100">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                          {template.description}
+                        </p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 bg-white/50 p-2 rounded border border-gray-100">
                           {renderTemplate(template.content, {
                             firstName: 'Ola',
                             date: format(new Date(), 'dd.MM.yyyy', { locale: nb }),
@@ -490,7 +494,7 @@ export default function NoShowImporter({
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 {matchedCount} melding{matchedCount !== 1 ? 'er' : ''} lagt i kø
               </h3>
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
                 {sendToApproval
                   ? 'Meldingene venter nå på godkjenning.'
                   : 'Meldingene sendes ut snart.'}
@@ -513,7 +517,7 @@ export default function NoShowImporter({
           <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
             <button
               onClick={handleClose}
-              className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg transition-colors"
             >
               Avbryt
             </button>

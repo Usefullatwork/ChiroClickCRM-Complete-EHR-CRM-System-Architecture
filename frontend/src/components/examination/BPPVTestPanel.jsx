@@ -24,7 +24,7 @@ const FINDING_STATES = [
     value: 'NT',
     label: 'Not Tested',
     labelNo: 'Ikke testet',
-    color: 'bg-gray-100 text-gray-500',
+    color: 'bg-gray-100 text-gray-500 dark:text-gray-400',
     icon: MinusCircle,
   },
   {
@@ -251,7 +251,7 @@ function BPPVTestItem({ test, values, onChange, lang, showTechnique = false }) {
         <div className="flex-1">
           <h5 className="font-medium text-gray-700">{lang === 'no' ? test.nameNo : test.name}</h5>
           {showTechnique && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {lang === 'no' ? test.technique : test.techniqueEn}
             </p>
           )}
@@ -269,7 +269,7 @@ function BPPVTestItem({ test, values, onChange, lang, showTechnique = false }) {
         <div className="mt-3 space-y-2 pt-3 border-t border-red-200">
           {/* Nystagmus type */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-600 w-24">
+            <span className="text-xs text-gray-600 dark:text-gray-300 w-24">
               {lang === 'no' ? 'Nystagmus:' : 'Nystagmus:'}
             </span>
             <select
@@ -288,7 +288,7 @@ function BPPVTestItem({ test, values, onChange, lang, showTechnique = false }) {
 
           {/* Intensity */}
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-600 w-24">
+            <span className="text-xs text-gray-600 dark:text-gray-300 w-24">
               {lang === 'no' ? 'Intensitet:' : 'Intensity:'}
             </span>
             <div className="flex gap-1">
@@ -300,7 +300,7 @@ function BPPVTestItem({ test, values, onChange, lang, showTechnique = false }) {
                   className={`px-2 py-1 text-xs rounded border ${
                     values[intensityKey] === opt
                       ? 'bg-teal-600 text-white border-teal-600'
-                      : 'bg-white text-gray-600 border-gray-200 hover:bg-gray-50'
+                      : 'bg-white text-gray-600 dark:text-gray-300 border-gray-200 hover:bg-gray-50'
                   }`}
                 >
                   {opt}
@@ -396,7 +396,9 @@ function CategorySection({
             <span className="font-medium text-gray-700">
               {lang === 'no' ? category.nameNo : category.name}
             </span>
-            <span className="text-xs text-gray-500 ml-2">({category.prevalence})</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">
+              ({category.prevalence})
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -406,9 +408,9 @@ function CategorySection({
             </span>
           )}
           {expanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
+            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           )}
         </div>
       </button>
@@ -570,13 +572,13 @@ export default function BPPVTestPanel({
           <h3 className="text-lg font-semibold text-gray-800">
             {lang === 'no' ? 'BPPV Testing' : 'BPPV Testing'}
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {lang === 'no'
               ? 'Benign paroksysmal posisjonsvertigo'
               : 'Benign Paroxysmal Positional Vertigo'}
           </p>
           {summary.tested > 0 && (
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {summary.tested} {lang === 'no' ? 'tester' : 'tests'}
               {summary.positive > 0 && (
                 <span className="text-red-600 ml-2">
@@ -681,7 +683,7 @@ export default function BPPVTestPanel({
 
       {/* Quick treatment selection */}
       <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-        <p className="text-xs font-medium text-gray-600 mb-2">
+        <p className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
           {lang === 'no' ? 'Behandlingsprotokoller:' : 'Treatment Protocols:'}
         </p>
         <div className="flex flex-wrap gap-2">

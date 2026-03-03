@@ -173,7 +173,7 @@ const MiniBarChart = ({ data, maxValue, label, color = 'teal' }) => {
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-sm">
-        <span className="text-slate-600">{label}</span>
+        <span className="text-slate-600 dark:text-slate-300">{label}</span>
         <span className="font-medium text-slate-900">{data}</span>
       </div>
       <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -209,8 +209,10 @@ const StatCard = ({ icon: Icon, label, value, subValue, trend, color = 'slate' }
         </div>
         <div className="mt-3">
           <p className="text-2xl font-bold text-slate-900">{value}</p>
-          <p className="text-sm text-slate-500">{label}</p>
-          {subValue && <p className="text-xs text-slate-400 mt-1">{subValue}</p>}
+          <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
+          {subValue && (
+            <p className="text-xs text-slate-400 dark:text-slate-300 mt-1">{subValue}</p>
+          )}
         </div>
       </CardBody>
     </Card>
@@ -254,12 +256,12 @@ const SuggestionTypeCard = ({ type, data, t, maxTotal }) => {
 
         <div className="mt-3 pt-3 border-t border-slate-100">
           <div className="flex justify-between text-sm">
-            <span className="text-slate-500">{t.totalInteractions}</span>
+            <span className="text-slate-500 dark:text-slate-400">{t.totalInteractions}</span>
             <span className="font-medium">{data.total || 0}</span>
           </div>
           {data.avg_rating && (
             <div className="flex justify-between text-sm mt-1">
-              <span className="text-slate-500">{t.avgRating}</span>
+              <span className="text-slate-500 dark:text-slate-400">{t.avgRating}</span>
               <span className="font-medium flex items-center gap-1">
                 <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
                 {parseFloat(data.avg_rating).toFixed(1)}
@@ -408,7 +410,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
   if (isLoading && !performanceData) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="flex items-center gap-3 text-slate-500">
+        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
           <Loader2 className="w-6 h-6 animate-spin" />
           <span>{t.loading}</span>
         </div>
@@ -439,7 +441,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">{t.title}</h1>
-          <p className="text-slate-500">{t.subtitle}</p>
+          <p className="text-slate-500 dark:text-slate-400">{t.subtitle}</p>
         </div>
         <div className="flex items-center gap-3">
           {/* Time range selector */}
@@ -503,7 +505,9 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
               <SuggestionTypeCard key={type} type={type} data={data} t={t} maxTotal={maxTotal} />
             ))}
           {(!performanceData?.byType || Object.keys(performanceData.byType).length === 0) && (
-            <div className="col-span-3 text-center py-8 text-slate-500">{t.noData}</div>
+            <div className="col-span-3 text-center py-8 text-slate-500 dark:text-slate-400">
+              {t.noData}
+            </div>
           )}
         </div>
       </div>
@@ -567,7 +571,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
                       className="flex items-center justify-between p-2 bg-slate-50 rounded-lg"
                     >
                       <div className="flex items-center gap-2">
-                        <GitBranch className="w-4 h-4 text-slate-400" />
+                        <GitBranch className="w-4 h-4 text-slate-400 dark:text-slate-300" />
                         <span className="text-sm text-slate-700">
                           {event.model_version || `v${idx + 1}`}
                         </span>
@@ -577,7 +581,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
                           </Badge>
                         )}
                       </div>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
                         {event.created_at
                           ? new Date(event.created_at).toLocaleDateString('nb-NO')
                           : '-'}
@@ -586,7 +590,9 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-slate-500 text-center py-4">{t.noData}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-4">
+                  {t.noData}
+                </p>
               )}
             </div>
           </CardBody>
@@ -629,7 +635,9 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-500 text-center py-8">{t.noData}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">
+                {t.noData}
+              </p>
             )}
           </CardBody>
         </Card>

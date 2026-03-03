@@ -83,7 +83,7 @@ export default function PortalProfile() {
             onClick={() => navigate('/portal')}
             className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
           <h1 className="font-bold text-gray-900">Min profil</h1>
         </div>
@@ -113,7 +113,7 @@ export default function PortalProfile() {
             {profile?.firstName} {profile?.lastName}
           </h2>
           {profile?.dateOfBirth && (
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               Fodt{' '}
               {new Date(profile.dateOfBirth).toLocaleDateString('nb-NO', {
                 day: 'numeric',
@@ -186,15 +186,15 @@ export default function PortalProfile() {
           ) : (
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-500 mb-0.5">Telefon</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Telefon</p>
                 <p className="text-gray-900">{profile?.phone || 'Ikke registrert'}</p>
               </div>
               <div className="border-t border-gray-100 pt-4">
-                <p className="text-xs text-gray-500 mb-0.5">E-post</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">E-post</p>
                 <p className="text-gray-900">{profile?.email || 'Ikke registrert'}</p>
               </div>
               <div className="border-t border-gray-100 pt-4">
-                <p className="text-xs text-gray-500 mb-0.5">Fodselsdato</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Fodselsdato</p>
                 <p className="text-gray-900">
                   {profile?.dateOfBirth
                     ? new Date(profile.dateOfBirth).toLocaleDateString('nb-NO')
@@ -207,7 +207,7 @@ export default function PortalProfile() {
 
         {/* Privacy note */}
         <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             Din personlige informasjon er trygt oppbevart i henhold til norsk lov om helsepersonell
             og GDPR. Kun din behandler og autorisert helsepersonell har tilgang til dine
             journaldata.
@@ -215,7 +215,7 @@ export default function PortalProfile() {
         </div>
       </div>
 
-      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400">
+      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-300">
         <p>Kontakt klinikken for a oppdatere navn eller fodselsdato</p>
       </footer>
     </div>

@@ -1,6 +1,6 @@
 /**
  * API Client
- * Centralized API communication with ChiroClickCRM backend
+ * Centralized API communication with ChiroClickEHR backend
  */
 
 import axios from 'axios';

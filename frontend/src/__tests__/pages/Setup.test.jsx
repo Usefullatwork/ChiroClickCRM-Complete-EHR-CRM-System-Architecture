@@ -24,7 +24,7 @@ describe('Setup Wizard', () => {
 
   it('should render the welcome step initially', () => {
     renderSetup();
-    expect(screen.getByText('ChiroClickCRM')).toBeInTheDocument();
+    expect(screen.getByText('ChiroClickEHR')).toBeInTheDocument();
     expect(screen.getByText(/Velkommen til ditt nye journalsystem/)).toBeInTheDocument();
   });
 
@@ -60,7 +60,7 @@ describe('Setup Wizard', () => {
 
     // Step 4: Done
     expect(screen.getByText('Alt klart!')).toBeInTheDocument();
-    expect(screen.getByText('Start ChiroClickCRM')).toBeInTheDocument();
+    expect(screen.getByText('Start ChiroClickEHR')).toBeInTheDocument();
   });
 
   it('should navigate back with Tilbake button', () => {
@@ -279,7 +279,7 @@ describe('Setup Wizard', () => {
     fireEvent.click(screen.getByText('Neste')); // → step 4
 
     // Submit
-    fireEvent.click(screen.getByText('Start ChiroClickCRM'));
+    fireEvent.click(screen.getByText('Start ChiroClickEHR'));
 
     await waitFor(() => {
       expect(onComplete).toHaveBeenCalled();
@@ -325,7 +325,7 @@ describe('Setup Wizard', () => {
     fireEvent.click(screen.getByText('Neste'));
 
     // Submit
-    fireEvent.click(screen.getByText('Start ChiroClickCRM'));
+    fireEvent.click(screen.getByText('Start ChiroClickEHR'));
 
     await waitFor(() => {
       expect(screen.getByText('Password too weak')).toBeInTheDocument();

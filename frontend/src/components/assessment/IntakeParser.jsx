@@ -89,7 +89,7 @@ export function IntakeParserButton({
         ${
           aiStatus.connected
             ? 'bg-gradient-to-r from-purple-500 to-indigo-500 text-white hover:from-purple-600 hover:to-indigo-600'
-            : 'bg-gray-100 text-gray-500'
+            : 'bg-gray-100 text-gray-500 dark:text-gray-400'
         }
         disabled:opacity-50 disabled:cursor-not-allowed
         ${className}`}
@@ -235,7 +235,7 @@ export default function IntakeParser({
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">{t.title}</h3>
-              <p className="text-sm text-gray-500">{t.subtitle}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
             </div>
           </div>
 
@@ -243,7 +243,7 @@ export default function IntakeParser({
           <div className="flex items-center gap-2">
             <div
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium
-              ${aiStatus.connected ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}
+              ${aiStatus.connected ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500 dark:text-gray-400'}`}
             >
               {aiStatus.connected ? (
                 <Wifi className="w-3.5 h-3.5" />
@@ -257,7 +257,7 @@ export default function IntakeParser({
 
         {/* Model info */}
         {aiStatus.connected && (
-          <div className="mt-3 flex items-center gap-4 text-xs text-gray-500">
+          <div className="mt-3 flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1">
               <Zap className="w-3.5 h-3.5" />
               {t.model}: <span className="font-medium text-gray-700">{config.model}</span>
@@ -284,7 +284,7 @@ export default function IntakeParser({
         <div className="border-b border-gray-100">
           <button
             onClick={() => setShowIntakeData(!showIntakeData)}
-            className="w-full px-6 py-3 flex items-center justify-between text-sm text-gray-600 hover:bg-gray-50"
+            className="w-full px-6 py-3 flex items-center justify-between text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-50"
           >
             <span>{showIntakeData ? t.hideIntake : t.viewIntake}</span>
             {showIntakeData ? (
@@ -307,7 +307,7 @@ export default function IntakeParser({
       {/* Content */}
       <div className="p-6">
         {!intakeData ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             <AlertCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p>{t.noData}</p>
           </div>
@@ -376,14 +376,14 @@ export default function IntakeParser({
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setIsEditing(!isEditing)}
-                      className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
+                      className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded"
                       title={t.edit}
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
                     <button
                       onClick={handleCopy}
-                      className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
+                      className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded"
                       title={t.copy}
                     >
                       <Copy className="w-4 h-4" />
@@ -391,7 +391,7 @@ export default function IntakeParser({
                     <button
                       onClick={handleGenerate}
                       disabled={isLoading}
-                      className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
+                      className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded"
                       title={t.regenerate}
                     >
                       <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
@@ -426,7 +426,10 @@ export default function IntakeParser({
       {narrative && (
         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-3">
           {onCancel && (
-            <button onClick={onCancel} className="px-4 py-2 text-gray-600 hover:text-gray-800">
+            <button
+              onClick={onCancel}
+              className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800"
+            >
               {t.cancel}
             </button>
           )}
@@ -490,7 +493,9 @@ function IntakeDataDisplay({ data, language = 'en' }) {
 
     return (
       <div key={key} className="flex gap-2">
-        <span className="text-gray-500 font-medium min-w-[120px]">{t[key] || key}:</span>
+        <span className="text-gray-500 dark:text-gray-400 font-medium min-w-[120px]">
+          {t[key] || key}:
+        </span>
         <span className="text-gray-700">{Array.isArray(value) ? value.join(', ') : value}</span>
       </div>
     );

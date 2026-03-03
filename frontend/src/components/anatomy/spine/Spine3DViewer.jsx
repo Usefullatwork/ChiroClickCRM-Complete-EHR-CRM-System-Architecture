@@ -399,7 +399,7 @@ export default function Spine3DViewer({
                 className={`px-2 py-1 text-xs font-medium rounded transition-colors ${
                   cameraPreset === preset
                     ? 'bg-purple-600 text-white'
-                    : 'text-gray-600 hover:bg-gray-100'
+                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                 }`}
               >
                 {preset === 'front'
@@ -415,7 +415,7 @@ export default function Spine3DViewer({
 
           <button
             onClick={resetCamera}
-            className="p-1.5 text-gray-400 hover:text-gray-600 border border-gray-200 rounded"
+            className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 border border-gray-200 rounded"
             title="Nullstill kamera"
           >
             <RotateCcw className="w-4 h-4" />
@@ -461,7 +461,7 @@ export default function Spine3DViewer({
         </Canvas>
 
         {/* Instructions overlay */}
-        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-xs text-gray-500 pointer-events-none">
+        <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pointer-events-none">
           <span className="flex items-center gap-1">
             <Move className="w-3 h-3" /> Dra for å rotere
           </span>
@@ -479,11 +479,11 @@ export default function Spine3DViewer({
       {/* Legend */}
       <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 rounded-b-lg">
         <div className="flex flex-wrap items-center gap-4 text-xs">
-          <span className="text-gray-500 font-medium">Regioner:</span>
+          <span className="text-gray-500 dark:text-gray-400 font-medium">Regioner:</span>
           {Object.entries(VERTEBRA_CONFIG).map(([key, region]) => (
             <div key={key} className="flex items-center gap-1">
               <div className="w-3 h-3 rounded" style={{ backgroundColor: region.color }} />
-              <span className="text-gray-600">
+              <span className="text-gray-600 dark:text-gray-300">
                 {key === 'cervical'
                   ? 'Cervical'
                   : key === 'thoracic'

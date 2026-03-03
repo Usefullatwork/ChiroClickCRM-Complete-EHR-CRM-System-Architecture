@@ -115,7 +115,7 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-3">{t.title}</h1>
-        <p className="text-xl text-slate-500">{t.subtitle}</p>
+        <p className="text-xl text-slate-500 dark:text-slate-400">{t.subtitle}</p>
       </div>
 
       {/* Search input */}
@@ -167,7 +167,9 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
       {/* Results */}
       {results.length > 0 && (
         <div className="mt-8 flex-1 overflow-y-auto">
-          <p className="text-lg text-slate-600 mb-4 text-center">{t.selectAppointment}</p>
+          <p className="text-lg text-slate-600 dark:text-slate-300 mb-4 text-center">
+            {t.selectAppointment}
+          </p>
           <div className="space-y-3">
             {results.map((apt) => (
               <button
@@ -180,7 +182,7 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
                 <div className="text-2xl font-bold text-slate-800">
                   {apt.firstName} {apt.lastName}
                 </div>
-                <div className="text-lg text-slate-500 mt-1 flex items-center gap-2">
+                <div className="text-lg text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
                   <span className="font-medium">
                     {t.appointmentAt} {formatTime(apt.startTime)}
                   </span>
@@ -188,7 +190,7 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
                   <span>{typeLabels[apt.appointmentType] || apt.appointmentType}</span>
                 </div>
                 {apt.phoneLastFour && (
-                  <div className="text-sm text-slate-400 mt-1">
+                  <div className="text-sm text-slate-400 dark:text-slate-300 mt-1">
                     {lang === 'no' ? 'Telefon slutter på' : 'Phone ends with'} ...
                     {apt.phoneLastFour}
                   </div>

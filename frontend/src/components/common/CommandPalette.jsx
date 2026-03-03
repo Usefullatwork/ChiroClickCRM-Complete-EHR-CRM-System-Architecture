@@ -197,7 +197,7 @@ export default function CommandPalette({ isOpen, onClose }) {
       >
         {/* Search input */}
         <div className="flex items-center gap-3 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-          <Search className="w-5 h-5 text-gray-400 shrink-0" />
+          <Search className="w-5 h-5 text-gray-400 dark:text-gray-300 shrink-0" />
           <input
             ref={inputRef}
             type="text"
@@ -211,7 +211,7 @@ export default function CommandPalette({ isOpen, onClose }) {
             className="flex-1 bg-transparent text-sm text-gray-900 dark:text-white placeholder-gray-400 outline-none"
             aria-label={t('searchLabel', 'Sok')}
           />
-          <kbd className="hidden sm:inline-flex px-1.5 py-0.5 text-[10px] font-medium text-gray-500 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded">
+          <kbd className="hidden sm:inline-flex px-1.5 py-0.5 text-[10px] font-medium text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded">
             ESC
           </kbd>
         </div>
@@ -225,7 +225,9 @@ export default function CommandPalette({ isOpen, onClose }) {
                 {t('patientsSection', 'Pasienter')}
               </div>
               {loading && (
-                <div className="px-4 py-2 text-sm text-gray-400">{t('searching', 'Soker...')}</div>
+                <div className="px-4 py-2 text-sm text-gray-400 dark:text-gray-300">
+                  {t('searching', 'Soker...')}
+                </div>
               )}
               {patients.map((p) => {
                 const idx = getIdx();
@@ -290,7 +292,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                         : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
                     }`}
                   >
-                    <Icon className="w-4 h-4 text-gray-400 shrink-0" />
+                    <Icon className="w-4 h-4 text-gray-400 dark:text-gray-300 shrink-0" />
                     <span className="text-sm text-gray-700 dark:text-gray-200">
                       <HighlightText text={item.label} query={query} />
                     </span>
@@ -321,7 +323,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                         : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'
                     }`}
                   >
-                    <Icon className="w-4 h-4 text-gray-400 shrink-0" />
+                    <Icon className="w-4 h-4 text-gray-400 dark:text-gray-300 shrink-0" />
                     <span className="text-sm text-gray-700 dark:text-gray-200">
                       <HighlightText text={item.label} query={query} />
                     </span>
@@ -333,7 +335,7 @@ export default function CommandPalette({ isOpen, onClose }) {
 
           {/* Empty state */}
           {!loading && query.length >= 2 && allItems.length === 0 && (
-            <div className="px-4 py-6 text-center text-sm text-gray-400">
+            <div className="px-4 py-6 text-center text-sm text-gray-400 dark:text-gray-300">
               {t('noResultsFor', 'Ingen resultater for')} &laquo;{query}&raquo;
             </div>
           )}

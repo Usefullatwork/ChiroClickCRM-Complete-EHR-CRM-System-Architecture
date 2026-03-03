@@ -452,7 +452,7 @@ export default function MessageTemplates({ language = 'no' }) {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">{t.title}</h2>
-          <p className="text-sm text-gray-500">{t.subtitle}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
         </div>
         <button
           onClick={() => {
@@ -470,7 +470,7 @@ export default function MessageTemplates({ language = 'no' }) {
       {/* Filters */}
       <div className="flex items-center gap-4 flex-wrap">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
           <input
             type="text"
             placeholder={t.search}
@@ -544,15 +544,17 @@ export default function MessageTemplates({ language = 'no' }) {
                             {template.type}
                           </span>
                           {template.is_system && (
-                            <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-600">
+                            <span className="px-2 py-0.5 text-xs font-medium rounded bg-gray-100 text-gray-600 dark:text-gray-300">
                               {t.systemTemplate}
                             </span>
                           )}
                         </div>
 
-                        <p className="text-sm text-gray-500 mt-1 line-clamp-2">{template.body}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
+                          {template.body}
+                        </p>
 
-                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
                           <span className="flex items-center gap-1">
                             <Tag className="w-3 h-3" />
                             {categoryInfo.name[language]}
@@ -571,7 +573,7 @@ export default function MessageTemplates({ language = 'no' }) {
                     <div className="flex items-center gap-2 ml-4">
                       <button
                         onClick={() => handleEdit(template)}
-                        className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                        className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
                         title={t.editTemplate}
                       >
                         <Edit className="w-4 h-4" />
@@ -579,7 +581,7 @@ export default function MessageTemplates({ language = 'no' }) {
                       {!template.is_system && (
                         <button
                           onClick={() => handleDelete(template)}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+                          className="p-2 text-gray-400 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 rounded-lg"
                           title={t.delete}
                         >
                           <Trash2 className="w-4 h-4" />
@@ -594,7 +596,7 @@ export default function MessageTemplates({ language = 'no' }) {
         ) : (
           <div className="px-6 py-12 text-center">
             <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">{t.noTemplates}</p>
+            <p className="text-gray-500 dark:text-gray-400">{t.noTemplates}</p>
           </div>
         )}
       </div>
@@ -614,7 +616,7 @@ export default function MessageTemplates({ language = 'no' }) {
                   setEditingTemplate(null);
                   resetForm();
                 }}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -689,7 +691,9 @@ export default function MessageTemplates({ language = 'no' }) {
                     <button
                       onClick={() => setShowVariables(!showVariables)}
                       className={`flex items-center gap-1 px-2 py-1 text-xs rounded ${
-                        showVariables ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-600'
+                        showVariables
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'bg-gray-100 text-gray-600 dark:text-gray-300'
                       }`}
                     >
                       <Tag className="w-3 h-3" />
@@ -701,7 +705,9 @@ export default function MessageTemplates({ language = 'no' }) {
                     <button
                       onClick={() => setPreviewMode(!previewMode)}
                       className={`flex items-center gap-1 px-2 py-1 text-xs rounded ${
-                        previewMode ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                        previewMode
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-gray-100 text-gray-600 dark:text-gray-300'
                       }`}
                     >
                       <Eye className="w-3 h-3" />
@@ -713,7 +719,9 @@ export default function MessageTemplates({ language = 'no' }) {
                 {/* Variables Panel */}
                 {showVariables && (
                   <div className="mb-2 p-3 bg-gray-50 rounded-lg border border-gray-200">
-                    <p className="text-xs text-gray-500 mb-2">{t.insertVariable}:</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                      {t.insertVariable}:
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {TEMPLATE_VARIABLES.map((v) => (
                         <button
@@ -756,7 +764,7 @@ export default function MessageTemplates({ language = 'no' }) {
 
                 {/* Character count for SMS */}
                 {formData.type === 'SMS' && (
-                  <div className="flex items-center justify-between mt-1 text-xs text-gray-500">
+                  <div className="flex items-center justify-between mt-1 text-xs text-gray-500 dark:text-gray-400">
                     <span className={formData.body.length > 160 ? 'text-orange-600' : ''}>
                       {formData.body.length} {t.characters}
                     </span>

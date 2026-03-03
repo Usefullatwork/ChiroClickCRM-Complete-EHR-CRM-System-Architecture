@@ -144,7 +144,7 @@ export default function AnatomyViewer({
         return (
           <Suspense
             fallback={
-              <div className="flex items-center justify-center h-48 text-gray-400">
+              <div className="flex items-center justify-center h-48 text-gray-400 dark:text-gray-300">
                 Laster 3D-modell...
               </div>
             }
@@ -220,7 +220,7 @@ export default function AnatomyViewer({
                   className={`p-1.5 rounded transition-colors ${
                     mode === m
                       ? 'bg-emerald-100 text-emerald-700'
-                      : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                      : 'text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100'
                   }`}
                   title={config.label}
                 >
@@ -273,7 +273,9 @@ export default function AnatomyViewer({
                     key={m}
                     onClick={() => handleModeChange(m)}
                     className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                      mode === m ? 'bg-emerald-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                      mode === m
+                        ? 'bg-emerald-600 text-white'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                     }`}
                     title={config.description}
                   >
@@ -303,7 +305,7 @@ export default function AnatomyViewer({
             className={`p-1.5 rounded transition-colors ${
               showSettings
                 ? 'bg-gray-200 text-gray-700'
-                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100'
+                : 'text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100'
             }`}
             title="Innstillinger"
           >
@@ -323,7 +325,7 @@ export default function AnatomyViewer({
                 onChange={() => {}}
                 className="rounded text-emerald-600"
               />
-              <span className="text-gray-600">Vis narrativ</span>
+              <span className="text-gray-600 dark:text-gray-300">Vis narrativ</span>
             </label>
             <label className="flex items-center gap-2">
               <input
@@ -332,7 +334,7 @@ export default function AnatomyViewer({
                 onChange={() => {}}
                 className="rounded text-emerald-600"
               />
-              <span className="text-gray-600">Vis forklaring</span>
+              <span className="text-gray-600 dark:text-gray-300">Vis forklaring</span>
             </label>
           </div>
         </div>
@@ -344,7 +346,7 @@ export default function AnatomyViewer({
           <div className="flex items-center justify-center p-12">
             <div className="flex flex-col items-center gap-3">
               <div className="animate-spin w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full" />
-              <span className="text-sm text-gray-500">Laster maler...</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">Laster maler...</span>
             </div>
           </div>
         ) : (

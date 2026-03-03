@@ -246,7 +246,7 @@ export default function OfflineMyExercisesExample() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-300">
             {isOffline ? 'Laster fra hurtigbuffer...' : 'Laster ovelser...'}
           </p>
         </div>
@@ -268,7 +268,7 @@ export default function OfflineMyExercisesExample() {
           <h1 className="text-xl font-semibold text-gray-900 mb-2">
             {isOffline ? 'Frakoblet' : 'Kunne ikke laste ovelsene'}
           </h1>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
           <button
             onClick={loadData}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -303,7 +303,7 @@ export default function OfflineMyExercisesExample() {
                 <h1 className="font-semibold text-gray-900">
                   {data?.clinic?.name || 'Pasientportalen'}
                 </h1>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {data?.patient?.firstName ? `Hei, ${data.patient.firstName}!` : 'Mine ovelser'}
                   {usingCachedData && <span className="ml-2 text-amber-600">(frakoblet)</span>}
                 </p>
@@ -327,7 +327,7 @@ export default function OfflineMyExercisesExample() {
               <button
                 onClick={loadData}
                 disabled={loading}
-                className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg transition-colors"
+                className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg transition-colors"
                 title="Oppdater"
               >
                 <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
@@ -375,7 +375,7 @@ export default function OfflineMyExercisesExample() {
                 }}
               />
             </div>
-            <span className="text-sm font-medium text-gray-600 whitespace-nowrap">
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-300 whitespace-nowrap">
               {todayProgress.length} / {selectedPrescription?.exercises?.length || 0}
             </span>
           </div>
@@ -432,11 +432,11 @@ export default function OfflineMyExercisesExample() {
             <Download className="w-5 h-5 text-blue-600" />
             Frakoblet tilgang
           </h3>
-          <p className="text-sm text-gray-600 mb-3">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
             Ovelsene dine er tilgjengelige nar du er frakoblet. Fremgangen din lagres lokalt og
             synkroniseres automatisk nar du er tilkoblet igjen.
           </p>
-          <ul className="text-sm text-gray-500 space-y-1">
+          <ul className="text-sm text-gray-500 dark:text-gray-400 space-y-1">
             <li>- Se ovelser og instruksjoner</li>
             <li>- Registrer fremgang (synkroniseres senere)</li>
             <li>- Last ned videoer for frakoblet avspilling</li>

@@ -39,7 +39,11 @@ const getStatusConfig = (status) => {
     paid: { label: 'Betalt', color: 'bg-green-100 text-green-800', icon: CheckCircle },
     partial: { label: 'Delvis betalt', color: 'bg-orange-100 text-orange-800', icon: CreditCard },
     overdue: { label: 'Forfalt', color: 'bg-red-100 text-red-800', icon: AlertTriangle },
-    cancelled: { label: 'Kansellert', color: 'bg-gray-100 text-gray-500', icon: Ban },
+    cancelled: {
+      label: 'Kansellert',
+      color: 'bg-gray-100 text-gray-500 dark:text-gray-400',
+      icon: Ban,
+    },
     credited: { label: 'Kreditert', color: 'bg-purple-100 text-purple-800', icon: Ban },
   };
   return configs[status] || configs.pending;
@@ -212,7 +216,7 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
@@ -223,23 +227,27 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
             {/* From (Organization) */}
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
-                <Building className="w-4 h-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-500 uppercase">Fra</span>
+                <Building className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  Fra
+                </span>
               </div>
               <p className="font-semibold text-gray-900">{invoice.organization_name}</p>
               {invoice.organization_address && (
-                <p className="text-sm text-gray-600">{invoice.organization_address}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {invoice.organization_address}
+                </p>
               )}
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {invoice.organization_postal_code} {invoice.organization_city}
               </p>
               {invoice.organization_org_number && (
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
                   Org.nr: {invoice.organization_org_number}
                 </p>
               )}
               {invoice.organization_phone && (
-                <p className="text-sm text-gray-600 flex items-center gap-1 mt-1">
+                <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1 mt-1">
                   <Phone className="w-3 h-3" /> {invoice.organization_phone}
                 </p>
               )}
@@ -248,25 +256,29 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
             {/* To (Patient) */}
             <div className="bg-gray-50 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-3">
-                <User className="w-4 h-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-500 uppercase">Til</span>
+                <User className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+                <span className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  Til
+                </span>
               </div>
               <p className="font-semibold text-gray-900">
                 {invoice.patient_first_name} {invoice.patient_last_name}
               </p>
               {invoice.patient_address && (
-                <p className="text-sm text-gray-600">{invoice.patient_address}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {invoice.patient_address}
+                </p>
               )}
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {invoice.patient_postal_code} {invoice.patient_city}
               </p>
               {invoice.patient_phone && (
-                <p className="text-sm text-gray-600 flex items-center gap-1 mt-2">
+                <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1 mt-2">
                   <Phone className="w-3 h-3" /> {invoice.patient_phone}
                 </p>
               )}
               {invoice.patient_email && (
-                <p className="text-sm text-gray-600 flex items-center gap-1">
+                <p className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-1">
                   <Mail className="w-3 h-3" /> {invoice.patient_email}
                 </p>
               )}
@@ -276,45 +288,47 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
           {/* Invoice Details */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
-              <p className="text-sm text-gray-500">Fakturadato</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Fakturadato</p>
               <p className="font-medium">{formatDate(invoice.invoice_date)}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Forfallsdato</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Forfallsdato</p>
               <p className={`font-medium ${isOverdue ? 'text-red-600' : ''}`}>
                 {formatDate(invoice.due_date)}
               </p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Behandler</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Behandler</p>
               <p className="font-medium">{invoice.practitioner_name || '-'}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">HPR-nummer</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">HPR-nummer</p>
               <p className="font-medium">{invoice.practitioner_hpr || '-'}</p>
             </div>
           </div>
 
           {/* Line Items */}
           <div>
-            <h3 className="text-sm font-medium text-gray-500 uppercase mb-3">Takstkoder</h3>
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">
+              Takstkoder
+            </h3>
             <div className="border border-gray-200 rounded-lg overflow-hidden">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Takst
                     </th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Beskrivelse
                     </th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Antall
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Pris
                     </th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Belop
                     </th>
                   </tr>
@@ -340,7 +354,7 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
           <div className="flex justify-end">
             <div className="w-full max-w-xs space-y-2">
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">Brutto:</span>
+                <span className="text-gray-600 dark:text-gray-300">Brutto:</span>
                 <span>{formatCurrency(invoice.gross_amount)}</span>
               </div>
               <div className="flex justify-between text-sm text-green-600">
@@ -348,7 +362,7 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
                 <span>- {formatCurrency(invoice.helfo_refund)}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-600">A betale:</span>
+                <span className="text-gray-600 dark:text-gray-300">A betale:</span>
                 <span className="font-medium">{formatCurrency(invoice.patient_amount)}</span>
               </div>
               {invoice.amount_paid > 0 && (
@@ -387,7 +401,7 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
           {/* Payment History */}
           {payments && payments.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-gray-500 uppercase mb-3">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase mb-3">
                 Betalingshistorikk
               </h3>
               <div className="border border-gray-200 rounded-lg divide-y">
@@ -395,7 +409,7 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
                   <div key={index} className="p-3 flex items-center justify-between">
                     <div>
                       <p className="font-medium text-gray-900">{formatCurrency(payment.amount)}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {payment.payment_method === 'card' && 'Kort'}
                         {payment.payment_method === 'cash' && 'Kontant'}
                         {payment.payment_method === 'vipps' && 'Vipps'}
@@ -403,7 +417,9 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
                         {payment.payment_reference && ` - ${payment.payment_reference}`}
                       </p>
                     </div>
-                    <p className="text-sm text-gray-500">{formatDate(payment.payment_date)}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {formatDate(payment.payment_date)}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -413,7 +429,9 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
           {/* Notes */}
           {invoice.notes && (
             <div>
-              <h3 className="text-sm font-medium text-gray-500 uppercase mb-2">Merknad</h3>
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase mb-2">
+                Merknad
+              </h3>
               <p className="text-gray-700 bg-gray-50 p-3 rounded-lg">{invoice.notes}</p>
             </div>
           )}

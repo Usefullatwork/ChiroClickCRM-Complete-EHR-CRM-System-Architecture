@@ -103,7 +103,9 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
               )}
             </div>
             {item.interpretation && value && value !== 'Negativ' && (
-              <p className="text-xs text-gray-500 ml-[188px] italic">→ {item.interpretation}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 ml-[188px] italic">
+                → {item.interpretation}
+              </p>
             )}
           </div>
         );
@@ -126,7 +128,9 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
                         }`}
               placeholder="°"
             />
-            <span className="text-xs text-gray-400">/ {item.normal}° normal</span>
+            <span className="text-xs text-gray-400 dark:text-gray-300">
+              / {item.normal}° normal
+            </span>
             {value && item.normal && parseInt(value) < item.normal * 0.7 && (
               <span className="text-xs text-amber-600">Redusert</span>
             )}
@@ -146,8 +150,12 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
                         focus:ring-1 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder={item.unit}
             />
-            <span className="text-xs text-gray-400">{item.unit}</span>
-            {item.normal && <span className="text-xs text-gray-400">(normal: {item.normal})</span>}
+            <span className="text-xs text-gray-400 dark:text-gray-300">{item.unit}</span>
+            {item.normal && (
+              <span className="text-xs text-gray-400 dark:text-gray-300">
+                (normal: {item.normal})
+              </span>
+            )}
           </div>
         );
 
@@ -165,9 +173,11 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
               className="w-16 px-2 py-1 text-sm border border-gray-300 rounded-md text-center disabled:opacity-50 disabled:cursor-not-allowed
                         focus:ring-1 focus:ring-teal-500"
             />
-            <span className="text-xs text-gray-400">/ {item.max}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-300">/ {item.max}</span>
             {item.interpretation && (
-              <span className="text-xs text-gray-500">({item.interpretation})</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                ({item.interpretation})
+              </span>
             )}
           </div>
         );
@@ -371,7 +381,7 @@ export default function ExaminationProtocol({
     <div className="flex h-full">
       {/* Region selector sidebar */}
       <div className="w-48 border-r border-gray-200 bg-gray-50 p-2">
-        <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 px-2">
+        <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2 px-2">
           {lang === 'no' ? 'Kroppsregion' : 'Body Region'}
         </h3>
         <div className="space-y-1">
@@ -388,7 +398,7 @@ export default function ExaminationProtocol({
                           ${
                             activeRegion === key
                               ? 'bg-teal-100 text-teal-700 font-medium'
-                              : 'text-gray-600 hover:bg-gray-100'
+                              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                           }`}
               >
                 <span className="flex items-center gap-2">
@@ -414,7 +424,7 @@ export default function ExaminationProtocol({
                   {lang === 'no' ? currentRegion.name : currentRegion.nameEn}
                 </h2>
                 {findingsCount > 0 && (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     {findingsCount} {lang === 'no' ? 'funn registrert' : 'findings recorded'}
                   </p>
                 )}
@@ -495,7 +505,7 @@ export default function ExaminationProtocol({
             ))}
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-400">
+          <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-300">
             <div className="text-center">
               <Clipboard className="w-12 h-12 mx-auto mb-2 opacity-50" />
               <p>

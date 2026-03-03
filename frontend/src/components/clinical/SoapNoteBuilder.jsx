@@ -144,7 +144,7 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
         <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
           <div>
             <h2 className="text-xl font-bold text-slate-900">Clinical Encounter</h2>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               {patient.name} - {new Date().toLocaleDateString('no-NO')}
             </p>
           </div>
@@ -168,7 +168,7 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
         <div className="flex-1 flex overflow-hidden">
           {/* Quick Tools Sidebar */}
           <div className="w-64 border-r border-slate-200 bg-slate-50 p-4 overflow-y-auto hidden md:block">
-            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">
+            <h3 className="text-xs font-bold text-slate-400 dark:text-slate-300 uppercase tracking-wider mb-3">
               Quick Phrases
             </h3>
 
@@ -236,7 +236,7 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                   className={`flex-1 py-3 text-sm font-bold border-b-2 transition-colors ${
                     activeTab === tab.key
                       ? 'border-teal-600 text-teal-700 bg-teal-50'
-                      : 'border-transparent text-slate-500 hover:bg-slate-50'
+                      : 'border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-50'
                   }`}
                 >
                   {tab.label}
@@ -270,7 +270,7 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                       onChange={(e) => setPainScore(parseInt(e.target.value))}
                       className="w-full accent-teal-600"
                     />
-                    <div className="flex justify-between text-xs text-slate-500 mt-1">
+                    <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mt-1">
                       <span>0 - No pain</span>
                       <span className="font-bold text-lg">{painScore}/10</span>
                       <span>10 - Worst pain</span>
@@ -360,9 +360,13 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                         >
                           <div className="flex justify-between items-center">
                             <span className="font-bold text-slate-900">{t.code}</span>
-                            <span className="text-sm font-medium text-slate-600">{t.price} kr</span>
+                            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                              {t.price} kr
+                            </span>
                           </div>
-                          <div className="text-xs text-slate-500">{t.label}</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">
+                            {t.label}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -385,7 +389,7 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
 
             {/* Footer Actions */}
             <div className="p-4 bg-slate-50 border-t border-slate-200 flex justify-between items-center">
-              <div className="text-sm text-slate-600">
+              <div className="text-sm text-slate-600 dark:text-slate-300">
                 {totalPrice > 0 && (
                   <span>
                     Total: <strong>{totalPrice.toLocaleString('no-NO')} kr</strong>

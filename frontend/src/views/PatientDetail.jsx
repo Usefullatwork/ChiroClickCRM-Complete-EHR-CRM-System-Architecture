@@ -227,7 +227,9 @@ export const PatientDetail = () => {
                 <h1 className="text-2xl font-bold text-slate-900">
                   {patient.firstName} {patient.lastName}
                 </h1>
-                <p className="text-sm text-slate-600 mt-1">Pasient-ID: {patient.id}</p>
+                <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">
+                  Pasient-ID: {patient.id}
+                </p>
               </div>
 
               <Badge
@@ -286,7 +288,9 @@ export const PatientDetail = () => {
                   <div className="pt-4 border-t border-slate-200 space-y-3">
                     {patient.fodselsnummer && (
                       <div>
-                        <label className="text-xs text-slate-500 uppercase">Fødselsnummer</label>
+                        <label className="text-xs text-slate-500 dark:text-slate-400 uppercase">
+                          Fødselsnummer
+                        </label>
                         <p className="font-mono text-sm text-slate-900 mt-1">
                           {maskFodselsnummer(patient.fodselsnummer, 6, 0)}
                         </p>
@@ -295,17 +299,25 @@ export const PatientDetail = () => {
 
                     {birthDate && (
                       <div>
-                        <label className="text-xs text-slate-500 uppercase">Fodselsdato</label>
+                        <label className="text-xs text-slate-500 dark:text-slate-400 uppercase">
+                          Fodselsdato
+                        </label>
                         <p className="text-sm text-slate-900 mt-1">
                           {birthDate.toLocaleDateString('nb-NO')}
-                          {age !== null && <span className="text-slate-500 ml-2">({age} ar)</span>}
+                          {age !== null && (
+                            <span className="text-slate-500 dark:text-slate-400 ml-2">
+                              ({age} ar)
+                            </span>
+                          )}
                         </p>
                       </div>
                     )}
 
                     {gender && (
                       <div>
-                        <label className="text-xs text-slate-500 uppercase">Kjonn</label>
+                        <label className="text-xs text-slate-500 dark:text-slate-400 uppercase">
+                          Kjonn
+                        </label>
                         <p className="text-sm text-slate-900 mt-1 capitalize">{gender}</p>
                       </div>
                     )}
@@ -323,9 +335,11 @@ export const PatientDetail = () => {
                 <div className="space-y-3">
                   {patient.phone && (
                     <div className="flex items-center gap-3">
-                      <Phone size={18} className="text-slate-400" />
+                      <Phone size={18} className="text-slate-400 dark:text-slate-300" />
                       <div>
-                        <label className="text-xs text-slate-500">Telefon</label>
+                        <label className="text-xs text-slate-500 dark:text-slate-400">
+                          Telefon
+                        </label>
                         <p className="text-sm text-slate-900">{patient.phone}</p>
                       </div>
                     </div>
@@ -333,9 +347,9 @@ export const PatientDetail = () => {
 
                   {patient.email && (
                     <div className="flex items-center gap-3">
-                      <Mail size={18} className="text-slate-400" />
+                      <Mail size={18} className="text-slate-400 dark:text-slate-300" />
                       <div>
-                        <label className="text-xs text-slate-500">E-post</label>
+                        <label className="text-xs text-slate-500 dark:text-slate-400">E-post</label>
                         <p className="text-sm text-slate-900">{patient.email}</p>
                       </div>
                     </div>
@@ -343,9 +357,11 @@ export const PatientDetail = () => {
 
                   {patient.address && (
                     <div className="flex items-start gap-3">
-                      <MapPin size={18} className="text-slate-400 mt-1" />
+                      <MapPin size={18} className="text-slate-400 dark:text-slate-300 mt-1" />
                       <div>
-                        <label className="text-xs text-slate-500">Adresse</label>
+                        <label className="text-xs text-slate-500 dark:text-slate-400">
+                          Adresse
+                        </label>
                         <p className="text-sm text-slate-900">
                           {patient.address.street}
                           <br />
@@ -368,13 +384,15 @@ export const PatientDetail = () => {
               <Card.Body>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Totale besok</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">Totale besok</span>
                     <span className="font-semibold text-slate-900">{patient.totalVisits || 0}</span>
                   </div>
 
                   {patient.lastVisit && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">Siste besok</span>
+                      <span className="text-sm text-slate-600 dark:text-slate-300">
+                        Siste besok
+                      </span>
                       <span className="font-semibold text-slate-900">
                         {new Date(patient.lastVisit).toLocaleDateString('nb-NO')}
                       </span>
@@ -383,7 +401,7 @@ export const PatientDetail = () => {
 
                   {patient.nextAppointment && (
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">Neste time</span>
+                      <span className="text-sm text-slate-600 dark:text-slate-300">Neste time</span>
                       <span className="font-semibold text-teal-600">
                         {new Date(patient.nextAppointment).toLocaleDateString('nb-NO')}
                       </span>
@@ -491,7 +509,7 @@ export const PatientDetail = () => {
                     ))}
                   </div>
                 ) : encounterList.length === 0 ? (
-                  <div className="text-center py-12 text-slate-500">
+                  <div className="text-center py-12 text-slate-500 dark:text-slate-400">
                     <FileText size={48} className="mx-auto mb-3 text-slate-300" />
                     <p className="font-medium">Ingen kliniske notater enna</p>
                     <p className="text-sm mt-1">Begynn a dokumentere denne pasientens behandling</p>
@@ -518,7 +536,7 @@ export const PatientDetail = () => {
                             <h4 className="font-semibold text-slate-900">
                               {encounter.type || 'Kiropraktisk konsultasjon'}
                             </h4>
-                            <div className="flex items-center gap-3 mt-1 text-sm text-slate-600">
+                            <div className="flex items-center gap-3 mt-1 text-sm text-slate-600 dark:text-slate-300">
                               <span className="flex items-center gap-1">
                                 <Calendar size={14} />
                                 {new Date(encounter.date).toLocaleDateString('nb-NO')}
@@ -536,25 +554,25 @@ export const PatientDetail = () => {
                         <div className="grid grid-cols-4 gap-3 text-xs">
                           <div>
                             <label className="font-semibold text-slate-700">S</label>
-                            <p className="text-slate-600 mt-1 line-clamp-2">
+                            <p className="text-slate-600 dark:text-slate-300 mt-1 line-clamp-2">
                               {encounter.subjective || '-'}
                             </p>
                           </div>
                           <div>
                             <label className="font-semibold text-slate-700">O</label>
-                            <p className="text-slate-600 mt-1 line-clamp-2">
+                            <p className="text-slate-600 dark:text-slate-300 mt-1 line-clamp-2">
                               {encounter.objective || '-'}
                             </p>
                           </div>
                           <div>
                             <label className="font-semibold text-slate-700">A</label>
-                            <p className="text-slate-600 mt-1 line-clamp-2">
+                            <p className="text-slate-600 dark:text-slate-300 mt-1 line-clamp-2">
                               {encounter.assessment || '-'}
                             </p>
                           </div>
                           <div>
                             <label className="font-semibold text-slate-700">P</label>
-                            <p className="text-slate-600 mt-1 line-clamp-2">
+                            <p className="text-slate-600 dark:text-slate-300 mt-1 line-clamp-2">
                               {encounter.plan || '-'}
                             </p>
                           </div>

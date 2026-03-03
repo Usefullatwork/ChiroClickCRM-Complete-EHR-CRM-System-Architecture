@@ -168,11 +168,13 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
             </div>
             <div>
               <h2 className="text-xl font-semibold text-gray-900">Registrer betaling</h2>
-              <p className="text-sm text-gray-500">Faktura {invoice.invoice_number}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Faktura {invoice.invoice_number}
+              </p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
@@ -180,11 +182,11 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
         <div className="px-6 py-4 bg-gray-50 border-b">
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-sm text-gray-600">Pasient</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Pasient</p>
               <p className="font-medium">{invoice.patient_name}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-600">Utstaende</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Utstaende</p>
               <p className="text-2xl font-bold text-blue-600">
                 {formatCurrency(invoice.amount_due)}
               </p>
@@ -216,7 +218,7 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
                     errors.amount ? 'border-red-300' : 'border-gray-300'
                   }`}
                 />
-                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">
+                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400">
                   kr
                 </span>
               </div>
@@ -263,7 +265,7 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
                       }`}
                     >
                       <Icon
-                        className={`w-5 h-5 ${isSelected ? 'text-green-600' : 'text-gray-600'}`}
+                        className={`w-5 h-5 ${isSelected ? 'text-green-600' : 'text-gray-600 dark:text-gray-300'}`}
                       />
                     </div>
                     <div className="text-left">
@@ -272,7 +274,9 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
                       >
                         {method.name}
                       </p>
-                      <p className="text-xs text-gray-500">{method.description}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {method.description}
+                      </p>
                     </div>
                     {isSelected && <Check className="w-5 h-5 text-green-600 ml-auto" />}
                   </button>
@@ -291,7 +295,7 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Betalingsdato *</label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
               <input
                 type="date"
                 value={paymentDate}
@@ -316,7 +320,7 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
               Referanse (valgfri)
             </label>
             <div className="relative">
-              <Receipt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Receipt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
               <input
                 type="text"
                 value={paymentReference}

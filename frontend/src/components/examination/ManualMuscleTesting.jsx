@@ -283,7 +283,7 @@ function GradeSelector({ value, onChange, disabled = false }) {
 
   const getGradeColor = (grade) => {
     if (!grade || grade === 'NT') {
-      return 'bg-gray-100 text-gray-600';
+      return 'bg-gray-100 text-gray-600 dark:text-gray-300';
     }
     const numericValue = parseFloat(grade.replace('+', '.5').replace('-', '.25'));
     if (numericValue >= 4) {
@@ -338,7 +338,9 @@ function GradeSelector({ value, onChange, disabled = false }) {
                 >
                   {grade.label}
                 </span>
-                <span className="text-gray-600 text-xs">{grade.description}</span>
+                <span className="text-gray-600 dark:text-gray-300 text-xs">
+                  {grade.description}
+                </span>
               </button>
             ))}
           </div>
@@ -388,7 +390,9 @@ function MuscleRow({ muscle, values, onChange, lang = 'no', showDetails = false 
           <span className="text-sm font-medium text-gray-700">
             {lang === 'no' ? muscle.nameNo : muscle.name}
           </span>
-          {showDetails && <span className="text-xs text-gray-500">{muscle.primaryMuscle}</span>}
+          {showDetails && (
+            <span className="text-xs text-gray-500 dark:text-gray-400">{muscle.primaryMuscle}</span>
+          )}
         </div>
       </td>
       <td className="px-2 py-2 text-center">
@@ -397,7 +401,7 @@ function MuscleRow({ muscle, values, onChange, lang = 'no', showDetails = false 
         </span>
       </td>
       {showDetails && (
-        <td className="px-2 py-2 text-center text-xs text-gray-500">
+        <td className="px-2 py-2 text-center text-xs text-gray-500 dark:text-gray-400">
           {lang === 'no' ? muscle.positionNo : muscle.position}
         </td>
       )}
@@ -466,14 +470,14 @@ function RegionSection({
       >
         <h4 className="font-medium text-gray-700">
           {lang === 'no' ? region.nameNo : region.name}
-          <span className="ml-2 text-xs text-gray-500">
+          <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
             ({region.muscles.length} {lang === 'no' ? 'muskler' : 'muscles'})
           </span>
         </h4>
         {expanded ? (
-          <ChevronUp className="w-5 h-5 text-gray-400" />
+          <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-400" />
+          <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
         )}
       </button>
 
@@ -481,27 +485,27 @@ function RegionSection({
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 border-t border-gray-200">
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
                 {lang === 'no' ? 'Muskel' : 'Muscle'}
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500">
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
                 {lang === 'no' ? 'Nerverot' : 'Nerve'}
               </th>
               {showDetails && (
-                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500">
+                <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
                   {lang === 'no' ? 'Posisjon' : 'Position'}
                 </th>
               )}
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500">
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
                 {lang === 'no' ? 'Venstre' : 'Left'}
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 w-12">
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 w-12">
                 <span className="text-red-500">{lang === 'no' ? 'Sm.' : 'Pain'}</span>
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500">
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
                 {lang === 'no' ? 'Høyre' : 'Right'}
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 w-12">
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400 w-12">
                 <span className="text-red-500">{lang === 'no' ? 'Sm.' : 'Pain'}</span>
               </th>
             </tr>
@@ -562,7 +566,7 @@ function QuickTestPanel({ onSelectPattern, lang }) {
 
   return (
     <div className="flex flex-wrap gap-2">
-      <span className="text-xs text-gray-500 self-center mr-2">
+      <span className="text-xs text-gray-500 dark:text-gray-400 self-center mr-2">
         {lang === 'no' ? 'Hurtigtest myotomer:' : 'Quick myotome tests:'}
       </span>
       {patterns.map((pattern) => (
@@ -591,7 +595,7 @@ function GradingLegend({ lang }) {
       <button
         type="button"
         onClick={() => setShowFull(!showFull)}
-        className="flex items-center gap-2 text-gray-600 hover:text-gray-800"
+        className="flex items-center gap-2 text-gray-600 dark:text-gray-300 hover:text-gray-800"
       >
         <Info className="w-4 h-4" />
         <span className="font-medium">{lang === 'no' ? 'Graderingsskala' : 'Grading Scale'}</span>
@@ -608,12 +612,14 @@ function GradingLegend({ lang }) {
               >
                 {grade.label}
               </span>
-              <span className="text-gray-600 truncate">{grade.description.split(' - ')[0]}</span>
+              <span className="text-gray-600 dark:text-gray-300 truncate">
+                {grade.description.split(' - ')[0]}
+              </span>
             </div>
           ))}
         </div>
       ) : (
-        <div className="mt-1 flex flex-wrap gap-3 text-gray-500">
+        <div className="mt-1 flex flex-wrap gap-3 text-gray-500 dark:text-gray-400">
           <span>
             <strong>5</strong>=Normal
           </span>
@@ -788,7 +794,7 @@ export default function ManualMuscleTesting({
             {lang === 'no' ? 'Manuell Muskeltesting (MMT)' : 'Manual Muscle Testing (MMT)'}
           </h3>
           {summary.total > 0 && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {summary.total} {lang === 'no' ? 'tester' : 'tests'}
               {summary.weakness > 0 && (
                 <span className="text-amber-600 ml-2">
@@ -844,7 +850,7 @@ export default function ManualMuscleTesting({
       </div>
 
       {/* Summary indicators */}
-      <div className="flex items-center gap-4 text-xs text-gray-500 pt-2 border-t border-gray-200">
+      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-200">
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 bg-green-100 border border-green-300 rounded" />
           <span>{lang === 'no' ? 'Normal (≥4)' : 'Normal (≥4)'}</span>

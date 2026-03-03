@@ -108,7 +108,7 @@ jest.mock('../hooks/useAuth', () => ({
   useAuth: () => ({
     user: {
       id: 'test-user-id',
-      email: 'admin@chiroclickcrm.no',
+      email: 'admin@chiroclickehr.no',
       first_name: 'Test',
       last_name: 'Admin',
       role: 'ADMIN',

@@ -380,11 +380,13 @@ export default function ImportWizard({
           onDrop={handleDrop}
           onClick={() => document.getElementById('excel-file-input')?.click()}
         >
-          <Upload className="w-12 h-12 text-slate-400 mx-auto mb-4" />
+          <Upload className="w-12 h-12 text-slate-400 dark:text-slate-300 mx-auto mb-4" />
           <p className="text-lg font-medium text-slate-700 mb-2">
             {file ? file.name : t.excelTab.dropzone}
           </p>
-          <p className="text-sm text-slate-500">{t.excelTab.supportedFormats}</p>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {t.excelTab.supportedFormats}
+          </p>
           <input
             id="excel-file-input"
             type="file"
@@ -403,7 +405,9 @@ export default function ImportWizard({
                   <FileSpreadsheet className="w-8 h-8 text-teal-600" />
                   <div>
                     <p className="font-medium text-slate-900">{file.name}</p>
-                    <p className="text-sm text-slate-500">{(file.size / 1024).toFixed(2)} KB</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      {(file.size / 1024).toFixed(2)} KB
+                    </p>
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -437,7 +441,7 @@ export default function ImportWizard({
       <div className="text-center py-12">
         <Users className="w-16 h-16 text-blue-400 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-slate-900 mb-2">{t.googleTab.title}</h3>
-        <p className="text-slate-500 mb-6">{t.googleTab.description}</p>
+        <p className="text-slate-500 dark:text-slate-400 mb-6">{t.googleTab.description}</p>
         <Button
           variant="primary"
           icon={Users}
@@ -528,12 +532,16 @@ export default function ImportWizard({
                 <tbody className="divide-y divide-slate-100">
                   {data.slice(0, 10).map((patient, idx) => (
                     <tr key={idx} className="hover:bg-slate-50">
-                      <td className="px-4 py-2 text-slate-500">{idx + 1}</td>
+                      <td className="px-4 py-2 text-slate-500 dark:text-slate-400">{idx + 1}</td>
                       <td className="px-4 py-2">
                         {patient.first_name} {patient.last_name}
                       </td>
-                      <td className="px-4 py-2 text-slate-600">{patient.email || '-'}</td>
-                      <td className="px-4 py-2 text-slate-600">{patient.phone || '-'}</td>
+                      <td className="px-4 py-2 text-slate-600 dark:text-slate-300">
+                        {patient.email || '-'}
+                      </td>
+                      <td className="px-4 py-2 text-slate-600 dark:text-slate-300">
+                        {patient.phone || '-'}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -633,7 +641,7 @@ export default function ImportWizard({
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-slate-900">{t.title}</h1>
-            <p className="text-slate-500">{t.subtitle}</p>
+            <p className="text-slate-500 dark:text-slate-400">{t.subtitle}</p>
           </div>
           {onClose && <Button variant="ghost" icon={X} onClick={onClose} />}
         </div>
@@ -652,7 +660,7 @@ export default function ImportWizard({
                   ${
                     activeTab === tab.id
                       ? `text-${tab.color}-600 border-b-2 border-${tab.color}-600`
-                      : 'text-slate-600 hover:text-slate-900'
+                      : 'text-slate-600 dark:text-slate-300 hover:text-slate-900'
                   }`}
               >
                 <tab.icon className="w-5 h-5" />

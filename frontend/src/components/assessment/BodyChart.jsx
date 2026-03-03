@@ -339,7 +339,7 @@ export default function BodyChart({
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold text-gray-900">Body Chart</h3>
           <div className="flex items-center space-x-2">
-            <label className="text-sm text-gray-600">Size:</label>
+            <label className="text-sm text-gray-600 dark:text-gray-300">Size:</label>
             <input
               type="range"
               min="50"
@@ -348,7 +348,7 @@ export default function BodyChart({
               onChange={(e) => setImageSize(Number(e.target.value))}
               className="w-20"
             />
-            <span className="text-sm text-gray-500">{imageSize}%</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">{imageSize}%</span>
           </div>
         </div>
 
@@ -373,7 +373,7 @@ export default function BodyChart({
         <div className="p-2 border-b bg-gray-50 space-y-2">
           {/* Tools */}
           <div className="flex items-center space-x-1">
-            <span className="text-xs text-gray-500 mr-2">Tools:</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 mr-2">Tools:</span>
             {Object.entries(TOOLS).map(([key, tool]) => (
               <button
                 key={key}
@@ -392,7 +392,7 @@ export default function BodyChart({
             <div className="border-l mx-2 h-6" />
 
             {/* Brush size */}
-            <span className="text-xs text-gray-500 mr-1">Size:</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">Size:</span>
             {BRUSH_SIZES.map((bs) => (
               <button
                 key={bs.size}
@@ -416,7 +416,7 @@ export default function BodyChart({
 
           {/* Colors */}
           <div className="flex items-center space-x-1">
-            <span className="text-xs text-gray-500 mr-2">Color:</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 mr-2">Color:</span>
             {COLORS.map((color) => (
               <button
                 key={color}
@@ -576,7 +576,7 @@ export default function BodyChart({
             <div className="flex justify-end mt-2 space-x-2">
               <button
                 onClick={() => setTextInput({ show: false, x: 0, y: 0, value: '' })}
-                className="px-2 py-1 text-xs text-gray-600 hover:bg-gray-100 rounded"
+                className="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded"
               >
                 Cancel
               </button>
@@ -594,7 +594,9 @@ export default function BodyChart({
       {/* Marker legend */}
       {markers.length > 0 && (
         <div className="p-3 border-t bg-gray-50">
-          <h4 className="text-xs font-semibold text-gray-600 mb-2">Marker Legend</h4>
+          <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-2">
+            Marker Legend
+          </h4>
           <div className="space-y-1">
             {markers.map((marker) => (
               <div key={marker.id} className="flex items-center text-sm">
@@ -663,7 +665,9 @@ export function BodyChartCompact({ markers = [], view = 'front', onClick }) {
           </g>
         ))}
       </svg>
-      <p className="text-xs text-center text-gray-500 mt-1">{viewData.name} View</p>
+      <p className="text-xs text-center text-gray-500 dark:text-gray-400 mt-1">
+        {viewData.name} View
+      </p>
     </div>
   );
 }

@@ -45,7 +45,7 @@ import { useTranslation } from '../i18n';
 const AcceptanceLineChart = ({ data = [], color = '#14b8a6', t }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-slate-400">
+      <div className="flex items-center justify-center h-64 text-slate-400 dark:text-slate-300">
         <p>{t('noData')}</p>
       </div>
     );
@@ -124,7 +124,7 @@ const AcceptanceLineChart = ({ data = [], color = '#14b8a6', t }) => {
         </svg>
 
         {/* Y-axis labels */}
-        <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-slate-500 -ml-8">
+        <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-xs text-slate-500 dark:text-slate-400 -ml-8">
           <span>100%</span>
           <span>75%</span>
           <span>50%</span>
@@ -137,7 +137,7 @@ const AcceptanceLineChart = ({ data = [], color = '#14b8a6', t }) => {
           {chartData.slice(0, 7).map((item, index) => (
             <span
               key={index}
-              className="text-xs text-slate-600 font-medium truncate"
+              className="text-xs text-slate-600 dark:text-slate-300 font-medium truncate"
               style={{ maxWidth: `${100 / Math.min(chartData.length, 7)}%` }}
             >
               {item.period}
@@ -155,7 +155,7 @@ const AcceptanceLineChart = ({ data = [], color = '#14b8a6', t }) => {
 const TypeBarChart = ({ data = [], t }) => {
   if (!data || data.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-slate-400">
+      <div className="flex items-center justify-center h-64 text-slate-400 dark:text-slate-300">
         <p>{t('noData')}</p>
       </div>
     );
@@ -187,7 +187,7 @@ const TypeBarChart = ({ data = [], t }) => {
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-slate-700">{typeLabel}</span>
               <div className="flex items-center gap-3">
-                <span className="text-slate-500">
+                <span className="text-slate-500 dark:text-slate-400">
                   {item.total} {t('total')}
                 </span>
                 <span className="text-green-600 font-medium">
@@ -232,15 +232,15 @@ const TypeBarChart = ({ data = [], t }) => {
       <div className="flex items-center gap-4 pt-4 border-t border-slate-200">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-teal-500" />
-          <span className="text-xs text-slate-600">{t('actionAccepted')}</span>
+          <span className="text-xs text-slate-600 dark:text-slate-300">{t('actionAccepted')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-teal-500 opacity-60" />
-          <span className="text-xs text-slate-600">{t('actionModified')}</span>
+          <span className="text-xs text-slate-600 dark:text-slate-300">{t('actionModified')}</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-red-400" />
-          <span className="text-xs text-slate-600">{t('actionRejected')}</span>
+          <span className="text-xs text-slate-600 dark:text-slate-300">{t('actionRejected')}</span>
         </div>
       </div>
     </div>
@@ -313,18 +313,24 @@ const RetrainingStatusCard = ({ status, t }) => {
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-200">
             <div>
-              <p className="text-xs text-slate-500">{t('retrainingPendingFeedback')}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {t('retrainingPendingFeedback')}
+              </p>
               <p className="text-lg font-bold text-slate-900">
                 {status?.pendingFeedbackCount || 0}
               </p>
             </div>
             <div>
-              <p className="text-xs text-slate-500">{t('retrainingThreshold')}</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {t('retrainingThreshold')}
+              </p>
               <p className="text-lg font-bold text-slate-900">{status?.threshold || 50}</p>
             </div>
             {status?.lastTrainedAt && (
               <div className="col-span-2">
-                <p className="text-xs text-slate-500">{t('retrainingLastTrained')}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  {t('retrainingLastTrained')}
+                </p>
                 <p className="text-sm font-medium text-slate-700">
                   {new Date(status.lastTrainedAt).toLocaleString('nb-NO')}
                 </p>
@@ -335,7 +341,7 @@ const RetrainingStatusCard = ({ status, t }) => {
           {/* Progress to threshold */}
           {status?.threshold && (
             <div className="pt-2">
-              <div className="flex justify-between text-xs text-slate-500 mb-1">
+              <div className="flex justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
                 <span>{t('retrainingProgress')}</span>
                 <span>
                   {Math.min(
@@ -389,7 +395,7 @@ const RecentCorrectionsTable = ({ corrections = [], t }) => {
 
   if (corrections.length === 0) {
     return (
-      <div className="text-center py-8 text-slate-400">
+      <div className="text-center py-8 text-slate-400 dark:text-slate-300">
         <p>{t('noData')}</p>
       </div>
     );
@@ -400,11 +406,21 @@ const RecentCorrectionsTable = ({ corrections = [], t }) => {
       <table className="w-full">
         <thead className="bg-slate-50">
           <tr>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Type</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Action</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Rating</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Time</th>
-            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Date</th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300">
+              Type
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300">
+              Action
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300">
+              Rating
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300">
+              Time
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300">
+              Date
+            </th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-200">
@@ -440,12 +456,12 @@ const RecentCorrectionsTable = ({ corrections = [], t }) => {
                   </span>
                 </div>
               </td>
-              <td className="px-4 py-3 text-sm text-slate-600">
+              <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-300">
                 {correction.timeToDecision
                   ? `${Math.round(correction.timeToDecision / 1000)}s`
                   : '-'}
               </td>
-              <td className="px-4 py-3 text-sm text-slate-500">
+              <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
                 {formatDate(correction.createdAt)}
               </td>
             </tr>
@@ -567,7 +583,7 @@ export default function AIPerformance() {
             <Brain size={28} className="text-teal-600" />
             {t('title')}
           </h1>
-          <p className="text-sm text-slate-600 mt-1">{t('subtitle')}</p>
+          <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">{t('subtitle')}</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -599,13 +615,13 @@ export default function AIPerformance() {
         <CardBody>
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex items-center gap-2">
-              <Filter size={16} className="text-slate-400" />
+              <Filter size={16} className="text-slate-400 dark:text-slate-300" />
               <span className="text-sm font-medium text-slate-700">{t('filters')}:</span>
             </div>
 
             {/* Date Range */}
             <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-slate-400" />
+              <Calendar size={16} className="text-slate-400 dark:text-slate-300" />
               <select
                 value={dateRange}
                 onChange={(e) => setDateRange(e.target.value)}
@@ -620,7 +636,7 @@ export default function AIPerformance() {
 
             {/* Group By */}
             <div className="flex items-center gap-2">
-              <BarChart3 size={16} className="text-slate-400" />
+              <BarChart3 size={16} className="text-slate-400 dark:text-slate-300" />
               <select
                 value={groupBy}
                 onChange={(e) => setGroupBy(e.target.value)}
@@ -642,7 +658,9 @@ export default function AIPerformance() {
           <CardBody>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">{t('acceptanceRate')}</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  {t('acceptanceRate')}
+                </p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">
                   {overallStats.acceptanceRate?.toFixed(1) || 0}%
                 </p>
@@ -671,10 +689,12 @@ export default function AIPerformance() {
           <CardBody>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">{t('avgRating')}</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  {t('avgRating')}
+                </p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">
                   {overallStats.avgRating?.toFixed(1) || 0}
-                  <span className="text-lg font-normal text-slate-500">/5</span>
+                  <span className="text-lg font-normal text-slate-500 dark:text-slate-400">/5</span>
                 </p>
                 <div className="flex items-center gap-1 mt-1">
                   {[1, 2, 3, 4, 5].map((star) => (
@@ -702,11 +722,15 @@ export default function AIPerformance() {
           <CardBody>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">{t('totalSuggestions')}</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  {t('totalSuggestions')}
+                </p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">
                   {overallStats.totalFeedback || 0}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">{t('inSelectedPeriod')}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  {t('inSelectedPeriod')}
+                </p>
               </div>
               <div className="p-3 bg-blue-100 rounded-lg">
                 <Brain size={24} className="text-blue-600" />
@@ -720,13 +744,17 @@ export default function AIPerformance() {
           <CardBody>
             <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm font-medium text-slate-600">{t('avgDecisionTime')}</p>
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                  {t('avgDecisionTime')}
+                </p>
                 <p className="text-3xl font-bold text-slate-900 mt-2">
                   {overallStats.avgDecisionTime
                     ? `${Math.round(overallStats.avgDecisionTime / 1000)}s`
                     : '0s'}
                 </p>
-                <p className="text-xs text-slate-500 mt-1">{t('perSuggestion')}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                  {t('perSuggestion')}
+                </p>
               </div>
               <div className="p-3 bg-purple-100 rounded-lg">
                 <Clock size={24} className="text-purple-600" />

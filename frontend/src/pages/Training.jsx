@@ -100,7 +100,7 @@ export default function Training() {
           <Brain className="w-8 h-8 text-blue-600" />
           <h1 className="text-3xl font-bold">{t('aiModelManagement')}</h1>
         </div>
-        <p className="text-gray-600">{t('aiModelManagementDesc')}</p>
+        <p className="text-gray-600 dark:text-gray-300">{t('aiModelManagementDesc')}</p>
       </div>
 
       {/* Tabs */}
@@ -114,7 +114,7 @@ export default function Training() {
               className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 activeTab === tab.id
                   ? 'bg-white text-blue-700 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
               }`}
             >
               {Icon && <Icon className="w-4 h-4" />}
@@ -145,7 +145,11 @@ export default function Training() {
             testResult={testResult}
           />
           <div className="mt-8">
-            <Suspense fallback={<div className="text-gray-500 p-4">{t('loadingAnalytics')}</div>}>
+            <Suspense
+              fallback={
+                <div className="text-gray-500 dark:text-gray-400 p-4">{t('loadingAnalytics')}</div>
+              }
+            >
               <AnalyticsTab />
             </Suspense>
           </div>
@@ -153,21 +157,33 @@ export default function Training() {
       )}
 
       {activeTab === 'curation' && (
-        <Suspense fallback={<div className="text-gray-500 p-4">{t('loadingDataCuration')}</div>}>
+        <Suspense
+          fallback={
+            <div className="text-gray-500 dark:text-gray-400 p-4">{t('loadingDataCuration')}</div>
+          }
+        >
           <DataCurationTab />
         </Suspense>
       )}
 
       {activeTab === 'pipeline' && (
         <Suspense
-          fallback={<div className="text-gray-500 p-4">{t('loadingTrainingPipeline')}</div>}
+          fallback={
+            <div className="text-gray-500 dark:text-gray-400 p-4">
+              {t('loadingTrainingPipeline')}
+            </div>
+          }
         >
           <PipelineTab />
         </Suspense>
       )}
 
       {activeTab === 'playground' && (
-        <Suspense fallback={<div className="text-gray-500 p-4">{t('loadingPlayground')}</div>}>
+        <Suspense
+          fallback={
+            <div className="text-gray-500 dark:text-gray-400 p-4">{t('loadingPlayground')}</div>
+          }
+        >
           <PlaygroundTab />
         </Suspense>
       )}

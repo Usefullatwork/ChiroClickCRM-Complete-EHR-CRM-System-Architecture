@@ -112,7 +112,7 @@ const PrescriptionBuilder = ({ exercises = [], onRemove, onUpdate, onReorder, on
       case 'advanced':
         return 'text-red-600 bg-red-50 border-red-200';
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200';
+        return 'text-gray-600 dark:text-gray-300 bg-gray-50 border-gray-200';
     }
   };
 
@@ -150,7 +150,7 @@ const PrescriptionBuilder = ({ exercises = [], onRemove, onUpdate, onReorder, on
           </button>
         </div>
         {exercises.length > 0 && (
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
             Dra for a endre rekkefolge, eller bruk pilene
           </p>
         )}
@@ -161,10 +161,12 @@ const PrescriptionBuilder = ({ exercises = [], onRemove, onUpdate, onReorder, on
         {exercises.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4">
             <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mb-4">
-              <Dumbbell className="w-8 h-8 text-gray-400" />
+              <Dumbbell className="w-8 h-8 text-gray-400 dark:text-gray-300" />
             </div>
-            <h3 className="text-gray-600 font-medium mb-1">Ingen ovelser valgt</h3>
-            <p className="text-sm text-gray-400 text-center mb-4">
+            <h3 className="text-gray-600 dark:text-gray-300 font-medium mb-1">
+              Ingen ovelser valgt
+            </h3>
+            <p className="text-sm text-gray-400 dark:text-gray-300 text-center mb-4">
               Velg ovelser fra biblioteket til hoyre for a bygge treningsprogrammet
             </p>
             <button

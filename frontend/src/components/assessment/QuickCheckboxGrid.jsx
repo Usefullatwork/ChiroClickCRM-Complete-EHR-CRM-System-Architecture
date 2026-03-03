@@ -86,7 +86,9 @@ export default function QuickCheckboxGrid({
       <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-200 rounded-t-lg">
         <h3 className="font-medium text-gray-900">{title}</h3>
         <div className="flex items-center gap-2">
-          <span className="text-sm text-gray-500">{selectedValues.length} selected</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {selectedValues.length} selected
+          </span>
           {selectedValues.length > 0 && (
             <button onClick={clearAll} className="text-sm text-red-600 hover:text-red-800">
               Clear
@@ -126,15 +128,15 @@ export default function QuickCheckboxGrid({
                     className={`text-xs px-2 py-1 rounded ${
                       allSelected
                         ? 'bg-blue-600 text-white'
-                        : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+                        : 'bg-gray-200 text-gray-600 dark:text-gray-300 hover:bg-gray-300'
                     }`}
                   >
                     {allSelected ? 'Deselect All' : 'Select All'}
                   </button>
                   {isExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-gray-400" />
+                    <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                    <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                   )}
                 </div>
               </button>

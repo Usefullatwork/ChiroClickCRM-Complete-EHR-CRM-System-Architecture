@@ -275,7 +275,7 @@ export default function PatientDetail() {
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="flex items-start gap-3">
-                      <Phone className="w-5 h-5 text-gray-400 mt-0.5" />
+                      <Phone className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
                       <div className="flex-1">
                         <p className="text-sm text-gray-600 dark:text-gray-400">{t('phone')}</p>
                         {isEditing ? (
@@ -294,7 +294,7 @@ export default function PatientDetail() {
                     </div>
 
                     <div className="flex items-start gap-3">
-                      <Mail className="w-5 h-5 text-gray-400 mt-0.5" />
+                      <Mail className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
                       <div className="flex-1">
                         <p className="text-sm text-gray-600 dark:text-gray-400">{t('email')}</p>
                         {isEditing ? (
@@ -313,7 +313,7 @@ export default function PatientDetail() {
                     </div>
 
                     <div className="flex items-start gap-3">
-                      <MessageSquare className="w-5 h-5 text-gray-400 mt-0.5" />
+                      <MessageSquare className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
                       <div className="flex-1">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {t('preferredContactMethod')}
@@ -343,7 +343,7 @@ export default function PatientDetail() {
                     </div>
 
                     <div className="flex items-start gap-3">
-                      <Globe className="w-5 h-5 text-gray-400 mt-0.5" />
+                      <Globe className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
                       <div className="flex-1">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
                           {lang === 'no' ? 'Språk' : 'Language'}
@@ -373,7 +373,7 @@ export default function PatientDetail() {
 
                   {patient.address && (
                     <div className="mt-4 flex items-start gap-3">
-                      <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
+                      <MapPin className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
                       <div>
                         <p className="text-sm text-gray-600 dark:text-gray-400">{t('address')}</p>
                         <p className="font-medium text-gray-900 dark:text-white">
@@ -492,7 +492,7 @@ export default function PatientDetail() {
                               }`}
                             >
                               <span
-                                className={`text-lg ${val === true ? 'text-green-600' : val === false ? 'text-red-600' : 'text-gray-400'}`}
+                                className={`text-lg ${val === true ? 'text-green-600' : val === false ? 'text-red-600' : 'text-gray-400 dark:text-gray-300'}`}
                               >
                                 {val === true ? '✓' : val === false ? '✗' : '?'}
                               </span>
@@ -546,7 +546,11 @@ export default function PatientDetail() {
                                 label: t('prefNotOk'),
                                 color: 'text-red-700 dark:text-red-400',
                               },
-                              { val: null, label: t('prefNotCleared'), color: 'text-gray-500' },
+                              {
+                                val: null,
+                                label: t('prefNotCleared'),
+                                color: 'text-gray-500 dark:text-gray-400',
+                              },
                             ].map(({ val, label, color }) => (
                               <label
                                 key={String(val)}
@@ -607,7 +611,11 @@ export default function PatientDetail() {
                         <span className="text-sm text-gray-600 dark:text-gray-400">
                           {label || t(key)}
                         </span>
-                        <span className={patient[field] ? 'text-green-600' : 'text-gray-400'}>
+                        <span
+                          className={
+                            patient[field] ? 'text-green-600' : 'text-gray-400 dark:text-gray-300'
+                          }
+                        >
                           {patient[field] ? '✓' : '✗'}
                         </span>
                       </div>
@@ -653,7 +661,7 @@ export default function PatientDetail() {
                                 {lang === 'no' ? 'Signert' : 'Signed'}
                               </span>
                             )}
-                            <FileText className="w-5 h-5 text-gray-400" />
+                            <FileText className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                           </div>
                         </div>
                       </div>

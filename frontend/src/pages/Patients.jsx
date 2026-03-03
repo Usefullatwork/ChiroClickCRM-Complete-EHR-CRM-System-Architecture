@@ -252,9 +252,9 @@ export default function Patients() {
           {/* Search Bar */}
           <div className="relative flex-1">
             {isSearching ? (
-              <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+              <Loader2 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300 animate-spin" />
             ) : (
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
             )}
             <input
               ref={searchInputRef}
@@ -268,7 +268,7 @@ export default function Patients() {
             {searchTerm && (
               <button
                 onClick={() => setSearchTerm('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded text-gray-400 dark:text-gray-300 hover:text-gray-600"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
@@ -303,7 +303,7 @@ export default function Patients() {
         {/* Active filter chips */}
         {activeFilters.length > 0 && (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-gray-500">{t('filters')}:</span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">{t('filters')}:</span>
             {activeFilters.map((f) => (
               <span
                 key={f.key}
@@ -323,7 +323,7 @@ export default function Patients() {
                 setFilters((prev) => ({ ...prev, status: '', category: '' }));
                 setPage(1);
               }}
-              className="text-xs text-gray-400 hover:text-gray-600 underline"
+              className="text-xs text-gray-400 dark:text-gray-300 hover:text-gray-600 underline"
             >
               {t('clearAll')}
             </button>
@@ -460,7 +460,9 @@ export default function Patients() {
                                   </span>
                                 )}
                               </div>
-                              <div className="text-xs text-gray-400">{patient.solvit_id}</div>
+                              <div className="text-xs text-gray-400 dark:text-gray-300">
+                                {patient.solvit_id}
+                              </div>
                             </div>
                           </div>
                         </td>
@@ -471,7 +473,9 @@ export default function Patients() {
                           <div className="text-sm text-gray-700 dark:text-gray-200 truncate max-w-[200px]">
                             {patient.email || '-'}
                           </div>
-                          <div className="text-xs text-gray-400">{formatPhone(patient.phone)}</div>
+                          <div className="text-xs text-gray-400 dark:text-gray-300">
+                            {formatPhone(patient.phone)}
+                          </div>
                         </td>
                         <td className="px-5 py-3.5 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
                           {formatDate(patient.last_visit_date)}
@@ -501,7 +505,7 @@ export default function Patients() {
                                 e.stopPropagation();
                                 window.location.href = `tel:${patient.phone}`;
                               }}
-                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-teal-600"
+                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-300 hover:text-teal-600"
                             >
                               <Phone className="w-4 h-4" />
                             </button>
@@ -511,7 +515,7 @@ export default function Patients() {
                                 e.stopPropagation();
                                 navigate(`/communications?patient=${patient.id}&type=sms`);
                               }}
-                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-teal-600"
+                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-300 hover:text-teal-600"
                             >
                               <MessageSquare className="w-4 h-4" />
                             </button>
@@ -521,7 +525,7 @@ export default function Patients() {
                                 e.stopPropagation();
                                 navigate(`/calendar?patient=${patient.id}`);
                               }}
-                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-teal-600"
+                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-300 hover:text-teal-600"
                             >
                               <Calendar className="w-4 h-4" />
                             </button>
@@ -531,7 +535,7 @@ export default function Patients() {
                                 e.stopPropagation();
                                 navigate(`/patients/${patient.id}/encounter`);
                               }}
-                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 hover:text-teal-600"
+                              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-400 dark:text-gray-300 hover:text-teal-600"
                             >
                               <FileText className="w-4 h-4" />
                             </button>
@@ -582,7 +586,7 @@ export default function Patients() {
                     );
                   } else if (pageNum === page - 2 || pageNum === page + 2) {
                     return (
-                      <span key={pageNum} className="px-1 text-gray-400">
+                      <span key={pageNum} className="px-1 text-gray-400 dark:text-gray-300">
                         ...
                       </span>
                     );

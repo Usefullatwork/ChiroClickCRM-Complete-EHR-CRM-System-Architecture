@@ -125,7 +125,7 @@ export default function EasyAssessment() {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => navigate(`/patients/${patientId}`)}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
+                className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
@@ -135,7 +135,7 @@ export default function EasyAssessment() {
                     {patient?.data?.first_name} {patient?.data?.last_name}
                   </h1>
                   {patient?.data?.date_of_birth && (
-                    <span className="text-sm text-gray-500">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">
                       {Math.floor(
                         (new Date() - new Date(patient.data.date_of_birth)) / 31557600000
                       )}{' '}
@@ -162,7 +162,7 @@ export default function EasyAssessment() {
               {/* Language Selector */}
               <button
                 onClick={() => setLanguage(language === 'en' ? 'no' : 'en')}
-                className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
+                className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 rounded-lg hover:bg-gray-200"
                 title={language === 'en' ? 'Switch to Norwegian' : 'Bytt til Engelsk'}
               >
                 <Globe className="w-4 h-4" />
@@ -183,7 +183,7 @@ export default function EasyAssessment() {
                 </button>
                 <button
                   onClick={() => setShowAISettings(true)}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+                  className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg hover:bg-gray-100"
                   title={language === 'en' ? 'AI Settings' : 'AI-innstillinger'}
                 >
                   <Cpu className="w-4 h-4" />
@@ -212,7 +212,7 @@ export default function EasyAssessment() {
                     className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
                       viewMode === mode
                         ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                     }`}
                   >
                     {mode === 'easy'
@@ -307,7 +307,9 @@ export default function EasyAssessment() {
           <div className="bg-white border-b border-gray-200 px-4 py-3">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
-                <label className="text-xs font-medium text-gray-500">Date:</label>
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  Date:
+                </label>
                 <input
                   type="date"
                   value={encounterData.encounter_date}
@@ -318,7 +320,9 @@ export default function EasyAssessment() {
                 />
               </div>
               <div className="flex items-center gap-2">
-                <label className="text-xs font-medium text-gray-500">Type:</label>
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  Type:
+                </label>
                 <select
                   value={encounterData.encounter_type}
                   onChange={(e) =>
@@ -333,7 +337,9 @@ export default function EasyAssessment() {
                 </select>
               </div>
               <div className="flex items-center gap-2">
-                <label className="text-xs font-medium text-gray-500">Duration:</label>
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  Duration:
+                </label>
                 <input
                   type="number"
                   value={encounterData.duration_minutes}
@@ -345,12 +351,14 @@ export default function EasyAssessment() {
                   }
                   className="w-16 px-2 py-1 text-sm border border-gray-300 rounded"
                 />
-                <span className="text-xs text-gray-500">min</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">min</span>
               </div>
               <div className="flex-1"></div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <label className="text-xs font-medium text-gray-500">VAS Start:</label>
+                  <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    VAS Start:
+                  </label>
                   <input
                     type="number"
                     min="0"
@@ -367,7 +375,9 @@ export default function EasyAssessment() {
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <label className="text-xs font-medium text-gray-500">VAS End:</label>
+                  <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    VAS End:
+                  </label>
                   <input
                     type="number"
                     min="0"
@@ -434,7 +444,7 @@ export default function EasyAssessment() {
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                         activeTab === tab.id
                           ? 'bg-blue-600 text-white shadow'
-                          : 'text-gray-600 hover:bg-gray-100'
+                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                       }`}
                     >
                       <span>{tab.icon}</span>
@@ -545,7 +555,7 @@ export default function EasyAssessment() {
                 <h3 className="text-lg font-semibold">{outcomeType} Assessment</h3>
                 <button
                   onClick={() => setShowOutcomeAssessment(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -618,7 +628,7 @@ export default function EasyAssessment() {
                 <h3 className="text-lg font-semibold">Body Chart - Annotate Pain Locations</h3>
                 <button
                   onClick={() => setShowBodyChart(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -651,7 +661,7 @@ export default function EasyAssessment() {
                 <h3 className="text-lg font-semibold">Chart Template Library</h3>
                 <button
                   onClick={() => setShowTemplateLibrary(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -731,7 +741,7 @@ export default function EasyAssessment() {
                 </h3>
                 <button
                   onClick={() => setShowMacroMatrix(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -759,7 +769,7 @@ export default function EasyAssessment() {
                 </h3>
                 <button
                   onClick={() => setShowCompliancePanel(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -800,7 +810,7 @@ export default function EasyAssessment() {
                 </h3>
                 <button
                   onClick={() => setShowSlashReference(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -823,7 +833,7 @@ export default function EasyAssessment() {
                 </h3>
                 <button
                   onClick={() => setShowAIScribe(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
                 >
                   <X className="w-5 h-5" />
                 </button>

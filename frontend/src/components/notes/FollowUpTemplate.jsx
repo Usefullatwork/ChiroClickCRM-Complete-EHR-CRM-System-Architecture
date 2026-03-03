@@ -343,9 +343,9 @@ export default function FollowUpTemplate({
           <h3 className={`font-semibold text-${color}-900`}>{title}</h3>
         </div>
         {expandedSections[id] ? (
-          <ChevronUp className="w-5 h-5 text-gray-500" />
+          <ChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-500" />
+          <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         )}
       </button>
       {expandedSections[id] && <div className="p-4 space-y-4">{children}</div>}
@@ -365,7 +365,7 @@ export default function FollowUpTemplate({
         rows={rows}
         placeholder={placeholder}
         disabled={readOnly}
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 resize-none"
+        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-500 dark:text-gray-400 resize-none"
       />
     </div>
   );
@@ -399,7 +399,7 @@ export default function FollowUpTemplate({
       className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
         currentValue === value
           ? `bg-${color}-100 border-${color}-300 text-${color}-800`
-          : 'bg-white border-gray-300 text-gray-600 hover:border-gray-400'
+          : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:border-gray-400'
       } ${readOnly ? 'cursor-default' : 'cursor-pointer'}`}
     >
       <Icon className="w-4 h-4" />
@@ -414,7 +414,7 @@ export default function FollowUpTemplate({
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Oppfolgingskonsultasjon</h2>
           {patient && (
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {patient.firstName || patient.first_name} {patient.lastName || patient.last_name}
               {followUpData.visit_number && ` - Besok #${followUpData.visit_number}`}
             </p>
@@ -423,7 +423,7 @@ export default function FollowUpTemplate({
         <div className="flex items-center gap-3">
           {/* Auto-save indicator */}
           {lastAutoSave && (
-            <span className="text-xs text-gray-500 flex items-center gap-1">
+            <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
               <CheckCircle className="w-3 h-3 text-green-500" />
               Autolagret{' '}
               {lastAutoSave.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
@@ -508,7 +508,7 @@ export default function FollowUpTemplate({
               disabled={readOnly}
               className="w-full"
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
               <span>Ingen smerte</span>
               <span>Maksimal smerte</span>
             </div>
@@ -563,7 +563,7 @@ export default function FollowUpTemplate({
                 className={`px-3 py-1.5 text-sm rounded-lg border transition-colors ${
                   followUpData.subjective.complianceWithExercises === level
                     ? 'bg-blue-100 border-blue-300 text-blue-800'
-                    : 'bg-white border-gray-300 text-gray-600 hover:border-gray-400'
+                    : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:border-gray-400'
                 }`}
               >
                 {
@@ -678,7 +678,7 @@ export default function FollowUpTemplate({
                 className={`px-4 py-2 text-sm rounded-lg border transition-colors ${
                   followUpData.assessment.progressAssessment === value
                     ? `bg-${color}-100 border-${color}-300 text-${color}-800`
-                    : 'bg-white border-gray-300 text-gray-600 hover:border-gray-400'
+                    : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:border-gray-400'
                 }`}
               >
                 {label}
@@ -796,7 +796,9 @@ export default function FollowUpTemplate({
                 </span>
               ))}
               {(!followUpData.icd10_codes || followUpData.icd10_codes.length === 0) && (
-                <span className="text-sm text-gray-500">Ingen koder lagt til</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  Ingen koder lagt til
+                </span>
               )}
             </div>
           </div>
@@ -883,7 +885,7 @@ export default function FollowUpTemplate({
             disabled={readOnly}
             className="w-full"
           />
-          <div className="flex justify-between text-xs text-gray-500 mt-1">
+          <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
             <span>0</span>
             <span>10</span>
           </div>

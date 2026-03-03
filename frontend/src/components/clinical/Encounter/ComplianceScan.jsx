@@ -167,16 +167,16 @@ export default function ComplianceScan({
           <span className="text-sm font-semibold text-gray-900 dark:text-white">
             Samsvarskontroll
           </span>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-500 dark:text-gray-400">
             {passCount}/{checks.length} bestått
             {warnCount > 0 && ` · ${warnCount} advarsler`}
             {failCount > 0 && ` · ${failCount} feil`}
           </span>
         </div>
         {expanded ? (
-          <ChevronUp className="w-4 h-4 text-gray-400" />
+          <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
         ) : (
-          <ChevronDown className="w-4 h-4 text-gray-400" />
+          <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
         )}
       </button>
 
@@ -215,7 +215,7 @@ export default function ComplianceScan({
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={onDismiss}
-              className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
               Lukk
             </button>

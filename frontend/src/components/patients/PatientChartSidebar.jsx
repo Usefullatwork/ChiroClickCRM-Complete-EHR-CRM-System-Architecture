@@ -13,7 +13,7 @@ import StatusBadge from '../ui/StatusBadge';
 const PREF_ICONS = {
   ok: ['text-green-600', '\u2713'],
   no: ['text-red-600', '\u2717'],
-  unknown: ['text-gray-400', '?'],
+  unknown: ['text-gray-400 dark:text-gray-300', '?'],
 };
 
 function getPref(value) {
@@ -146,18 +146,18 @@ export default function PatientChartSidebar({
 
       {/* Contact Info */}
       <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700 space-y-1.5">
-        <h3 className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+        <h3 className="text-xs font-medium text-gray-400 dark:text-gray-300 uppercase tracking-wider mb-2">
           {t?.('sidebar.contact') || 'Kontakt'}
         </h3>
         {patient.phone && (
           <p className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
-            <Phone className="w-3.5 h-3.5 text-gray-400" />
+            <Phone className="w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />
             {formatPhone(patient.phone)}
           </p>
         )}
         {patient.email && (
           <p className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
-            <Mail className="w-3.5 h-3.5 text-gray-400" />
+            <Mail className="w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />
             <span className="truncate">{patient.email}</span>
           </p>
         )}
@@ -170,7 +170,7 @@ export default function PatientChartSidebar({
 
       {/* Treatment Preferences */}
       <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+        <h3 className="text-xs font-medium text-gray-400 dark:text-gray-300 uppercase tracking-wider mb-2">
           {t?.('sidebar.preferences') || 'Preferanser'}
         </h3>
         <div className="space-y-1">
@@ -191,7 +191,7 @@ export default function PatientChartSidebar({
 
       {/* Quick Stats */}
       <div className="px-5 py-4">
-        <h3 className="text-xs font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2">
+        <h3 className="text-xs font-medium text-gray-400 dark:text-gray-300 uppercase tracking-wider mb-2">
           {t?.('sidebar.stats') || 'Statistikk'}
         </h3>
         <dl className="space-y-1.5 text-sm">

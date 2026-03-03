@@ -147,7 +147,7 @@ export default function SALTButton({
             applied
               ? 'bg-green-600 text-white'
               : disabled || !previousEncounter
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                ? 'bg-gray-100 text-gray-400 dark:text-gray-300 cursor-not-allowed'
                 : 'bg-amber-500 text-white hover:bg-amber-600 shadow-sm hover:shadow'
           }
         `}
@@ -181,7 +181,7 @@ export default function SALTButton({
 
           {/* Improvement Modifier */}
           <div className="px-4 py-3 border-b border-gray-100">
-            <label className="block text-xs font-medium text-gray-600 mb-2">
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
               Patient Status Update
             </label>
             <div className="grid grid-cols-2 gap-1">
@@ -208,7 +208,7 @@ export default function SALTButton({
 
           {/* Section Selection */}
           <div className="px-4 py-3 border-b border-gray-100">
-            <label className="block text-xs font-medium text-gray-600 mb-2">
+            <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
               Sections to Clone
             </label>
             <div className="space-y-1">
@@ -232,7 +232,11 @@ export default function SALTButton({
                     />
                     <span className="text-sm">{section.icon}</span>
                     <span className="text-sm text-gray-700">{section.label}</span>
-                    {!hasData && <span className="ml-auto text-xs text-gray-400">(empty)</span>}
+                    {!hasData && (
+                      <span className="ml-auto text-xs text-gray-400 dark:text-gray-300">
+                        (empty)
+                      </span>
+                    )}
                   </label>
                 );
               })}
@@ -241,7 +245,7 @@ export default function SALTButton({
 
           {/* Preview of what will be cloned */}
           <div className="px-4 py-3 bg-gray-50 rounded-b-xl">
-            <div className="flex items-start gap-2 text-xs text-gray-500 mb-3">
+            <div className="flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400 mb-3">
               <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
               <span>
                 This will populate fields with data from the previous visit. You can edit after
@@ -251,7 +255,7 @@ export default function SALTButton({
             <div className="flex gap-2">
               <button
                 onClick={() => setIsOpen(false)}
-                className="flex-1 px-3 py-2 text-sm text-gray-600 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
+                className="flex-1 px-3 py-2 text-sm text-gray-600 dark:text-gray-300 bg-white border border-gray-200 rounded-lg hover:bg-gray-50"
               >
                 Cancel
               </button>
@@ -347,7 +351,7 @@ export function SALTButtonCompact({ previousEncounter, onApply }) {
             ? 'bg-green-100 text-green-600'
             : previousEncounter
               ? 'bg-amber-100 text-amber-600 hover:bg-amber-200'
-              : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              : 'bg-gray-100 text-gray-400 dark:text-gray-300 cursor-not-allowed'
         }
       `}
       title="Same As Last Treatment"

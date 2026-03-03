@@ -55,7 +55,7 @@ const STATUS_COLORS = {
   completed: {
     bg: 'bg-gray-100',
     border: 'border-gray-400',
-    text: 'text-gray-600',
+    text: 'text-gray-600 dark:text-gray-300',
     label: 'Fullfort',
   },
   cancelled: { bg: 'bg-red-100', border: 'border-red-300', text: 'text-red-600', label: 'Avlyst' },
@@ -293,7 +293,7 @@ export default function LiveAppointmentBoard() {
         {/* Time grid */}
         <div className="flex-1 overflow-y-auto">
           {loading ? (
-            <div className="flex items-center justify-center h-48 text-gray-400">
+            <div className="flex items-center justify-center h-48 text-gray-400 dark:text-gray-300">
               <RefreshCw className="w-6 h-6 animate-spin mr-2" />
               Laster...
             </div>
@@ -316,7 +316,9 @@ export default function LiveAppointmentBoard() {
                     {/* Time label */}
                     <div
                       className={`w-16 flex-shrink-0 text-right pr-2 py-1 ${
-                        isHour ? 'text-xs font-medium text-gray-600' : 'text-[10px] text-gray-400'
+                        isHour
+                          ? 'text-xs font-medium text-gray-600'
+                          : 'text-[10px] text-gray-400 dark:text-gray-300'
                       }`}
                     >
                       {isHour || time.endsWith(':30') ? time : ''}
@@ -384,7 +386,9 @@ export default function LiveAppointmentBoard() {
             </h3>
           </div>
           {upcomingQueue.length === 0 ? (
-            <div className="p-4 text-center text-sm text-gray-400">Ingen avtaler i ko</div>
+            <div className="p-4 text-center text-sm text-gray-400 dark:text-gray-300">
+              Ingen avtaler i ko
+            </div>
           ) : (
             <div className="divide-y divide-gray-200">
               {upcomingQueue.map((appt) => {
@@ -402,7 +406,9 @@ export default function LiveAppointmentBoard() {
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-mono text-gray-500 w-10">{time}</span>
+                      <span className="text-xs font-mono text-gray-500 dark:text-gray-400 w-10">
+                        {time}
+                      </span>
                       <div className="flex-1 min-w-0">
                         <div className="text-sm font-medium text-gray-900 truncate">
                           {appt.patient_name || 'Pasient'}
@@ -432,13 +438,13 @@ export default function LiveAppointmentBoard() {
             <div className="grid grid-cols-2 gap-2 text-center">
               <div className="bg-white rounded p-1.5">
                 <div className="text-lg font-bold text-gray-800">{sortedAppointments.length}</div>
-                <div className="text-[10px] text-gray-500">Totalt</div>
+                <div className="text-[10px] text-gray-500 dark:text-gray-400">Totalt</div>
               </div>
               <div className="bg-white rounded p-1.5">
                 <div className="text-lg font-bold text-green-600">
                   {sortedAppointments.filter((a) => a.status === 'completed').length}
                 </div>
-                <div className="text-[10px] text-gray-500">Fullfort</div>
+                <div className="text-[10px] text-gray-500 dark:text-gray-400">Fullfort</div>
               </div>
             </div>
           </div>

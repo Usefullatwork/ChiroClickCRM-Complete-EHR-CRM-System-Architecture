@@ -121,7 +121,7 @@ export default function IdentityVerify({
           <ShieldCheck className="w-12 h-12 text-green-600" />
         </div>
         <h2 className="text-3xl font-bold text-green-700 mb-2">{t.success}</h2>
-        <p className="text-xl text-slate-600">
+        <p className="text-xl text-slate-600 dark:text-slate-300">
           {lang === 'no' ? 'Velkommen,' : 'Welcome,'} {appointment.firstName}!
         </p>
       </div>
@@ -133,7 +133,7 @@ export default function IdentityVerify({
       {/* Back button */}
       <button
         onClick={onBack}
-        className="self-start flex items-center gap-2 text-slate-500 hover:text-slate-700
+        className="self-start flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-700
                    transition-colors mb-4"
       >
         <ArrowLeft className="w-5 h-5" />
@@ -143,7 +143,7 @@ export default function IdentityVerify({
       {/* Header */}
       <div className="text-center mb-8">
         <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-3">{t.title}</h1>
-        <p className="text-xl text-slate-500">{t.subtitle}</p>
+        <p className="text-xl text-slate-500 dark:text-slate-400">{t.subtitle}</p>
         <p className="text-lg text-teal-600 font-medium mt-2">
           {appointment.firstName} {appointment.lastName}
         </p>
@@ -153,7 +153,7 @@ export default function IdentityVerify({
       <div className="grid grid-cols-3 gap-4 mb-8">
         {/* Day */}
         <div>
-          <label className="block text-sm font-medium text-slate-600 mb-2 text-center">
+          <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2 text-center">
             {t.day}
           </label>
           <select
@@ -174,7 +174,7 @@ export default function IdentityVerify({
 
         {/* Month */}
         <div>
-          <label className="block text-sm font-medium text-slate-600 mb-2 text-center">
+          <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2 text-center">
             {t.month}
           </label>
           <select
@@ -195,7 +195,7 @@ export default function IdentityVerify({
 
         {/* Year */}
         <div>
-          <label className="block text-sm font-medium text-slate-600 mb-2 text-center">
+          <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2 text-center">
             {t.year}
           </label>
           <select

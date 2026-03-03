@@ -37,7 +37,9 @@ const MacroButton = React.memo(({ macro, onInsert, isLoading }) => {
       title={macro.text}
     >
       <div className="font-medium truncate">{macro.name}</div>
-      {macro.shortcutKey && <div className="text-xs text-gray-400 mt-0.5">{macro.shortcutKey}</div>}
+      {macro.shortcutKey && (
+        <div className="text-xs text-gray-400 dark:text-gray-300 mt-0.5">{macro.shortcutKey}</div>
+      )}
     </button>
   );
 });
@@ -76,7 +78,7 @@ const CategorySection = ({ category, macros, subcategories, onInsert, isCollapse
           {/* Subcategories */}
           {Object.entries(subcategories).map(([subName, subMacros]) => (
             <div key={subName} className="mb-3">
-              <div className="text-xs font-medium text-gray-500 mb-1 uppercase tracking-wide">
+              <div className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1 uppercase tracking-wide">
                 {subName}
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
@@ -151,11 +153,13 @@ const SearchBar = ({ value, onChange, onClear }) => {
         placeholder="Søk i makroer... (Ctrl+M)"
         className="w-full px-4 py-2 pl-10 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
-      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">🔍</span>
+      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300">
+        🔍
+      </span>
       {value && (
         <button
           onClick={onClear}
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600"
         >
           ✕
         </button>
@@ -187,7 +191,7 @@ const SectionFilter = ({ activeSection, onChange }) => {
             ${
               activeSection === section.id
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
             }
           `}
         >
@@ -292,7 +296,7 @@ export const MacroMatrix = ({
 
   if (isLoading) {
     return (
-      <div className="p-8 text-center text-gray-500">
+      <div className="p-8 text-center text-gray-500 dark:text-gray-400">
         <div className="animate-spin text-2xl mb-2">⏳</div>
         Laster makroer...
       </div>
@@ -327,7 +331,7 @@ export const MacroMatrix = ({
 
       {/* Empty state */}
       {Object.keys(filteredMacros).length === 0 && (
-        <div className="p-8 text-center text-gray-500">
+        <div className="p-8 text-center text-gray-500 dark:text-gray-400">
           {searchTerm || activeSection ? (
             <>
               <div className="text-2xl mb-2">🔍</div>

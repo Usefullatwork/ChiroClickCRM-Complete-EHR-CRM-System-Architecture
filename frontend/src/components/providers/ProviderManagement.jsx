@@ -324,7 +324,7 @@ function ProviderCard({ provider, onEdit, onSelect, isSelected, lang }) {
           <p className="text-sm text-gray-600 dark:text-gray-400">
             {provider.title} • {provider.credentials}
           </p>
-          <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
+          <p className="text-sm text-gray-500 dark:text-gray-300 mt-1">
             {ROLES[provider.role]?.name[lang]}
           </p>
         </div>
@@ -335,7 +335,7 @@ function ProviderCard({ provider, onEdit, onSelect, isSelected, lang }) {
             e.stopPropagation();
             onEdit?.(provider);
           }}
-          className="p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-300"
         >
           ✎
         </button>
@@ -398,7 +398,7 @@ function WorkingHoursEditor({ hours, onChange, lang }) {
                 onChange={(e) => handleDayChange(day, 'start', e.target.value)}
                 className="px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
-              <span className="text-gray-500">-</span>
+              <span className="text-gray-500 dark:text-gray-400">-</span>
               <input
                 type="time"
                 value={hours[day]?.end || '17:00'}
@@ -407,7 +407,7 @@ function WorkingHoursEditor({ hours, onChange, lang }) {
               />
             </div>
           ) : (
-            <span className="text-sm text-gray-400">{t.closed}</span>
+            <span className="text-sm text-gray-400 dark:text-gray-300">{t.closed}</span>
           )}
         </div>
       ))}

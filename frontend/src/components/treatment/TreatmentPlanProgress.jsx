@@ -100,7 +100,7 @@ export default function TreatmentPlanProgress({
 
       {plans.length === 0 ? (
         <div className="p-6 text-center">
-          <p className="text-gray-500 mb-3">{t.noPlans}</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-3">{t.noPlans}</p>
           {onNewPlan && (
             <button
               onClick={onNewPlan}
@@ -123,7 +123,9 @@ export default function TreatmentPlanProgress({
                   <div>
                     <h4 className="font-medium text-gray-900 dark:text-white">{plan.title}</h4>
                     {plan.condition_description && (
-                      <p className="text-xs text-gray-500">{plan.condition_description}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {plan.condition_description}
+                      </p>
                     )}
                   </div>
                   <span
@@ -141,7 +143,7 @@ export default function TreatmentPlanProgress({
 
                 {/* Progress bar */}
                 <div className="mb-2">
-                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                  <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
                     <span>
                       {plan.completed_sessions} / {plan.total_sessions} {t.sessions}
                     </span>

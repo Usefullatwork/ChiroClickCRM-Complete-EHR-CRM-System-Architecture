@@ -124,7 +124,9 @@ function ClusterCard({ cluster, results, onTestResult, expanded, onToggle, langu
       {/* Tests */}
       {expanded && (
         <div className="p-4 space-y-3">
-          <p className="text-sm text-gray-600 mb-3">{cluster.description[language]}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
+            {cluster.description[language]}
+          </p>
 
           {cluster.tests.map((test) => (
             <TestRow
@@ -189,13 +191,15 @@ function TestRow({ test, result, onResult, language }) {
             <span className="font-medium text-gray-900">{test.name[language]}</span>
             {test.redFlag && <AlertTriangle size={16} className="text-red-500" />}
             {test.sensitivity && (
-              <span className="text-xs text-gray-500">
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 Se: {Math.round(test.sensitivity * 100)}% / Sp: {Math.round(test.specificity * 100)}
                 %
               </span>
             )}
           </div>
-          {test.target && <p className="text-xs text-gray-500 mt-0.5">Target: {test.target}</p>}
+          {test.target && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Target: {test.target}</p>
+          )}
         </div>
 
         {/* Result buttons */}
@@ -205,7 +209,7 @@ function TestRow({ test, result, onResult, language }) {
             className={`p-2 rounded-lg transition-colors ${
               result?.result === 'positive'
                 ? 'bg-red-500 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-red-100'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-red-100'
             }`}
             title="Positive"
           >
@@ -216,7 +220,7 @@ function TestRow({ test, result, onResult, language }) {
             className={`p-2 rounded-lg transition-colors ${
               result?.result === 'negative'
                 ? 'bg-green-500 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-green-100'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-green-100'
             }`}
             title="Negative"
           >
@@ -224,7 +228,7 @@ function TestRow({ test, result, onResult, language }) {
           </button>
           <button
             onClick={() => setShowDetails(!showDetails)}
-            className="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200"
+            className="p-2 rounded-lg bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200"
           >
             <ChevronDown size={18} className={showDetails ? 'rotate-180' : ''} />
           </button>
@@ -235,13 +239,13 @@ function TestRow({ test, result, onResult, language }) {
       {showDetails && (
         <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
           <div>
-            <label className="text-xs font-medium text-gray-600">
+            <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
               {language === 'no' ? 'Prosedyre' : 'Procedure'}
             </label>
             <p className="text-sm text-gray-700">{test.procedure[language]}</p>
           </div>
           <div>
-            <label className="text-xs font-medium text-gray-600">
+            <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
               {language === 'no' ? 'Positiv ved' : 'Positive finding'}
             </label>
             <p className="text-sm text-gray-700">{test.positive[language]}</p>
@@ -249,7 +253,7 @@ function TestRow({ test, result, onResult, language }) {
 
           {/* Side selector */}
           <div className="flex items-center gap-4">
-            <label className="text-xs font-medium text-gray-600">
+            <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
               {language === 'no' ? 'Side' : 'Side'}
             </label>
             <div className="flex gap-2">
@@ -263,7 +267,9 @@ function TestRow({ test, result, onResult, language }) {
                     }
                   }}
                   className={`px-2 py-1 text-xs rounded ${
-                    side === s ? 'bg-blue-500 text-white' : 'bg-gray-100 text-gray-600'
+                    side === s
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-100 text-gray-600 dark:text-gray-300'
                   }`}
                 >
                   {s === 'left'
@@ -284,7 +290,7 @@ function TestRow({ test, result, onResult, language }) {
 
           {/* Notes */}
           <div>
-            <label className="text-xs font-medium text-gray-600">
+            <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
               {language === 'no' ? 'Notater' : 'Notes'}
             </label>
             <input
@@ -304,7 +310,7 @@ function TestRow({ test, result, onResult, language }) {
           {/* Grading if available */}
           {test.grading && (
             <div>
-              <label className="text-xs font-medium text-gray-600">
+              <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
                 {language === 'no' ? 'Gradering' : 'Grading'}
               </label>
               <div className="flex gap-2 mt-1">
@@ -466,7 +472,7 @@ export default function OrthopedicExam({
         </h2>
         <button
           onClick={resetExam}
-          className="flex items-center gap-1 px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
+          className="flex items-center gap-1 px-3 py-1 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800"
         >
           <RotateCcw size={14} />
           {language === 'no' ? 'Nullstill' : 'Reset'}

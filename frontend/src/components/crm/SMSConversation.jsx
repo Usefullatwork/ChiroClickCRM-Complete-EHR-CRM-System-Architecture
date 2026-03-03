@@ -224,7 +224,7 @@ export default function SMSConversation({
       case MESSAGE_STATUS.DELIVERED:
         return <CheckCheck className="w-3 h-3 text-blue-500" />;
       case MESSAGE_STATUS.SENT:
-        return <Check className="w-3 h-3 text-gray-400" />;
+        return <Check className="w-3 h-3 text-gray-400 dark:text-gray-300" />;
       case MESSAGE_STATUS.FAILED:
         return <AlertCircle className="w-3 h-3 text-red-500" />;
       default:
@@ -252,7 +252,7 @@ export default function SMSConversation({
         {/* Search */}
         <div className="px-4 py-2 border-b border-gray-100">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300" />
             <input
               type="text"
               value={searchTerm}
@@ -266,7 +266,7 @@ export default function SMSConversation({
         {/* Conversation List */}
         <div className="flex-1 overflow-y-auto">
           {filteredConversations.length === 0 ? (
-            <div className="px-4 py-8 text-center text-gray-500">
+            <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
               <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p className="text-sm">{t.noConversations}</p>
             </div>
@@ -285,7 +285,7 @@ export default function SMSConversation({
                 >
                   <div className="relative">
                     <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-gray-500" />
+                      <User className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     </div>
                     {hasUnread && (
                       <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">
@@ -302,12 +302,12 @@ export default function SMSConversation({
                           ? `${patient.first_name} ${patient.last_name}`
                           : formatNorwegianPhone(conv.phone)}
                       </p>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-400 dark:text-gray-300">
                         {conv.lastMessage?.timestamp && formatTimestamp(conv.lastMessage.timestamp)}
                       </span>
                     </div>
                     <p
-                      className={`text-sm truncate ${hasUnread ? 'text-gray-900 font-medium' : 'text-gray-500'}`}
+                      className={`text-sm truncate ${hasUnread ? 'text-gray-900 font-medium' : 'text-gray-500 dark:text-gray-400'}`}
                     >
                       {conv.lastMessage?.body || '...'}
                     </p>
@@ -328,12 +328,12 @@ export default function SMSConversation({
               <div className="flex items-center gap-3">
                 <button
                   onClick={() => setSelectedPhone(null)}
-                  className="lg:hidden p-2 text-gray-400 hover:text-gray-600"
+                  className="lg:hidden p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-gray-500" />
+                  <User className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </div>
                 <div>
                   <p className="font-medium text-gray-900">
@@ -341,7 +341,7 @@ export default function SMSConversation({
                       ? `${selectedPatient.first_name} ${selectedPatient.last_name}`
                       : formatNorwegianPhone(selectedPhone)}
                   </p>
-                  <p className="text-xs text-gray-500 flex items-center gap-1">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
                     <Phone className="w-3 h-3" />
                     {formatNorwegianPhone(selectedPhone)}
                   </p>
@@ -356,7 +356,7 @@ export default function SMSConversation({
                     {language === 'no' ? 'Se Pasient' : 'View Patient'}
                   </button>
                 )}
-                <button className="p-2 text-gray-400 hover:text-gray-600">
+                <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600">
                   <MoreVertical className="w-5 h-5" />
                 </button>
               </div>
@@ -365,7 +365,7 @@ export default function SMSConversation({
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
               {selectedConversation?.messages?.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   <MessageSquare className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p className="text-sm">{t.noMessages}</p>
                 </div>
@@ -387,7 +387,7 @@ export default function SMSConversation({
                         <p className="text-sm whitespace-pre-wrap">{msg.body}</p>
                         <div
                           className={`flex items-center justify-end gap-1 mt-1 ${
-                            isOutbound ? 'text-blue-100' : 'text-gray-400'
+                            isOutbound ? 'text-blue-100' : 'text-gray-400 dark:text-gray-300'
                           }`}
                         >
                           <span className="text-xs">{formatTimestamp(msg.timestamp)}</span>
@@ -404,7 +404,9 @@ export default function SMSConversation({
             {/* Quick Replies */}
             {showTemplates && (
               <div className="px-4 py-2 border-t border-gray-100 bg-gray-50">
-                <p className="text-xs font-medium text-gray-500 mb-2">{t.quickReplies}</p>
+                <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                  {t.quickReplies}
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {Object.entries(DEFAULT_TEMPLATES)
                     .slice(0, 4)
@@ -429,7 +431,7 @@ export default function SMSConversation({
                   className={`p-2 rounded-lg transition-colors ${
                     showTemplates
                       ? 'bg-blue-100 text-blue-600'
-                      : 'text-gray-400 hover:text-gray-600'
+                      : 'text-gray-400 dark:text-gray-300 hover:text-gray-600'
                   }`}
                   title={t.templates}
                 >
@@ -466,7 +468,7 @@ export default function SMSConversation({
             </div>
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center text-gray-500">
+          <div className="flex-1 flex items-center justify-center text-gray-500 dark:text-gray-400">
             <div className="text-center">
               <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
               <p>{t.selectConversation}</p>
@@ -571,13 +573,15 @@ export function ConversationPreview({
               className="w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 text-left"
             >
               <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
-                <User className="w-4 h-4 text-gray-500" />
+                <User className="w-4 h-4 text-gray-500 dark:text-gray-400" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 truncate">
                   {patient ? `${patient.first_name} ${patient.last_name}` : conv.phone}
                 </p>
-                <p className="text-xs text-gray-500 truncate">{conv.lastMessage?.body}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                  {conv.lastMessage?.body}
+                </p>
               </div>
               {conv.unreadCount > 0 && (
                 <span className="w-5 h-5 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center">

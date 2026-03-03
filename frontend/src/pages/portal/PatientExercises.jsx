@@ -100,7 +100,9 @@ const PinEntry = ({ onSubmit, error, isLoading }) => {
             <Dumbbell className="w-8 h-8 text-green-600" />
           </div>
           <h1 className="text-2xl font-bold text-slate-800">Mine øvelser</h1>
-          <p className="text-slate-500 mt-2">Skriv inn din 4-sifrede kode for å se øvelsene dine</p>
+          <p className="text-slate-500 dark:text-slate-400 mt-2">
+            Skriv inn din 4-sifrede kode for å se øvelsene dine
+          </p>
         </div>
 
         <div className="flex justify-center gap-3 mb-6">
@@ -134,7 +136,7 @@ const PinEntry = ({ onSubmit, error, isLoading }) => {
           </div>
         )}
 
-        <p className="text-center text-xs text-slate-400 mt-6">
+        <p className="text-center text-xs text-slate-400 dark:text-slate-300 mt-6">
           Du finner koden din på utskriften fra kiropraktoren din
         </p>
       </div>
@@ -198,12 +200,12 @@ const ExerciseCard = ({ prescription, onLogCompliance, onRate, todayCompleted })
             <h3 className="font-semibold text-slate-800 text-lg">{prescription.exercise_name}</h3>
             <div className="flex flex-wrap gap-2 mt-1">
               {prescription.body_region && (
-                <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full">
+                <span className="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 dark:text-slate-300 rounded-full">
                   {BODY_REGION_LABELS[prescription.body_region] || prescription.body_region}
                 </span>
               )}
             </div>
-            <div className="mt-2 text-sm text-slate-500">
+            <div className="mt-2 text-sm text-slate-500 dark:text-slate-400">
               <span className="font-medium text-slate-700">
                 {prescription.sets || 3} x {prescription.reps || 10}
               </span>
@@ -234,7 +236,7 @@ const ExerciseCard = ({ prescription, onLogCompliance, onRate, todayCompleted })
 
         {/* Progress bar */}
         <div className="mt-4">
-          <div className="flex items-center justify-between text-xs text-slate-500 mb-1">
+          <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 mb-1">
             <span>Gjennomføring</span>
             <span>{compliancePercent}%</span>
           </div>
@@ -250,7 +252,7 @@ const ExerciseCard = ({ prescription, onLogCompliance, onRate, todayCompleted })
       {/* Expand/collapse button */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-2 bg-slate-50 text-sm text-slate-600 hover:bg-slate-100 flex items-center justify-center gap-1 transition-colors"
+        className="w-full px-4 py-2 bg-slate-50 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 flex items-center justify-center gap-1 transition-colors"
       >
         {expanded ? (
           <>
@@ -272,7 +274,7 @@ const ExerciseCard = ({ prescription, onLogCompliance, onRate, todayCompleted })
           {prescription.exercise_instructions && (
             <div className="mb-4">
               <h4 className="font-medium text-slate-700 mb-2">Instruksjoner</h4>
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                 {prescription.exercise_instructions}
               </p>
             </div>
@@ -315,14 +317,14 @@ const ExerciseCard = ({ prescription, onLogCompliance, onRate, todayCompleted })
                         : level <= 6
                           ? 'bg-yellow-500 text-white'
                           : 'bg-red-500 text-white'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      : 'bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
                   }`}
                 >
                   {level}
                 </button>
               ))}
             </div>
-            <div className="flex justify-between text-xs text-slate-400 mt-1">
+            <div className="flex justify-between text-xs text-slate-400 dark:text-slate-300 mt-1">
               <span>Ingen smerte</span>
               <span>Verst tenkelig</span>
             </div>
@@ -597,7 +599,7 @@ const PatientExercises = () => {
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-green-500 animate-spin mx-auto mb-4" />
-          <p className="text-slate-600">Laster øvelser...</p>
+          <p className="text-slate-600 dark:text-slate-300">Laster øvelser...</p>
         </div>
       </div>
     );
@@ -610,7 +612,7 @@ const PatientExercises = () => {
         <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h1 className="text-xl font-bold text-slate-800 mb-2">Noe gikk galt</h1>
-          <p className="text-slate-500 mb-4">{error}</p>
+          <p className="text-slate-500 dark:text-slate-400 mb-4">{error}</p>
           <button
             onClick={() => window.location.reload()}
             className="px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors"
@@ -639,13 +641,15 @@ const PatientExercises = () => {
               <div>
                 <h1 className="font-bold text-slate-800">Mine øvelser</h1>
                 {patientInfo && (
-                  <p className="text-sm text-slate-500">Hei, {patientInfo.first_name}!</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Hei, {patientInfo.first_name}!
+                  </p>
                 )}
               </div>
             </div>
             <button
               onClick={handleDownloadPDF}
-              className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
+              className="flex items-center gap-2 px-3 py-2 text-sm text-slate-600 dark:text-slate-300 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
             >
               <Download className="w-4 h-4" />
               <span className="hidden sm:inline">Last ned</span>
@@ -658,7 +662,7 @@ const PatientExercises = () => {
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="grid grid-cols-3 gap-3 mb-6">
           <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-2 text-slate-500 text-xs mb-1">
+            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs mb-1">
               <Activity className="w-3.5 h-3.5" />I dag
             </div>
             <div className="text-2xl font-bold text-slate-800">
@@ -666,14 +670,14 @@ const PatientExercises = () => {
             </div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-2 text-slate-500 text-xs mb-1">
+            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs mb-1">
               <TrendingUp className="w-3.5 h-3.5" />
               Totalt
             </div>
             <div className="text-2xl font-bold text-green-600">{overallCompliance}%</div>
           </div>
           <div className="bg-white rounded-xl p-4 shadow-sm border border-slate-100">
-            <div className="flex items-center gap-2 text-slate-500 text-xs mb-1">
+            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-xs mb-1">
               <Calendar className="w-3.5 h-3.5" />
               Øvelser
             </div>
@@ -702,7 +706,7 @@ const PatientExercises = () => {
             <div className="bg-white rounded-xl p-8 text-center shadow-sm">
               <Dumbbell className="w-16 h-16 text-slate-200 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-slate-700">Ingen øvelser ennå</h3>
-              <p className="text-slate-500 mt-2">
+              <p className="text-slate-500 dark:text-slate-400 mt-2">
                 Din behandler har ikke lagt til øvelser for deg ennå.
               </p>
             </div>
@@ -725,7 +729,7 @@ const PatientExercises = () => {
             onClick={() =>
               loadExercises(patientInfo?.id || patientId, localStorage.getItem('portal_session'))
             }
-            className="inline-flex items-center gap-2 px-4 py-2 text-sm text-slate-500 hover:text-slate-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Oppdater
@@ -734,9 +738,9 @@ const PatientExercises = () => {
       </div>
 
       {/* Footer */}
-      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-slate-400">
+      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-slate-400 dark:text-slate-300">
         <p>Ved spørsmål, kontakt din behandler</p>
-        <p className="mt-1">ChiroClick CRM</p>
+        <p className="mt-1">ChiroClick EHR</p>
       </footer>
     </div>
   );

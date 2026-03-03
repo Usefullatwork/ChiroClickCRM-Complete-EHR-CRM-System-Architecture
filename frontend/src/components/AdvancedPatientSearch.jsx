@@ -95,7 +95,9 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
             <Search className="w-6 h-6 text-blue-600" />
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Advanced Patient Search</h2>
-              <p className="text-sm text-gray-600">Search patients using multiple criteria</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Search patients using multiple criteria
+              </p>
             </div>
           </div>
           <button
@@ -116,7 +118,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
                 Name, Email, or Phone
               </label>
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Search by name, email, or phone..."
@@ -169,7 +171,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                 <input
                   type="text"
                   placeholder="e.g., Oslo"
@@ -282,21 +284,25 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
           {!resultsData ? (
             <div className="text-center py-12">
               <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600">Angi sokekriterier og klikk Sok for a finne pasienter</p>
+              <p className="text-gray-600 dark:text-gray-300">
+                Angi sokekriterier og klikk Sok for a finne pasienter
+              </p>
             </div>
           ) : isLoading ? (
             <div className="text-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-              <p className="text-gray-600 mt-4">Soker...</p>
+              <p className="text-gray-600 dark:text-gray-300 mt-4">Soker...</p>
             </div>
           ) : patients.length === 0 ? (
             <div className="text-center py-12">
               <AlertCircle className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-600">Ingen pasienter funnet med dine kriterier</p>
+              <p className="text-gray-600 dark:text-gray-300">
+                Ingen pasienter funnet med dine kriterier
+              </p>
             </div>
           ) : (
             <div>
-              <div className="mb-4 text-sm text-gray-600">
+              <div className="mb-4 text-sm text-gray-600 dark:text-gray-300">
                 Fant {patients.length} pasient{patients.length !== 1 ? 'er' : ''}
               </div>
               <div className="space-y-3">
@@ -316,7 +322,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
                           <h3 className="text-sm font-semibold text-gray-900">
                             {patient.first_name} {patient.last_name}
                           </h3>
-                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2 text-xs text-gray-600">
+                          <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2 text-xs text-gray-600 dark:text-gray-300">
                             <div className="flex items-center gap-1">
                               <Mail className="w-3 h-3" />
                               {patient.email || 'N/A'}

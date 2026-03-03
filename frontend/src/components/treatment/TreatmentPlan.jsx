@@ -340,7 +340,7 @@ function PhaseCard({ phase, index, currentPhaseIndex, _visits, lang }) {
       <ul className="space-y-1">
         {phase.goals.map((goal, i) => (
           <li key={i} className="text-sm text-gray-600 dark:text-gray-400 flex items-start gap-2">
-            <span className="text-gray-400">•</span>
+            <span className="text-gray-400 dark:text-gray-300">•</span>
             {goal[lang]}
           </li>
         ))}
@@ -378,7 +378,7 @@ function GoalTracker({ goals, onToggle, lang }) {
           </div>
           <div className="flex-1">
             <div
-              className={`font-medium ${goal.achieved ? 'line-through text-gray-500' : 'text-gray-900 dark:text-white'}`}
+              className={`font-medium ${goal.achieved ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-900 dark:text-white'}`}
             >
               {goal.description}
             </div>

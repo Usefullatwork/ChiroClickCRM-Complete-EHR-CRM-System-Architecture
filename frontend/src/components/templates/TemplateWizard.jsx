@@ -295,7 +295,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
             }`}
           >
             <span className="font-medium block">{tone.labelNo}</span>
-            <span className="text-sm text-gray-500">{tone.description}</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">{tone.description}</span>
           </button>
         ))}
       </div>
@@ -322,7 +322,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
       <div>
         <div className="flex justify-between items-center mb-1">
           <label className="block text-sm font-medium text-gray-700">Melding</label>
-          <span className="text-xs text-gray-500">
+          <span className="text-xs text-gray-500 dark:text-gray-400">
             {formData.content.length} tegn
             {formData.channel === 'SMS' && formData.content.length > 160 && (
               <span className="text-orange-500 ml-1">
@@ -410,7 +410,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
 
         {formData.channel === 'EMAIL' && formData.subject && (
           <div className="mb-2">
-            <span className="text-sm text-gray-500">Emne: </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">Emne: </span>
             <span className="font-medium">{formData.subject}</span>
           </div>
         )}
@@ -419,7 +419,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
           <p className="whitespace-pre-wrap">{testPreview()}</p>
         </div>
 
-        <div className="mt-3 text-sm text-gray-500">
+        <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
           <p>📍 Variabler er erstattet med eksempeldata</p>
         </div>
       </div>
@@ -465,14 +465,18 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
             >
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  step >= s.number ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+                  step >= s.number
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-600 dark:text-gray-300'
                 }`}
               >
                 {step > s.number ? '✓' : s.number}
               </div>
               <span
                 className={`ml-2 text-sm ${
-                  step >= s.number ? 'text-blue-600 font-medium' : 'text-gray-500'
+                  step >= s.number
+                    ? 'text-blue-600 font-medium'
+                    : 'text-gray-500 dark:text-gray-400'
                 }`}
               >
                 {s.title}
@@ -499,7 +503,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
       <div className="px-6 py-4 border-t border-gray-200 flex justify-between">
         <button
           onClick={step === 1 ? onCancel : () => setStep(step - 1)}
-          className="px-4 py-2 text-gray-600 hover:text-gray-800"
+          className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800"
         >
           {step === 1 ? 'Avbryt' : '← Tilbake'}
         </button>

@@ -124,7 +124,7 @@ const AISettings = () => {
           <span
             className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
               statusLoading
-                ? 'bg-gray-100 text-gray-600'
+                ? 'bg-gray-100 text-gray-600 dark:text-gray-300'
                 : isConnected
                   ? 'bg-green-100 text-green-700'
                   : 'bg-red-100 text-red-700'
@@ -140,7 +140,7 @@ const AISettings = () => {
         </div>
 
         {status && (
-          <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 mb-3">
+          <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 dark:text-slate-300 mb-3">
             <div>
               Ollama-versjon: <span className="font-medium">{status.ollamaVersion || '-'}</span>
             </div>
@@ -207,9 +207,9 @@ const AISettings = () => {
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-slate-800">{model.name}</span>
-                    <span className="text-xs text-slate-400">{model.size}</span>
+                    <span className="text-xs text-slate-400 dark:text-slate-300">{model.size}</span>
                   </div>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     {model.base} - {model.purpose}
                   </p>
                 </div>
@@ -254,7 +254,7 @@ const AISettings = () => {
             <div key={feature.key} className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-slate-700">{feature.label}</p>
-                <p className="text-xs text-slate-500">{feature.desc}</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">{feature.desc}</p>
               </div>
               <button
                 onClick={() => toggleFeature(feature.key)}

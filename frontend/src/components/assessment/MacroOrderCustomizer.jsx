@@ -76,7 +76,7 @@ const SortableCategoryItem = ({
         <div
           {...attributes}
           {...listeners}
-          className="cursor-grab text-gray-400 hover:text-gray-600"
+          className="cursor-grab text-gray-400 dark:text-gray-300 hover:text-gray-600"
         >
           <GripVertical className="w-4 h-4" />
         </div>
@@ -92,14 +92,14 @@ const SortableCategoryItem = ({
 
         <span className="flex-1 font-medium text-gray-900">{category.name}</span>
 
-        <span className="text-xs text-gray-500">
+        <span className="text-xs text-gray-500 dark:text-gray-400">
           {macros.filter((m) => m.category === category.name).length} macros
         </span>
 
         <button
           onClick={() => onToggleHidden(category.name)}
           className={`p-1 rounded hover:bg-gray-200 ${
-            category.isHidden ? 'text-red-500' : 'text-gray-400'
+            category.isHidden ? 'text-red-500' : 'text-gray-400 dark:text-gray-300'
           }`}
           title={category.isHidden ? 'Vis kategori' : 'Skjul kategori'}
         >
@@ -156,11 +156,15 @@ const SortableMacroItem = ({ macro, onToggleFavorite }) => {
         isDragging ? 'border-blue-500 shadow-lg' : 'border-gray-100 hover:border-gray-200'
       }`}
     >
-      <div {...attributes} {...listeners} className="cursor-grab text-gray-300 hover:text-gray-500">
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-grab text-gray-300 hover:text-gray-500 dark:text-gray-400"
+      >
         <GripVertical className="w-3 h-3" />
       </div>
 
-      <FileText className="w-3 h-3 text-gray-400" />
+      <FileText className="w-3 h-3 text-gray-400 dark:text-gray-300" />
 
       <span className="flex-1 text-sm text-gray-700 truncate" title={macro.macro_text}>
         {macro.macro_name}
@@ -423,7 +427,9 @@ const MacroOrderCustomizer = ({ isOpen, onClose, onSave }) => {
             <Settings className="w-5 h-5 text-blue-600" />
             <div>
               <h2 className="text-lg font-semibold text-gray-900">Tilpass makroer</h2>
-              <p className="text-sm text-gray-500">Dra og slipp for å endre rekkefølge</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Dra og slipp for å endre rekkefølge
+              </p>
             </div>
           </div>
 
@@ -439,7 +445,7 @@ const MacroOrderCustomizer = ({ isOpen, onClose, onSave }) => {
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'categories'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700'
             }`}
           >
             Kategorier
@@ -449,7 +455,7 @@ const MacroOrderCustomizer = ({ isOpen, onClose, onSave }) => {
             className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'favorites'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700'
             }`}
           >
             Favoritter
@@ -489,7 +495,7 @@ const MacroOrderCustomizer = ({ isOpen, onClose, onSave }) => {
           ) : (
             /* Favorites Tab */
             <div className="space-y-2">
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                 Dra for å endre rekkefølgen på favorittmakroene dine.
               </p>
               <DndContext
@@ -517,7 +523,7 @@ const MacroOrderCustomizer = ({ isOpen, onClose, onSave }) => {
                   strategy={verticalListSortingStrategy}
                 >
                   {macros.filter((m) => m.is_favorite).length === 0 ? (
-                    <div className="text-center py-8 text-gray-500">
+                    <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                       <Star className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                       <p>Ingen favorittmakroer</p>
                       <p className="text-sm">Klikk på stjernen ved en makro for å legge den til</p>
@@ -543,7 +549,7 @@ const MacroOrderCustomizer = ({ isOpen, onClose, onSave }) => {
         <div className="flex items-center justify-between px-6 py-4 border-t border-gray-200 bg-gray-50">
           <button
             onClick={handleReset}
-            className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"
+            className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 rounded-lg transition-colors"
           >
             <RotateCcw className="w-4 h-4" />
             Tilbakestill
@@ -553,7 +559,7 @@ const MacroOrderCustomizer = ({ isOpen, onClose, onSave }) => {
             {hasChanges && <span className="text-sm text-orange-600">Ulagrede endringer</span>}
             <button
               onClick={onClose}
-              className="px-4 py-2 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"
+              className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-200 rounded-lg transition-colors"
             >
               Avbryt
             </button>

@@ -106,10 +106,12 @@ const FieldTypeSelector = ({ onSelect }) => {
                   }}
                   className="flex items-center gap-3 w-full px-4 py-2 hover:bg-gray-50 text-left"
                 >
-                  <Icon className="w-4 h-4 text-gray-500" />
+                  <Icon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                   <div>
                     <div className="text-sm font-medium text-gray-900">{fieldType.label}</div>
-                    <div className="text-xs text-gray-500">{fieldType.description}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">
+                      {fieldType.description}
+                    </div>
                   </div>
                 </button>
               );
@@ -155,14 +157,14 @@ const SortableFieldItem = ({ field, _onUpdate, onDelete, onDuplicate, isSelected
         {...listeners}
         className="absolute left-2 top-1/2 -translate-y-1/2 cursor-grab hover:text-blue-600"
       >
-        <GripVertical className="w-4 h-4 text-gray-400" />
+        <GripVertical className="w-4 h-4 text-gray-400 dark:text-gray-300" />
       </div>
 
       {/* Field Content */}
       <div className="ml-6">
         {/* Field Header */}
         <div className="flex items-center gap-2 mb-2">
-          <Icon className="w-4 h-4 text-gray-500" />
+          <Icon className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           <span className="text-sm font-medium text-gray-700">
             {field.label || fieldTypeInfo?.label || 'Uten tittel'}
           </span>
@@ -188,14 +190,20 @@ const SortableFieldItem = ({ field, _onUpdate, onDelete, onDuplicate, isSelected
           )}
           {field.type === 'checkbox' &&
             field.options?.map((opt) => (
-              <label key={opt.id} className="flex items-center gap-2 text-sm text-gray-600">
+              <label
+                key={opt.id}
+                className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300"
+              >
                 <input type="checkbox" disabled />
                 {opt.value}
               </label>
             ))}
           {field.type === 'radio' &&
             field.options?.map((opt) => (
-              <label key={opt.id} className="flex items-center gap-2 text-sm text-gray-600">
+              <label
+                key={opt.id}
+                className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300"
+              >
                 <input type="radio" name={field.id} disabled />
                 {opt.value}
               </label>
@@ -232,20 +240,22 @@ const SortableFieldItem = ({ field, _onUpdate, onDelete, onDuplicate, isSelected
           )}
           {field.type === 'vas' && (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">0</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">0</span>
               <input type="range" min="0" max="10" className="flex-1" disabled />
-              <span className="text-xs text-gray-500">10</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">10</span>
             </div>
           )}
           {field.type === 'section' && (
-            <div className="border-b-2 border-gray-300 pb-1 text-gray-500 text-sm">
+            <div className="border-b-2 border-gray-300 pb-1 text-gray-500 dark:text-gray-400 text-sm">
               {field.label || 'Seksjonsdeler'}
             </div>
           )}
         </div>
 
         {/* Help Text */}
-        {field.helpText && <p className="text-xs text-gray-500">{field.helpText}</p>}
+        {field.helpText && (
+          <p className="text-xs text-gray-500 dark:text-gray-400">{field.helpText}</p>
+        )}
       </div>
 
       {/* Actions */}
@@ -259,7 +269,7 @@ const SortableFieldItem = ({ field, _onUpdate, onDelete, onDuplicate, isSelected
             className="p-1.5 hover:bg-gray-100 rounded"
             title="Dupliser"
           >
-            <Copy className="w-4 h-4 text-gray-500" />
+            <Copy className="w-4 h-4 text-gray-500 dark:text-gray-400" />
           </button>
           <button
             onClick={(e) => {
@@ -608,14 +618,16 @@ const DragDropFormBuilder = ({
               onChange={(e) => setLocalFormName(e.target.value)}
               className="text-xl font-semibold text-gray-900 border-none focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 py-1"
             />
-            <span className="text-sm text-gray-500">{fields.length} felt</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">{fields.length} felt</span>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setShowPreview(!showPreview)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                showPreview ? 'bg-blue-100 text-blue-700' : 'hover:bg-gray-100 text-gray-600'
+                showPreview
+                  ? 'bg-blue-100 text-blue-700'
+                  : 'hover:bg-gray-100 text-gray-600 dark:text-gray-300'
               }`}
             >
               <Eye className="w-4 h-4" />
@@ -714,9 +726,9 @@ const DragDropFormBuilder = ({
                     )}
                     {field.type === 'vas' && (
                       <div className="flex items-center gap-3">
-                        <span className="text-sm text-gray-500">0</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">0</span>
                         <input type="range" min="0" max="10" className="flex-1" />
-                        <span className="text-sm text-gray-500">10</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">10</span>
                       </div>
                     )}
                     {field.type === 'rating' && (
@@ -732,7 +744,9 @@ const DragDropFormBuilder = ({
                       <div className="border-b-2 border-gray-300 pb-2 mt-4" />
                     )}
                     {field.helpText && (
-                      <p className="text-xs text-gray-500 mt-1">{field.helpText}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                        {field.helpText}
+                      </p>
                     )}
                   </div>
                 ))}
@@ -742,15 +756,17 @@ const DragDropFormBuilder = ({
             /* Edit Mode */
             <div className="max-w-2xl mx-auto">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-medium text-gray-600">Dra for å endre rekkefølge</h3>
+                <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">
+                  Dra for å endre rekkefølge
+                </h3>
                 <FieldTypeSelector onSelect={addField} />
               </div>
 
               {fields.length === 0 ? (
                 <div className="text-center py-16 bg-white rounded-lg border-2 border-dashed border-gray-300">
                   <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">Ingen felt ennå</p>
-                  <p className="text-sm text-gray-400 mb-4">
+                  <p className="text-gray-500 dark:text-gray-400">Ingen felt ennå</p>
+                  <p className="text-sm text-gray-400 dark:text-gray-300 mb-4">
                     Klikk "Legg til felt" for å komme i gang
                   </p>
                   <FieldTypeSelector onSelect={addField} />

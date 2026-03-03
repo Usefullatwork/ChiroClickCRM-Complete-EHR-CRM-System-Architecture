@@ -157,7 +157,11 @@ function ClusterSelector({ clusters, selectedCluster, onSelect, testResults, lan
             >
               <Icon
                 className={`w-5 h-5 flex-shrink-0 ${
-                  isCritical ? 'text-red-600' : isSelected ? 'text-blue-600' : 'text-gray-400'
+                  isCritical
+                    ? 'text-red-600'
+                    : isSelected
+                      ? 'text-blue-600'
+                      : 'text-gray-400 dark:text-gray-300'
                 }`}
               />
               <div className="flex-1 min-w-0">
@@ -175,7 +179,7 @@ function ClusterSelector({ clusters, selectedCluster, onSelect, testResults, lan
                         ? isCritical
                           ? 'text-red-600'
                           : 'text-orange-600'
-                        : 'text-gray-500'
+                        : 'text-gray-500 dark:text-gray-400'
                     }`}
                   >
                     {t.score}: {score.score}/{score.total}
@@ -271,23 +275,27 @@ function TestCard({ test, results, onChange, lang }) {
             >
               {test.name[lang]}
             </h4>
-            {test.subtitle && <p className="text-xs text-gray-500">{test.subtitle[lang]}</p>}
+            {test.subtitle && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">{test.subtitle[lang]}</p>
+            )}
           </div>
         </div>
         <div className="flex items-center gap-2">
           {checkedCount > 0 && (
             <span
               className={`text-xs px-2 py-0.5 rounded-full ${
-                hasPositiveFindings ? 'bg-orange-200 text-orange-800' : 'bg-gray-200 text-gray-600'
+                hasPositiveFindings
+                  ? 'bg-orange-200 text-orange-800'
+                  : 'bg-gray-200 text-gray-600 dark:text-gray-300'
               }`}
             >
               {checkedCount}
             </span>
           )}
           {isExpanded ? (
-            <ChevronUp className="w-4 h-4 text-gray-400" />
+            <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
           )}
         </div>
       </button>
@@ -323,7 +331,7 @@ function TestCard({ test, results, onChange, lang }) {
               >
                 {criterion.label[lang]}
                 {criterion.exclusive && (
-                  <span className="ml-2 text-xs text-gray-500">(negativ)</span>
+                  <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(negativ)</span>
                 )}
               </span>
             </label>
@@ -387,7 +395,11 @@ function ClusterScoreCard({ cluster, score, lang }) {
         </h4>
         <span
           className={`text-2xl font-bold ${
-            isCritical ? 'text-red-600' : score.meetsThreshold ? 'text-orange-600' : 'text-gray-600'
+            isCritical
+              ? 'text-red-600'
+              : score.meetsThreshold
+                ? 'text-orange-600'
+                : 'text-gray-600 dark:text-gray-300'
           }`}
         >
           {score.score}/{score.total}
@@ -404,7 +416,7 @@ function ClusterScoreCard({ cluster, score, lang }) {
         />
       </div>
 
-      <div className="text-xs text-gray-600">
+      <div className="text-xs text-gray-600 dark:text-gray-300">
         {t.threshold}: ≥{score.threshold}/{score.total}
       </div>
 
@@ -564,7 +576,9 @@ function NarrativeDisplay({ narratives, lang }) {
   const t = TRANSLATIONS[lang];
 
   if (narratives.length === 0) {
-    return <div className="text-center py-8 text-gray-500">{t.noTestsPerformed}</div>;
+    return (
+      <div className="text-center py-8 text-gray-500 dark:text-gray-400">{t.noTestsPerformed}</div>
+    );
   }
 
   return (
@@ -573,7 +587,7 @@ function NarrativeDisplay({ narratives, lang }) {
         <div key={i} className="border border-gray-200 rounded-lg overflow-hidden">
           <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
             <h4 className="font-medium text-gray-900">{cluster.clusterName}</h4>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-gray-600 dark:text-gray-300">
               {t.score}: {cluster.score}
             </span>
           </div>
@@ -685,7 +699,7 @@ export default function NeurologicalExam({
               <Brain className="w-7 h-7 text-blue-600" />
               {t.title}
             </h1>
-            <p className="text-sm text-gray-600">{t.subtitle}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">{t.subtitle}</p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -756,12 +770,14 @@ export default function NeurologicalExam({
                   <h2 className="text-lg font-semibold text-gray-900 mb-1">
                     {currentCluster.name[lang]}
                   </h2>
-                  <p className="text-sm text-gray-600">{currentCluster.description[lang]}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {currentCluster.description[lang]}
+                  </p>
 
                   {/* Diagnostic Criteria Info */}
                   {currentCluster.diagnosticCriteria && (
                     <div className="mt-3 flex items-center gap-4 text-sm">
-                      <span className="text-gray-600">
+                      <span className="text-gray-600 dark:text-gray-300">
                         {t.threshold}:{' '}
                         <strong>
                           ≥{currentCluster.diagnosticCriteria.threshold}/
@@ -769,7 +785,7 @@ export default function NeurologicalExam({
                         </strong>
                       </span>
                       {currentCluster.diagnosticCriteria.sensitivity && (
-                        <span className="text-gray-500">
+                        <span className="text-gray-500 dark:text-gray-400">
                           Sens: {currentCluster.diagnosticCriteria.sensitivity}% | Spec:{' '}
                           {currentCluster.diagnosticCriteria.specificity}%
                         </span>
@@ -861,7 +877,9 @@ export function NeurologicalExamCompact({ testResults = {}, onChange, lang = 'no
           <Brain className="w-5 h-5 text-blue-600" />
           {t.title}
         </h3>
-        {hasAnyResults && <span className="text-xs text-gray-500">{t.inProgress}</span>}
+        {hasAnyResults && (
+          <span className="text-xs text-gray-500 dark:text-gray-400">{t.inProgress}</span>
+        )}
       </div>
 
       <div className="divide-y divide-gray-100">
@@ -891,16 +909,16 @@ export function NeurologicalExamCompact({ testResults = {}, onChange, lang = 'no
                           ? 'bg-red-200 text-red-800'
                           : score.meetsThreshold
                             ? 'bg-orange-200 text-orange-800'
-                            : 'bg-gray-200 text-gray-600'
+                            : 'bg-gray-200 text-gray-600 dark:text-gray-300'
                       }`}
                     >
                       {score.score}/{score.total}
                     </span>
                   )}
                   {isExpanded ? (
-                    <ChevronUp className="w-4 h-4 text-gray-400" />
+                    <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                   ) : (
-                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                    <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                   )}
                 </div>
               </button>
@@ -929,7 +947,7 @@ export function NeurologicalExamCompact({ testResults = {}, onChange, lang = 'no
                     </div>
                   ))}
                   {cluster.tests?.length > 5 && (
-                    <div className="text-xs text-gray-500 pt-1">
+                    <div className="text-xs text-gray-500 dark:text-gray-400 pt-1">
                       +{cluster.tests.length - 5} more tests...
                     </div>
                   )}

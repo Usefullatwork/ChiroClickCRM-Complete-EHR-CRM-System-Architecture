@@ -163,17 +163,23 @@ export default function SendProgramModal({ isOpen, onClose, prescription, patien
               <h3 className="mb-3 text-sm font-medium text-gray-700">Kontaktinformasjon</h3>
               <div className="space-y-2">
                 <div className="flex items-center gap-3">
-                  <Mail className={`h-4 w-4 ${hasEmail ? 'text-green-600' : 'text-gray-400'}`} />
-                  <span className={`text-sm ${hasEmail ? 'text-gray-900' : 'text-gray-400'}`}>
+                  <Mail
+                    className={`h-4 w-4 ${hasEmail ? 'text-green-600' : 'text-gray-400 dark:text-gray-300'}`}
+                  />
+                  <span
+                    className={`text-sm ${hasEmail ? 'text-gray-900' : 'text-gray-400 dark:text-gray-300'}`}
+                  >
                     {patient?.email || 'Ingen e-post registrert'}
                   </span>
                   {hasEmail && <CheckCircle2 className="h-4 w-4 text-green-500" />}
                 </div>
                 <div className="flex items-center gap-3">
                   <Smartphone
-                    className={`h-4 w-4 ${hasPhone ? 'text-green-600' : 'text-gray-400'}`}
+                    className={`h-4 w-4 ${hasPhone ? 'text-green-600' : 'text-gray-400 dark:text-gray-300'}`}
                   />
-                  <span className={`text-sm ${hasPhone ? 'text-gray-900' : 'text-gray-400'}`}>
+                  <span
+                    className={`text-sm ${hasPhone ? 'text-gray-900' : 'text-gray-400 dark:text-gray-300'}`}
+                  >
                     {patient?.phone || patient?.mobile || 'Ingen telefon registrert'}
                   </span>
                   {hasPhone && <CheckCircle2 className="h-4 w-4 text-green-500" />}
@@ -200,12 +206,16 @@ export default function SendProgramModal({ isOpen, onClose, prescription, patien
                   >
                     <Mail
                       className={`h-5 w-5 ${
-                        sendMethod === 'email' ? 'text-blue-600' : 'text-gray-500'
+                        sendMethod === 'email'
+                          ? 'text-blue-600'
+                          : 'text-gray-500 dark:text-gray-400'
                       }`}
                     />
                     <span
                       className={`text-xs font-medium ${
-                        sendMethod === 'email' ? 'text-blue-700' : 'text-gray-600'
+                        sendMethod === 'email'
+                          ? 'text-blue-700'
+                          : 'text-gray-600 dark:text-gray-300'
                       }`}
                     >
                       E-post
@@ -226,12 +236,12 @@ export default function SendProgramModal({ isOpen, onClose, prescription, patien
                   >
                     <Smartphone
                       className={`h-5 w-5 ${
-                        sendMethod === 'sms' ? 'text-blue-600' : 'text-gray-500'
+                        sendMethod === 'sms' ? 'text-blue-600' : 'text-gray-500 dark:text-gray-400'
                       }`}
                     />
                     <span
                       className={`text-xs font-medium ${
-                        sendMethod === 'sms' ? 'text-blue-700' : 'text-gray-600'
+                        sendMethod === 'sms' ? 'text-blue-700' : 'text-gray-600 dark:text-gray-300'
                       }`}
                     >
                       SMS
@@ -253,18 +263,22 @@ export default function SendProgramModal({ isOpen, onClose, prescription, patien
                     <div className="flex -space-x-1">
                       <Mail
                         className={`h-4 w-4 ${
-                          sendMethod === 'both' ? 'text-blue-600' : 'text-gray-500'
+                          sendMethod === 'both'
+                            ? 'text-blue-600'
+                            : 'text-gray-500 dark:text-gray-400'
                         }`}
                       />
                       <Smartphone
                         className={`h-4 w-4 ${
-                          sendMethod === 'both' ? 'text-blue-600' : 'text-gray-500'
+                          sendMethod === 'both'
+                            ? 'text-blue-600'
+                            : 'text-gray-500 dark:text-gray-400'
                         }`}
                       />
                     </div>
                     <span
                       className={`text-xs font-medium ${
-                        sendMethod === 'both' ? 'text-blue-700' : 'text-gray-600'
+                        sendMethod === 'both' ? 'text-blue-700' : 'text-gray-600 dark:text-gray-300'
                       }`}
                     >
                       Begge
@@ -284,10 +298,10 @@ export default function SendProgramModal({ isOpen, onClose, prescription, patien
                     onChange={(e) => setIncludeAttachment(e.target.checked)}
                     className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <FileText className="h-5 w-5 text-gray-500" />
+                  <FileText className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                   <div>
                     <p className="text-sm font-medium text-gray-700">Legg ved PDF</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       Inkluder ovelsesprogrammet som PDF-vedlegg
                     </p>
                   </div>
@@ -299,17 +313,17 @@ export default function SendProgramModal({ isOpen, onClose, prescription, patien
             <div className="mb-5 rounded-lg border border-gray-200 p-4">
               <h3 className="mb-2 text-sm font-medium text-gray-700">Program</h3>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-gray-600">
+                <span className="text-gray-600 dark:text-gray-300">
                   {prescription?.exercises?.length || 0} ovelser
                 </span>
-                <span className="text-gray-500">
+                <span className="text-gray-500 dark:text-gray-400">
                   {prescription?.prescribed_at
                     ? new Date(prescription.prescribed_at).toLocaleDateString('nb-NO')
                     : 'I dag'}
                 </span>
               </div>
               {prescription?.patient_instructions && (
-                <p className="mt-2 text-xs text-gray-500 line-clamp-2">
+                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 line-clamp-2">
                   {prescription.patient_instructions}
                 </p>
               )}
@@ -322,16 +336,18 @@ export default function SendProgramModal({ isOpen, onClose, prescription, patien
                 className="flex w-full items-center justify-between rounded-lg border border-gray-200 p-3 text-left hover:bg-gray-50"
               >
                 <div className="flex items-center gap-3">
-                  <ExternalLink className="h-5 w-5 text-gray-500" />
+                  <ExternalLink className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                   <div>
                     <p className="text-sm font-medium text-gray-700">Kopier lenke</p>
-                    <p className="truncate text-xs text-gray-500 max-w-[200px]">{portalLink}</p>
+                    <p className="truncate text-xs text-gray-500 dark:text-gray-400 max-w-[200px]">
+                      {portalLink}
+                    </p>
                   </div>
                 </div>
                 {copied ? (
                   <Check className="h-5 w-5 text-green-500" />
                 ) : (
-                  <Copy className="h-5 w-5 text-gray-400" />
+                  <Copy className="h-5 w-5 text-gray-400 dark:text-gray-300" />
                 )}
               </button>
             </div>

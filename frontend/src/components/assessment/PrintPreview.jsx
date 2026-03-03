@@ -450,7 +450,7 @@ ${plan || 'No plan documented.'}
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-gray-50">
           <div className="flex items-center gap-3">
-            <FileText className="w-5 h-5 text-gray-600" />
+            <FileText className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             <h2 className="text-lg font-semibold text-gray-900">Print Preview</h2>
           </div>
           <div className="flex items-center gap-2">
@@ -467,7 +467,7 @@ ${plan || 'No plan documented.'}
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300 pointer-events-none" />
             </div>
 
             {/* Options */}
@@ -510,7 +510,10 @@ ${plan || 'No plan documented.'}
               Print
             </button>
 
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg">
+            <button
+              onClick={onClose}
+              className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
@@ -527,10 +530,10 @@ ${plan || 'No plan documented.'}
             {showHeader && (
               <div className="text-center border-b-2 border-black pb-4 mb-6">
                 <div className="text-xl font-bold">{practiceInfo.name || 'ChiroClick Clinic'}</div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-600 dark:text-gray-300">
                   {practiceInfo.address || '123 Health Street, Medical City, MC 12345'}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-gray-600 dark:text-gray-300">
                   Phone: {practiceInfo.phone || '(555) 123-4567'} | Fax:{' '}
                   {practiceInfo.fax || '(555) 123-4568'}
                 </div>
@@ -558,7 +561,7 @@ ${plan || 'No plan documented.'}
             <div className="text-center text-lg font-bold mb-6">
               CLINICAL ENCOUNTER NOTES
               {encounterData.encounter_type && (
-                <span className="ml-2 text-sm font-normal text-gray-600">
+                <span className="ml-2 text-sm font-normal text-gray-600 dark:text-gray-300">
                   ({encounterData.encounter_type})
                 </span>
               )}
@@ -571,7 +574,9 @@ ${plan || 'No plan documented.'}
               </div>
               <div className="text-justify leading-relaxed">
                 {subjective || (
-                  <em className="text-gray-400">No subjective findings documented.</em>
+                  <em className="text-gray-400 dark:text-gray-300">
+                    No subjective findings documented.
+                  </em>
                 )}
               </div>
             </div>
@@ -582,7 +587,11 @@ ${plan || 'No plan documented.'}
                 OBJECTIVE
               </div>
               <div className="text-justify leading-relaxed">
-                {objective || <em className="text-gray-400">No objective findings documented.</em>}
+                {objective || (
+                  <em className="text-gray-400 dark:text-gray-300">
+                    No objective findings documented.
+                  </em>
+                )}
               </div>
             </div>
 
@@ -592,7 +601,9 @@ ${plan || 'No plan documented.'}
                 ASSESSMENT
               </div>
               <div className="text-justify leading-relaxed">
-                {assessment || <em className="text-gray-400">No assessment documented.</em>}
+                {assessment || (
+                  <em className="text-gray-400 dark:text-gray-300">No assessment documented.</em>
+                )}
               </div>
             </div>
 
@@ -600,7 +611,7 @@ ${plan || 'No plan documented.'}
             <div className="mb-6">
               <div className="font-bold text-base border-b border-gray-300 pb-1 mb-2">PLAN</div>
               <div className="text-justify leading-relaxed">
-                {plan || <em className="text-gray-400">No plan documented.</em>}
+                {plan || <em className="text-gray-400 dark:text-gray-300">No plan documented.</em>}
               </div>
             </div>
 
@@ -609,19 +620,21 @@ ${plan || 'No plan documented.'}
               <div className="mt-12">
                 <div className="border-t border-black w-72 pt-2">
                   <div className="font-bold">{practiceInfo.provider || 'Provider Name, DC'}</div>
-                  <div className="text-sm text-gray-600">
+                  <div className="text-sm text-gray-600 dark:text-gray-300">
                     {practiceInfo.credentials || 'Doctor of Chiropractic'}
                   </div>
-                  <div className="text-sm text-gray-600 mt-2">Date: ________________</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                    Date: ________________
+                  </div>
                 </div>
               </div>
             )}
 
             {/* Footer */}
-            <div className="mt-8 pt-4 border-t border-gray-300 text-center text-xs text-gray-500">
+            <div className="mt-8 pt-4 border-t border-gray-300 text-center text-xs text-gray-500 dark:text-gray-400">
               This document is confidential and intended solely for the patient named above.
               <br />
-              Page 1 of 1 | Generated by ChiroClickCRM
+              Page 1 of 1 | Generated by ChiroClickEHR
             </div>
           </div>
         </div>

@@ -432,16 +432,16 @@ export default function ClinicalNotes() {
                 onClick={() => setShowPatientSelector(true)}
                 className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
-                <User className="w-4 h-4 text-gray-600" />
+                <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                 {selectedPatient?.data?.first_name || selectedPatient?.first_name ? (
                   <span className="text-sm font-medium text-gray-900">
                     {selectedPatient?.data?.first_name || selectedPatient?.first_name}{' '}
                     {selectedPatient?.data?.last_name || selectedPatient?.last_name}
                   </span>
                 ) : (
-                  <span className="text-sm text-gray-500">Velg pasient...</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">Velg pasient...</span>
                 )}
-                <ChevronDown className="w-4 h-4 text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
               </button>
             </div>
 
@@ -477,7 +477,9 @@ export default function ClinicalNotes() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">SOAP Notat</p>
-                        <p className="text-xs text-gray-500">Standard konsultasjon</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Standard konsultasjon
+                        </p>
                       </div>
                     </button>
                     <button
@@ -489,7 +491,7 @@ export default function ClinicalNotes() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">Forstegangskonsultasjon</p>
-                        <p className="text-xs text-gray-500">Ny pasient</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">Ny pasient</p>
                       </div>
                     </button>
                     <button
@@ -501,7 +503,9 @@ export default function ClinicalNotes() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">Oppfolgingskonsultasjon</p>
-                        <p className="text-xs text-gray-500">Eksisterende pasient</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Eksisterende pasient
+                        </p>
                       </div>
                     </button>
                     <button
@@ -513,7 +517,9 @@ export default function ClinicalNotes() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">Vestibular vurdering</p>
-                        <p className="text-xs text-gray-500">Svimmelhet/balanse</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Svimmelhet/balanse
+                        </p>
                       </div>
                     </button>
                   </div>
@@ -538,7 +544,7 @@ export default function ClinicalNotes() {
                   }}
                   className="p-2 hover:bg-gray-100 rounded-lg"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </button>
                 <h2 className="text-lg font-semibold text-gray-900">
                   {selectedNoteId ? 'Rediger notat' : `Nytt ${getNoteTypeLabel(noteType)} notat`}
@@ -569,7 +575,9 @@ export default function ClinicalNotes() {
                   </div>
                   <div className="text-left">
                     <p className="font-medium text-gray-900">SOAP Notat</p>
-                    <p className="text-xs text-gray-500">Standard konsultasjon</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      Standard konsultasjon
+                    </p>
                   </div>
                 </button>
                 <button
@@ -581,7 +589,7 @@ export default function ClinicalNotes() {
                   </div>
                   <div className="text-left">
                     <p className="font-medium text-gray-900">Forstegangskonsultasjon</p>
-                    <p className="text-xs text-gray-500">Ny pasient</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Ny pasient</p>
                   </div>
                 </button>
                 <button
@@ -593,7 +601,7 @@ export default function ClinicalNotes() {
                   </div>
                   <div className="text-left">
                     <p className="font-medium text-gray-900">Oppfolgingskonsultasjon</p>
-                    <p className="text-xs text-gray-500">Eksisterende pasient</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Eksisterende pasient</p>
                   </div>
                 </button>
                 <button
@@ -605,7 +613,7 @@ export default function ClinicalNotes() {
                   </div>
                   <div className="text-left">
                     <p className="font-medium text-gray-900">Vestibular vurdering</p>
-                    <p className="text-xs text-gray-500">Svimmelhet/balanse</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Svimmelhet/balanse</p>
                   </div>
                 </button>
               </div>
@@ -616,7 +624,7 @@ export default function ClinicalNotes() {
               <div className="flex flex-wrap gap-4">
                 <div className="flex-1 min-w-[200px]">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                     <input
                       type="text"
                       placeholder="Sok i notater..."
@@ -681,12 +689,12 @@ export default function ClinicalNotes() {
                 onClick={() => setShowPatientSelector(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
             </div>
             <div className="p-4">
               <div className="relative mb-4">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                 <input
                   type="text"
                   placeholder="Sok etter pasient..."
@@ -710,13 +718,13 @@ export default function ClinicalNotes() {
                         className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors text-left"
                       >
                         <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                          <User className="w-5 h-5 text-gray-600" />
+                          <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                         </div>
                         <div>
                           <p className="font-medium text-gray-900">
                             {patient.first_name} {patient.last_name}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             {patient.date_of_birth &&
                               new Date(patient.date_of_birth).toLocaleDateString('no-NO')}
                             {patient.solvit_id && ` - ${patient.solvit_id}`}
@@ -726,7 +734,7 @@ export default function ClinicalNotes() {
                     ))}
                   </div>
                 ) : (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     {patientSearchTerm
                       ? 'Ingen pasienter funnet'
                       : 'Skriv for a soke etter pasienter'}

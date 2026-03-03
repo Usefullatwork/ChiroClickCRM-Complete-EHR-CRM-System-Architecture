@@ -370,7 +370,7 @@ function TestItem({ test, value, onChange, isExtra = false }) {
             className={`p-1.5 rounded text-xs font-medium transition-colors ${
               value === true
                 ? 'bg-amber-500 text-white'
-                : 'bg-gray-100 text-gray-500 hover:bg-amber-100 hover:text-amber-600'
+                : 'bg-gray-100 text-gray-500 dark:text-gray-400 hover:bg-amber-100 hover:text-amber-600'
             }`}
             title="Positiv"
           >
@@ -381,7 +381,7 @@ function TestItem({ test, value, onChange, isExtra = false }) {
             className={`p-1.5 rounded text-xs font-medium transition-colors ${
               value === false
                 ? 'bg-green-500 text-white'
-                : 'bg-gray-100 text-gray-500 hover:bg-green-100 hover:text-green-600'
+                : 'bg-gray-100 text-gray-500 dark:text-gray-400 hover:bg-green-100 hover:text-green-600'
             }`}
             title="Negativ"
           >
@@ -400,7 +400,7 @@ function TestItem({ test, value, onChange, isExtra = false }) {
           >
             {test.name}
           </span>
-          <span className="text-xs text-gray-500 ml-2">{test.description}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400 ml-2">{test.description}</span>
         </div>
       </div>
     </div>
@@ -451,7 +451,7 @@ function RegionPanel({ region, values = {}, onChange, expanded, onToggle }) {
         </div>
         <div className="flex items-center gap-3">
           {totalTested > 0 && (
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               {totalTested} tester
               {positiveCount > 0 && (
                 <span className="text-amber-600 font-medium ml-1">({positiveCount} positiv)</span>
@@ -466,7 +466,7 @@ function RegionPanel({ region, values = {}, onChange, expanded, onToggle }) {
         <div className="p-4 space-y-4">
           {/* Normal tests */}
           <div>
-            <h4 className="text-sm font-semibold text-gray-600 mb-2 flex items-center gap-2">
+            <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2 flex items-center gap-2">
               <Activity className="w-4 h-4" />
               Normale tester ({normalCount}/{region.normalTests.length})
             </h4>
@@ -638,12 +638,14 @@ export default function RegionalExamination({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-lg font-semibold text-gray-800">Regional undersøkelse</h2>
-          <p className="text-sm text-gray-500">Full kroppsundersøkelse organisert etter region</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            Full kroppsundersøkelse organisert etter region
+          </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={handleReset}
-            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600
+            className="flex items-center gap-2 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300
                       border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />

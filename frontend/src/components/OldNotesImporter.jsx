@@ -248,7 +248,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                   className={`px-4 py-2 font-medium ${
                     uploadMode === 'single'
                       ? 'border-b-2 border-blue-600 text-blue-600'
-                      : 'text-gray-600 hover:text-gray-800'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-800'
                   }`}
                 >
                   Enkelt notat
@@ -258,7 +258,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                   className={`px-4 py-2 font-medium ${
                     uploadMode === 'multiple'
                       ? 'border-b-2 border-blue-600 text-blue-600'
-                      : 'text-gray-600 hover:text-gray-800'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-800'
                   }`}
                 >
                   Flere notater
@@ -354,7 +354,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
 
                   <button
                     onClick={addNoteField}
-                    className="w-full border-2 border-dashed border-gray-300 text-gray-600 py-2 px-4 rounded-lg hover:border-blue-500 hover:text-blue-600"
+                    className="w-full border-2 border-dashed border-gray-300 text-gray-600 dark:text-gray-300 py-2 px-4 rounded-lg hover:border-blue-500 hover:text-blue-600"
                   >
                     + Legg til nytt notat
                   </button>
@@ -390,9 +390,9 @@ export default function OldNotesImporter({ patientId, onClose }) {
               <h3 className="font-semibold text-gray-900 text-lg">Importerte notater</h3>
 
               {loadingNotes ? (
-                <div className="text-center py-8 text-gray-500">Laster...</div>
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">Laster...</div>
               ) : existingNotes?.notes?.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   Ingen importerte notater enna. Last opp ditt forste notat for a komme i gang.
                 </div>
               ) : (
@@ -410,7 +410,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <div className="font-medium text-sm">{note.original_filename}</div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             {new Date(note.upload_date).toLocaleDateString('nb-NO')}
                           </div>
                         </div>
@@ -419,7 +419,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
 
                       {note.ai_confidence_score && (
                         <div className="mt-2">
-                          <div className="text-xs text-gray-600 mb-1">
+                          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">
                             AI-konfidens: {(note.ai_confidence_score * 100).toFixed(0)}%
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">

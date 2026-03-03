@@ -160,14 +160,18 @@ function MarkerEntry({ marker, _index, onChange, onRemove, lang }) {
             {tissueType ? (lang === 'no' ? tissueType.nameNo : tissueType.name) : marker.type}
           </span>
         </div>
-        <button type="button" onClick={onRemove} className="text-gray-400 hover:text-red-500">
+        <button
+          type="button"
+          onClick={onRemove}
+          className="text-gray-400 dark:text-gray-300 hover:text-red-500"
+        >
           <X className="w-4 h-4" />
         </button>
       </div>
 
       <div className="grid md:grid-cols-2 gap-2">
         <div>
-          <label className="block text-xs text-gray-500 mb-1">
+          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
             {lang === 'no' ? 'Lokasjon' : 'Location'}
           </label>
           <select
@@ -185,7 +189,7 @@ function MarkerEntry({ marker, _index, onChange, onRemove, lang }) {
         </div>
 
         <div>
-          <label className="block text-xs text-gray-500 mb-1">
+          <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
             {lang === 'no' ? 'Alvorlighetsgrad' : 'Severity'}
           </label>
           <div className="flex gap-1">
@@ -198,7 +202,7 @@ function MarkerEntry({ marker, _index, onChange, onRemove, lang }) {
                            ${
                              marker.severity === level.value
                                ? `${level.color} border-current font-medium`
-                               : 'bg-white border-gray-200 text-gray-500 hover:bg-gray-50'
+                               : 'bg-white border-gray-200 text-gray-500 dark:text-gray-400 hover:bg-gray-50'
                            }`}
               >
                 {lang === 'no' ? level.labelNo : level.label}
@@ -240,7 +244,7 @@ function MarkerEntry({ marker, _index, onChange, onRemove, lang }) {
 function QuickAddPanel({ onAdd, lang }) {
   return (
     <div className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-      <span className="text-xs font-medium text-gray-500 block mb-2">
+      <span className="text-xs font-medium text-gray-500 dark:text-gray-400 block mb-2">
         {lang === 'no' ? 'Hurtigtillegg:' : 'Quick Add:'}
       </span>
       <div className="flex flex-wrap gap-2">
@@ -305,7 +309,7 @@ function MarkerLegend({ lang, expanded, onToggle }) {
         onClick={onToggle}
         className="w-full flex items-center justify-between px-4 py-2 bg-gray-50 hover:bg-gray-100"
       >
-        <span className="text-sm font-medium text-gray-600 flex items-center gap-2">
+        <span className="text-sm font-medium text-gray-600 dark:text-gray-300 flex items-center gap-2">
           <Info className="w-4 h-4" />
           {lang === 'no' ? 'Markørtegn (Legend)' : 'Marker Legend'}
         </span>
@@ -326,7 +330,7 @@ function MarkerLegend({ lang, expanded, onToggle }) {
                 <span className="text-sm font-medium text-gray-700">
                   {lang === 'no' ? type.nameNo : type.name}
                 </span>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
                   {lang === 'no' ? type.descriptionNo : type.description}
                 </p>
               </div>
@@ -459,10 +463,10 @@ export default function TissueAbnormalityMarkers({
       {markers.length === 0 ? (
         <div className="text-center py-8 bg-gray-50 rounded-lg border-2 border-dashed border-gray-200">
           <Crosshair className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             {lang === 'no' ? 'Ingen markører lagt til' : 'No markers added'}
           </p>
-          <p className="text-xs text-gray-400 mt-1">
+          <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">
             {lang === 'no'
               ? 'Bruk hurtigtillegg-knappene ovenfor for å legge til funn'
               : 'Use quick add buttons above to add findings'}

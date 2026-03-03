@@ -199,11 +199,13 @@ export default function InvoiceGenerator({
             </div>
             <div>
               <h2 className="text-xl font-semibold text-gray-900">Ny faktura</h2>
-              <p className="text-sm text-gray-500">Opprett faktura med takstkoder</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Opprett faktura med takstkoder
+              </p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
@@ -216,7 +218,7 @@ export default function InvoiceGenerator({
             {showPatientSearch ? (
               <div className="space-y-3">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                   <input
                     type="text"
                     placeholder="Sok etter pasient (navn, telefon, eller fodselsnummer)..."
@@ -228,7 +230,7 @@ export default function InvoiceGenerator({
 
                 {/* Search Results */}
                 {searchLoading ? (
-                  <div className="flex items-center gap-2 text-gray-500 p-4">
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 p-4">
                     <Loader2 className="w-4 h-4 animate-spin" />
                     Soker...
                   </div>
@@ -244,17 +246,19 @@ export default function InvoiceGenerator({
                           <p className="font-medium text-gray-900">
                             {p.first_name} {p.last_name}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             {p.date_of_birth && formatDate(p.date_of_birth)}
                             {p.phone && ` - ${p.phone}`}
                           </p>
                         </div>
-                        <Check className="w-5 h-5 text-gray-400" />
+                        <Check className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                       </button>
                     ))}
                   </div>
                 ) : patientSearch.length >= 2 ? (
-                  <p className="text-gray-500 text-sm p-4">Ingen pasienter funnet</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm p-4">
+                    Ingen pasienter funnet
+                  </p>
                 ) : null}
               </div>
             ) : patient ? (
@@ -267,7 +271,7 @@ export default function InvoiceGenerator({
                     <p className="font-medium text-gray-900">
                       {patient.first_name} {patient.last_name}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {patient.date_of_birth && formatDate(patient.date_of_birth)}
                       {patient.phone && ` - ${patient.phone}`}
                     </p>
@@ -284,7 +288,7 @@ export default function InvoiceGenerator({
                 </button>
               </div>
             ) : patientLoading ? (
-              <div className="flex items-center gap-2 text-gray-500 p-4">
+              <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 p-4">
                 <Loader2 className="w-4 h-4 animate-spin" />
                 Laster pasient...
               </div>
@@ -351,7 +355,7 @@ export default function InvoiceGenerator({
                 <option value={21}>21 dager</option>
                 <option value={30}>30 dager</option>
               </select>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Forfallsdato: {formatDate(new Date(Date.now() + dueDays * 24 * 60 * 60 * 1000))}
               </p>
             </div>
@@ -376,7 +380,7 @@ export default function InvoiceGenerator({
               <h4 className="font-semibold text-gray-900 mb-3">Fakturasammendrag</h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Brutto:</span>
+                  <span className="text-gray-600 dark:text-gray-300">Brutto:</span>
                   <span className="font-medium">{formatCurrency(totals.totalGross)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-green-600">

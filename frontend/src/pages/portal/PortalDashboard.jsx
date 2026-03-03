@@ -78,7 +78,7 @@ export default function PortalDashboard() {
       <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-teal-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Laster pasientportalen...</p>
+          <p className="text-gray-600 dark:text-gray-300">Laster pasientportalen...</p>
         </div>
       </div>
     );
@@ -96,11 +96,11 @@ export default function PortalDashboard() {
             <h1 className="text-xl font-bold text-gray-900">
               Hei, {profile?.firstName || 'Pasient'}!
             </h1>
-            <p className="text-sm text-gray-500">Pasientportalen</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Pasientportalen</p>
           </div>
           <button
             onClick={handleLogout}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+            className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
             title="Logg ut"
           >
             <LogOut className="w-5 h-5" />
@@ -118,7 +118,7 @@ export default function PortalDashboard() {
 
         {/* Next Appointment Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-          <h2 className="text-sm font-medium text-gray-500 mb-3 flex items-center gap-2">
+          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4" />
             Neste time
           </h2>
@@ -132,7 +132,7 @@ export default function PortalDashboard() {
                     month: 'long',
                   })}
                 </p>
-                <div className="flex items-center gap-2 mt-1 text-gray-500">
+                <div className="flex items-center gap-2 mt-1 text-gray-500 dark:text-gray-400">
                   <Clock className="w-4 h-4" />
                   <span>
                     {nextAppointment.appointment_time?.slice(0, 5)} &bull;{' '}
@@ -145,21 +145,21 @@ export default function PortalDashboard() {
               </div>
             </div>
           ) : (
-            <p className="text-gray-400">Ingen kommende timer</p>
+            <p className="text-gray-400 dark:text-gray-300">Ingen kommende timer</p>
           )}
         </div>
 
         {/* Stats Row */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-            <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
+            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-xs mb-1">
               <Dumbbell className="w-3.5 h-3.5" />
               Aktive ovelser
             </div>
             <div className="text-2xl font-bold text-gray-900">{activeExercises.length}</div>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-            <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
+            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-xs mb-1">
               <Calendar className="w-3.5 h-3.5" />
               Timer
             </div>
@@ -169,7 +169,9 @@ export default function PortalDashboard() {
 
         {/* Quick Links */}
         <div className="space-y-2">
-          <h2 className="text-sm font-medium text-gray-500 px-1">Hurtiglenker</h2>
+          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 px-1">
+            Hurtiglenker
+          </h2>
           {[
             {
               icon: Calendar,
@@ -214,7 +216,7 @@ export default function PortalDashboard() {
               </div>
               <div className="flex-1">
                 <p className="font-medium text-gray-900">{item.label}</p>
-                <p className="text-sm text-gray-500">{item.desc}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{item.desc}</p>
               </div>
               <ChevronRight className="w-5 h-5 text-gray-300" />
             </button>
@@ -223,9 +225,9 @@ export default function PortalDashboard() {
       </div>
 
       {/* Footer */}
-      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400">
+      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-300">
         <p>Ved sporsmal, kontakt din behandler</p>
-        <p className="mt-1">ChiroClick CRM</p>
+        <p className="mt-1">ChiroClick EHR</p>
       </footer>
     </div>
   );

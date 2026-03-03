@@ -203,7 +203,7 @@ const PatientLifecycle = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        <span className="ml-2 text-gray-600">Laster pasientdata...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">Laster pasientdata...</span>
       </div>
     );
   }
@@ -230,7 +230,9 @@ const PatientLifecycle = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Pasientlivssyklus</h2>
-          <p className="text-gray-600">Segmentér og følg opp pasienter basert på engasjement</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Segmentér og følg opp pasienter basert på engasjement
+          </p>
         </div>
         <div className="flex gap-2">
           <button
@@ -279,7 +281,7 @@ const PatientLifecycle = () => {
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-64">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
               <input
                 type="text"
                 placeholder="Søk etter pasient..."
@@ -307,28 +309,28 @@ const PatientLifecycle = () => {
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                 Pasient
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                 Status
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                 Engasjement
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                 Siste Besøk
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                 Neste Time
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                 Besøk
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                 Livstidsverdi
               </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                 Handlinger
               </th>
             </tr>
@@ -364,7 +366,7 @@ const PatientLifecycle = () => {
                           {patient.tags.slice(0, 2).map((tag) => (
                             <span
                               key={tag}
-                              className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full"
+                              className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:text-gray-300 text-xs rounded-full"
                             >
                               {tag}
                             </span>
@@ -397,7 +399,7 @@ const PatientLifecycle = () => {
                     <div>
                       <span className="text-gray-900">{formatDate(patient.lastVisit)}</span>
                       <span
-                        className={`block text-xs ${days > 45 ? 'text-red-500' : 'text-gray-500'}`}
+                        className={`block text-xs ${days > 45 ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}
                       >
                         {days === 0 ? 'I dag' : `${days} dager siden`}
                       </span>
@@ -431,14 +433,14 @@ const PatientLifecycle = () => {
                               e.stopPropagation();
                               // Action handler placeholder
                             }}
-                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title={action.label}
                           >
                             <Icon className="w-4 h-4" />
                           </button>
                         );
                       })}
-                      <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg">
+                      <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg">
                         <MoreVertical className="w-4 h-4" />
                       </button>
                     </div>
@@ -513,11 +515,11 @@ const PatientLifecycle = () => {
             <h4 className="font-medium text-gray-700 mb-3">Segment Statistikk</h4>
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-600">Antall pasienter</span>
+                <span className="text-gray-600 dark:text-gray-300">Antall pasienter</span>
                 <span className="font-medium">{stageCounts[selectedStage]}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Gj.snitt engasjement</span>
+                <span className="text-gray-600 dark:text-gray-300">Gj.snitt engasjement</span>
                 <span className="font-medium">
                   {Math.round(
                     filteredPatients.reduce((sum, p) => sum + p.engagementScore, 0) /
@@ -527,7 +529,7 @@ const PatientLifecycle = () => {
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Total livstidsverdi</span>
+                <span className="text-gray-600 dark:text-gray-300">Total livstidsverdi</span>
                 <span className="font-medium">
                   {filteredPatients
                     .reduce((sum, p) => sum + p.lifetimeValue, 0)
@@ -562,7 +564,7 @@ const PatientLifecycle = () => {
               <h3 className="text-lg font-bold text-gray-900">Pasientdetaljer</h3>
               <button
                 onClick={() => setSelectedPatient(null)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
               >
                 ×
               </button>
@@ -590,14 +592,14 @@ const PatientLifecycle = () => {
                 href={`tel:${selectedPatient.phone}`}
                 className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100"
               >
-                <Phone className="w-5 h-5 text-gray-500" />
+                <Phone className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 <span>{selectedPatient.phone}</span>
               </a>
               <a
                 href={`mailto:${selectedPatient.email}`}
                 className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100"
               >
-                <Mail className="w-5 h-5 text-gray-500" />
+                <Mail className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 <span>{selectedPatient.email}</span>
               </a>
             </div>

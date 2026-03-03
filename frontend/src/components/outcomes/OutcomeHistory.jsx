@@ -285,7 +285,7 @@ function SummaryCard({ questionnaireId, history, lang }) {
                 ? 'text-green-600'
                 : change.absoluteChange < 0
                   ? 'text-red-600'
-                  : 'text-gray-600'
+                  : 'text-gray-600 dark:text-gray-300'
             }`}
           >
             {change.absoluteChange > 0 ? '-' : change.absoluteChange < 0 ? '+' : ''}
@@ -376,11 +376,14 @@ function HistoryTable({ questionnaireId, history, lang }) {
                       day: 'numeric',
                     })}
                     {index === 0 && (
-                      <span className="ml-2 text-xs text-gray-500">({t.baseline})</span>
+                      <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                        ({t.baseline})
+                      </span>
                     )}
                   </td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-white">
-                    {entry.percentage}%<span className="ml-1 text-gray-500">({entry.score})</span>
+                    {entry.percentage}%
+                    <span className="ml-1 text-gray-500 dark:text-gray-400">({entry.score})</span>
                   </td>
                   <td className="px-6 py-4">
                     {change ? (
@@ -390,14 +393,14 @@ function HistoryTable({ questionnaireId, history, lang }) {
                             ? 'text-green-600'
                             : change.absoluteChange < 0
                               ? 'text-red-600'
-                              : 'text-gray-500'
+                              : 'text-gray-500 dark:text-gray-400'
                         }`}
                       >
                         {change.absoluteChange > 0 ? '↓ -' : change.absoluteChange < 0 ? '↑ +' : ''}
                         {Math.abs(change.absoluteChange)}%{change.clinicallySignificant && ' *'}
                       </span>
                     ) : (
-                      <span className="text-gray-400">—</span>
+                      <span className="text-gray-400 dark:text-gray-300">—</span>
                     )}
                   </td>
                   <td className="px-6 py-4">

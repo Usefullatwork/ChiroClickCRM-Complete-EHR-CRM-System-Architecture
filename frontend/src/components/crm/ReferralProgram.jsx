@@ -140,7 +140,7 @@ const ReferralProgram = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        <span className="ml-2 text-gray-600">Laster henvisninger...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">Laster henvisninger...</span>
       </div>
     );
   }
@@ -167,7 +167,9 @@ const ReferralProgram = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Henvisningsprogram</h2>
-          <p className="text-gray-600">Belønn pasienter som henviser nye kunder</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Belønn pasienter som henviser nye kunder
+          </p>
         </div>
         <button
           onClick={() => setShowNewReferralForm(true)}
@@ -187,7 +189,7 @@ const ReferralProgram = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-          <p className="text-sm text-gray-600">Totalt Henvisninger</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Totalt Henvisninger</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -197,7 +199,7 @@ const ReferralProgram = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.converted}</p>
-          <p className="text-sm text-gray-600">Konvertert</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Konvertert</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -207,7 +209,7 @@ const ReferralProgram = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
-          <p className="text-sm text-gray-600">Ventende</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Ventende</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -217,7 +219,7 @@ const ReferralProgram = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.conversionRate}%</p>
-          <p className="text-sm text-gray-600">Konverteringsrate</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Konverteringsrate</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -229,7 +231,7 @@ const ReferralProgram = () => {
           <p className="text-2xl font-bold text-gray-900">
             {stats.totalRewards.toLocaleString('nb-NO')} kr
           </p>
-          <p className="text-sm text-gray-600">Utbetalt Belønning</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">Utbetalt Belønning</p>
         </div>
       </div>
 
@@ -247,7 +249,7 @@ const ReferralProgram = () => {
             className={`px-4 py-2 border-b-2 transition-colors ${
               activeTab === tab.id
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900'
             }`}
           >
             {tab.label}
@@ -309,14 +311,14 @@ const ReferralProgram = () => {
                           ? 'bg-gray-200 text-gray-700'
                           : index === 2
                             ? 'bg-orange-100 text-orange-700'
-                            : 'bg-gray-100 text-gray-600'
+                            : 'bg-gray-100 text-gray-600 dark:text-gray-300'
                     }`}
                   >
                     {index + 1}
                   </div>
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{referrer.name}</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
                       {referrer.converted} av {referrer.referrals} konvertert
                     </p>
                   </div>
@@ -324,7 +326,7 @@ const ReferralProgram = () => {
                     <p className="font-bold text-green-600">
                       {referrer.totalReward.toLocaleString('nb-NO')} kr
                     </p>
-                    <p className="text-xs text-gray-500">Totalt opptjent</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">Totalt opptjent</p>
                   </div>
                 </div>
               ))}
@@ -346,19 +348,19 @@ const ReferralProgram = () => {
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Henviser
                     </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Ny Pasient
                     </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Kode
                     </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Status
                     </th>
-                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       Dato
                     </th>
                   </tr>
@@ -382,7 +384,7 @@ const ReferralProgram = () => {
                             </code>
                             <button
                               onClick={() => copyToClipboard(referral.referralCode)}
-                              className="p-1 text-gray-400 hover:text-gray-600"
+                              className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600"
                             >
                               {copiedCode === referral.referralCode ? (
                                 <Check className="w-4 h-4 text-green-500" />
@@ -400,7 +402,7 @@ const ReferralProgram = () => {
                             {status.label}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-gray-600">
+                        <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
                           {formatDate(referral.createdAt)}
                         </td>
                       </tr>
@@ -418,25 +420,25 @@ const ReferralProgram = () => {
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Henviser
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Ny Pasient
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Kode
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Status
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Opprettet
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Konvertert
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                   Belønning
                 </th>
               </tr>
@@ -450,13 +452,17 @@ const ReferralProgram = () => {
                     <td className="px-4 py-3">
                       <div>
                         <p className="font-medium text-gray-900">{referral.referrerName}</p>
-                        <p className="text-sm text-gray-500">{referral.referrerEmail}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {referral.referrerEmail}
+                        </p>
                       </div>
                     </td>
                     <td className="px-4 py-3">
                       <div>
                         <p className="font-medium text-gray-900">{referral.refereeName}</p>
-                        <p className="text-sm text-gray-500">{referral.refereeEmail}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {referral.refereeEmail}
+                        </p>
                       </div>
                     </td>
                     <td className="px-4 py-3">
@@ -472,8 +478,12 @@ const ReferralProgram = () => {
                         {status.label}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{formatDate(referral.createdAt)}</td>
-                    <td className="px-4 py-3 text-gray-600">{formatDate(referral.convertedAt)}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                      {formatDate(referral.createdAt)}
+                    </td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                      {formatDate(referral.convertedAt)}
+                    </td>
                     <td className="px-4 py-3">
                       {referral.rewardStatus === 'PAID' ? (
                         <span className="text-green-600 font-medium">
@@ -482,7 +492,7 @@ const ReferralProgram = () => {
                       ) : referral.rewardStatus === 'PENDING' ? (
                         <span className="text-yellow-600">Ventende</span>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span className="text-gray-400 dark:text-gray-300">-</span>
                       )}
                     </td>
                   </tr>
@@ -510,7 +520,7 @@ const ReferralProgram = () => {
                         ? 'bg-gradient-to-br from-gray-300 to-gray-500 text-white'
                         : index === 2
                           ? 'bg-gradient-to-br from-orange-400 to-orange-600 text-white'
-                          : 'bg-gray-200 text-gray-600'
+                          : 'bg-gray-200 text-gray-600 dark:text-gray-300'
                   }`}
                 >
                   {index === 0 ? <Award className="w-6 h-6" /> : index + 1}
@@ -518,10 +528,10 @@ const ReferralProgram = () => {
                 <div className="flex-1">
                   <p className="font-bold text-gray-900">{referrer.name}</p>
                   <div className="flex gap-4 mt-1">
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
                       <span className="font-medium">{referrer.referrals}</span> henvisninger
                     </span>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-600 dark:text-gray-300">
                       <span className="font-medium text-green-600">{referrer.converted}</span>{' '}
                       konvertert
                     </span>
@@ -531,7 +541,7 @@ const ReferralProgram = () => {
                   <p className="text-2xl font-bold text-green-600">
                     {referrer.totalReward.toLocaleString('nb-NO')} kr
                   </p>
-                  <p className="text-sm text-gray-500">Total belønning</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Total belønning</p>
                 </div>
               </div>
             ))}

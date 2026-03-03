@@ -197,7 +197,7 @@ export default function RedFlagDemo() {
                 <Shield className="w-6 h-6 text-red-500" />
                 {t.title}
               </h1>
-              <p className="text-sm text-gray-500 mt-1">{t.subtitle}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t.subtitle}</p>
             </div>
 
             <div className="flex items-center gap-4">
@@ -239,7 +239,7 @@ export default function RedFlagDemo() {
                 className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
                   activeTab === tab
                     ? 'bg-red-600 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
                 }`}
               >
                 {t.tabs[tab]}
@@ -321,7 +321,7 @@ export default function RedFlagDemo() {
                                   >
                                     {flag.severity}
                                   </span>
-                                  <span className="text-xs text-gray-500">
+                                  <span className="text-xs text-gray-500 dark:text-gray-400">
                                     {flag.categoryLabel}
                                   </span>
                                 </div>
@@ -351,7 +351,9 @@ export default function RedFlagDemo() {
                 </h3>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">{t.patientInfo.age}</label>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      {t.patientInfo.age}
+                    </label>
                     <input
                       type="number"
                       value={patientData.age}
@@ -362,7 +364,7 @@ export default function RedFlagDemo() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
                       {t.patientInfo.temperature}
                     </label>
                     <input
@@ -378,7 +380,9 @@ export default function RedFlagDemo() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Babinski</label>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                      Babinski
+                    </label>
                     <select
                       value={patientData.examination.babinski_left}
                       onChange={(e) =>
@@ -468,7 +472,9 @@ export default function RedFlagDemo() {
                   </div>
                 </div>
                 <div className="p-4">
-                  <p className="text-sm text-gray-600 line-clamp-3">{scenario.text}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-3">
+                    {scenario.text}
+                  </p>
                 </div>
                 <div className="px-4 py-3 border-t border-gray-100">
                   <button className="text-sm text-blue-600 hover:text-blue-800 font-medium">
@@ -488,7 +494,7 @@ export default function RedFlagDemo() {
                 <BookOpen className="w-5 h-5" />
                 {t.reference.title}
               </h2>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                 {lang === 'no'
                   ? `Totalt ${allDefinitions.length} røde flagg-definisjoner på tvers av ${Object.keys(definitionsByCategory).length} kategorier.`
                   : `Total of ${allDefinitions.length} red flag definitions across ${Object.keys(definitionsByCategory).length} categories.`}
@@ -525,25 +531,29 @@ export default function RedFlagDemo() {
                         <div className="flex-1">
                           <p className="font-medium text-gray-800">{def.description}</p>
                           <div className="mt-2">
-                            <span className="text-xs text-gray-500">{t.reference.keywords}:</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              {t.reference.keywords}:
+                            </span>
                             <div className="flex flex-wrap gap-1 mt-1">
                               {def.keywords.slice(0, 5).map((kw, i) => (
                                 <span
                                   key={i}
-                                  className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded"
+                                  className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 dark:text-gray-300 rounded"
                                 >
                                   {kw}
                                 </span>
                               ))}
                               {def.keywords.length > 5 && (
-                                <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-500 rounded">
+                                <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-500 dark:text-gray-400 rounded">
                                   +{def.keywords.length - 5}
                                 </span>
                               )}
                             </div>
                           </div>
                           <div className="mt-2">
-                            <span className="text-xs text-gray-500">{t.reference.action}:</span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              {t.reference.action}:
+                            </span>
                             <p className="text-sm text-gray-700 mt-1">{def.action}</p>
                           </div>
                         </div>

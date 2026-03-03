@@ -12,7 +12,12 @@ import UpperExtremityDiagram from './UpperExtremityDiagram';
 
 // Finding states
 const FINDING_STATES = [
-  { value: 'NT', label: 'Not Tested', labelNo: 'Ikke testet', color: 'bg-gray-100 text-gray-500' },
+  {
+    value: 'NT',
+    label: 'Not Tested',
+    labelNo: 'Ikke testet',
+    color: 'bg-gray-100 text-gray-500 dark:text-gray-400',
+  },
   {
     value: 'negative',
     label: 'Negative',
@@ -262,7 +267,7 @@ function FindingToggle({
             onClick={() => !disabled && onChange(state.value)}
             disabled={disabled}
             className={`px-2 py-1 text-xs rounded border transition-colors
-                       ${value === state.value ? `${state.color} border-current font-medium` : 'bg-white border-gray-200 text-gray-400 hover:border-gray-300'}`}
+                       ${value === state.value ? `${state.color} border-current font-medium` : 'bg-white border-gray-200 text-gray-400 dark:text-gray-300 hover:border-gray-300'}`}
           >
             {lang === 'no' ? state.labelNo : state.label}
           </button>
@@ -280,7 +285,7 @@ function FindingToggle({
             placeholder="°"
             className="w-12 px-1 py-1 text-xs border border-gray-200 rounded text-center"
           />
-          <span className="text-xs text-gray-400">°</span>
+          <span className="text-xs text-gray-400 dark:text-gray-300">°</span>
         </div>
       )}
     </div>
@@ -309,7 +314,7 @@ function TestItem({ test, values, onChange, lang }) {
           <p className="text-xs text-teal-600 mt-0.5">
             {lang === 'no' ? test.nerveNo : test.nerve}
           </p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             {lang === 'no' ? test.techniqueNo : test.technique}
           </p>
           {test.sensitizers && (
@@ -327,7 +332,7 @@ function TestItem({ test, values, onChange, lang }) {
         {test.bilateral ? (
           <>
             <div>
-              <span className="text-xs text-gray-400 block mb-1">
+              <span className="text-xs text-gray-400 dark:text-gray-300 block mb-1">
                 {lang === 'no' ? 'Venstre' : 'Left'}
               </span>
               <FindingToggle
@@ -340,7 +345,7 @@ function TestItem({ test, values, onChange, lang }) {
               />
             </div>
             <div>
-              <span className="text-xs text-gray-400 block mb-1">
+              <span className="text-xs text-gray-400 dark:text-gray-300 block mb-1">
                 {lang === 'no' ? 'Høyre' : 'Right'}
               </span>
               <FindingToggle
@@ -355,7 +360,7 @@ function TestItem({ test, values, onChange, lang }) {
           </>
         ) : (
           <div>
-            <span className="text-xs text-gray-400 block mb-1">
+            <span className="text-xs text-gray-400 dark:text-gray-300 block mb-1">
               {lang === 'no' ? 'Resultat' : 'Result'}
             </span>
             <FindingToggle
@@ -426,9 +431,9 @@ function CategorySection({ _categoryKey, category, values, onChange, lang, expan
             </span>
           )}
           {expanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
+            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           )}
         </div>
       </button>
@@ -597,7 +602,7 @@ export default function NerveTensionTests({
             {lang === 'no' ? 'Nervestrekkstester' : 'Neural Tension Tests'}
           </h3>
           {summary.tested > 0 && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {summary.tested} {lang === 'no' ? 'tester' : 'tests'}
               {summary.positive > 0 && (
                 <span className="text-red-600 ml-2">
@@ -649,16 +654,16 @@ export default function NerveTensionTests({
               </span>
             )}
             {showLowerDiagram ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
+              <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
+              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             )}
           </div>
         </button>
 
         {showLowerDiagram && (
           <div className="p-4 bg-white">
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
               {lang === 'no'
                 ? 'Klikk på diagrammet for å markere symptomer. Viser isjiasnerven (gul) og dermatomer (L4, L5, S1).'
                 : 'Click on the diagram to mark symptoms. Shows sciatic nerve (yellow) and dermatomes (L4, L5, S1).'}
@@ -715,16 +720,16 @@ export default function NerveTensionTests({
               </span>
             )}
             {showUpperDiagram ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
+              <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
+              <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             )}
           </div>
         </button>
 
         {showUpperDiagram && (
           <div className="p-4 bg-white">
-            <p className="text-xs text-gray-500 mb-3">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
               {lang === 'no'
                 ? 'Klikk på diagrammet for å markere symptomer. Viser median-, ulnar- og radialisnervene samt dermatomer (C5-T1).'
                 : 'Click on the diagram to mark symptoms. Shows median, ulnar, and radial nerves with dermatomes (C5-T1).'}

@@ -245,7 +245,9 @@ const AppointmentImporter = () => {
     <div className="border rounded-lg bg-white shadow-sm">
       <div className="px-4 py-3 border-b border-slate-100">
         <h3 className="text-lg font-medium text-slate-800">Importer avtaler</h3>
-        <p className="text-xs text-slate-500 mt-1">Last opp ICS (kalender) eller CSV-filer</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+          Last opp ICS (kalender) eller CSV-filer
+        </p>
       </div>
 
       <div className="p-4 space-y-4">
@@ -265,7 +267,7 @@ const AppointmentImporter = () => {
             >
               Velg fil (.ics / .csv)
             </button>
-            <p className="text-xs text-slate-400 mt-2">
+            <p className="text-xs text-slate-400 dark:text-slate-300 mt-2">
               Eksporter fra Google Calendar, Outlook, eller annen kalender
             </p>
           </div>
@@ -273,7 +275,7 @@ const AppointmentImporter = () => {
 
         {/* Checking Status */}
         {importStatus === 'checking' && (
-          <div className="flex items-center gap-2 text-sm text-slate-600">
+          <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
             <div className="h-4 w-4 border-2 border-teal-600 border-t-transparent rounded-full animate-spin" />
             Analyserer {fileName}...
           </div>
@@ -283,7 +285,7 @@ const AppointmentImporter = () => {
         {(importStatus === 'ready' || importStatus === 'importing') && parsedEvents.length > 0 && (
           <>
             <div className="flex items-center justify-between">
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 {parsedEvents.length} avtaler funnet
                 {Object.keys(conflicts).length > 0 && (
                   <span className="text-amber-600 ml-2">
@@ -294,13 +296,13 @@ const AppointmentImporter = () => {
               <div className="flex gap-2">
                 <button
                   onClick={toggleAll}
-                  className="text-xs px-2 py-1 bg-slate-100 text-slate-600 rounded hover:bg-slate-200"
+                  className="text-xs px-2 py-1 bg-slate-100 text-slate-600 dark:text-slate-300 rounded hover:bg-slate-200"
                 >
                   {selectedIds.size === parsedEvents.length ? 'Fjern alle' : 'Velg alle'}
                 </button>
                 <button
                   onClick={reset}
-                  className="text-xs px-2 py-1 text-slate-500 hover:text-slate-700"
+                  className="text-xs px-2 py-1 text-slate-500 dark:text-slate-400 hover:text-slate-700"
                 >
                   Avbryt
                 </button>
