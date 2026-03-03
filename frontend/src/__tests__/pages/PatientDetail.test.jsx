@@ -62,6 +62,10 @@ vi.mock('../../i18n', () => ({
         treatmentNotesPlaceholder: 'Any notes about treatment preferences...',
         recentVisits: 'Recent Visits',
         noVisitsRecorded: 'No visits recorded',
+        editPatient: 'Edit',
+        cancel: 'Cancel',
+        newVisit: 'New Visit',
+        backToPatients: 'Back to patients',
       };
       return map[key] || key;
     },
@@ -112,6 +116,10 @@ vi.mock('../../components/GDPRExportModal', () => ({
   ),
 }));
 
+vi.mock('../../components/patients/PatientTimeline', () => ({
+  default: () => <div data-testid="patient-timeline">Timeline</div>,
+}));
+
 // Mock lucide-react icons — use aria-hidden to avoid text matching conflicts
 vi.mock('lucide-react', () => ({
   ArrowLeft: () => <span aria-hidden="true" />,
@@ -126,6 +134,16 @@ vi.mock('lucide-react', () => ({
   MessageSquare: () => <span aria-hidden="true" />,
   Globe: () => <span aria-hidden="true" />,
   Shield: () => <span aria-hidden="true" />,
+  // StatusBadge.jsx icons
+  CheckCircle2: () => <span aria-hidden="true" />,
+  Clock: () => <span aria-hidden="true" />,
+  XCircle: () => <span aria-hidden="true" />,
+  AlertTriangle: () => <span aria-hidden="true" />,
+  Pause: () => <span aria-hidden="true" />,
+  HelpCircle: () => <span aria-hidden="true" />,
+  // PatientChartSidebar.jsx icons
+  Calendar: () => <span aria-hidden="true" />,
+  CheckCircle: () => <span aria-hidden="true" />,
 }));
 
 // Mock lib/utils
@@ -212,19 +230,21 @@ describe('PatientDetail Page', () => {
     expect(screen.getByText('Korsryggsmerter')).toBeInTheDocument();
   });
 
-  it('should display quick stats with total visits', async () => {
+  it('should display treatment preferences section', async () => {
     renderWithProviders(<PatientDetail />);
 
     await waitFor(() => {
-      expect(screen.getByText('Quick Stats')).toBeInTheDocument();
+      expect(screen.getByText('Treatment Preferences')).toBeInTheDocument();
     });
-    expect(screen.getByText('12')).toBeInTheDocument();
+    expect(screen.getByText('Needles')).toBeInTheDocument();
+    expect(screen.getByText('Adjustments')).toBeInTheDocument();
   });
 
   it('should show Edit button in non-editing mode', async () => {
     renderWithProviders(<PatientDetail />);
 
     await waitFor(() => {
+      // Edit text is inside <span className="hidden sm:inline"> but still in DOM
       expect(screen.getByText('Edit')).toBeInTheDocument();
     });
   });
@@ -248,7 +268,9 @@ describe('PatientDetail Page', () => {
     renderWithProviders(<PatientDetail />);
 
     await waitFor(() => {
-      expect(screen.getByText('ACTIVE')).toBeInTheDocument();
+      // Sidebar renders StatusBadge in two places (avatar section + stats)
+      const badges = screen.getAllByText('ACTIVE');
+      expect(badges.length).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -260,16 +282,28 @@ describe('PatientDetail Page', () => {
     });
   });
 
-  it('should render treatment plan progress widget', async () => {
+  it('should render treatment plan progress widget on Journals tab', async () => {
     renderWithProviders(<PatientDetail />);
+
+    // Switch to Journals tab
+    await waitFor(() => {
+      expect(screen.getByText('Journaler')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('Journaler'));
 
     await waitFor(() => {
       expect(screen.getByTestId('treatment-plan-progress')).toBeInTheDocument();
     });
   });
 
-  it('should display "No visits recorded" when encounters list is empty', async () => {
+  it('should display "No visits recorded" on Journals tab when encounters list is empty', async () => {
     renderWithProviders(<PatientDetail />);
+
+    // Switch to Journals tab
+    await waitFor(() => {
+      expect(screen.getByText('Journaler')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('Journaler'));
 
     await waitFor(() => {
       expect(screen.getByText('No visits recorded')).toBeInTheDocument();
@@ -290,10 +324,10 @@ describe('PatientDetail Page', () => {
     renderWithProviders(<PatientDetail />);
 
     await waitFor(() => {
-      expect(screen.getByText('Export Data')).toBeInTheDocument();
+      expect(screen.getByTitle('GDPR Export')).toBeInTheDocument();
     });
 
-    fireEvent.click(screen.getByText('Export Data'));
+    fireEvent.click(screen.getByTitle('GDPR Export'));
 
     await waitFor(() => {
       expect(screen.getByTestId('gdpr-modal')).toBeInTheDocument();
