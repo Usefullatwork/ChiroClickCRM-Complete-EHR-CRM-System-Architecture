@@ -236,6 +236,9 @@ export const encountersAPI = {
   // Assessment-first: diagnosis-to-findings map
   getDiagnosisFindings: (diagnosisCode) =>
     apiClient.get(`/encounters/diagnosis-findings/${encodeURIComponent(diagnosisCode)}`),
+  // Reverse lookup: suggest diagnosis codes from anatomy findings
+  getCodesFromFindings: (bodyRegions) =>
+    apiClient.post('/encounters/codes-from-findings', { bodyRegions }),
 };
 
 // Appointments

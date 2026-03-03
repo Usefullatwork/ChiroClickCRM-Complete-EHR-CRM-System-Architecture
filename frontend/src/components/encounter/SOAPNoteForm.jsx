@@ -79,6 +79,9 @@ export function SOAPNoteForm({
   _setAutoSaveStatus,
   // Section order
   sectionOrder = 'soap',
+  // Auto-coding suggestions
+  suggestedCodes,
+  suggestedCMTCode,
 }) {
   // --- SECTION DEFINITIONS ---
 
@@ -378,6 +381,38 @@ export function SOAPNoteForm({
           isSigned={isSigned}
         />
 
+        {/* Auto-suggested codes from anatomy findings */}
+        {suggestedCodes?.length > 0 && !isSigned && (
+          <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg">
+            <div className="text-xs font-medium text-amber-700 mb-2">
+              Foreslatte koder fra funn:
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {suggestedCodes
+                .filter((s) => !encounterData.icpc_codes.includes(s.diagnosis_code))
+                .map((suggestion) => (
+                  <button
+                    key={suggestion.diagnosis_code}
+                    onClick={() =>
+                      toggleDiagnosis({
+                        code: suggestion.diagnosis_code,
+                        description_no: suggestion.diagnosis_name,
+                      })
+                    }
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-amber-200 bg-white text-amber-800 hover:bg-amber-100 transition-colors"
+                    title={`${suggestion.matching_regions} matchende regioner, ${Math.round(suggestion.avg_confidence * 100)}% konfidenssnitt`}
+                  >
+                    <span className="font-medium">{suggestion.diagnosis_code}</span>
+                    <span className="text-amber-600">{suggestion.diagnosis_name}</span>
+                    <span className="text-[10px] text-amber-500">
+                      {Math.round(suggestion.avg_confidence * 100)}%
+                    </span>
+                  </button>
+                ))}
+            </div>
+          </div>
+        )}
+
         <EnhancedClinicalTextarea
           value={encounterData.assessment.clinical_reasoning}
           onChange={(val) => updateField('assessment', 'clinical_reasoning', val)}
@@ -456,6 +491,21 @@ export function SOAPNoteForm({
             Endre i innstillinger
           </button>
         </div>
+
+        {/* CMT code suggestion from anatomy findings */}
+        {suggestedCMTCode && !isSigned && (
+          <div className="p-3 bg-purple-50 border border-purple-100 rounded-lg flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-purple-700">Behandlingskode:</span>
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
+                {suggestedCMTCode.code}
+              </span>
+              <span className="text-xs text-purple-600">
+                {suggestedCMTCode.name} ({suggestedCMTCode.regions} spinalregioner)
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Treatment Performed - Conditional Rendering Based on Notation Method */}
         {isVisualNotation ? (

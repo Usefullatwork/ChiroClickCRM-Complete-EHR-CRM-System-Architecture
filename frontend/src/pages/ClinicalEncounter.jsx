@@ -5,7 +5,7 @@
  * UI sections are extracted to components/encounter/.
  */
 
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { encountersAPI, patientsAPI, diagnosisAPI, aiAPI } from '../services/api';
@@ -337,6 +337,44 @@ export default function ClinicalEncounter() {
       state.setAnatomySpineFindings(findingsMap);
     }
   }, [existingAnatomyFindings]);
+
+  // === AUTO-CODING ===
+
+  // Confirmed body regions for reverse lookup
+  const confirmedRegions = useMemo(() => {
+    const findings = state.anatomySpineFindings || {};
+    return Object.values(findings)
+      .filter((f) => f.confirmed !== false)
+      .map((f) => f.body_region);
+  }, [state.anatomySpineFindings]);
+
+  // CMT code auto-calculation based on treated spinal regions
+  const suggestedCMTCode = useMemo(() => {
+    const spinalRegionPattern = /^[CTLS]\d+$/;
+    const treatedRegions = new Set();
+    for (const region of confirmedRegions) {
+      if (spinalRegionPattern.test(region)) {
+        // Map to broad region: C=cervical, T=thoracic, L=lumbar, S=sacral
+        treatedRegions.add(region[0]);
+      }
+    }
+    const count = treatedRegions.size;
+    if (count === 0) return null;
+    if (count <= 2) return { code: '98940', name: 'CMT 1-2 regioner', regions: count };
+    if (count <= 4) return { code: '98941', name: 'CMT 3-4 regioner', regions: count };
+    return { code: '98942', name: 'CMT 5+ regioner', regions: count };
+  }, [confirmedRegions]);
+
+  // Reverse lookup: suggest diagnosis codes from confirmed findings
+  const { data: suggestedCodes } = useQuery({
+    queryKey: ['codes-from-findings', confirmedRegions],
+    queryFn: async () => {
+      const response = await encountersAPI.getCodesFromFindings(confirmedRegions);
+      return response?.data?.data || [];
+    },
+    enabled: confirmedRegions.length > 0,
+    staleTime: 10000,
+  });
 
   // === MUTATIONS ===
 
@@ -1086,6 +1124,8 @@ export default function ClinicalEncounter() {
               setShowExercisePanel={setShowExercisePanel}
               setAutoSaveStatus={setAutoSaveStatus}
               sectionOrder={clinicalPrefs.soapSectionOrder || 'soap'}
+              suggestedCodes={suggestedCodes}
+              suggestedCMTCode={suggestedCMTCode}
             />
 
             {/* Amendments (signed encounters only) */}

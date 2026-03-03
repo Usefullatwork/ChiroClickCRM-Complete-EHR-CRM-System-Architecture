@@ -691,4 +691,19 @@ router.get(
   }
 );
 
+// Reverse lookup: suggest diagnosis codes from anatomy finding regions
+router.post(
+  '/codes-from-findings',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  async (req, res, next) => {
+    try {
+      const { bodyRegions } = req.body;
+      const codes = await encounterService.getCodesFromFindings(bodyRegions);
+      res.json({ data: codes });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 export default router;

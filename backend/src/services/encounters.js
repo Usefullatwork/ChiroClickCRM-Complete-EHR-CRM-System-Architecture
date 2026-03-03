@@ -667,6 +667,28 @@ const getDiagnosisFindings = async (diagnosisCode) => {
   }
 };
 
+// Reverse lookup: given body regions, suggest diagnosis codes
+const getCodesFromFindings = async (bodyRegions) => {
+  try {
+    if (!bodyRegions || bodyRegions.length === 0) return [];
+    const result = await query(
+      `SELECT diagnosis_code, diagnosis_name,
+              COUNT(*) as matching_regions,
+              AVG(confidence) as avg_confidence
+       FROM finding_diagnosis_map
+       WHERE body_region = ANY($1) AND is_active = true
+       GROUP BY diagnosis_code, diagnosis_name
+       ORDER BY matching_regions DESC, avg_confidence DESC
+       LIMIT 5`,
+      [bodyRegions]
+    );
+    return result.rows;
+  } catch (error) {
+    logger.error('Error reverse-looking up codes from findings:', error);
+    throw error;
+  }
+};
+
 export default {
   getAllEncounters,
   getEncounterById,
@@ -681,4 +703,5 @@ export default {
   getAnatomyFindings,
   getLatestAnatomyFindings,
   getDiagnosisFindings,
+  getCodesFromFindings,
 };
