@@ -633,4 +633,48 @@ router.delete(
   amendmentController.deleteAmendment
 );
 
+// --- Anatomy Findings ---
+
+router.get(
+  '/:encounterId/anatomy-findings',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  async (req, res, next) => {
+    try {
+      const findings = await encounterService.getAnatomyFindings(req.params.encounterId);
+      res.json({ data: findings });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.post(
+  '/:encounterId/anatomy-findings',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  async (req, res, next) => {
+    try {
+      const result = await encounterService.saveAnatomyFindings(
+        req.params.encounterId,
+        req.body.findings
+      );
+      res.json({ data: result });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+router.get(
+  '/patient/:patientId/latest-anatomy-findings',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  async (req, res, next) => {
+    try {
+      const findings = await encounterService.getLatestAnatomyFindings(req.params.patientId);
+      res.json({ data: findings });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 export default router;

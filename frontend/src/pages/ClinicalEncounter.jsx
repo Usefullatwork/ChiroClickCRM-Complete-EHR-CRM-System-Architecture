@@ -308,6 +308,36 @@ export default function ClinicalEncounter() {
     enabled: !!patientId,
   });
 
+  // Carry-forward: fetch latest anatomy findings for this patient
+  const { data: latestAnatomyFindings } = useQuery({
+    queryKey: ['anatomy-findings', 'latest', patientId],
+    queryFn: async () => {
+      const response = await encountersAPI.getLatestAnatomyFindings(patientId);
+      return response?.data?.data || [];
+    },
+    enabled: !!patientId && !encounterId,
+  });
+
+  // Load existing anatomy findings when editing an encounter
+  const { data: existingAnatomyFindings } = useQuery({
+    queryKey: ['anatomy-findings', encounterId],
+    queryFn: async () => {
+      const response = await encountersAPI.getAnatomyFindings(encounterId);
+      return response?.data?.data || [];
+    },
+    enabled: !!encounterId,
+  });
+
+  useEffect(() => {
+    if (existingAnatomyFindings?.length > 0) {
+      const findingsMap = {};
+      for (const f of existingAnatomyFindings) {
+        findingsMap[f.body_region] = f;
+      }
+      state.setAnatomySpineFindings(findingsMap);
+    }
+  }, [existingAnatomyFindings]);
+
   // === MUTATIONS ===
 
   const saveMutation = useMutation({
@@ -322,6 +352,27 @@ export default function ClinicalEncounter() {
       queryClient.invalidateQueries(['patient', patientId]);
       setAutoSaveStatus('saved');
       setLastSaved(new Date());
+
+      // Save anatomy findings alongside encounter
+      const savedEncounterId = encounterId || response?.data?.id;
+      const findings = state.anatomySpineFindings;
+      if (savedEncounterId && findings && Object.keys(findings).length > 0) {
+        const findingsArray = Object.values(findings).map((f) => ({
+          body_region: f.body_region,
+          finding_type: f.finding_type || 'palpation',
+          laterality: f.laterality || 'bilateral',
+          severity: f.severity || 'moderate',
+          direction: f.direction || null,
+          note_text: f.note_text || null,
+          is_positive: f.is_positive !== false,
+          source: f.source || 'manual',
+          confirmed: f.confirmed !== false,
+        }));
+        encountersAPI.saveAnatomyFindings(savedEncounterId, findingsArray).catch(() => {
+          // Non-blocking — anatomy save failure shouldn't block encounter save
+        });
+      }
+
       if (!encounterId && response?.data?.id) {
         navigate(`/patients/${patientId}/encounter/${response.data.id}`, { replace: true });
       }
@@ -803,6 +854,22 @@ export default function ClinicalEncounter() {
     }
   };
 
+  // Carry-forward: load previous visit anatomy findings as unconfirmed
+  const handleCarryForward = () => {
+    if (!latestAnatomyFindings || latestAnatomyFindings.length === 0) return;
+
+    const carriedFindings = {};
+    for (const f of latestAnatomyFindings) {
+      carriedFindings[f.body_region] = {
+        ...f,
+        source: 'carried_forward',
+        confirmed: false,
+      };
+    }
+    state.setAnatomySpineFindings(carriedFindings);
+    setAutoSaveStatus('unsaved');
+  };
+
   // === COMPUTED VALUES ===
 
   const totalPrice = taksterNorwegian
@@ -913,6 +980,31 @@ export default function ClinicalEncounter() {
               </span>
             </button>
           </div>
+
+          {/* CARRY-FORWARD ANATOMY FINDINGS BANNER */}
+          {latestAnatomyFindings?.length > 0 && !encounterId && !isSigned && (
+            <div className="mx-6 mt-2 space-y-1">
+              <div className="p-3 bg-violet-50 border border-violet-200 rounded-lg flex items-center justify-between">
+                <div className="text-sm text-violet-800">
+                  <span className="font-medium">{latestAnatomyFindings.length} funn</span>
+                  {' fra forrige konsultasjon tilgjengelig'}
+                </div>
+                <button
+                  onClick={handleCarryForward}
+                  className="px-3 py-1.5 text-xs font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-md transition-colors"
+                >
+                  Bruk forrige funn
+                </button>
+              </div>
+              {/* Compliance guard: warn if previous findings were also carried forward */}
+              {latestAnatomyFindings.some((f) => f.source === 'carried_forward') && (
+                <div className="p-2 bg-amber-50 border border-amber-200 rounded-md text-xs text-amber-700">
+                  Noen funn har blitt viderefort uten ny undersokelse i flere konsultasjoner. Vurder
+                  a bekrefte eller oppdatere disse funnene.
+                </div>
+              )}
+            </div>
+          )}
 
           {/* SCROLLABLE SOAP FORM */}
           <div className="flex-1 overflow-y-auto">

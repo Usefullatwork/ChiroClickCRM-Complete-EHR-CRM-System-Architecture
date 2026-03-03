@@ -562,6 +562,94 @@ export const checkRedFlags = async (patientId, _encounterData) => {
   }
 };
 
+/**
+ * Save anatomy findings for an encounter
+ */
+export const saveAnatomyFindings = async (encounterId, findings) => {
+  try {
+    await query('DELETE FROM encounter_anatomy_findings WHERE encounter_id = $1', [encounterId]);
+
+    if (!findings || findings.length === 0) return { saved: 0 };
+
+    const values = [];
+    const placeholders = [];
+    let paramIndex = 1;
+
+    for (const f of findings) {
+      placeholders.push(
+        `($${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++}, $${paramIndex++})`
+      );
+      values.push(
+        encounterId,
+        f.body_region,
+        f.finding_type || 'palpation',
+        f.laterality || 'bilateral',
+        f.severity || 'moderate',
+        f.direction || null,
+        f.note_text || null,
+        f.is_positive !== false,
+        f.source || 'manual'
+      );
+    }
+
+    await query(
+      `INSERT INTO encounter_anatomy_findings
+        (encounter_id, body_region, finding_type, laterality, severity, direction, note_text, is_positive, source)
+       VALUES ${placeholders.join(', ')}`,
+      values
+    );
+
+    return { saved: findings.length };
+  } catch (error) {
+    logger.error('Error saving anatomy findings:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get anatomy findings for an encounter
+ */
+export const getAnatomyFindings = async (encounterId) => {
+  try {
+    const result = await query(
+      `SELECT id, body_region, finding_type, laterality, severity, direction,
+              note_text, is_positive, source, confirmed, created_at
+       FROM encounter_anatomy_findings
+       WHERE encounter_id = $1
+       ORDER BY created_at`,
+      [encounterId]
+    );
+    return result.rows;
+  } catch (error) {
+    logger.error('Error fetching anatomy findings:', error);
+    throw error;
+  }
+};
+
+/**
+ * Get latest anatomy findings for a patient (for carry-forward)
+ */
+export const getLatestAnatomyFindings = async (patientId) => {
+  try {
+    const result = await query(
+      `SELECT eaf.id, eaf.body_region, eaf.finding_type, eaf.laterality,
+              eaf.severity, eaf.direction, eaf.note_text, eaf.is_positive,
+              eaf.source, eaf.confirmed, eaf.created_at,
+              ce.encounter_date
+       FROM encounter_anatomy_findings eaf
+       JOIN clinical_encounters ce ON ce.id = eaf.encounter_id
+       WHERE ce.patient_id = $1 AND eaf.confirmed = true
+       ORDER BY ce.encounter_date DESC, eaf.created_at DESC
+       LIMIT 50`,
+      [patientId]
+    );
+    return result.rows;
+  } catch (error) {
+    logger.error('Error fetching latest anatomy findings:', error);
+    throw error;
+  }
+};
+
 export default {
   getAllEncounters,
   getEncounterById,
@@ -572,4 +660,7 @@ export default {
   generateFormattedNote,
   getPatientEncounterHistory,
   checkRedFlags,
+  saveAnatomyFindings,
+  getAnatomyFindings,
+  getLatestAnatomyFindings,
 };

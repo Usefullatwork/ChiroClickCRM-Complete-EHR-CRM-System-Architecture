@@ -354,6 +354,60 @@ export default function AnatomyViewer({
         )}
       </div>
 
+      {/* Findings list with confirmed/carried-forward styling */}
+      {totalFindings > 0 && (
+        <div className="px-4 py-3 border-t border-gray-100">
+          <div className="text-xs font-medium text-gray-500 mb-2">Registrerte funn:</div>
+          <div className="flex flex-wrap gap-1.5">
+            {Object.entries(spineFindings).map(([region, finding]) => {
+              const isConfirmed = finding.confirmed !== false;
+              const isCarriedForward = finding.source === 'carried_forward';
+              return (
+                <button
+                  key={region}
+                  onClick={() => {
+                    if (!isConfirmed && onSpineFindingsChange) {
+                      onSpineFindingsChange({
+                        ...spineFindings,
+                        [region]: { ...finding, confirmed: true, source: 'manual' },
+                      });
+                    }
+                  }}
+                  className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border transition-colors ${
+                    isConfirmed
+                      ? 'bg-blue-50 border-blue-200 text-blue-800'
+                      : 'bg-gray-50 border-gray-300 text-gray-500 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 cursor-pointer'
+                  }`}
+                  title={isCarriedForward && !isConfirmed ? 'Klikk for å bekrefte' : region}
+                >
+                  <span
+                    className={`w-1.5 h-1.5 rounded-full ${isConfirmed ? 'bg-blue-500' : 'bg-gray-400'}`}
+                  />
+                  {region}
+                  {finding.direction && (
+                    <span className="text-[10px] opacity-70">({finding.direction})</span>
+                  )}
+                </button>
+              );
+            })}
+            {bodyRegions.map((region) => (
+              <span
+                key={region}
+                className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border bg-emerald-50 border-emerald-200 text-emerald-800"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                {region}
+              </span>
+            ))}
+          </div>
+          {Object.values(spineFindings).some((f) => f.confirmed === false) && (
+            <div className="mt-2 text-[11px] text-gray-400 italic">
+              Grå funn er fra forrige konsultasjon. Klikk for å bekrefte.
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Combined narrative footer */}
       {showNarrative && mode === VIEW_MODES.COMBINED && totalFindings > 0 && (
         <div className="px-4 py-3 bg-green-50 border-t border-green-200 rounded-b-lg">

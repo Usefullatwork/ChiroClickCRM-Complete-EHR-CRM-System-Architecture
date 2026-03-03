@@ -227,6 +227,12 @@ export const encountersAPI = {
     apiClient.post(`/encounters/${encounterId}/amendments/${amendmentId}/sign`),
   deleteAmendment: (encounterId, amendmentId) =>
     apiClient.delete(`/encounters/${encounterId}/amendments/${amendmentId}`),
+  // Anatomy findings
+  getAnatomyFindings: (encounterId) => apiClient.get(`/encounters/${encounterId}/anatomy-findings`),
+  saveAnatomyFindings: (encounterId, findings) =>
+    apiClient.post(`/encounters/${encounterId}/anatomy-findings`, { findings }),
+  getLatestAnatomyFindings: (patientId) =>
+    apiClient.get(`/encounters/patient/${patientId}/latest-anatomy-findings`),
 };
 
 // Appointments
