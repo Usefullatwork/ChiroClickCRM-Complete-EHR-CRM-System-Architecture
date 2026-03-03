@@ -650,6 +650,23 @@ export const getLatestAnatomyFindings = async (patientId) => {
   }
 };
 
+// Get diagnosis-to-findings mappings for assessment-first workflow
+const getDiagnosisFindings = async (diagnosisCode) => {
+  try {
+    const result = await query(
+      `SELECT body_region, expected_findings, suggested_ortho_tests, confidence
+       FROM finding_diagnosis_map
+       WHERE diagnosis_code = $1 AND is_active = true
+       ORDER BY confidence DESC`,
+      [diagnosisCode]
+    );
+    return result.rows;
+  } catch (error) {
+    logger.error('Error fetching diagnosis findings map:', error);
+    throw error;
+  }
+};
+
 export default {
   getAllEncounters,
   getEncounterById,
@@ -663,4 +680,5 @@ export default {
   saveAnatomyFindings,
   getAnatomyFindings,
   getLatestAnatomyFindings,
+  getDiagnosisFindings,
 };

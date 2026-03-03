@@ -354,14 +354,31 @@ export default function AnatomyViewer({
         )}
       </div>
 
-      {/* Findings list with confirmed/carried-forward styling */}
+      {/* Findings list with confirmed/suggested/carried-forward styling */}
       {totalFindings > 0 && (
         <div className="px-4 py-3 border-t border-gray-100">
           <div className="text-xs font-medium text-gray-500 mb-2">Registrerte funn:</div>
           <div className="flex flex-wrap gap-1.5">
             {Object.entries(spineFindings).map(([region, finding]) => {
               const isConfirmed = finding.confirmed !== false;
+              const isSuggested = finding.source === 'ai_suggested';
               const isCarriedForward = finding.source === 'carried_forward';
+              // Three states: blue=confirmed, yellow=AI suggested, gray=carried forward
+              const chipClass = isConfirmed
+                ? 'bg-blue-50 border-blue-200 text-blue-800'
+                : isSuggested
+                  ? 'bg-amber-50 border-amber-200 text-amber-800 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 cursor-pointer'
+                  : 'bg-gray-50 border-gray-300 text-gray-500 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 cursor-pointer';
+              const dotClass = isConfirmed
+                ? 'bg-blue-500'
+                : isSuggested
+                  ? 'bg-amber-400'
+                  : 'bg-gray-400';
+              const title = isConfirmed
+                ? region
+                : isSuggested
+                  ? `Foreslatt fra diagnose (${Math.round((finding.confidence || 0.8) * 100)}%) — klikk for a bekrefte`
+                  : 'Klikk for a bekrefte';
               return (
                 <button
                   key={region}
@@ -373,19 +390,18 @@ export default function AnatomyViewer({
                       });
                     }
                   }}
-                  className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border transition-colors ${
-                    isConfirmed
-                      ? 'bg-blue-50 border-blue-200 text-blue-800'
-                      : 'bg-gray-50 border-gray-300 text-gray-500 hover:bg-blue-50 hover:border-blue-200 hover:text-blue-700 cursor-pointer'
-                  }`}
-                  title={isCarriedForward && !isConfirmed ? 'Klikk for å bekrefte' : region}
+                  className={`inline-flex items-center gap-1 px-2 py-1 text-xs rounded-full border transition-colors ${chipClass}`}
+                  title={title}
                 >
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full ${isConfirmed ? 'bg-blue-500' : 'bg-gray-400'}`}
-                  />
+                  <span className={`w-1.5 h-1.5 rounded-full ${dotClass}`} />
                   {region}
                   {finding.direction && (
                     <span className="text-[10px] opacity-70">({finding.direction})</span>
+                  )}
+                  {isSuggested && !isConfirmed && finding.confidence && (
+                    <span className="text-[10px] opacity-60">
+                      {Math.round(finding.confidence * 100)}%
+                    </span>
                   )}
                 </button>
               );
@@ -402,7 +418,9 @@ export default function AnatomyViewer({
           </div>
           {Object.values(spineFindings).some((f) => f.confirmed === false) && (
             <div className="mt-2 text-[11px] text-gray-400 italic">
-              Grå funn er fra forrige konsultasjon. Klikk for å bekrefte.
+              {Object.values(spineFindings).some((f) => f.source === 'ai_suggested')
+                ? 'Gule funn er foreslatt fra diagnosen. Klikk for a bekrefte.'
+                : 'Gra funn er fra forrige konsultasjon. Klikk for a bekrefte.'}
             </div>
           )}
         </div>

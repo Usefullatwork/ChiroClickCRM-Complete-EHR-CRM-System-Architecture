@@ -677,4 +677,18 @@ router.get(
   }
 );
 
+// Assessment-first: get findings map for a diagnosis code
+router.get(
+  '/diagnosis-findings/:diagnosisCode',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  async (req, res, next) => {
+    try {
+      const findings = await encounterService.getDiagnosisFindings(req.params.diagnosisCode);
+      res.json({ data: findings });
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 export default router;

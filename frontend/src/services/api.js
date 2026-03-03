@@ -233,6 +233,9 @@ export const encountersAPI = {
     apiClient.post(`/encounters/${encounterId}/anatomy-findings`, { findings }),
   getLatestAnatomyFindings: (patientId) =>
     apiClient.get(`/encounters/patient/${patientId}/latest-anatomy-findings`),
+  // Assessment-first: diagnosis-to-findings map
+  getDiagnosisFindings: (diagnosisCode) =>
+    apiClient.get(`/encounters/diagnosis-findings/${encodeURIComponent(diagnosisCode)}`),
 };
 
 // Appointments

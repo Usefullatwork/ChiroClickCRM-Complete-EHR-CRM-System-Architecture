@@ -693,7 +693,8 @@ export default function ClinicalEncounter() {
     updateField(section, field, `${currentValue + (currentValue ? '\n' : '')}\u2022 ${phrase}`);
   };
 
-  const toggleDiagnosis = (diagnosis) => {
+  const toggleDiagnosis = async (diagnosis) => {
+    const isAdding = !encounterData.icpc_codes.includes(diagnosis.code);
     setEncounterData((prev) => {
       const exists = prev.icpc_codes.includes(diagnosis.code);
       return {
@@ -705,6 +706,36 @@ export default function ClinicalEncounter() {
     });
     setDiagnosisSearch('');
     setShowDiagnosisDropdown(false);
+
+    // Assessment-first: when adding a diagnosis, auto-suggest anatomy findings
+    if (isAdding) {
+      try {
+        const response = await encountersAPI.getDiagnosisFindings(diagnosis.code);
+        const mappings = response?.data?.data || [];
+        if (mappings.length > 0) {
+          const suggestedFindings = {};
+          for (const m of mappings) {
+            if (!state.anatomySpineFindings[m.body_region]) {
+              suggestedFindings[m.body_region] = {
+                body_region: m.body_region,
+                finding_type: m.expected_findings?.[0]?.type || 'palpation',
+                severity: m.expected_findings?.[0]?.severity_range?.[0] || 'moderate',
+                laterality: m.expected_findings?.[0]?.laterality || 'bilateral',
+                source: 'ai_suggested',
+                confirmed: false,
+                confidence: m.confidence,
+              };
+            }
+          }
+          if (Object.keys(suggestedFindings).length > 0) {
+            state.setAnatomySpineFindings((prev) => ({ ...prev, ...suggestedFindings }));
+            state.setShowAnatomyPanel(true);
+          }
+        }
+      } catch {
+        // Non-blocking — diagnosis suggestion failure shouldn't block code selection
+      }
+    }
   };
 
   const removeDiagnosisCode = (code) => {
