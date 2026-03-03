@@ -9,6 +9,7 @@ lerna-debug.log*
 # Environment variables
 .env
 .env.local
+.env.production
 .env.development.local
 .env.test.local
 .env.production.local
@@ -43,6 +44,9 @@ tmp/
 # Testing
 coverage/
 .nyc_output/
+e2e/playwright-report/
+e2e/test-results/
+e2e/tests/.auth/
 
 # Database
 *.sqlite
