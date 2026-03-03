@@ -1,0 +1,38 @@
+# =============================================================================
+# ChiroClickCRM — Local Production Override
+# =============================================================================
+# Overrides docker-compose.production.yml to build from source instead of
+# pulling pre-built images from GHCR. Use for local development/testing of
+# the production stack.
+#
+# Usage:
+#   docker compose -f docker-compose.production.yml -f docker-compose.local-prod.yml \
+#     --env-file .env.production up -d --build
+# =============================================================================
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DESKTOP_MODE: "true"
+      CORS_ORIGIN: "http://localhost,http://localhost:80"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: http://localhost/api/v1
+        VITE_CLERK_PUBLISHABLE_KEY: pk_test_placeholder
+
+  # Expose postgres port locally for debugging (production keeps it internal)
+  postgres:
+    ports:
+      - "5432:5432"
+
+  # Expose redis port locally for debugging
+  redis:
+    ports:
+      - "6379:6379"
