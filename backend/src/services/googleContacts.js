@@ -153,7 +153,7 @@ export const syncPatientToContact = async (patientData) => {
         },
         {
           key: 'Source',
-          value: 'ChiroClickCRM',
+          value: 'ChiroClickEHR',
         },
       ],
     };

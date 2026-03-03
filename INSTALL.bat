@@ -1,11 +1,11 @@
 @echo off
-title ChiroClick CRM - Installasjon
+title ChiroClickEHR - Installasjon
 color 0B
 setlocal enabledelayedexpansion
 
 echo.
 echo  =====================================================
-echo   ChiroClick CRM - Installasjon (Installation)
+echo   ChiroClickEHR - Installasjon (Installation)
 echo  =====================================================
 echo.
 echo   Dette skriptet setter opp alt du trenger.
@@ -226,8 +226,8 @@ if %errorlevel% equ 0 (
     echo         (For AI support, download Ollama from:)
     echo           https://ollama.ai
     echo.
-    echo         ChiroClick fungerer fint uten AI ogsaa!
-    echo         (ChiroClick works fine without AI too!)
+    echo         ChiroClickEHR fungerer fint uten AI ogsaa!
+    echo         (ChiroClickEHR works fine without AI too!)
 )
 
 :: Check portable models
@@ -276,8 +276,8 @@ echo     AI-modeller:       !OLLAMA_MODELS_COUNT! portable modell(er)
 )
 echo.
 echo   -------------------------------------------------
-echo   For aa starte ChiroClick CRM, kjoer:
-echo   (To start ChiroClick CRM, run:)
+echo   For aa starte ChiroClickEHR, kjoer:
+echo   (To start ChiroClickEHR, run:)
 echo.
 echo     START-CHIROCLICK.bat
 echo.

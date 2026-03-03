@@ -1,14 +1,14 @@
 @echo off
 REM ============================================================================
-REM ChiroClick AI Models - Test Script
+REM ChiroClickEHR AI Models - Test Script
 REM ============================================================================
-REM Tests all ChiroClick models with sample prompts.
+REM Tests all ChiroClickEHR models with sample prompts.
 REM Run this after build-all-models.bat to verify everything works.
 REM ============================================================================
 
 echo.
 echo ============================================================
-echo    ChiroClick AI Models - Test Suite
+echo    ChiroClickEHR AI Models - Test Suite
 echo ============================================================
 echo.
 

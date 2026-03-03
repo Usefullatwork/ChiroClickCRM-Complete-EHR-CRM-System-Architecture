@@ -1,6 +1,6 @@
 @echo off
 REM ============================================================
-REM ChiroClickCRM Database Setup Script for Windows
+REM ChiroClickEHR Database Setup Script for Windows
 REM ============================================================
 REM Prerequisites:
 REM   - PostgreSQL 14+ installed and in PATH
@@ -28,7 +28,7 @@ set PROJECT_ROOT=%SCRIPT_DIR%..
 
 echo.
 echo ============================================================
-echo ChiroClickCRM Database Setup
+echo ChiroClickEHR Database Setup
 echo ============================================================
 echo Database: %DB_NAME%
 echo User: %DB_USER%

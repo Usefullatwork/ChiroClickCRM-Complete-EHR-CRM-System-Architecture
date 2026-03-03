@@ -200,13 +200,13 @@ export const sendEmail = async (emailData) => {
 export const sendTemplateEmail = async (to, templateName, variables) => {
   // This would fetch the template from database and populate variables
   // For now, basic implementation
-  const subject = variables.subject || 'Melding fra ChiroClickCRM';
+  const subject = variables.subject || 'Melding fra ChiroClickEHR';
   const body = `
     <html>
       <body>
         <p>Hei ${variables.patient_name || ''},</p>
         <p>${variables.message || ''}</p>
-        <p>Med vennlig hilsen,<br>${variables.clinic_name || 'ChiroClickCRM'}</p>
+        <p>Med vennlig hilsen,<br>${variables.clinic_name || 'ChiroClickEHR'}</p>
       </body>
     </html>
   `;

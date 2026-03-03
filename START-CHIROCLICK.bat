@@ -1,11 +1,11 @@
 @echo off
-title ChiroClick CRM - Starting...
+title ChiroClickEHR - Starting...
 color 0A
 setlocal enabledelayedexpansion
 
 echo.
 echo  ========================================
-echo   ChiroClick CRM - Starting Application
+echo   ChiroClickEHR - Starting Application
 echo  ========================================
 echo.
 
@@ -124,7 +124,7 @@ if "%AI_MODE%"=="enabled" (
     echo [2/4] Starting Backend Server...
 )
 cd /d "%~dp0\backend"
-start "ChiroClick Backend" cmd /k "npm start"
+start "ChiroClickEHR Backend" cmd /k "npm start"
 timeout /t 5 /nobreak >nul
 
 :: Start Frontend
@@ -135,7 +135,7 @@ if "%AI_MODE%"=="enabled" (
     echo [3/4] Starting Frontend...
 )
 cd /d "%~dp0\frontend"
-start "ChiroClick Frontend" cmd /k "npm run dev"
+start "ChiroClickEHR Frontend" cmd /k "npm run dev"
 timeout /t 8 /nobreak >nul
 
 :: Open Browser
@@ -149,7 +149,7 @@ start msedge "http://localhost:5173"
 
 echo.
 echo  ========================================
-echo   ChiroClick CRM is now running!
+echo   ChiroClickEHR is now running!
 echo  ========================================
 echo.
 echo   Frontend: http://localhost:5173

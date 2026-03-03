@@ -1,6 +1,6 @@
 /**
  * FHIR R4 Adapter Service
- * Converts ChiroClickCRM data to HL7 FHIR R4 format for interoperability
+ * Converts ChiroClickEHR data to HL7 FHIR R4 format for interoperability
  * Supports Norwegian healthcare integration requirements
  */
 
@@ -31,13 +31,13 @@ const CODE_SYSTEMS = {
  */
 class FHIRAdapter {
   constructor(options = {}) {
-    this.baseUrl = options.baseUrl || 'https://api.chiroclickcrm.no/fhir/r4';
+    this.baseUrl = options.baseUrl || 'https://api.chiroclickehr.no/fhir/r4';
     this.version = 'R4';
   }
 
   /**
    * Convert patient to FHIR Patient resource
-   * @param {Object} patient - ChiroClickCRM patient object
+   * @param {Object} patient - ChiroClickEHR patient object
    * @returns {Object} FHIR Patient resource
    */
   toFHIRPatient(patient) {
@@ -188,7 +188,7 @@ class FHIRAdapter {
 
   /**
    * Convert encounter to FHIR Encounter resource
-   * @param {Object} encounter - ChiroClickCRM clinical encounter
+   * @param {Object} encounter - ChiroClickEHR clinical encounter
    * @param {Object} patient - Associated patient
    * @returns {Object} FHIR Encounter resource
    */
@@ -256,7 +256,7 @@ class FHIRAdapter {
 
   /**
    * Convert diagnosis to FHIR Condition resource
-   * @param {Object} diagnosis - ChiroClickCRM diagnosis
+   * @param {Object} diagnosis - ChiroClickEHR diagnosis
    * @param {Object} patient - Associated patient
    * @returns {Object} FHIR Condition resource
    */
@@ -328,7 +328,7 @@ class FHIRAdapter {
 
   /**
    * Convert treatment to FHIR Procedure resource
-   * @param {Object} treatment - ChiroClickCRM treatment
+   * @param {Object} treatment - ChiroClickEHR treatment
    * @param {Object} patient - Associated patient
    * @returns {Object} FHIR Procedure resource
    */
@@ -398,7 +398,7 @@ class FHIRAdapter {
 
   /**
    * Convert appointment to FHIR Appointment resource
-   * @param {Object} appointment - ChiroClickCRM appointment
+   * @param {Object} appointment - ChiroClickEHR appointment
    * @param {Object} patient - Associated patient
    * @returns {Object} FHIR Appointment resource
    */

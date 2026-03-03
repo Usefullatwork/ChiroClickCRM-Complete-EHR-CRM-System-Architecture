@@ -1,5 +1,5 @@
 /**
- * ChiroClickCRM Backend Server
+ * ChiroClickEHR Backend Server
  * Main application entry point
  */
 
@@ -113,7 +113,7 @@ const swaggerSpec = swaggerJsdoc({
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'ChiroClickCRM API',
+      title: 'ChiroClickEHR API',
       version: '1.0.0',
       description: 'Norwegian EHR/CRM/PMS API for chiropractic practices',
     },
@@ -243,7 +243,7 @@ app.get('/health/detailed', requireAuth, requireRole(['ADMIN']), async (req, res
 // API root
 app.get(`/api/${API_VERSION}`, (req, res) => {
   res.json({
-    message: 'ChiroClickCRM API',
+    message: 'ChiroClickEHR API',
     version: API_VERSION,
     documentation: '/api/docs',
     endpoints: {
@@ -475,7 +475,7 @@ let server;
 if (process.env.NODE_ENV !== 'test') {
   try {
     server = httpServer.listen(PORT, async () => {
-      logger.info(`🚀 ChiroClickCRM API Server started`);
+      logger.info(`🚀 ChiroClickEHR API Server started`);
       logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
       logger.info(`📍 Port: ${PORT}`);
       logger.info(`📍 API Version: ${API_VERSION}`);

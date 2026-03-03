@@ -31,8 +31,8 @@ const config = {
     },
   },
   defaults: {
-    fromName: process.env.SMTP_FROM_NAME || 'ChiroClickCRM',
-    fromEmail: process.env.SMTP_FROM_EMAIL || 'noreply@chiroclickcrm.no',
+    fromName: process.env.SMTP_FROM_NAME || 'ChiroClickEHR',
+    fromEmail: process.env.SMTP_FROM_EMAIL || 'noreply@chiroclickehr.no',
     replyTo: process.env.SMTP_REPLY_TO || null,
   },
   tracking: {

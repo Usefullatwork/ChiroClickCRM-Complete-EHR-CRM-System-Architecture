@@ -1,16 +1,16 @@
 /**
  * OpenAPI/Swagger Documentation
- * API specification for ChiroClickCRM
+ * API specification for ChiroClickEHR
  */
 
 export const openApiSpec = {
   openapi: '3.0.3',
   info: {
-    title: 'ChiroClickCRM API',
+    title: 'ChiroClickEHR API',
     description: `
-# ChiroClickCRM EHR-CRM API Documentation
+# ChiroClickEHR EHR-CRM API Documentation
 
-ChiroClickCRM is a comprehensive Electronic Health Record (EHR) and Customer Relationship Management (CRM) system designed specifically for chiropractic clinics in Norway.
+ChiroClickEHR is a comprehensive Electronic Health Record (EHR) and Customer Relationship Management (CRM) system designed specifically for chiropractic clinics in Norway.
 
 ## Features
 
@@ -51,8 +51,8 @@ This API is designed to comply with:
     `,
     version: '1.0.0',
     contact: {
-      name: 'ChiroClickCRM Support',
-      email: 'support@chiroclickcrm.no',
+      name: 'ChiroClickEHR Support',
+      email: 'support@chiroclickehr.no',
     },
     license: {
       name: 'Proprietary',

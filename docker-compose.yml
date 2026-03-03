@@ -4,7 +4,7 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: chiroclickcrm-db
+    container_name: chiroclickehr-db
     environment:
       POSTGRES_DB: ${DB_NAME:-chiroclickcrm}
       POSTGRES_USER: ${DB_USER:-postgres}
@@ -22,7 +22,7 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - chiroclickcrm-network
+      - chiroclickehr-network
     restart: unless-stopped
 
   # Backend API
@@ -30,7 +30,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: chiroclickcrm-backend
+    container_name: chiroclickehr-backend
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: 3000
@@ -65,7 +65,7 @@ services:
       - backend_logs:/app/logs
       - backend_temp:/app/temp
     networks:
-      - chiroclickcrm-network
+      - chiroclickehr-network
     extra_hosts:
       - "host.docker.internal:host-gateway"
     restart: unless-stopped
@@ -84,13 +84,13 @@ services:
   # Ollama AI Service (Local LLM) - ChiroClick Custom Models
   ollama:
     image: ollama/ollama:latest
-    container_name: chiroclickcrm-ollama
+    container_name: chiroclickehr-ollama
     volumes:
       - ollama_data:/root/.ollama
     ports:
       - "11434:11434"
     networks:
-      - chiroclickcrm-network
+      - chiroclickehr-network
     restart: unless-stopped
     deploy:
       resources:
@@ -108,7 +108,7 @@ services:
   # Ollama Model Loader (pulls base models on first run)
   ollama-setup:
     image: ollama/ollama:latest
-    container_name: chiroclickcrm-ollama-setup
+    container_name: chiroclickehr-ollama-setup
     depends_on:
       - ollama
     entrypoint: /bin/sh
@@ -122,7 +122,7 @@ services:
       echo 'Base models downloaded successfully. Run build-model.bat to create custom chiro-* models.'
       "
     networks:
-      - chiroclickcrm-network
+      - chiroclickehr-network
     restart: "no"
 
   # Frontend (React/Vite) - Development
@@ -130,7 +130,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    container_name: chiroclickcrm-frontend-dev
+    container_name: chiroclickehr-frontend-dev
     environment:
       VITE_API_URL: http://localhost:3000/api/v1
       VITE_CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
@@ -140,7 +140,7 @@ services:
       - ./frontend:/app
       - /app/node_modules
     networks:
-      - chiroclickcrm-network
+      - chiroclickehr-network
     command: npm run dev
     restart: unless-stopped
     profiles:
@@ -149,7 +149,7 @@ services:
   # Nginx Reverse Proxy (Production)
   nginx:
     image: nginx:alpine
-    container_name: chiroclickcrm-nginx
+    container_name: chiroclickehr-nginx
     ports:
       - "80:80"
       - "443:443"
@@ -160,7 +160,7 @@ services:
     depends_on:
       - backend
     networks:
-      - chiroclickcrm-network
+      - chiroclickehr-network
     restart: unless-stopped
     profiles:
       - production
@@ -168,13 +168,13 @@ services:
   # Redis (for caching and sessions)
   redis:
     image: redis:7-alpine
-    container_name: chiroclickcrm-redis
+    container_name: chiroclickehr-redis
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
-      - chiroclickcrm-network
+      - chiroclickehr-network
     restart: unless-stopped
     command: redis-server --appendonly yes
     healthcheck:
@@ -186,7 +186,7 @@ services:
   # Automated Database Backup (GDPR Compliant - 10 year retention)
   backup:
     image: postgres:15-alpine
-    container_name: chiroclickcrm-backup
+    container_name: chiroclickehr-backup
     depends_on:
       - postgres
     volumes:
@@ -209,7 +209,7 @@ services:
                sleep 86400
              done"
     networks:
-      - chiroclickcrm-network
+      - chiroclickehr-network
     restart: unless-stopped
     profiles:
       - production
@@ -231,5 +231,5 @@ volumes:
     driver: local
 
 networks:
-  chiroclickcrm-network:
+  chiroclickehr-network:
     driver: bridge

@@ -108,7 +108,7 @@ export const requireAuth = (req, res, next) => {
   ) {
     req.user = {
       id: DEV_USER_ID,
-      email: 'dev@chiroclickcrm.local',
+      email: 'dev@chiroclickehr.local',
       first_name: 'Dev',
       last_name: 'User',
       role: 'ADMIN',

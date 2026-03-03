@@ -1,7 +1,7 @@
 {
-  "name": "chiroclickcrm-backend",
+  "name": "chiroclickehr-backend",
   "version": "2.0.0",
-  "description": "ChiroClickCRM Backend API - Norwegian-compliant EHR-CRM system",
+  "description": "ChiroClickEHR Backend API - Norwegian-compliant EHR system",
   "main": "src/server.js",
   "type": "module",
   "scripts": {
@@ -19,7 +19,7 @@
     "healthcare",
     "norwegian"
   ],
-  "author": "ChiroClickCRM",
+  "author": "ChiroClickEHR",
   "license": "MIT",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.70.1",

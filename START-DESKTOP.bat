@@ -1,7 +1,7 @@
 @echo off
-title ChiroClickCRM Desktop
+title ChiroClickEHR Desktop
 echo ========================================
-echo   ChiroClickCRM - Standalone Desktop
+echo   ChiroClickEHR - Standalone Desktop
 echo ========================================
 echo.
 
@@ -45,7 +45,7 @@ if not exist "frontend\dist" (
 )
 
 echo.
-echo Starting ChiroClickCRM Desktop...
+echo Starting ChiroClickEHR Desktop...
 echo.
 cd desktop
 call npx electron main.js

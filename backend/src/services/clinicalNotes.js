@@ -782,7 +782,7 @@ export const generateNotePDF = async (organizationId, noteId, _options = {}) => 
       margins: { top: 50, bottom: 50, left: 50, right: 50 },
       info: {
         Title: `Klinisk Notat - ${note.patient_name}`,
-        Author: note.practitioner_name || 'ChiroClickCRM',
+        Author: note.practitioner_name || 'ChiroClickEHR',
         Subject: 'Klinisk Notat',
         CreationDate: new Date(),
       },
@@ -1040,7 +1040,7 @@ export const generateNotePDF = async (organizationId, noteId, _options = {}) => 
       doc.switchToPage(i);
       doc.fontSize(8).fillColor('#a0aec0');
       doc.text(
-        `Side ${i + 1} av ${pageCount} | Generert ${new Date().toLocaleString('no-NO')} | ChiroClickCRM`,
+        `Side ${i + 1} av ${pageCount} | Generert ${new Date().toLocaleString('no-NO')} | ChiroClickEHR`,
         50,
         doc.page.height - 30,
         { align: 'center', width: doc.page.width - 100 }

@@ -7,16 +7,16 @@ export const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'ChiroClickCRM API',
+      title: 'ChiroClickEHR API',
       version: '2.0.0',
       description: 'Norwegian-compliant EHR-CRM-PMS API for chiropractic practices',
       contact: {
-        name: 'ChiroClickCRM Support',
-        email: 'support@chiroclickcrm.no',
+        name: 'ChiroClickEHR Support',
+        email: 'support@chiroclickehr.no',
       },
       license: {
         name: 'Private and Confidential',
-        url: 'https://chiroclickcrm.no/license',
+        url: 'https://chiroclickehr.no/license',
       },
     },
     servers: [
@@ -25,7 +25,7 @@ export const swaggerOptions = {
         description: 'Development server',
       },
       {
-        url: 'https://api.chiroclickcrm.no/api/v1',
+        url: 'https://api.chiroclickehr.no/api/v1',
         description: 'Production server',
       },
     ],

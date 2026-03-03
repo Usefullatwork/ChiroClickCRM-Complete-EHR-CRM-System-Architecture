@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ============================================================
-echo   ChiroClick AI - Model Backup
+echo   ChiroClickEHR AI - Model Backup
 echo   Kopierer Ollama-modeller til prosjektmappen
 echo ============================================================
 echo.

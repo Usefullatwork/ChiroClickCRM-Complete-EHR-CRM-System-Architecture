@@ -1,6 +1,6 @@
 @echo off
 echo ============================================================
-echo   ChiroClick - Reinstalling Dependencies
+echo   ChiroClickEHR - Reinstalling Dependencies
 echo ============================================================
 echo.
 

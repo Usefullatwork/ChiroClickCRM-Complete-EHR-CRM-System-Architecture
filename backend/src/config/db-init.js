@@ -443,7 +443,7 @@ export async function initializeDatabase(db) {
           logger.warn(`Seed statement skipped: ${err.message.substring(0, 80)}`);
         }
       }
-      logger.info('Demo users seeded (admin@chiroclickcrm.no / admin123)');
+      logger.info('Demo users seeded (admin@chiroclickehr.no / admin123)');
     }
   } catch (err) {
     logger.error('Failed to seed demo users:', err.message);

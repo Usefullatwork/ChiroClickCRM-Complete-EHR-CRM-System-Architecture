@@ -128,7 +128,7 @@ export const processReminders = async () => {
         const message =
           `Hei ${reminder.patient_first_name}! ` +
           `Påminnelse om din time ${dateStr} kl. ${timeStr}. ` +
-          `Vennligst gi beskjed om du ikke kan komme. Mvh ChiroClickCRM`;
+          `Vennligst gi beskjed om du ikke kan komme. Mvh ChiroClickEHR`;
 
         if (reminder.reminder_type === 'SMS' && reminder.patient_phone) {
           await sendSMS(

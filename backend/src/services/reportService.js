@@ -130,7 +130,7 @@ export const generateWeeklyAIDigest = async () => {
     try {
       const result = await sendEmail({
         to: adminEmail,
-        subject: `ChiroClickCRM — Ukentlig AI-rapport (${formatDateNO(sevenDaysAgo())} – ${formatDateNO(new Date())})`,
+        subject: `ChiroClickEHR — Ukentlig AI-rapport (${formatDateNO(sevenDaysAgo())} – ${formatDateNO(new Date())})`,
         html,
       });
 
@@ -301,7 +301,7 @@ const buildDigestHtml = (stats) => {
 
     <!-- Footer -->
     <div style="background:#f9fafb;padding:16px 32px;text-align:center;font-size:12px;color:#9ca3af;">
-      <p style="margin:0;">Generert automatisk av ChiroClickCRM</p>
+      <p style="margin:0;">Generert automatisk av ChiroClickEHR</p>
       <p style="margin:4px 0 0;">${new Date().toLocaleString('nb-NO', { timeZone: 'Europe/Oslo' })}</p>
     </div>
 

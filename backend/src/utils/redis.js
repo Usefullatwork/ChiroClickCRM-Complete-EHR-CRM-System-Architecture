@@ -16,7 +16,7 @@ class RedisClient {
     this.port = options.port || parseInt(process.env.REDIS_PORT || '6379');
     this.password = options.password || process.env.REDIS_PASSWORD;
     this.db = options.db || parseInt(process.env.REDIS_DB || '0');
-    this.keyPrefix = options.keyPrefix || 'chiroclickcrm:';
+    this.keyPrefix = options.keyPrefix || 'chiroclickehr:';
 
     // Connection state
     this.client = null;

@@ -97,7 +97,7 @@ class SmtpEmailProvider {
     const transporter = await this._getTransporter();
 
     const info = await transporter.sendMail({
-      from: process.env.SMTP_FROM || 'noreply@chiroclickcrm.no',
+      from: process.env.SMTP_FROM || 'noreply@chiroclickehr.no',
       to: Array.isArray(to) ? to.join(', ') : to,
       cc: cc || undefined,
       bcc: bcc || undefined,

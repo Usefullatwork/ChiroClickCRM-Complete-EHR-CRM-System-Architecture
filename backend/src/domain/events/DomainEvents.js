@@ -96,7 +96,7 @@ export const DOMAIN_EVENTS = {
   OLLAMA_REQUEST_COMPLETED: 'external.ollama_request_completed',
   OLLAMA_REQUEST_FAILED: 'external.ollama_request_failed',
   OLLAMA_CIRCUIT_OPENED: 'external.ollama_circuit_opened',
-  OLLAMA_CIRCUIT_CLOSED: 'external.ollama_circuit_closed'
+  OLLAMA_CIRCUIT_CLOSED: 'external.ollama_circuit_closed',
 };
 
 /**
@@ -116,11 +116,11 @@ export class DomainEvent {
     this.metadata = {
       timestamp: new Date().toISOString(),
       version: '1.0',
-      source: metadata.source || 'chiroclickcrm',
+      source: metadata.source || 'chiroclickehr',
       correlationId: metadata.correlationId || crypto.randomUUID(),
       userId: metadata.userId || null,
       organizationId: metadata.organizationId || null,
-      ...metadata
+      ...metadata,
     };
   }
 
@@ -132,7 +132,7 @@ export class DomainEvent {
       id: this.id,
       type: this.type,
       payload: this.payload,
-      metadata: this.metadata
+      metadata: this.metadata,
     };
   }
 }
@@ -157,34 +157,50 @@ export const EventFactory = {
 
   // AI Events
   suggestionGenerated: (suggestionId, type, content, confidence, metadata) =>
-    new DomainEvent(DOMAIN_EVENTS.SUGGESTION_GENERATED, {
-      suggestionId,
-      type,
-      content,
-      confidence
-    }, metadata),
+    new DomainEvent(
+      DOMAIN_EVENTS.SUGGESTION_GENERATED,
+      {
+        suggestionId,
+        type,
+        content,
+        confidence,
+      },
+      metadata
+    ),
 
   suggestionAccepted: (suggestionId, responseTime, metadata) =>
-    new DomainEvent(DOMAIN_EVENTS.SUGGESTION_ACCEPTED, {
-      suggestionId,
-      responseTime,
-      acceptedAt: new Date().toISOString()
-    }, metadata),
+    new DomainEvent(
+      DOMAIN_EVENTS.SUGGESTION_ACCEPTED,
+      {
+        suggestionId,
+        responseTime,
+        acceptedAt: new Date().toISOString(),
+      },
+      metadata
+    ),
 
   suggestionRejected: (suggestionId, reason, metadata) =>
-    new DomainEvent(DOMAIN_EVENTS.SUGGESTION_REJECTED, {
-      suggestionId,
-      reason,
-      rejectedAt: new Date().toISOString()
-    }, metadata),
+    new DomainEvent(
+      DOMAIN_EVENTS.SUGGESTION_REJECTED,
+      {
+        suggestionId,
+        reason,
+        rejectedAt: new Date().toISOString(),
+      },
+      metadata
+    ),
 
   suggestionModified: (suggestionId, originalContent, modifiedContent, metadata) =>
-    new DomainEvent(DOMAIN_EVENTS.SUGGESTION_MODIFIED, {
-      suggestionId,
-      originalContent,
-      modifiedContent,
-      modifiedAt: new Date().toISOString()
-    }, metadata),
+    new DomainEvent(
+      DOMAIN_EVENTS.SUGGESTION_MODIFIED,
+      {
+        suggestionId,
+        originalContent,
+        modifiedContent,
+        modifiedAt: new Date().toISOString(),
+      },
+      metadata
+    ),
 
   trainingThresholdReached: (stats, metadata) =>
     new DomainEvent(DOMAIN_EVENTS.TRAINING_THRESHOLD_REACHED, { stats }, metadata),
@@ -194,34 +210,50 @@ export const EventFactory = {
 
   // Clinical Events
   encounterCompleted: (encounterId, patientId, diagnoses, treatments, metadata) =>
-    new DomainEvent(DOMAIN_EVENTS.ENCOUNTER_COMPLETED, {
-      encounterId,
-      patientId,
-      diagnoses,
-      treatments
-    }, metadata),
+    new DomainEvent(
+      DOMAIN_EVENTS.ENCOUNTER_COMPLETED,
+      {
+        encounterId,
+        patientId,
+        diagnoses,
+        treatments,
+      },
+      metadata
+    ),
 
   redFlagDetected: (patientId, encounterId, flags, metadata) =>
-    new DomainEvent(DOMAIN_EVENTS.RED_FLAG_DETECTED, {
-      patientId,
-      encounterId,
-      flags,
-      severity: 'HIGH'
-    }, metadata),
+    new DomainEvent(
+      DOMAIN_EVENTS.RED_FLAG_DETECTED,
+      {
+        patientId,
+        encounterId,
+        flags,
+        severity: 'HIGH',
+      },
+      metadata
+    ),
 
   // External Service Events
   ollamaCircuitOpened: (service, failureCount, metadata) =>
-    new DomainEvent(DOMAIN_EVENTS.OLLAMA_CIRCUIT_OPENED, {
-      service,
-      failureCount,
-      openedAt: new Date().toISOString()
-    }, metadata),
+    new DomainEvent(
+      DOMAIN_EVENTS.OLLAMA_CIRCUIT_OPENED,
+      {
+        service,
+        failureCount,
+        openedAt: new Date().toISOString(),
+      },
+      metadata
+    ),
 
   ollamaCircuitClosed: (service, metadata) =>
-    new DomainEvent(DOMAIN_EVENTS.OLLAMA_CIRCUIT_CLOSED, {
-      service,
-      closedAt: new Date().toISOString()
-    }, metadata)
+    new DomainEvent(
+      DOMAIN_EVENTS.OLLAMA_CIRCUIT_CLOSED,
+      {
+        service,
+        closedAt: new Date().toISOString(),
+      },
+      metadata
+    ),
 };
 
 export default { DOMAIN_EVENTS, DomainEvent, EventFactory };

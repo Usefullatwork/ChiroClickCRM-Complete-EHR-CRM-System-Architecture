@@ -1,5 +1,5 @@
 @echo off
-echo Building ChiroClickCRM Portable...
+echo Building ChiroClickEHR Portable...
 echo.
 
 cd desktop

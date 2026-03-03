@@ -1,12 +1,12 @@
 @echo off
 REM ============================================================================
-REM ChiroClickCRM Development Environment Setup (Windows)
+REM ChiroClickEHR Development Environment Setup (Windows)
 REM ============================================================================
 
 setlocal enabledelayedexpansion
 
 echo ==============================================
-echo   ChiroClickCRM Development Setup
+echo   ChiroClickEHR Development Setup
 echo ==============================================
 echo.
 

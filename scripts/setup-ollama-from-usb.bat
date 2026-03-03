@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ============================================================
-echo   ChiroClick - Setup Ollama Models from USB/Project Folder
+echo   ChiroClickEHR - Setup Ollama Models from USB/Project Folder
 echo   Kopierer AI-modeller til lokal Ollama-installasjon
 echo ============================================================
 echo.
@@ -35,7 +35,7 @@ if not exist "%DEST_DIR%" mkdir "%DEST_DIR%"
 echo Kilde:      %SOURCE_DIR%
 echo Destinasjon: %DEST_DIR%
 echo.
-echo Dette vil kopiere alle ChiroClick AI-modeller til din Ollama-installasjon.
+echo Dette vil kopiere alle ChiroClickEHR AI-modeller til din Ollama-installasjon.
 echo Storrelse: ca. 30 GB
 echo.
 

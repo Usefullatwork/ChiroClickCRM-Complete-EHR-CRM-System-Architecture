@@ -1,10 +1,10 @@
 @echo off
-title ChiroClick CRM - Stopping...
+title ChiroClickEHR - Stopping...
 color 0C
 
 echo.
 echo  ========================================
-echo   ChiroClick CRM - Stopping Application
+echo   ChiroClickEHR - Stopping Application
 echo  ========================================
 echo.
 
@@ -13,7 +13,7 @@ taskkill /F /IM node.exe 2>nul
 
 echo.
 echo  ========================================
-echo   ChiroClick CRM has been stopped
+echo   ChiroClickEHR has been stopped
 echo  ========================================
 echo.
 pause
