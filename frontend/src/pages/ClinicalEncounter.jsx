@@ -936,6 +936,7 @@ export default function ClinicalEncounter() {
               encounterId={encounterId}
               handleOrthoExamChange={handleOrthoExamChange}
               handleNeuroExamChange={handleNeuroExamChange}
+              onAnatomyInsertText={handleSpineTextInsert}
               diagnosisSearch={diagnosisSearch}
               setDiagnosisSearch={setDiagnosisSearch}
               showDiagnosisDropdown={showDiagnosisDropdown}

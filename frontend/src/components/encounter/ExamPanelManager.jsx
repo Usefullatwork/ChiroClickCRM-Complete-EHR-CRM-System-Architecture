@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import {
   ChevronDown,
   ChevronUp,
@@ -8,7 +9,11 @@ import {
   ClipboardList,
   Target,
   Brain,
+  Stethoscope,
 } from 'lucide-react';
+
+// Lazy-load AnatomyViewer to avoid eagerly pulling in Three.js
+const AnatomyViewer = lazy(() => import('../anatomy/AnatomyViewer'));
 import { NeurologicalExamCompact } from '../neuroexam';
 import { OrthopedicExamCompact } from '../orthoexam';
 // Direct imports to avoid examination barrel bloat (~750KB)
@@ -168,12 +173,46 @@ export function ExamPanelManager({
   setShowTissueMarkers,
   tissueMarkerData,
   setTissueMarkerData,
+  // Anatomy Viewer
+  showAnatomyPanel,
+  setShowAnatomyPanel,
+  anatomySpineFindings,
+  setAnatomySpineFindings,
+  anatomyBodyRegions,
+  setAnatomyBodyRegions,
+  onAnatomyInsertText,
   // Updater
   updateField,
   encounterData,
 }) {
   return (
     <>
+      {/* Anatomy Viewer — detailed spine/body documentation */}
+      <ExamToggle
+        show={showAnatomyPanel}
+        onToggle={() => setShowAnatomyPanel(!showAnatomyPanel)}
+        icon={Stethoscope}
+        label="Anatomi \u2013 Klikk for \u00E5 notere"
+        color="violet"
+        badgeText={
+          Object.keys(anatomySpineFindings).length + anatomyBodyRegions.length > 0
+            ? `${Object.keys(anatomySpineFindings).length + anatomyBodyRegions.length} funn`
+            : null
+        }
+      >
+        <Suspense fallback={<div className="animate-pulse bg-violet-50 rounded-lg h-64" />}>
+          <AnatomyViewer
+            spineFindings={anatomySpineFindings}
+            onSpineFindingsChange={setAnatomySpineFindings}
+            bodyRegions={anatomyBodyRegions}
+            onBodyRegionsChange={setAnatomyBodyRegions}
+            onInsertText={onAnatomyInsertText}
+            language="NO"
+            compact={false}
+          />
+        </Suspense>
+      </ExamToggle>
+
       {/* Orthopedic Exam */}
       <ExamToggle
         show={showOrthoExam}

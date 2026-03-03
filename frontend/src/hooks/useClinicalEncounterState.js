@@ -67,6 +67,11 @@ export function useClinicalEncounterState(patientId) {
   const [showTissueMarkers, setShowTissueMarkers] = useState(false);
   const [tissueMarkerData, setTissueMarkerData] = useState({});
 
+  // Anatomy Panel State
+  const [showAnatomyPanel, setShowAnatomyPanel] = useState(false);
+  const [anatomySpineFindings, setAnatomySpineFindings] = useState({});
+  const [anatomyBodyRegions, setAnatomyBodyRegions] = useState([]);
+
   // Notation State
   const [notationData, setNotationData] = useState({ markers: [], selectedPoints: [] });
   const [notationNarrative, setNotationNarrative] = useState('');
@@ -260,6 +265,14 @@ export function useClinicalEncounterState(patientId) {
     setShowTissueMarkers,
     tissueMarkerData,
     setTissueMarkerData,
+
+    // Anatomy Panel State
+    showAnatomyPanel,
+    setShowAnatomyPanel,
+    anatomySpineFindings,
+    setAnatomySpineFindings,
+    anatomyBodyRegions,
+    setAnatomyBodyRegions,
 
     // Notation State
     notationData,

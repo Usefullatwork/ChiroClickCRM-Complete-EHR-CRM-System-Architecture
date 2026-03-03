@@ -46,6 +46,7 @@ export function SOAPNoteForm({
   encounterId,
   handleOrthoExamChange,
   handleNeuroExamChange,
+  onAnatomyInsertText,
   // Diagnosis
   diagnosisSearch,
   setDiagnosisSearch,
@@ -299,6 +300,13 @@ export function SOAPNoteForm({
             setShowTissueMarkers={state.setShowTissueMarkers}
             tissueMarkerData={state.tissueMarkerData}
             setTissueMarkerData={state.setTissueMarkerData}
+            showAnatomyPanel={state.showAnatomyPanel}
+            setShowAnatomyPanel={state.setShowAnatomyPanel}
+            anatomySpineFindings={state.anatomySpineFindings}
+            setAnatomySpineFindings={state.setAnatomySpineFindings}
+            anatomyBodyRegions={state.anatomyBodyRegions}
+            setAnatomyBodyRegions={state.setAnatomyBodyRegions}
+            onAnatomyInsertText={onAnatomyInsertText}
             updateField={updateField}
             encounterData={encounterData}
           />
