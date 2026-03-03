@@ -1,6 +1,84 @@
-import { AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Loader2 } from 'lucide-react';
+import { usersAPI } from '../../services/api';
+import toast from '../../utils/toast';
+
+const DEFAULT_PREFS = {
+  emailNotifications: true,
+  appointmentReminders: true,
+  followUpNotifications: true,
+  systemUpdates: false,
+};
 
 export default function NotificationSettings({ t }) {
+  const queryClient = useQueryClient();
+  const [prefs, setPrefs] = useState(DEFAULT_PREFS);
+
+  const { data: userResponse, isLoading } = useQuery({
+    queryKey: ['current-user'],
+    queryFn: () => usersAPI.getCurrent(),
+  });
+
+  useEffect(() => {
+    const saved = userResponse?.data?.user?.notification_preferences;
+    if (saved && typeof saved === 'object') {
+      setPrefs((prev) => ({ ...prev, ...saved }));
+    }
+  }, [userResponse]);
+
+  const updateMutation = useMutation({
+    mutationFn: (newPrefs) => usersAPI.update({ notification_preferences: newPrefs }),
+    onSuccess: () => {
+      queryClient.invalidateQueries(['current-user']);
+      toast.success(t('savedSuccessfully') || 'Lagret');
+    },
+    onError: () => {
+      toast.error(t('saveError') || 'Kunne ikke lagre');
+    },
+  });
+
+  const handleToggle = (key) => {
+    const updated = { ...prefs, [key]: !prefs[key] };
+    setPrefs(updated);
+    updateMutation.mutate(updated);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  const toggles = [
+    {
+      key: 'emailNotifications',
+      label: t('emailNotifications'),
+      desc: t('emailNotificationsDesc'),
+      border: true,
+    },
+    {
+      key: 'appointmentReminders',
+      label: t('appointmentReminders'),
+      desc: t('appointmentRemindersDesc'),
+      border: true,
+    },
+    {
+      key: 'followUpNotifications',
+      label: t('followUpNotifications'),
+      desc: t('followUpNotificationsDesc'),
+      border: true,
+    },
+    {
+      key: 'systemUpdates',
+      label: t('systemUpdates'),
+      desc: t('systemUpdatesDesc'),
+      border: false,
+    },
+  ];
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
       <div className="px-6 py-4 border-b border-gray-200">
@@ -11,77 +89,27 @@ export default function NotificationSettings({ t }) {
       </div>
 
       <div className="p-6 space-y-4">
-        {/* Email Notifications */}
-        <div className="flex items-center justify-between py-3 border-b border-gray-100">
-          <div>
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {t('emailNotifications')}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-200">
-              {t('emailNotificationsDesc')}
-            </p>
-          </div>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" className="sr-only peer" defaultChecked />
-            <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 dark:border-gray-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-          </label>
-        </div>
-
-        {/* Appointment Reminders */}
-        <div className="flex items-center justify-between py-3 border-b border-gray-100">
-          <div>
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {t('appointmentReminders')}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-200">
-              {t('appointmentRemindersDesc')}
-            </p>
-          </div>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" className="sr-only peer" defaultChecked />
-            <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 dark:border-gray-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-          </label>
-        </div>
-
-        {/* Follow-up Notifications */}
-        <div className="flex items-center justify-between py-3 border-b border-gray-100">
-          <div>
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {t('followUpNotifications')}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-200">
-              {t('followUpNotificationsDesc')}
-            </p>
-          </div>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" className="sr-only peer" defaultChecked />
-            <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 dark:border-gray-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-          </label>
-        </div>
-
-        {/* System Updates */}
-        <div className="flex items-center justify-between py-3">
-          <div>
-            <p className="text-sm font-medium text-gray-900 dark:text-white">
-              {t('systemUpdates')}
-            </p>
-            <p className="text-xs text-gray-500 dark:text-gray-200">{t('systemUpdatesDesc')}</p>
-          </div>
-          <label className="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" className="sr-only peer" />
-            <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 dark:border-gray-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-          </label>
-        </div>
-
-        <div className="pt-4">
-          <div className="flex items-start gap-2 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5" />
+        {toggles.map(({ key, label, desc, border }) => (
+          <div
+            key={key}
+            className={`flex items-center justify-between py-3 ${border ? 'border-b border-gray-100' : ''}`}
+          >
             <div>
-              <p className="text-sm font-medium text-blue-900">{t('notificationComingSoon')}</p>
-              <p className="text-xs text-blue-700 mt-1">{t('notificationComingSoonDesc')}</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-white">{label}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-200">{desc}</p>
             </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only peer"
+                checked={prefs[key]}
+                onChange={() => handleToggle(key)}
+                disabled={updateMutation.isPending}
+              />
+              <div className="w-11 h-6 bg-gray-200 dark:bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 dark:border-gray-600 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+            </label>
           </div>
-        </div>
+        ))}
       </div>
     </div>
   );

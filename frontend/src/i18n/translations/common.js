@@ -114,7 +114,7 @@ export const common = {
     folderIdHint:
       'Find this in the Google Drive folder URL: drive.google.com/drive/folders/[FOLDER_ID]',
     modelName: 'Model Name',
-    modelNamePlaceholder: 'chiroclickcrm-custom',
+    modelNamePlaceholder: 'chiroclickehr-custom',
     modelNameHint: 'Choose a unique name for your trained model',
     temperature: 'Temperature',
     temperatureHint: 'Lower = more focused, Higher = more creative',
@@ -217,6 +217,8 @@ export const common = {
     loadingDataCuration: 'Loading data curation...',
     loadingTrainingPipeline: 'Loading training pipeline...',
     loadingPlayground: 'Loading playground...',
+    notConfigured: 'Not configured',
+    notAvailable: 'Not available',
   },
   no: {
     save: 'Lagre',
@@ -333,7 +335,7 @@ export const common = {
     folderIdHint:
       'Finn dette i Google Drive-mappens URL: drive.google.com/drive/folders/[FOLDER_ID]',
     modelName: 'Modellnavn',
-    modelNamePlaceholder: 'chiroclickcrm-custom',
+    modelNamePlaceholder: 'chiroclickehr-custom',
     modelNameHint: 'Velg et unikt navn for din trente modell',
     temperature: 'Temperatur',
     temperatureHint: 'Lavere = mer fokusert, Høyere = mer kreativ',
@@ -436,5 +438,7 @@ export const common = {
     loadingDataCuration: 'Laster datakurering...',
     loadingTrainingPipeline: 'Laster treningspipeline...',
     loadingPlayground: 'Laster lekeplass...',
+    notConfigured: 'Ikke konfigurert',
+    notAvailable: 'Ikke tilgjengelig',
   },
 };
