@@ -1,7 +1,10 @@
 /**
- * PDF Generator Service
- * Enhanced PDF generation for treatment summaries, referral letters,
- * sick notes, and invoices using PDFKit.
+ * PDF Generator Service — SCOPE: Treatment summaries, referral letters, sick notes.
+ * Imported directly by route files (not via controllers).
+ *
+ * NOTE: Letters, invoices, custom PDFs, and exercise handouts live in pdf.js
+ * (called via controllers). The two files have divergent APIs and merging is
+ * deferred — see docs/sprint-history.md.
  *
  * Norwegian-compliant formats throughout.
  */

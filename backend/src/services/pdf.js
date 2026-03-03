@@ -1,7 +1,10 @@
 /**
- * PDF Generation Service
- * Generates PDF documents for letters, reports, and invoices
- * Uses pdfkit for server-side PDF generation
+ * PDF Generation Service — SCOPE: Letters, invoices, custom PDFs, exercise handouts.
+ * Called via controllers (e.g., pdf.controller.js).
+ *
+ * NOTE: Treatment summaries, referral letters, and sick notes live in
+ * pdfGenerator.js (imported directly by routes). The two files have divergent
+ * APIs and merging is deferred — see docs/sprint-history.md.
  */
 
 import PDFDocument from 'pdfkit';

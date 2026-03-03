@@ -89,6 +89,10 @@ bin/pgsql/
 # Session cookies
 cookies.txt
 
+# PHI / sensitive data files — NEVER commit
+import_patients.sql
+*.sql.bak
+
 # AI training - large local files
 ai-training/ml-env/
 ai-training/models/

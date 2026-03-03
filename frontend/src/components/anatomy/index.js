@@ -26,7 +26,3 @@ export { default as AnatomyProvider } from './AnatomyProvider';
 // NOTE: Spine3DViewer and CompactSpine3D are NOT re-exported here to avoid
 // eagerly loading Three.js (~300KB). Import directly with React.lazy():
 //   const Spine3DViewer = lazy(() => import('./anatomy/spine/Spine3DViewer'));
-
-// Re-export existing body chart components for convenience
-export { default as BodyChart } from '../BodyChart';
-export { default as SpineWidget } from '../SpineWidget';

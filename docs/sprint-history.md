@@ -1,0 +1,971 @@
+# Sprint History
+
+All dated sprint/session logs from ChiroClickEHR development, preserved for reference.
+
+---
+
+## Overnight Cleanup Sprint (2026-03-01)
+
+4 parallel agent streams executed in isolated git worktrees. All verified, pushed.
+
+### Stream A: Bundle Splitting (commit fff9e37)
+
+Converted 5 eagerly-imported components to `React.lazy()` with `<Suspense>` fallbacks:
+
+| File                        | Component            | Chunk Before  | After                        | Savings    |
+| --------------------------- | -------------------- | ------------- | ---------------------------- | ---------- |
+| `SOAPNoteForm.jsx`          | AnatomicalBodyChart  | —             | 61.77 KB (new)               | —          |
+| `SOAPNoteForm.jsx`          | FacialLinesChart     | —             | 26.36 KB (new)               | —          |
+| `SOAPNoteForm.jsx`          | BodyChartPanel       | —             | 14.80 KB (new)               | —          |
+| `SOAPNoteForm.jsx`          | ActivatorMethodPanel | —             | 15.41 KB (new)               | —          |
+| `EasyAssessment.jsx`        | OutcomeAssessment    | —             | (merged into existing chunk) | —          |
+| **ClinicalEncounter chunk** |                      | **226.66 KB** | **111.70 KB**                | **-50.7%** |
+| **EasyAssessment chunk**    |                      | **133.55 KB** | **122.11 KB**                | **-8.6%**  |
+
+**Pattern:** Components behind user interaction gates (tab switches, modal opens, panel toggles) are ideal `React.lazy()` candidates. Wrap with `<Suspense fallback={<div className="animate-pulse h-64 bg-gray-100 rounded" />}>`.
+
+### Stream B: Test Coverage (commit 47fb129)
+
++33 tests (941 -> 974 frontend tests, 44 suites):
+
+| File                                | Tests Added | Coverage                                                                                    |
+| ----------------------------------- | ----------- | ------------------------------------------------------------------------------------------- |
+| `AnatomyViewer.test.jsx` (expanded) | +9          | COMBINED mode narrative, preset exports (Examination/Treatment/QuickPalpation)              |
+| `MuscleMap.test.jsx` (expanded)     | +9          | SVG click add/remove, label toggle, view switch, finding type, filter groups                |
+| `socket.test.js` (NEW)              | +20         | connectSocket, disconnectSocket, getSocket, useSocketEvent, useSocketStatus, useOnlineUsers |
+
+**Backend diagnostics:** 13/20 queries profiled (11 index scan, 2 seq scan on small tables), smoke-test 3/3 pass.
+
+### Stream C: AI Integration Polish (commit d17862d)
+
+**Model refs updated:**
+
+- Default model: `chiro-no-sft-dpo-v6` (Qwen2.5-7B, ~8GB, SFT+DPO v6)
+- Fallback: `chiro-no-sft-dpo-v5`
+- Removed stale `chiro-no`, `chiro-norwegian` entries
+- Kept `chiro-fast`, `chiro-medical`
+
+**3 API methods wired in `api.js` -> `trainingAPI`:**
+
+- `getCostPerSuggestion` -> `/training/analytics/cost-per-suggestion`
+- `getProviderValue` -> `/training/analytics/provider-value`
+- `getCacheTrends` -> `/training/analytics/cache-trends`
+
+**AB_SPLIT_CONFIG updated in `ai.js`:**
+
+- Added v6 entry: Model A = `chiro-no-sft-dpo-v6`, Model B = `chiro-no-sft-dpo-v5`, env var `AB_SPLIT_V6`
+
+**AnalyticsTab.jsx enhanced (+255 lines):**
+
+- A/B Testing Controls: active splits, progress bars, significance indicator (<30 feedbacks warning)
+- Cost per Suggestion: div-based bar chart by task type
+- Provider Value Comparison: table (provider, suggestions, latency, approval rate, cost)
+- Cache Trends: Recharts LineChart (hit rate + total requests over time)
+
+### Stream D: Weekly AI Digest Report (commit 8f85bff)
+
+**New file: `backend/src/services/reportService.js` (~300 lines)**
+
+- `generateWeeklyAIDigest()` -- queries `ai_suggestions` + `ai_api_usage`, formats HTML email in Norwegian
+- Graceful degradation: logs stats to console when SMTP not configured
+- Sends to `ADMIN_EMAIL` or `SMTP_FROM_EMAIL`
+
+**Scheduler:** `cron.schedule('0 7 * * 1', ...)` -- Monday 07:00 Europe/Oslo, 120s timeout
+
+**Manual trigger:** `POST /training/analytics/send-report` (admin only, returns `{ stats, html }` for preview)
+
+### Verification
+
+- Frontend build: clean (6.86s)
+- Frontend tests: 44 suites, 974 tests, 0 failures
+- Backend tests: 84 suites, 2,035 tests, 0 failures
+- All 4 commits pushed to origin/main
+
+---
+
+## Healthcare UX Feature Sprint (2026-02-22)
+
+### Text Expansion & AI Ghost Text (commits 654954c, 424c6d0)
+
+Completed the final 3/12 Healthcare UX Implementation Plan features. Extracted and upgraded slash commands from the 540-line `EnhancedClinicalTextarea` monolith into reusable components.
+
+**3 New Files:**
+
+| File                                         | Lines | Purpose                                                                                                                                                                   |
+| -------------------------------------------- | ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `hooks/useTextExpansion.js`                  | ~170  | API-backed `/` template hook -- fetches from `templatesAPI`, falls back to `DEFAULT_COMMANDS`, variable substitution (`{{today}}`, `{{followUp.2weeks}}`), usage tracking |
+| `components/clinical/TextExpansionPopup.jsx` | ~150  | Cursor-positioned floating dropdown via mirror-div technique, Norwegian category badges, grouped results, max 8                                                           |
+| `components/clinical/AITextarea.jsx`         | ~115  | Lightweight `<textarea>` with ghost text AI suggestions, Tab-to-accept, AbortController for stale requests, no macros/voice/slash                                         |
+
+**4 Modified Files:**
+
+| File                           | Change                                                                                                |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| `EnhancedClinicalTextarea.jsx` | `useSlashCommands` -> `useTextExpansion`, `SlashCommandMenu` -> `TextExpansionPopup`                  |
+| `SOAPNoteForm.jsx`             | 3 plain `<textarea>` (ROM, ortho_tests, neuro_tests) -> `<AITextarea>` with field-specific ghost text |
+| `hooks/index.js`               | Added `useTextExpansion` barrel export                                                                |
+| `components/clinical/index.js` | Added `TextExpansionPopup` + `AITextarea` barrel exports                                              |
+
+**Key Design Decisions:**
+
+- Tab key priority: expansion popup open -> insert template; popup closed + ghost text -> accept AI suggestion; neither -> normal Tab
+- `useTextExpansion` merges API templates (priority) with local `DEFAULT_COMMANDS` (fallback when API unavailable)
+- `AITextarea` is intentionally minimal (~115 lines) vs `EnhancedClinicalTextarea` (540 lines) -- only ghost text, no macros/voice/slash
+- Mirror-div technique for caret position avoids external dependencies
+
+**Healthcare UX Plan Status: 12/12 COMPLETE**
+
+---
+
+## 5-Phase Improvement Sprint (2026-02-21)
+
+### Phase 1: AI Training Data Cleanup (commit 4d703aa)
+
+- Moved 6 duplicate JSONL files, legacy Modelfiles, legacy .bat scripts to `_archive/`
+- Re-ran `clean_and_prepare.py`: 9,115 clean examples (8,802 dupes removed)
+- Verified 100 benchmark cases, 540 DPO pairs, dry-run passed
+
+### Phase 2: Frontend UI/UX Polish (commit 3dfb614)
+
+- **Bundle splitting**: ClinicalEncounter 678KB -> 570KB (lazy-load TemplatePicker, QuickPalpationSpine, AIDiagnosisSidebar)
+- **Accessibility**: Modal.jsx: role="dialog", aria-modal, focus trap, ESC close
+- **ErrorBoundary**: Wired `logErrorToService()` to POST `/api/v1/errors`
+- **TemplateVariableModal**: New component for `{{variable}}` substitution
+- **CRM tests**: 31 new (ReferralProgram 9, CampaignManager 10, WaitlistManager 12)
+
+### Phase 3: EHR Clinical Features (commit ec04e13)
+
+- **ComplianceScan**: Wired into encounter signing flow (pre-sign checklist)
+- **OutcomeChart**: Wired into PatientDetail (trend visualization)
+- **OrthopedicTemplatePicker**: Added tmj (Kjeve) + hand (Hand) body regions
+- **Cleanup**: Deleted orphaned clinical/TreatmentPlanProgress, removed SoapNoteBuilder from barrel
+- **Tests**: 42 new OrthopedicTemplatePicker tests
+
+### Phase 4: CRM & Backend Hardening (commit df83c5f)
+
+- **Security alerts**: `alertAuditFailure()` -> admin notifications via `notifyByRole()`
+- **AI retraining**: `notifyRetrainingNeeded()` -> admin+practitioner notifications
+- **Automations**: Staff notifications -> `createNotification()` + WebSocket push
+- **Notification types**: Added SECURITY_ALERT, AI_RETRAINING_READY, SYSTEM_ERROR, STAFF_NOTIFICATION
+- **CRM integration tests**: 39 tests (lead pipeline, campaigns, retention, waitlist, workflows)
+
+### Phase 5: Integration QA (this commit)
+
+- Build: pass (7.7s), Lint: 0 warnings (frontend + backend)
+- Frontend: **493 tests** (27 suites), Backend: **1445+ tests** (52 suites)
+- E2E: crm-flow.spec.js added (7 Playwright specs)
+- **i18n audit**: 75+ hardcoded strings in 6 new/modified components (audit only, not fixed)
+
+### Current Test Counts
+
+- Frontend: **974 tests** (44 suites) -- all pass
+- Backend: **2035 tests** (84 suites, all pass)
+- E2E: 11 Playwright spec files
+
+---
+
+## RECENT FIXES (Session 2026-02-03)
+
+### Backend Fixes
+
+- Rebuilt node_modules to fix corrupted cors package
+- Removed dead code `getCircuitBreakerStatus` from `backend/src/controllers/ai.js`
+
+### Language Switching Fix
+
+- Fixed 8 pages using local `useState` for language instead of global `useTranslation`:
+  - EasyAssessment.jsx, CRM.jsx, Automations.jsx, Exercises.jsx
+  - Letters.jsx, ReferralLetters.jsx, SickNotes.jsx, VNGAssessment.jsx
+- All pages now use `useTranslation()` hook from `../i18n`
+
+### Design Improvements
+
+- Changed `bg-blue-600` -> `bg-teal-600` in Appointments.jsx
+- Fixed mobile sidebar in DashboardLayout.jsx (hidden on <768px)
+
+### Training Data
+
+- Currently have 5,738 training examples in `ai-training/merged/chiro-complete-training.jsonl`
+
+---
+
+## Multi-Model AI System (Updated 2026-02-18)
+
+### Models
+
+All models now use **Qwen2.5-Instruct** as base (Sprint 2 migration from mixed architectures).
+LoRA fine-tuned variants (suffix `-lora`) are the production models.
+
+| Model             | Base         | Size   | Purpose            | Baseline |
+| ----------------- | ------------ | ------ | ------------------ | -------- |
+| `chiro-no`        | Qwen2.5-7B   | ~4.5GB | Default/balanced   | 56%      |
+| `chiro-fast`      | Qwen2.5-1.5B | ~1GB   | Quick autocomplete | 48%      |
+| `chiro-norwegian` | Qwen2.5-7B   | ~4.5GB | Norwegian language | 44%      |
+| `chiro-medical`   | Qwen2.5-3B   | ~2GB   | Clinical reasoning | 54%      |
+
+**Sprint 2 changes:** Unified all models on Qwen2.5 architecture (was: Mistral/Llama/NorwAI/MedGemma mix). This fixes chiro-medical 29s->~2s latency and enables fair base vs LoRA comparison. All use ChatML template format.
+
+### Task Routing
+
+```
+Norwegian (spell check, SOAP)  -> chiro-norwegian (NorwAI-Mistral-7B)
+Medical (diagnosis, red flags) -> chiro-medical (MedGemma 4B)
+Quick (autocomplete)           -> chiro-fast (Llama 3.2 3B)
+General                        -> chiro-no (Mistral 7B)
+```
+
+### Key Files
+
+- `ai-training/Modelfile*` - 4 Modelfiles for each variant
+- `ai-training/build-model.bat` - Builds all models
+- `backend/src/services/ai.js` - Multi-model routing with guardrails/RAG
+- `backend/src/services/guardrails.js` - Input validation & output filtering
+- `backend/src/services/rag.js` - RAG context augmentation
+- `backend/src/services/embeddings.js` - Text embedding service
+- `START-CHIROCLICK.bat` - Launcher with model detection
+
+### Commands
+
+```batch
+# Build all models (~14GB total)
+cd ai-training && build-model.bat
+
+# Verify
+ollama list | findstr chiro
+
+# Test
+ollama run chiro-norwegian "Skriv subjektiv for nakkesmerter"
+```
+
+### Environment (.env)
+
+```env
+# AI Models
+AI_MODEL=chiro-no
+AI_MODEL_FAST=chiro-fast
+AI_MODEL_NORWEGIAN=chiro-norwegian
+AI_MODEL_MEDICAL=chiro-medical
+
+# Feature Flags
+AI_ENABLED=true
+GUARDRAILS_ENABLED=true
+RAG_ENABLED=true
+
+# Ollama
+OLLAMA_BASE_URL=http://localhost:11434
+```
+
+---
+
+## Claude API Integration (2026-02-27)
+
+### Architecture Overview
+
+The AI layer uses a **provider abstraction** so all existing `ai.js` exports (13 functions) remain unchanged.
+
+```
+Request -> ai.js (unchanged API) -> getAIProvider()
+  -> Factory selects mode:
+    |-- disabled   -> OllamaProvider only (default)
+    |-- fallback   -> Ollama primary, Claude secondary
+    |-- preferred  -> Claude primary, Ollama secondary
+    |-- claude_only -> ClaudeProvider only
+
+  FallbackProvider wraps primary + secondary:
+    1. Budget check (canSpend?)
+    2. Try primary provider
+    3. On failure -> automatic failover to secondary
+    4. Log usage to ai_api_usage table
+```
+
+Key files:
+
+- `src/services/providers/aiProviderFactory.js` -- Factory modes + `FallbackProvider` class
+- `src/services/providers/claudeProvider.js` -- Anthropic SDK wrapper, model mapping, prompt caching
+- `src/services/providers/ollamaProvider.js` -- Ollama HTTP client (extracted from `ai.js`)
+- `src/services/providers/budgetTracker.js` -- Cost tracking, daily/monthly spend limits
+
+### Environment Configuration
+
+| Variable                    | Default             | Description                                           |
+| --------------------------- | ------------------- | ----------------------------------------------------- |
+| `CLAUDE_FALLBACK_MODE`      | `disabled`          | `disabled` / `fallback` / `preferred` / `claude_only` |
+| `CLAUDE_API_KEY`            | (none)              | Anthropic SDK key; required for any non-disabled mode |
+| `CLAUDE_MODEL`              | `claude-sonnet-4-6` | Override default model mapping                        |
+| `CLAUDE_DAILY_BUDGET_USD`   | `10`                | Hard daily spend cap (USD)                            |
+| `CLAUDE_MONTHLY_BUDGET_USD` | `200`               | Hard monthly spend cap (USD)                          |
+
+Without `CLAUDE_API_KEY`, the factory falls back to `disabled` regardless of `CLAUDE_FALLBACK_MODE`.
+
+### Model Mapping
+
+`CLAUDE_MODEL_MAP` in `claudeProvider.js` maps Ollama model names to Claude equivalents:
+
+| Task                | Ollama Model Pattern | Claude Model        |
+| ------------------- | -------------------- | ------------------- |
+| SOAP / letters      | `chiro-no*`          | `claude-sonnet-4-6` |
+| Norwegian           | `chiro-norwegian*`   | `claude-sonnet-4-6` |
+| Red flags / medical | `chiro-medical*`     | `claude-sonnet-4-6` |
+| Autocomplete        | `chiro-fast*`        | `claude-haiku-4-5`  |
+| Default (no match)  | --                   | `claude-sonnet-4-6` |
+
+### New Services
+
+| Service               | File                               | Lines | Provider                 | Key Exports                                                                         |
+| --------------------- | ---------------------------------- | ----- | ------------------------ | ----------------------------------------------------------------------------------- |
+| Extended Thinking     | `services/extendedThinking.js`     | 141   | Claude                   | `analyzeWithThinking()`, `differentialDiagnosis()`, `analyzeRedFlagsWithThinking()` |
+| Structured Extraction | `services/structuredExtraction.js` | 184   | Claude (tool_use)        | `extractSOAP()`, `extractDiagnoses()`                                               |
+| Clinical Vision       | `services/clinicalVision.js`       | 112   | Claude (vision)          | `analyzeImage()` -- X-ray, MRI, posture, general                                    |
+| Batch Processor       | `services/batchProcessor.js`       | 125   | Claude (Batch API)       | `createBatch()`, `getBatchStatus/Results()`, `scoreTrainingData()`                  |
+| Clinical Orchestrator | `services/clinicalOrchestrator.js` | 187   | Factory (multi-provider) | `orchestrate()` -- safety -> parallel -> synthesis pipeline                         |
+| Clinical Evals        | `services/clinicalEvals.js`        | 283   | Ollama + Claude          | `runComparison()`, `runEvalBatch()` -- A/B model grading                            |
+| Compliance Validator  | `services/complianceValidator.js`  | 131   | None (utility)           | `redactPII()`, `validateForCloudAPI()`, `ensureCompliance()`                        |
+
+Provider files (in `services/providers/`):
+
+| File                   | Lines | Purpose                                    |
+| ---------------------- | ----- | ------------------------------------------ |
+| `claudeProvider.js`    | 302   | SDK wrapper, model mapping, prompt caching |
+| `aiProviderFactory.js` | 175   | Factory modes, FallbackProvider class      |
+| `budgetTracker.js`     | 215   | Cost tracking, daily/monthly limits        |
+| `ollamaProvider.js`    | 204   | Ollama HTTP client (extracted from ai.js)  |
+
+### New API Endpoints
+
+**AI routes** (`routes/ai.js`, requires ADMIN or PRACTITIONER):
+
+| Method | Path                            | Purpose                                                  |
+| ------ | ------------------------------- | -------------------------------------------------------- |
+| POST   | `/api/v1/ai/extended-analysis`  | Extended thinking for differential diagnosis / red flags |
+| POST   | `/api/v1/ai/analyze-image`      | Clinical image analysis (vision)                         |
+| POST   | `/api/v1/ai/extract-structured` | SOAP / diagnosis JSON extraction (tool_use)              |
+
+**Cost analytics** (`routes/aiCost.js`, ADMIN only):
+
+| Method | Path                        | Purpose                               |
+| ------ | --------------------------- | ------------------------------------- |
+| GET    | `/api/v1/ai-cost/budget`    | Current daily/monthly spend vs limits |
+| GET    | `/api/v1/ai-cost/by-task`   | Cost breakdown by task type           |
+| GET    | `/api/v1/ai-cost/cache`     | Prompt cache hit rates                |
+| GET    | `/api/v1/ai-cost/trend`     | Daily cost trend (`?days=30`)         |
+| GET    | `/api/v1/ai-cost/providers` | Ollama vs Claude comparison           |
+
+**Batch processing** (`routes/batch.js`, ADMIN only):
+
+| Method | Path                             | Purpose                 |
+| ------ | -------------------------------- | ----------------------- |
+| POST   | `/api/v1/batch`                  | Create batch job        |
+| GET    | `/api/v1/batch`                  | List batches            |
+| GET    | `/api/v1/batch/:batchId`         | Get batch status        |
+| GET    | `/api/v1/batch/:batchId/results` | Get batch results       |
+| POST   | `/api/v1/batch/:batchId/cancel`  | Cancel batch            |
+| POST   | `/api/v1/batch/score-training`   | Score training examples |
+
+### Cost Model
+
+| Model               | Input/MTok | Output/MTok | Cache Read      | Cache Create          |
+| ------------------- | ---------- | ----------- | --------------- | --------------------- |
+| `claude-sonnet-4-6` | $3.00      | $15.00      | $0.30 (90% off) | $3.75 (25% surcharge) |
+| `claude-haiku-4-5`  | $0.80      | $4.00       | $0.08           | $1.00                 |
+
+- **Budget enforcement**: Pre-flight `canSpend()` check before every Claude call; auto-resets daily/monthly
+- **Prompt caching**: System prompts >500 chars get `cache_control: ephemeral`; safety task types always cached
+- **Batch API**: 50% cost reduction for async bulk processing (training scoring, daily summaries)
+
+### Database -- `ai_api_usage` Table
+
+Tracks every Claude/Ollama API call. Used by `budgetTracker.js` (cost enforcement) and `aiCost.js` controller (analytics).
+
+Key columns: `provider`, `model`, `input_tokens`, `output_tokens`, `cache_read_tokens`, `cache_creation_tokens`, `cost_usd`, `task_type`, `duration_ms`, `organization_id`
+
+BudgetTracker gracefully degrades to in-memory tracking if the table doesn't exist yet.
+
+### Testing
+
+**186 tests** across **13 test files**:
+
+- Provider tests (4 files, 76 tests): `tests/services/providers/{claudeProvider,aiProviderFactory,budgetTracker,ollamaProvider}.test.js`
+- Service tests (8 files, 101 tests): `tests/services/{extendedThinking,structuredExtraction,clinicalVision,batchProcessor,clinicalOrchestrator,clinicalEvals,complianceValidator,aiCost}.test.js`
+- RAG contextual tests (1 file, 9 tests): `tests/services/rag.contextual.test.js`
+
+### Troubleshooting
+
+| Symptom                            | Cause                       | Fix                                                                 |
+| ---------------------------------- | --------------------------- | ------------------------------------------------------------------- |
+| "CLAUDE_API_KEY not set"           | No API key configured       | Degrades gracefully -- Ollama serves all requests                   |
+| Budget exceeded (requests blocked) | Daily/monthly limit hit     | Check `/api/v1/ai-cost/budget`; resets automatically next day/month |
+| Provider failover logged           | Primary provider timed out  | Normal behavior -- check `provider.getStatus()` for details         |
+| ESM test import errors             | Running `npx jest` directly | Must use `npm test` (configures ESM loader via jest.config)         |
+| `CLAUDE_FALLBACK_MODE` ignored     | Missing `CLAUDE_API_KEY`    | Factory falls back to `disabled` mode without a valid key           |
+
+---
+
+## AI Training Pipeline (2026-01-29)
+
+### Training Scripts
+
+| Script                                          | Purpose                                     |
+| ----------------------------------------------- | ------------------------------------------- |
+| `ai-training/training/train_unsloth.py`         | LoRA fine-tuning with Unsloth (2-5x faster) |
+| `ai-training/data/scripts/convert_to_chatml.py` | Convert JSONL to ChatML format              |
+| `ai-training/rag/chunker.py`                    | SOAP-aware clinical document chunker        |
+
+### Training Commands
+
+```bash
+# 1. Convert data to ChatML format
+cd ai-training/data/scripts
+python convert_to_chatml.py
+
+# 2. Train Norwegian model with Unsloth
+cd ai-training/training
+pip install -r requirements.txt
+python train_unsloth.py --model norwegian --data ../data/processed
+
+# 3. Deploy to Ollama
+ollama create chiro-norwegian -f ../Modelfile.chiro-norwegian
+```
+
+### Database Migrations
+
+```bash
+# Add pgvector for RAG
+psql -d chiroclickcrm < database/migrations/030_pgvector_rag.sql
+```
+
+### Safety Features
+
+- **Input Guardrails**: HIPAA pattern detection, prompt injection blocking
+- **Output Filtering**: Hallucination risk scoring, clinical heuristics
+- **Confidence Calibration**: Temperature scaling per task type
+
+### RAG System
+
+- **Vector DB**: pgvector with HNSW index
+- **Embeddings**: e5-multilingual-large (1024 dims)
+- **Chunking**: SOAP-aware with configurable overlap
+- **Search**: Hybrid BM25 + vector (alpha=0.7)
+
+### Training Data
+
+- `ai-training/training-data.jsonl` - 5,642 examples (3.0 MB)
+- `ai-training/rag-chunks.json` - RAG data (4.4 MB)
+
+### Important Notes
+
+- **USB Drive**: Must be NTFS or exFAT (not FAT32) for models >4GB
+- **Disk Space**: ~14GB required for all AI models
+- **RAM**: Minimum 8GB, recommended 12-16GB for multi-model routing
+
+---
+
+## Quick-Click Spine Palpation System (2026-01-25)
+
+**Status:** Code complete, needs database setup & testing
+
+### What Was Built
+
+A clickable spine segment system for rapid palpation documentation:
+
+- Click spine segment -> select direction -> Norwegian clinical text inserted into palpation field
+- Right sidebar always visible in ClinicalEncounter
+- 100+ default Norwegian templates for all spine segments
+- Customizable templates per organization via Settings UI
+
+### Files Created/Modified
+
+| File                                                       | Status                           |
+| ---------------------------------------------------------- | -------------------------------- |
+| `database/schema.sql`                                      | Added spine_text_templates table |
+| `database/seeds/spine-templates.sql`                       | NEW - 100+ Norwegian templates   |
+| `backend/src/controllers/spineTemplates.js`                | NEW - CRUD controller            |
+| `backend/src/routes/spineTemplates.js`                     | NEW - API routes                 |
+| `backend/src/server.js`                                    | Added route registration         |
+| `frontend/src/components/clinical/QuickPalpationSpine.jsx` | NEW - Main component             |
+| `frontend/src/pages/ClinicalEncounter.jsx`                 | Integrated sidebar               |
+| `frontend/src/pages/Settings.jsx`                          | Added template editor            |
+| `frontend/src/services/api.js`                             | Added spineTemplatesAPI          |
+
+### Commit
+
+`7961cb0` - feat(clinical): Add quick-click spine palpation text insertion system
+
+---
+
+## Repository Cleanup (Completed 2026-01-30)
+
+### Status: ALL PHASES COMPLETE
+
+### Phase 1: Git Cleanup - DONE
+
+- Updated .gitignore for large binary files (ollama, pgsql, AI models)
+- Renamed long filenames in training-data-extracted/
+- Staged all 60+ untracked files
+- Used merge strategy (not rebase) to resolve 30 commits behind
+- Pushed all changes to remote
+
+### Phase 2: Spine Palpation Database - DONE
+
+- Created spine_text_templates table
+- Seeded 149 Norwegian palpation templates
+- Tested all API endpoints (authenticated via session cookie)
+- Templates cover C0-C1 through Coccyx + muscle groups
+
+### Phase 3: Documentation Reorganization - DONE
+
+- Created docs/ hierarchy:
+  - docs/getting-started/ (3 files)
+  - docs/architecture/ (4 files)
+  - docs/clinical/ (12 files)
+  - docs/deployment/ (4 files)
+  - docs/development/ (9 files)
+  - docs/ai-training/ (7 files)
+  - docs/archive/ (12 old completion notices)
+- Trimmed README.md from 555 to 241 lines
+- Kept at root: README.md, CLAUDE.md, SECURITY.md, docker-compose.yml
+
+### Phase 4: Environment Validation - DONE
+
+- Created scripts/setup.sh (Linux/Mac)
+- Created scripts/setup.bat (Windows)
+- Updated backend/.env.example with AI model variants
+- Docker services verified healthy
+- Backend health check passing
+
+---
+
+## Spine Templates API Reference
+
+| Method | Endpoint                                    | Description                       |
+| ------ | ------------------------------------------- | --------------------------------- |
+| GET    | /api/v1/spine-templates                     | List all templates                |
+| GET    | /api/v1/spine-templates/grouped             | Templates grouped by segment      |
+| GET    | /api/v1/spine-templates/segments            | List of segments                  |
+| GET    | /api/v1/spine-templates/directions          | List of directions                |
+| GET    | /api/v1/spine-templates/:segment/:direction | Specific template                 |
+| POST   | /api/v1/spine-templates                     | Create custom template            |
+| PATCH  | /api/v1/spine-templates/:id                 | Update template                   |
+| DELETE | /api/v1/spine-templates/:id                 | Delete custom (revert to default) |
+| POST   | /api/v1/spine-templates/reset               | Reset all to defaults             |
+
+---
+
+## Session 2026-01-27: Database & Frontend Fixes
+
+### Database Schema Applied
+
+The following were added to make auth work:
+
+```sql
+-- Run these if starting fresh:
+ALTER TABLE users ADD COLUMN password_hash VARCHAR(255);
+ALTER TABLE users ADD COLUMN failed_login_attempts INTEGER DEFAULT 0;
+ALTER TABLE users ADD COLUMN locked_until TIMESTAMP;
+ALTER TABLE users ADD COLUMN email_verified BOOLEAN DEFAULT false;
+
+CREATE TABLE sessions (
+  id VARCHAR(64) PRIMARY KEY,
+  user_id UUID NOT NULL REFERENCES users(id),
+  expires_at TIMESTAMP NOT NULL,
+  ip_address VARCHAR(45),
+  user_agent TEXT,
+  fresh BOOLEAN DEFAULT true,
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE scheduled_job_logs (
+  id SERIAL PRIMARY KEY,
+  job_name VARCHAR(100) NOT NULL,
+  job_id VARCHAR(100),
+  status VARCHAR(20) NOT NULL,
+  started_at TIMESTAMP DEFAULT NOW(),
+  completed_at TIMESTAMP,
+  error_message TEXT
+);
+
+-- Auth functions
+CREATE OR REPLACE FUNCTION record_successful_login(user_uuid UUID)
+RETURNS void AS $$ UPDATE users SET failed_login_attempts = 0, locked_until = NULL WHERE id = user_uuid; $$ LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION record_failed_login(user_uuid UUID)
+RETURNS void AS $$ UPDATE users SET failed_login_attempts = failed_login_attempts + 1 WHERE id = user_uuid; $$ LANGUAGE SQL;
+```
+
+Migration file: `database/migrations/005_complete_auth_schema.sql`
+Demo users seed: `database/seeds/demo-users.sql`
+
+### Test Credentials
+
+| Email                        | Password | Role         |
+| ---------------------------- | -------- | ------------ |
+| admin@chiroclickcrm.no       | admin123 | ADMIN        |
+| kiropraktor@chiroclickcrm.no | admin123 | PRACTITIONER |
+
+### Frontend Dev Mode
+
+The frontend can run WITHOUT Clerk by using a placeholder key in `.env`:
+
+```env
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_key_here
+```
+
+- `main.jsx` - Detects placeholder key and skips ClerkProvider
+- `App.jsx` - Renders without SignedIn/SignedOut wrappers in dev mode
+- `api.js` - Skips 401 redirect to /sign-in in dev mode
+
+### Stub Components Created
+
+These are placeholders to prevent import errors:
+
+| Component             | Path                                                        |
+| --------------------- | ----------------------------------------------------------- |
+| AISettings            | `frontend/src/components/AISettings.jsx`                    |
+| SchedulerDecisions    | `frontend/src/components/scheduler/SchedulerDecisions.jsx`  |
+| AppointmentImporter   | `frontend/src/components/scheduler/AppointmentImporter.jsx` |
+| TodaysMessages        | `frontend/src/components/scheduler/TodaysMessages.jsx`      |
+| ExaminationComponents | `frontend/src/components/examination/index.jsx`             |
+| ExercisePanel         | `frontend/src/components/exercises/index.jsx`               |
+
+### Stub Backend Routes Created
+
+| Route             | Path                                      | Status       |
+| ----------------- | ----------------------------------------- | ------------ |
+| scheduler         | `backend/src/routes/scheduler.js`         | Stub         |
+| kiosk             | `backend/src/routes/kiosk.js`             | Stub         |
+| crm               | `backend/src/routes/crm.js`               | **COMPLETE** |
+| automations       | `backend/src/routes/automations.js`       | Stub         |
+| bulkCommunication | `backend/src/routes/bulkCommunication.js` | Stub         |
+| exercises         | `backend/src/routes/exercises.js`         | Stub         |
+| notifications     | `backend/src/routes/notifications.js`     | Stub         |
+| patientPortal     | `backend/src/routes/patientPortal.js`     | Stub         |
+
+---
+
+## CRM System (Completed 2026-01-28)
+
+### Status: FULLY OPERATIONAL
+
+The CRM module is now complete with 40+ API endpoints:
+
+### CRM API Endpoints
+
+| Method   | Endpoint                   | Description              |
+| -------- | -------------------------- | ------------------------ |
+| GET      | /crm/overview              | Dashboard metrics        |
+| GET      | /crm/leads                 | Lead list with filtering |
+| GET      | /crm/leads/pipeline        | Pipeline statistics      |
+| GET/POST | /crm/leads/:id             | Lead CRUD                |
+| POST     | /crm/leads/:id/convert     | Convert to patient       |
+| GET      | /crm/lifecycle             | Patients by lifecycle    |
+| GET      | /crm/lifecycle/stats       | Lifecycle statistics     |
+| GET/POST | /crm/referrals             | Referral management      |
+| GET      | /crm/referrals/stats       | Referral statistics      |
+| GET/POST | /crm/surveys               | Survey management        |
+| GET      | /crm/surveys/:id/responses | Survey responses         |
+| GET      | /crm/surveys/nps/stats     | NPS analytics            |
+| GET/POST | /crm/communications        | Communication history    |
+| GET/POST | /crm/campaigns             | Campaign management      |
+| POST     | /crm/campaigns/:id/launch  | Launch campaign          |
+| GET/POST | /crm/workflows             | Workflow automation      |
+| POST     | /crm/workflows/:id/toggle  | Toggle workflow          |
+| GET      | /crm/retention             | Retention dashboard      |
+| GET      | /crm/retention/churn       | Churn analysis           |
+| GET      | /crm/retention/cohorts     | Cohort analysis          |
+| GET/POST | /crm/waitlist              | Waitlist management      |
+| POST     | /crm/waitlist/notify       | Notify waitlist          |
+| GET/PUT  | /crm/settings              | CRM settings             |
+
+### Key Files
+
+- `backend/src/routes/crm.js` - Full route definitions (310 lines)
+- `backend/src/controllers/crm.js` - Controller with 50+ methods
+- `backend/src/services/crm.js` - Business logic (~1300 lines)
+
+### Database Fixes Applied
+
+1. Created `current_tenant_id()` function for RLS
+2. Fixed `setTenantContext()` to use `set_config()` instead of `SET`
+3. Changed `clinic_id` to `organization_id` in CRM service/controller
+
+---
+
+## Clinical Settings System
+
+Full backend API for clinical documentation preferences:
+
+**Files:**
+
+- `backend/src/services/clinicalSettings.js` - Settings service with defaults
+- `backend/src/controllers/clinicalSettings.js` - CRUD controller
+- `backend/src/routes/clinicalSettings.js` - API routes
+
+**API Endpoints:**
+
+| Method | Endpoint                            | Description              |
+| ------ | ----------------------------------- | ------------------------ |
+| GET    | /clinical-settings                  | Get org settings         |
+| GET    | /clinical-settings/defaults         | Get default values       |
+| PATCH  | /clinical-settings                  | Update settings          |
+| PUT    | /clinical-settings/adjustment/style | Set Gonstead/Diversified |
+| POST   | /clinical-settings/reset            | Reset to defaults        |
+
+**Settings Structure:**
+
+```javascript
+{
+  adjustment: {
+    style: 'gonstead' | 'diversified' | 'segment_listing',
+    gonstead: { useFullNotation, includeDirection, listings },
+    diversified: { useAnatomicalTerms, includeRestriction, terminology }
+  },
+  tests: {
+    orthopedic: { resultFormat: 'plus_minus' | 'pos_neg' | 'numeric' },
+    neurological: { reflexGrading: 'numeric' | 'plus_system' },
+    rom: { format: 'degrees' | 'percent' | 'descriptive' }
+  }
+}
+```
+
+### Letter Templates Added to AI Training
+
+14 Norwegian letter templates added to `ai-training/letters-training.jsonl`:
+
+- Headache referral letters
+- Exam declarations (studieattester)
+- Insurance reports
+- Referrals to neurologist, orthopedist, physiotherapy
+
+### Common Issues & Fixes
+
+| Issue                                  | Fix                                                |
+| -------------------------------------- | -------------------------------------------------- |
+| `useKeyboardShortcuts.js` parse error  | File contains JSX - renamed to `.jsx`              |
+| Duplicate `aiAPI` export               | Remove first declaration at line ~470 in api.js    |
+| Duplicate hook exports                 | Don't export both `default as X` and `X`           |
+| Missing index.js for directory imports | Create `index.js` that re-exports from `index.jsx` |
+| 401 redirect loop in dev               | Check `import.meta.env.DEV` before redirecting     |
+
+---
+
+## Testing Status (2026-01-28)
+
+### Current State
+
+- **All tests pass**: 118 tests, 0 failures
+- **Test suites**: 5 passing (CRM, Auth, Patients, Encounters, Health)
+- **Coverage**: ~23% (threshold is 70% - not enforced)
+
+### What Was Fixed
+
+1. CRM tests - Updated to match actual API response structures
+2. Auth tests - Fixed response code expectations
+3. Patients tests - Added required fields (solvit_id, date_of_birth), fixed schema
+4. Encounters tests - Removed non-existent status column, fixed schema
+5. Unit tests - Removed (tested non-existent functions)
+
+---
+
+## Exercise Library + Rehab System (2026-01-29)
+
+### Status: FULLY IMPLEMENTED
+
+Complete exercise prescription system with offline support for single practitioner clinics.
+
+### Backend Components
+
+| Component      | Path                                          | Status                            |
+| -------------- | --------------------------------------------- | --------------------------------- |
+| Migration      | `backend/migrations/023_exercise_library.sql` | COMPLETE                          |
+| Controller     | `backend/src/controllers/exercises.js`        | COMPLETE (850+ lines)             |
+| Service        | `backend/src/services/exercises.js`           | COMPLETE (1100+ lines)            |
+| Routes         | `backend/src/routes/exercises.js`             | COMPLETE                          |
+| Patient Routes | `backend/src/routes/patients.js`              | Exercise routes added             |
+| PDF Handout    | `backend/src/services/pdf.js`                 | Exercise handout generation added |
+| Seed Data      | `backend/seeds/exercise_library.sql`          | 40+ exercises, 5 programs         |
+
+### Frontend Components
+
+| Component               | Path                                             | Status                 |
+| ----------------------- | ------------------------------------------------ | ---------------------- |
+| ExercisePanel           | `frontend/src/components/exercises/index.jsx`    | COMPLETE (670 lines)   |
+| useExerciseSync         | `frontend/src/hooks/useExerciseSync.js`          | COMPLETE (520+ lines)  |
+| PatientExercises Portal | `frontend/src/pages/portal/PatientExercises.jsx` | COMPLETE               |
+| Service Worker          | `frontend/public/sw.js`                          | Exercise caching added |
+| API Client              | `frontend/src/services/api.js`                   | exercisesAPI complete  |
+
+### Database Tables
+
+```sql
+-- Main tables
+exercise_library         -- 40+ global exercises with Norwegian instructions
+patient_exercise_prescriptions  -- Patient-specific prescriptions with compliance tracking
+exercise_programs        -- Reusable program templates (McGill Big 3, etc.)
+patient_exercise_programs -- Assigned programs per patient
+exercise_favorites       -- Practitioner's frequently used exercises
+```
+
+### Exercise API Endpoints
+
+| Method | Endpoint                                | Description                                      |
+| ------ | --------------------------------------- | ------------------------------------------------ |
+| GET    | /exercises                              | List with filters (category, bodyRegion, search) |
+| GET    | /exercises/categories                   | Available categories                             |
+| GET    | /exercises/body-regions                 | Available body regions                           |
+| GET    | /exercises/favorites                    | User's favorites                                 |
+| GET    | /exercises/recent                       | Recently used                                    |
+| GET    | /exercises/stats                        | Usage statistics                                 |
+| GET    | /exercises/programs                     | Program templates                                |
+| POST   | /exercises/programs                     | Create program                                   |
+| GET    | /exercises/prescriptions/:id            | Get prescription                                 |
+| POST   | /exercises/prescriptions/:id/compliance | Log daily compliance                             |
+| POST   | /patients/:id/exercises                 | Prescribe to patient                             |
+| GET    | /patients/:id/exercises                 | Patient's exercises                              |
+| GET    | /patients/:id/exercises/pdf             | Generate PDF handout                             |
+
+### Offline Support Features
+
+1. **Exercise Library Caching** - Full library cached in IndexedDB
+2. **Prescription Queuing** - Offline prescriptions synced when online
+3. **Compliance Logging** - Can log compliance offline
+4. **Service Worker** - Caches exercise media and API responses
+5. **Background Sync** - Automatic sync when connection restored
+
+### Patient Portal
+
+- **URL**: `/portal/exercises/:patientId` or `/portal/exercises`
+- **Auth**: PIN entry or magic link token
+- **Features**: View exercises, log compliance, rate effectiveness, download PDF
+
+### Exercise Categories (Norwegian)
+
+- Toyning (Stretching)
+- Styrke (Strengthening)
+- Mobilitet (Mobility)
+- Balanse (Balance)
+- Vestibular (Vestibular)
+- Pust (Breathing)
+- Holdning (Posture)
+- Nervegliding (Nerve Glide)
+
+### Body Regions (Norwegian)
+
+- Nakke (Cervical)
+- Brystsyle (Thoracic)
+- Korsrygg (Lumbar)
+- Skulder (Shoulder)
+- Hofte (Hip)
+- Kne (Knee)
+- Ankel (Ankle)
+- Kjerne (Core)
+- Helkropp (Full Body)
+
+### Seeded Programs
+
+1. **Nakkesmerter - Grunnprogram** - Chin tuck, stretches, isometrics
+2. **Korsrygg - McGill Big 3** - Curl-up, side plank, bird-dog
+3. **Skulder - Rotatorcuff rehabilitering** - Pendulum, rotator cuff exercises
+4. **Holdningskorrigering** - Posture correction for desk workers
+5. **Balanse og propriosepsjon** - Balance training
+
+---
+
+## Session 2026-01-29: Anatomy Module, AI Fixes, USB Portable
+
+### Completed
+
+#### 1. Fixed AI Model Management Page Error
+
+- **Problem**: `/api/v1/training/status` required ADMIN role, user was PRACTITIONER
+- **Fix**: Changed `backend/src/routes/training.js` to allow `['ADMIN', 'PRACTITIONER']` for status and data endpoints
+- **Also**: Improved error display in `frontend/src/pages/Training.jsx`
+
+#### 2. Merged PR #4: Enhanced Anatomy Visualization Module
+
+- Merged `claude/improve-model-setup-6HkqY` branch
+- Created combined `frontend/src/components/anatomy/index.js` with all exports
+- **New components added**:
+  - `AnatomyViewer` - Combined 2D/3D viewer with mode switching
+  - `EnhancedSpineDiagram` - Anatomical SVG spine
+  - `Spine3DViewer` - Three.js 3D interactive spine
+  - `EnhancedBodyDiagram` - react-body-highlighter wrapper
+  - `AnatomyProvider` - Context for shared state
+  - `MuscleMap` - Interactive muscle map (50+ muscles)
+  - `AnatomicalSpine` - Simple 2D spine diagram
+
+#### 3. USB Portable Setup (Partial)
+
+- **Copied Ollama models** to `ollama-models/` folder (21GB)
+- **Created scripts**:
+  - `scripts/setup-ollama-from-usb.bat` - Restore models on new machine
+  - `copy-usb.bat` - Copy project to USB
+- **Updated** `START-CHIROCLICK.bat` with relative paths (`%~dp0`)
+- **Added** `ollama-models/` to `.gitignore`
+- **PENDING**: USB copy was slow/incomplete - needs manual copy or retry
+
+---
+
+## Sprint Improvements (2026-02-09)
+
+### Phase 1: Security Hardening
+
+- All SQL queries parameterized (eliminated string concatenation in queries)
+- Winston logger replaces all console.log/console.error calls
+- Empty catch blocks filled with proper error logging
+- Audit alerting implemented for suspicious activity
+
+### Phase 2: UX/UI Improvements
+
+- **New components:** Breadcrumbs, PatientSummaryCard, KeyboardShortcutsModal, UnsavedChangesDialog
+- **New hooks:** useUnsavedChanges, useGlobalKeyboardShortcuts
+- Mobile navigation integrated into DashboardLayout
+- All `alert()` calls replaced with toast notifications
+- ARIA accessibility pass complete across all interactive elements
+- Loading states added to async operations
+
+### Phase 3: Testing Foundation
+
+- 814 tests across 32 suites -- all passing
+- SQL injection test coverage for patient/encounter/auth endpoints
+- Auth bypass tests (session tampering, expired tokens, role escalation)
+- GDPR compliance tests (data export, anonymization, consent)
+
+### Phase 4: Performance Optimization
+
+- N+1 queries fixed in getPatientStatistics and getRetentionDashboard
+- 50+ database indexes added (`database/migrations/040_performance_indexes.sql`)
+- Memory caching on diagnosis codes, treatment types, and org settings
+
+### Phase 5: Feature Completion
+
+- QuickNotePanel wired to follow-ups API
+- NoShowImporter wired to patients search API
+- MessageApprovalDashboard wired to scheduler API
+- usePatientIntake hook wired to kiosk API
+- ExerciseLog export and ProgressChart navigation added
+- All hardcoded placeholders replaced with real data/API calls
+
+### Phase 6: Documentation
+
+- Swagger API docs available at `/api-docs`
+- 20+ endpoint annotations across auth, patients, encounters, appointments, billing routes
+- CLAUDE.md updated with sprint summary
+
+---
+
+## Resolved Items (2026-02-07)
+
+The following were previously listed as TODO but are confirmed complete:
+
+- Scheduler clinic_id bug -> uses `organization_id`
+- CRM frontend connected to backend API -> all 14 components use real `crmAPI.*` calls
+- 3D dependencies installed -> three, @react-three/fiber, @react-three/drei in package.json
+- Exercise system -> 670-line ExercisePanel with full API
+- Multi-model AI routing -> 42KB ai.js with task-based routing
+- AI model references fixed -> docker-compose.yml and build-model.bat updated
+- training_data/ cleanup -> obsolete files removed, all data in ai-training/
+
+### Remaining TODO
+
+- [ ] Test AnatomyViewer component (2D/3D mode switching)
+- [ ] Test MuscleMap (anterior/posterior views)
+- [ ] Review/merge any open PRs: `gh pr list --state open`

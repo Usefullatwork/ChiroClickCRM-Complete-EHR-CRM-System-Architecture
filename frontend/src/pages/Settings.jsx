@@ -24,7 +24,7 @@ const ProfileSettings = lazy(() => import('../components/settings/ProfileSetting
 const UserManagement = lazy(() => import('../components/settings/UserManagement'));
 const NotificationSettings = lazy(() => import('../components/settings/NotificationSettings'));
 const IntegrationSettings = lazy(() => import('../components/settings/IntegrationSettings'));
-const AISettings = lazy(() => import('../components/AISettings'));
+const AISettings = lazy(() => import('../components/assessment/AISettings'));
 const TrainingDataExport = lazy(() => import('../components/settings/TrainingDataExport'));
 const ClinicalSettings = lazy(() => import('../components/settings/ClinicalSettings'));
 const ExerciseSettings = lazy(() => import('../components/settings/ExerciseSettings'));
