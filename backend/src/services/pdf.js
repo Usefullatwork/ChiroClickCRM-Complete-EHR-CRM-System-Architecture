@@ -3,8 +3,8 @@
  * Called via controllers (e.g., pdf.controller.js).
  *
  * NOTE: Treatment summaries, referral letters, and sick notes live in
- * pdfGenerator.js (imported directly by routes). The two files have divergent
- * APIs and merging is deferred — see docs/sprint-history.md.
+ * pdfGenerator.js. Both services are consumed via controllers/pdf.js
+ * (routes never import services directly).
  */
 
 import PDFDocument from 'pdfkit';

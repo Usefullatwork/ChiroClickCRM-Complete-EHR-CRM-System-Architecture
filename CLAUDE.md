@@ -111,7 +111,7 @@ Full endpoint docs at `/api-docs` (Swagger).
 
 ## Known Tech Debt
 
-- `pdf.js` + `pdfGenerator.js` are split with divergent APIs (not merging yet)
+- `pdf.js` + `pdfGenerator.js` are split by domain (letters/invoices vs summaries/referrals) — both consumed via controllers/pdf.js
 - `assessment/` BodyChart + SpineDiagram used by EasyAssessment (not consolidated with `anatomy/`)
 - `mobile-app/` exists (routes/mobile.js now registered in server.js)
 - `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (kept for future)
