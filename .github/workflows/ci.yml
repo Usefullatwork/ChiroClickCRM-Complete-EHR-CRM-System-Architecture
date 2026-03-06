@@ -177,7 +177,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: false
-          tags: chiroclickcrm-backend:test
+          tags: chiroclickehr-backend:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -187,7 +187,7 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: false
-          tags: chiroclickcrm-frontend:test
+          tags: chiroclickehr-frontend:test
           build-args: |
             VITE_API_URL=http://localhost:3000/api/v1
             VITE_CLERK_PUBLISHABLE_KEY=pk_test_placeholder

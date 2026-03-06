@@ -43,7 +43,7 @@ test.describe('Authentication API', () => {
   test('should login with valid credentials', async ({ request }) => {
     const response = await request.post(`${API_BASE}/api/v1/auth/login`, {
       data: {
-        email: 'admin@chiroclickcrm.no',
+        email: 'admin@chiroclickehr.no',
         password: 'admin123',
       },
     });
@@ -62,7 +62,7 @@ test.describe('Authentication API', () => {
   test('should reject login with wrong password', async ({ request }) => {
     const response = await request.post(`${API_BASE}/api/v1/auth/login`, {
       data: {
-        email: 'admin@chiroclickcrm.no',
+        email: 'admin@chiroclickehr.no',
         password: 'wrongpassword',
       },
     });

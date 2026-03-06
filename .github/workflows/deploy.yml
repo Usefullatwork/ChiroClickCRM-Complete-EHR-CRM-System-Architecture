@@ -6,13 +6,13 @@ name: Deploy
 on:
   push:
     branches: [main]
-    tags: ['v*']
+    tags: ["v*"]
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to deploy to'
+        description: "Environment to deploy to"
         required: true
-        default: 'staging'
+        default: "staging"
         type: choice
         options:
           - staging
@@ -108,7 +108,7 @@ jobs:
     if: github.ref == 'refs/heads/main' || github.event.inputs.environment == 'staging'
     environment:
       name: staging
-      url: https://staging.chiroclickcrm.no
+      url: https://staging.chiroclickehr.no
 
     steps:
       - name: Checkout code
@@ -131,7 +131,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.environment == 'production'
     environment:
       name: production
-      url: https://chiroclickcrm.no
+      url: https://chiroclickehr.no
 
     steps:
       - name: Checkout code

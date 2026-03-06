@@ -58,7 +58,7 @@ export const test = base.extend({
 
   // Practitioner user context — needs separate login (different user)
   practitionerPage: async ({ page }, use) => {
-    await loginViaAPI(page, 'kiropraktor@chiroclickcrm.no', 'admin123');
+    await loginViaAPI(page, 'kiropraktor@chiroclickehr.no', 'admin123');
     await use(page);
   },
 });

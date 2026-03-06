@@ -1,5 +1,5 @@
 /**
- * ChiroClickCRM Desktop - Electron Main Process
+ * ChiroClickEHR Desktop - Electron Main Process
  * Manages the browser window, backend server lifecycle, and application menus.
  */
 
@@ -15,7 +15,7 @@ const ElectronStore = require('electron-store');
 // ============================================================================
 
 const store = new ElectronStore({
-  name: 'chiroclickcrm-settings',
+  name: 'chiroclickehr-settings',
   defaults: {
     windowBounds: { x: undefined, y: undefined, width: 1280, height: 800 },
     maximized: false,
@@ -165,7 +165,7 @@ function createWindow() {
     height,
     minWidth: 1024,
     minHeight: 700,
-    title: 'ChiroClickCRM',
+    title: 'ChiroClickEHR',
     icon: path.join(__dirname, 'icons', 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -223,7 +223,7 @@ function createMenu() {
           click: async () => {
             const { filePath } = await dialog.showSaveDialog(mainWindow, {
               title: 'Export Data',
-              defaultPath: `chiroclickcrm-export-${new Date().toISOString().split('T')[0]}.sql`,
+              defaultPath: `chiroclickehr-export-${new Date().toISOString().split('T')[0]}.sql`,
               filters: [
                 { name: 'SQL Backup', extensions: ['sql'] },
                 { name: 'All Files', extensions: ['*'] },
@@ -268,12 +268,12 @@ function createMenu() {
       label: 'Help',
       submenu: [
         {
-          label: 'About ChiroClickCRM',
+          label: 'About ChiroClickEHR',
           click: () => {
             dialog.showMessageBox(mainWindow, {
               type: 'info',
-              title: 'About ChiroClickCRM',
-              message: `ChiroClickCRM v${app.getVersion()}`,
+              title: 'About ChiroClickEHR',
+              message: `ChiroClickEHR v${app.getVersion()}`,
               detail: 'Standalone Desktop Edition\nEHR-CRM for Chiropractors\n\nOffline-first. Your data. Your machine.',
             });
           },
@@ -281,7 +281,7 @@ function createMenu() {
         {
           label: 'Documentation',
           click: () => {
-            shell.openExternal('https://github.com/ChiroClick/chiroclickcrm/wiki');
+            shell.openExternal('https://github.com/ChiroClick/chiroclickehr/wiki');
           },
         },
         { type: 'separator' },

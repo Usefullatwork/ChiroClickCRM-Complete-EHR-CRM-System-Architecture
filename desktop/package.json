@@ -1,7 +1,7 @@
 {
-  "name": "chiroclickcrm-desktop",
+  "name": "chiroclickehr-desktop",
   "version": "2.0.0",
-  "description": "ChiroClickCRM Desktop - Standalone EHR-CRM for Chiropractors",
+  "description": "ChiroClickEHR Desktop - Standalone EHR for Chiropractors",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -11,8 +11,8 @@
     "build:linux": "electron-builder --linux"
   },
   "build": {
-    "appId": "no.chiroclick.crm",
-    "productName": "ChiroClickCRM",
+    "appId": "no.chiroclickehr.desktop",
+    "productName": "ChiroClickEHR",
     "directories": {
       "output": "../release"
     },

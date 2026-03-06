@@ -135,7 +135,7 @@ const QUERY_PATTERNS = [
   {
     name: 'users: by email (login)',
     sql: `SELECT * FROM users WHERE email = $1`,
-    params: ['admin@chiroclickcrm.no'],
+    params: ['admin@chiroclickehr.no'],
   },
 
   // Treatment plans
