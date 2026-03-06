@@ -34,7 +34,7 @@ export function initializeWebSocket(httpServer) {
       const cookies = socket.handshake.headers.cookie;
       if (!cookies) {
         // Allow connection in dev mode without auth
-        if (process.env.DEV_SKIP_AUTH === 'true') {
+        if (process.env.DEV_SKIP_AUTH === 'true' && process.env.NODE_ENV !== 'production') {
           socket.user = {
             id: 'dev-user',
             organizationId: 'a0000000-0000-0000-0000-000000000001',
@@ -48,7 +48,7 @@ export function initializeWebSocket(httpServer) {
       // Parse session cookie
       const sessionMatch = cookies.match(/session=([^;]+)/);
       if (!sessionMatch) {
-        if (process.env.DEV_SKIP_AUTH === 'true') {
+        if (process.env.DEV_SKIP_AUTH === 'true' && process.env.NODE_ENV !== 'production') {
           socket.user = {
             id: 'dev-user',
             organizationId: 'a0000000-0000-0000-0000-000000000001',
