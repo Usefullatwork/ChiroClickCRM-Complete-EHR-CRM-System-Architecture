@@ -219,6 +219,9 @@ export const common = {
     loadingPlayground: 'Loading playground...',
     notConfigured: 'Not configured',
     notAvailable: 'Not available',
+    areYouSure: 'Are you sure?',
+    yesHelpful: 'Yes, helpful',
+    noNotHelpful: 'No, not helpful',
   },
   no: {
     save: 'Lagre',
@@ -440,5 +443,8 @@ export const common = {
     loadingPlayground: 'Laster lekeplass...',
     notConfigured: 'Ikke konfigurert',
     notAvailable: 'Ikke tilgjengelig',
+    areYouSure: 'Er du sikker?',
+    yesHelpful: 'Ja, nyttig',
+    noNotHelpful: 'Nei, ikke nyttig',
   },
 };

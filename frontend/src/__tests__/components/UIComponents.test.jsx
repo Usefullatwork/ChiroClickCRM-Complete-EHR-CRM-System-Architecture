@@ -9,6 +9,15 @@ import LoadingButton from '../../components/ui/LoadingButton';
 import ConfirmDialog, { ConfirmProvider, useConfirm } from '../../components/ui/ConfirmDialog';
 import { Search, Trash2 } from 'lucide-react';
 
+// Mock i18n — ConfirmDialog now uses useTranslation()
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({
+    t: (key, fallback) => fallback || key,
+    lang: 'no',
+    setLang: vi.fn(),
+  }),
+}));
+
 // ============================================================================
 // EMPTY STATE
 // ============================================================================
@@ -218,13 +227,13 @@ describe('ConfirmDialog Component (Declarative)', () => {
 
   it('should call onConfirm when confirm button clicked', () => {
     render(<ConfirmDialog {...defaultProps} />);
-    fireEvent.click(screen.getByText('Bekreft'));
+    fireEvent.click(screen.getByText('confirm'));
     expect(defaultProps.onConfirm).toHaveBeenCalledTimes(1);
   });
 
   it('should call onCancel when cancel button clicked', () => {
     render(<ConfirmDialog {...defaultProps} />);
-    fireEvent.click(screen.getByText('Avbryt'));
+    fireEvent.click(screen.getByText('cancel'));
     expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
   });
 
@@ -236,7 +245,7 @@ describe('ConfirmDialog Component (Declarative)', () => {
 
   it('should call onCancel when close button clicked', () => {
     render(<ConfirmDialog {...defaultProps} />);
-    fireEvent.click(screen.getByLabelText('Lukk'));
+    fireEvent.click(screen.getByLabelText('close'));
     expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
   });
 
@@ -284,7 +293,7 @@ describe('useConfirm Hook', () => {
     });
 
     // Click confirm
-    fireEvent.click(screen.getByText('Bekreft'));
+    fireEvent.click(screen.getByText('confirm'));
 
     await waitFor(() => {
       expect(onResult).toHaveBeenCalledWith(true);
@@ -308,7 +317,7 @@ describe('useConfirm Hook', () => {
     });
 
     // Click cancel
-    fireEvent.click(screen.getByText('Avbryt'));
+    fireEvent.click(screen.getByText('cancel'));
 
     await waitFor(() => {
       expect(onResult).toHaveBeenCalledWith(false);

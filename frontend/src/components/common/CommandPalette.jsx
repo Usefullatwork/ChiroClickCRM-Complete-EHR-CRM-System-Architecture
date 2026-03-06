@@ -18,21 +18,21 @@ import { useTranslation } from '../../i18n';
 import { patientsAPI } from '../../services/api';
 import { calculateAge, formatDate } from '../../lib/utils';
 
-const NAV_ITEMS = [
-  { label: 'Dashbord', path: '/', icon: LayoutDashboard },
-  { label: 'Pasienter', path: '/patients', icon: Users },
-  { label: 'Kalender', path: '/calendar', icon: CalendarDays },
-  { label: 'Pasientflyt', path: '/patient-flow', icon: Kanban },
-  { label: 'Kommunikasjon', path: '/communications', icon: MessageSquare },
-  { label: 'Oppfolginger', path: '/follow-ups', icon: CheckCircle2 },
-  { label: 'Okonomi', path: '/financial', icon: DollarSign },
-  { label: 'Innstillinger', path: '/settings', icon: Settings },
+const NAV_ITEM_DEFS = [
+  { key: 'dashboard', path: '/', icon: LayoutDashboard },
+  { key: 'patients', path: '/patients', icon: Users },
+  { key: 'calendar', path: '/calendar', icon: CalendarDays },
+  { key: 'patientFlow', path: '/patient-flow', icon: Kanban },
+  { key: 'communications', path: '/communications', icon: MessageSquare },
+  { key: 'followUps', path: '/follow-ups', icon: CheckCircle2 },
+  { key: 'financial', path: '/financial', icon: DollarSign },
+  { key: 'settings', path: '/settings', icon: Settings },
 ];
 
-const ACTION_ITEMS = [
-  { label: 'Ny pasient', path: '/patients/new', icon: UserPlus },
-  { label: 'Ny time', path: '/calendar?new=true', icon: CalendarPlus },
-  { label: 'Ny journal', action: 'newEncounter', icon: FileText },
+const ACTION_ITEM_DEFS = [
+  { key: 'newPatient', path: '/patients/new', icon: UserPlus },
+  { key: 'newAppointment', path: '/calendar?new=true', icon: CalendarPlus },
+  { key: 'newJournal', action: 'newEncounter', icon: FileText },
 ];
 
 function fuzzyMatch(text, query) {
@@ -72,6 +72,16 @@ export default function CommandPalette({ isOpen, onClose }) {
   const [patients, setPatients] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
   const [loading, setLoading] = useState(false);
+
+  // Resolve translated labels for nav/action items
+  const NAV_ITEMS = useMemo(
+    () => NAV_ITEM_DEFS.map((item) => ({ ...item, label: t(item.key) })),
+    [t]
+  );
+  const ACTION_ITEMS = useMemo(
+    () => ACTION_ITEM_DEFS.map((item) => ({ ...item, label: t(item.key) })),
+    [t]
+  );
 
   // Search patients with debounce
   useEffect(() => {

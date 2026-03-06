@@ -9,6 +9,7 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const ElectronStore = require('electron-store');
+const { isFirstRun, ensureDataDirectories, getSplashHTML } = require('./first-run');
 
 // ============================================================================
 // Settings Store - persists window position/size across sessions
@@ -166,7 +167,7 @@ function createWindow() {
     minWidth: 1024,
     minHeight: 700,
     title: 'ChiroClickEHR',
-    icon: path.join(__dirname, 'icons', 'icon.png'),
+    icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -368,8 +369,18 @@ app.whenReady().then(async () => {
   // Set up menu
   createMenu();
 
+  // Ensure data directories exist (critical for PGlite on first launch)
+  ensureDataDirectories();
+
   // Create the main window (hidden until ready-to-show)
   createWindow();
+
+  // Show splash screen on first run while database initializes
+  const firstRun = isFirstRun();
+  if (firstRun) {
+    mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(getSplashHTML())}`);
+    mainWindow.show();
+  }
 
   // Start the backend server
   startBackend();

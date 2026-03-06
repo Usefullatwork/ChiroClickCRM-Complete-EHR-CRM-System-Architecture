@@ -13,6 +13,7 @@ import { letters } from './letters';
 import { exercises } from './exercises';
 import { validation } from './validation';
 import { analytics } from './analytics';
+import { ai } from './ai';
 
 export const translations = {
   common,
@@ -30,4 +31,5 @@ export const translations = {
   exercises,
   validation,
   analytics,
+  ai,
 };

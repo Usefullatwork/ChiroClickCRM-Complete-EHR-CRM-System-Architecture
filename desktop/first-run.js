@@ -75,7 +75,7 @@ function getSplashHTML() {
   border-radius: 12px;
   user-select: none;
 ">
-  <h1 style="font-size: 2em; margin: 0 0 0.5em 0;">ChiroClickCRM</h1>
+  <h1 style="font-size: 2em; margin: 0 0 0.5em 0;">ChiroClickEHR</h1>
   <p style="opacity: 0.85; margin: 0;">Initializing database...</p>
   <div style="
     width: 200px;

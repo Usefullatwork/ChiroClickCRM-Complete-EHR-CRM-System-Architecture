@@ -7,8 +7,6 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo from '@react-native-community/netinfo';
-import { api } from '../services/api';
-
 type OperationType = 'workout_log' | 'profile_update' | 'favorite_toggle';
 
 interface QueuedOperation {
@@ -230,7 +228,7 @@ export const useOfflineStore = create<OfflineState>()(
       }
     }),
     {
-      name: 'chiroclick-offline-store',
+      name: 'chiroclickehr-offline-store',
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({
         operationQueue: state.operationQueue,
