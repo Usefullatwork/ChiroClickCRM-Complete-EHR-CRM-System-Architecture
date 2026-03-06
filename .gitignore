@@ -102,3 +102,6 @@ ai-training/data/processed/
 reports/weekly/*.md
 reports/weekly/*.log
 .claude/settings.local.json
+
+# Ephemeral planning files (session-specific, not source code)
+.planning/

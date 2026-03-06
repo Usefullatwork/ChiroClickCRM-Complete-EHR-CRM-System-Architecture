@@ -1,6 +1,7 @@
 ---
 name: backend-dev
 description: Backend development specialist for Express/PGlite/Node.js. Use for backend bug fixes, API changes, database work, service layer modifications, and test writing.
+model: claude-sonnet-4-6
 tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 

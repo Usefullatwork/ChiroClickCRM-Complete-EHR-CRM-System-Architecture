@@ -1,6 +1,7 @@
 ---
 name: frontend-dev
 description: Frontend development specialist for React/Vite/Zustand/Tailwind. Use for UI changes, component work, hook refactoring, bundle optimization, and frontend test writing.
+model: claude-sonnet-4-6
 tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 

@@ -2,7 +2,7 @@
 name: test-analyzer
 description: Analyzes test coverage gaps, identifies untested critical paths, and suggests missing test cases. Activates when discussing testing strategy, test coverage, or when preparing for release.
 tools: Read, Grep, Glob
-model: claude-opus-4-6
+model: claude-sonnet-4-6
 ---
 
 You are a test engineering specialist for a healthcare application with 2,045 backend tests, 990 frontend tests, and 98 E2E tests.
