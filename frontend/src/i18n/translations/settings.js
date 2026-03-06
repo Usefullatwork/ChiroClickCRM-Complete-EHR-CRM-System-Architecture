@@ -145,7 +145,6 @@ export const settings = {
     emailRequired: 'Email is required',
     invalidEmail: 'Invalid email address',
     cancel: 'Cancel',
-    savedSuccessfully: 'Settings saved successfully',
     saveError: 'Could not save settings',
   },
   no: {
@@ -294,7 +293,6 @@ export const settings = {
     emailRequired: 'E-post er paakrevd',
     invalidEmail: 'Ugyldig e-postadresse',
     cancel: 'Avbryt',
-    savedSuccessfully: 'Innstillinger lagret',
     saveError: 'Kunne ikke lagre innstillinger',
   },
 };

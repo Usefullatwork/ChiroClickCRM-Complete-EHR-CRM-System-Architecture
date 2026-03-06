@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '../i18n';
 import { Activity, Eye, Brain, Target, RotateCw, ChevronDown, ChevronUp } from 'lucide-react';
 
 /**
