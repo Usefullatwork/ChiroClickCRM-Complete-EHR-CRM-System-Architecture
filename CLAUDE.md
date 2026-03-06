@@ -116,7 +116,7 @@ Full endpoint docs at `/api-docs` (Swagger).
 - `mobile-app/` exists (routes/mobile.js now registered in server.js)
 - `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (kept for future)
 - `services/ai.js` is now a shim re-exporting from `services/ai/` (5 modules)
-- i18n: ~75 hardcoded Norwegian strings in 6 components (partially extracted)
+- i18n: ~676 hardcoded Norwegian strings across 121 files; 3 components extracted (ConfirmDialog, AIFeedback, CommandPalette) + ai.js namespace added
 
 ## Current State
 

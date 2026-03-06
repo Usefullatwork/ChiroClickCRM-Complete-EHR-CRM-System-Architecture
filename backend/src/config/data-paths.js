@@ -33,7 +33,9 @@ const APP_ROOT = detectAppRoot();
 /**
  * All data paths, relative to APP_ROOT/data/
  */
-const DATA_DIR = path.join(APP_ROOT, 'data');
+const DATA_DIR = process.env.DATA_DIR
+  ? path.resolve(process.env.DATA_DIR)
+  : path.join(APP_ROOT, 'data');
 
 const PATHS = {
   root: APP_ROOT,

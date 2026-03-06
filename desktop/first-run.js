@@ -3,27 +3,31 @@
  * Checks if the PGlite database directory exists. If not, this is the first
  * launch and the database will be initialized automatically by the backend's
  * db-init.js when PGlite starts.
- *
- * This module provides a simple check and an optional splash screen message
- * for the first-run experience.
  */
 
 const fs = require('fs');
 const path = require('path');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
-const PGLITE_DIR = path.join(DATA_DIR, 'pglite');
+let dataDir = path.join(__dirname, '..', 'data');
+
+/**
+ * Set the data directory (called from main.js for packaged apps).
+ */
+function setDataDir(dir) {
+  dataDir = dir;
+}
 
 /**
  * Check if this is the first time the app is running.
  * Returns true if the PGlite data directory does not exist or is empty.
  */
 function isFirstRun() {
-  if (!fs.existsSync(PGLITE_DIR)) {
+  const pgliteDir = path.join(dataDir, 'pglite');
+  if (!fs.existsSync(pgliteDir)) {
     return true;
   }
   try {
-    const contents = fs.readdirSync(PGLITE_DIR);
+    const contents = fs.readdirSync(pgliteDir);
     return contents.length === 0;
   } catch {
     return true;
@@ -32,31 +36,24 @@ function isFirstRun() {
 
 /**
  * Ensure all required data directories exist for the application.
- * Called on first run before the backend starts.
  */
 function ensureDataDirectories() {
-  const dirs = [
-    'data',
-    'data/pglite',
-    'data/backups',
-    'data/uploads',
-    'data/exports',
-    'data/logs',
-    'data/temp',
-  ];
+  const subdirs = ['pglite', 'backups', 'uploads', 'exports', 'logs', 'temp'];
 
-  for (const dir of dirs) {
-    const fullPath = path.join(__dirname, '..', dir);
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+
+  for (const sub of subdirs) {
+    const fullPath = path.join(dataDir, sub);
     if (!fs.existsSync(fullPath)) {
       fs.mkdirSync(fullPath, { recursive: true });
-      console.log(`[first-run] Created directory: ${fullPath}`);
     }
   }
 }
 
 /**
  * Get an HTML string for a splash screen to display while the database initializes.
- * This can be loaded into a frameless BrowserWindow during first-run setup.
  */
 function getSplashHTML() {
   return `<!DOCTYPE html>
@@ -104,4 +101,4 @@ function getSplashHTML() {
 </html>`;
 }
 
-module.exports = { isFirstRun, ensureDataDirectories, getSplashHTML };
+module.exports = { isFirstRun, ensureDataDirectories, getSplashHTML, setDataDir };

@@ -397,7 +397,8 @@ if (process.env.DESKTOP_MODE === 'true') {
   const { fileURLToPath } = await import('url');
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.default.dirname(__filename);
-  const frontendDist = path.default.resolve(__dirname, '../../frontend/dist');
+  const frontendDist =
+    process.env.FRONTEND_DIST || path.default.resolve(__dirname, '../../frontend/dist');
 
   try {
     const fs = await import('fs');

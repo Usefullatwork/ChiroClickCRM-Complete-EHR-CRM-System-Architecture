@@ -9,7 +9,7 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const ElectronStore = require('electron-store');
-const { isFirstRun, ensureDataDirectories, getSplashHTML } = require('./first-run');
+const { isFirstRun, ensureDataDirectories, getSplashHTML, setDataDir } = require('./first-run');
 
 // ============================================================================
 // Settings Store - persists window position/size across sessions
@@ -77,11 +77,38 @@ function waitForBackendHealth(port, maxRetries = 30, interval = 500) {
 }
 
 /**
+ * Resolve the correct base directory for backend/frontend.
+ * In dev: relative to desktop/ (../backend).
+ * In packaged app: inside process.resourcesPath.
+ */
+function getResourcePath(subPath) {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, subPath);
+  }
+  return path.join(__dirname, '..', subPath);
+}
+
+/**
  * Start the backend by forking the Express server as a child process.
  */
 function startBackend() {
-  const backendDir = path.join(__dirname, '..', 'backend');
+  const backendDir = getResourcePath('backend');
   const serverPath = path.join(backendDir, 'src', 'server.js');
+
+  // Data directory: writable location for PGlite, uploads, etc.
+  const dataDir = app.isPackaged
+    ? path.join(app.getPath('userData'), 'data')
+    : path.join(__dirname, '..', 'data');
+
+  // Ensure data dir exists
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+
+  // Generate a stable machine-specific encryption key for desktop mode
+  const crypto = require('crypto');
+  const machineId = `${require('os').hostname()}-${require('os').userInfo().username}`;
+  const defaultKey = crypto.createHash('sha256').update(machineId).digest('hex').slice(0, 32);
 
   const env = {
     ...process.env,
@@ -90,6 +117,10 @@ function startBackend() {
     PORT: String(BACKEND_PORT),
     DB_ENGINE: 'pglite',
     CACHE_ENGINE: 'memory',
+    DEV_SKIP_AUTH: 'true',
+    DATA_DIR: dataDir,
+    FRONTEND_DIST: getResourcePath('frontend/dist'),
+    ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || defaultKey,
   };
 
   console.log(`[desktop] Starting backend server on port ${BACKEND_PORT}...`);
@@ -317,6 +348,9 @@ ipcMain.handle('open-external-link', (_, url) => {
 });
 
 ipcMain.handle('get-data-path', () => {
+  if (app.isPackaged) {
+    return path.join(app.getPath('userData'), 'data');
+  }
   return path.join(__dirname, '..', 'data');
 });
 
@@ -368,6 +402,11 @@ ipcMain.handle('check-ollama-status', async () => {
 app.whenReady().then(async () => {
   // Set up menu
   createMenu();
+
+  // Set data directory for packaged builds (writable user data location)
+  if (app.isPackaged) {
+    setDataDir(path.join(app.getPath('userData'), 'data'));
+  }
 
   // Ensure data directories exist (critical for PGlite on first launch)
   ensureDataDirectories();

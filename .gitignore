@@ -1,5 +1,8 @@
 # Dependencies
 node_modules/
+
+# Electron build output
+release/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

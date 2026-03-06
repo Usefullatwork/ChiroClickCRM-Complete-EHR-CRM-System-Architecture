@@ -12,9 +12,9 @@
  */
 
 const CACHE_VERSION = 'v1';
-const STATIC_CACHE = `chiroclickcrm-static-${CACHE_VERSION}`;
-const DATA_CACHE = `chiroclickcrm-data-${CACHE_VERSION}`;
-const VIDEO_CACHE = `chiroclickcrm-videos-${CACHE_VERSION}`;
+const STATIC_CACHE = `chiroclickehr-static-${CACHE_VERSION}`;
+const DATA_CACHE = `chiroclickehr-data-${CACHE_VERSION}`;
+const VIDEO_CACHE = `chiroclickehr-videos-${CACHE_VERSION}`;
 
 // Static assets to cache on install (app shell)
 const STATIC_ASSETS = [
@@ -82,7 +82,7 @@ self.addEventListener('activate', (event) => {
             .filter((cacheName) => {
               // Delete old caches
               return (
-                cacheName.startsWith('chiroclickcrm-') &&
+                cacheName.startsWith('chiroclickehr-') &&
                 cacheName !== STATIC_CACHE &&
                 cacheName !== DATA_CACHE &&
                 cacheName !== VIDEO_CACHE
@@ -462,7 +462,7 @@ async function clearAllCaches() {
   const cacheNames = await caches.keys();
   await Promise.all(
     cacheNames
-      .filter((name) => name.startsWith('chiroclickcrm-'))
+      .filter((name) => name.startsWith('chiroclickehr-'))
       .map((name) => caches.delete(name))
   );
 
