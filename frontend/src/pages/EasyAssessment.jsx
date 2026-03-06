@@ -21,7 +21,7 @@ import {
 import ProblemList from '../components/assessment/ProblemList';
 import TreatmentPlanTracker, { VisitCounter } from '../components/assessment/TreatmentPlanTracker';
 import SALTButton from '../components/assessment/SALTButton';
-import { ComplianceIndicator } from '../components/assessment/ComplianceEngine';
+import CompliancePanel, { ComplianceIndicator } from '../components/assessment/ComplianceEngine';
 import { AIStatusIndicator } from '../components/assessment/AISettings';
 const OutcomeAssessment = lazy(() => import('../components/assessment/OutcomeAssessment'));
 const TemplatePicker = lazy(() => import('../components/TemplatePicker'));
@@ -30,7 +30,6 @@ const TemplatePicker = lazy(() => import('../components/TemplatePicker'));
 const MacroMatrix = lazy(() => import('../components/assessment/MacroMatrix'));
 const BodyChart = lazy(() => import('../components/assessment/BodyChart'));
 const TemplateLibrary = lazy(() => import('../components/assessment/TemplateLibrary'));
-const CompliancePanel = lazy(() => import('../components/assessment/ComplianceEngine'));
 const PrintPreview = lazy(() => import('../components/assessment/PrintPreview'));
 const AIScribe = lazy(() => import('../components/assessment/AIScribe'));
 const AISettings = lazy(() => import('../components/assessment/AISettings'));

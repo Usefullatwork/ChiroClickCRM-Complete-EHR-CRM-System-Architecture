@@ -124,5 +124,5 @@ Full endpoint docs at `/api-docs` (Swagger).
 - **Frontend**: 974 tests (45 suites), 0 lint errors
 - **E2E**: 88 tests (11 Playwright specs)
 - **CI**: All 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
-- **Commits**: ~42 on main
+- **GDPR**: 55 tests pass (erasure, access, portability, consent audit trail)
 - **Sprint history**: see `docs/sprint-history.md`
