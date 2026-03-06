@@ -73,10 +73,12 @@ export default function DashboardAnalytics() {
       }),
   });
 
-  const revenue = revenueData?.data || [];
-  const utilization = utilizationData?.data || [];
-  const noShow = noShowData?.data || [];
-  const patientFlow = patientFlowData?.data || [];
+  // Axios wraps response in .data, API wraps payload in {success, data}
+  const unwrap = (resp) => resp?.data?.data ?? resp?.data;
+  const revenue = unwrap(revenueData) || [];
+  const utilization = unwrap(utilizationData) || [];
+  const noShow = unwrap(noShowData) || [];
+  const patientFlow = unwrap(patientFlowData) || [];
 
   const toggleSection = (section) => {
     setExpandedSection(expandedSection === section ? null : section);

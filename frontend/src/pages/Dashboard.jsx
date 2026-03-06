@@ -72,9 +72,12 @@ export default function Dashboard() {
     queryFn: () => followUpsAPI.getPatientsNeedingFollowUp(),
   });
 
-  const stats = statsResponse?.data;
-  const appointments = appointmentsResponse?.data?.appointments || [];
-  const followUpPatients = followUpPatientsResponse?.data || [];
+  // Axios wraps response in .data, API wraps payload in {success, data}
+  const unwrap = (resp) => resp?.data?.data ?? resp?.data;
+  const stats = unwrap(statsResponse);
+  const appointments = unwrap(appointmentsResponse)?.appointments || [];
+  const followUpRaw = unwrap(followUpPatientsResponse);
+  const followUpPatients = Array.isArray(followUpRaw) ? followUpRaw : [];
 
   // Derived data
   const overdueFollowUps = followUpPatients.filter((p) => new Date(p.follow_up_date) < new Date());

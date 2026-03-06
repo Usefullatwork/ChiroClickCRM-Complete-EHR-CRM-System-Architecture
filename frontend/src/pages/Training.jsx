@@ -98,13 +98,15 @@ export default function Training() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <Brain className="w-8 h-8 text-blue-600" />
-          <h1 className="text-3xl font-bold">{t('aiModelManagement')}</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+            {t('aiModelManagement')}
+          </h1>
         </div>
         <p className="text-gray-600 dark:text-gray-300">{t('aiModelManagementDesc')}</p>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-gray-100 rounded-lg p-1 w-fit">
+      <div className="flex gap-1 mb-6 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-fit">
         {TABS.map((tab) => {
           const Icon = TAB_ICONS[tab.id];
           return (
@@ -113,8 +115,8 @@ export default function Training() {
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-white text-blue-700 shadow-sm'
-                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-700 text-blue-700 dark:text-blue-300 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               {Icon && <Icon className="w-4 h-4" />}
