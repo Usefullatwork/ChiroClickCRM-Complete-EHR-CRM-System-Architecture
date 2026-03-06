@@ -128,12 +128,31 @@ const CampaignManager = () => {
     };
   };
 
-  // Overall stats
+  // Overall stats (calculated from actual campaign data)
+  const sentCampaigns = campaigns.filter((c) => c.sent > 0);
   const overallStats = {
-    totalSent: campaigns.reduce((sum, c) => sum + c.sent, 0),
-    avgOpenRate: 62,
-    avgClickRate: 28,
-    avgConversionRate: 8,
+    totalSent: campaigns.reduce((sum, c) => sum + (c.sent || 0), 0),
+    avgOpenRate:
+      sentCampaigns.length > 0
+        ? Math.round(
+            sentCampaigns.reduce((sum, c) => sum + (c.opened / c.sent) * 100, 0) /
+              sentCampaigns.length
+          )
+        : 0,
+    avgClickRate:
+      sentCampaigns.length > 0
+        ? Math.round(
+            sentCampaigns.reduce((sum, c) => sum + ((c.clicked || 0) / c.sent) * 100, 0) /
+              sentCampaigns.length
+          )
+        : 0,
+    avgConversionRate:
+      sentCampaigns.length > 0
+        ? Math.round(
+            sentCampaigns.reduce((sum, c) => sum + ((c.converted || 0) / c.sent) * 100, 0) /
+              sentCampaigns.length
+          )
+        : 0,
   };
 
   const formatDate = (dateStr) => {

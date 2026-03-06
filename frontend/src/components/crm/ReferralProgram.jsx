@@ -612,12 +612,11 @@ const ReferralProgram = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Henviser (Eksisterende Pasient)
                 </label>
-                <select className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
-                  <option>Velg pasient...</option>
-                  <option>Erik Hansen</option>
-                  <option>Sofie Nilsen</option>
-                  <option>Maria Olsen</option>
-                </select>
+                <input
+                  type="text"
+                  placeholder="Skriv pasientnavn..."
+                  className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
