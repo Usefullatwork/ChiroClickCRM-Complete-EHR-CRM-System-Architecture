@@ -5,8 +5,20 @@
 
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import { OAuth2Client } from 'google-auth-library';
-import jwksClient from 'jwks-rsa';
+
+// Lazy-load optional social login deps (ESM-only jose breaks Jest)
+let OAuth2Client;
+let jwksClient;
+async function loadSocialAuthDeps() {
+  if (!OAuth2Client) {
+    const gauth = await import('google-auth-library');
+    OAuth2Client = gauth.OAuth2Client;
+  }
+  if (!jwksClient) {
+    const jwks = await import('jwks-rsa');
+    jwksClient = jwks.default || jwks;
+  }
+}
 
 const noop = () => {};
 const fallbackLogger = { info: noop, error: noop, warn: noop, debug: noop };
@@ -210,6 +222,7 @@ async function verifyOTP(db, phoneNumber, code) {
  * Verify Google Sign-In token
  */
 async function verifyGoogleToken(db, idToken) {
+  await loadSocialAuthDeps();
   const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
   try {
@@ -293,6 +306,7 @@ async function verifyAppleToken(db, identityToken, appleUser) {
     }
 
     // Get Apple's public key
+    await loadSocialAuthDeps();
     const client = jwksClient({
       jwksUri: 'https://appleid.apple.com/auth/keys',
     });

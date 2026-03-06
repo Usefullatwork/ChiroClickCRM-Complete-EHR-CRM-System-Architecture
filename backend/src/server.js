@@ -284,6 +284,8 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       treatmentPlans: `/api/${API_VERSION}/treatment-plans`,
       macros: `/api/${API_VERSION}/macros`,
       errors: `/api/${API_VERSION}/errors`,
+      mobile: `/api/${API_VERSION}/mobile`,
+      auditLogs: `/api/${API_VERSION}/audit-logs`,
     },
   });
 });
@@ -332,6 +334,8 @@ import errorReportRoutes from './routes/errors.js';
 import aiRetrainingRoutes from './routes/aiRetraining.js';
 import aiCostRoutes from './routes/aiCost.js';
 import batchRoutes from './routes/batch.js';
+import mobileRoutes from './routes/mobile.js';
+import auditLogRoutes from './routes/auditLogs.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
@@ -374,6 +378,8 @@ app.use(`/api/${API_VERSION}/ai-retraining`, aiRetrainingRoutes);
 app.use(`/api/${API_VERSION}/ai-cost`, aiCostRoutes);
 app.use(`/api/${API_VERSION}/batch`, batchRoutes);
 app.use(`/api/${API_VERSION}/errors`, errorReportRoutes);
+app.use(`/api/${API_VERSION}/mobile`, mobileRoutes);
+app.use(`/api/${API_VERSION}/audit-logs`, auditLogRoutes);
 
 // Portal routes (public - no auth required for patient access)
 app.use(`/api/${API_VERSION}/portal`, portalRoutes);

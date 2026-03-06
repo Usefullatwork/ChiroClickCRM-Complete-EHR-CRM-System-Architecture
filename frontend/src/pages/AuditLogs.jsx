@@ -21,94 +21,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useTranslation } from '../i18n';
-
-// Mock API - In production, this would call a real audit logs endpoint
-const mockAuditAPI = {
-  getAll: async (_params) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const mockLogs = [
-      {
-        id: '1',
-        created_at: new Date().toISOString(),
-        user_email: 'dr.smith@chiroclinic.no',
-        user_name: 'Dr. John Smith',
-        user_role: 'PRACTITIONER',
-        action: 'READ',
-        resource_type: 'PATIENT',
-        resource_id: 'pat-001',
-        resource_name: 'Erik Johansen',
-        ip_address: '192.168.1.100',
-        user_agent: 'Mozilla/5.0...',
-        reason: null,
-        changes: null,
-      },
-      {
-        id: '2',
-        created_at: new Date(Date.now() - 3600000).toISOString(),
-        user_email: 'admin@chiroclinic.no',
-        user_name: 'Admin User',
-        user_role: 'ADMIN',
-        action: 'UPDATE',
-        resource_type: 'PATIENT',
-        resource_id: 'pat-001',
-        resource_name: 'Erik Johansen',
-        ip_address: '192.168.1.101',
-        user_agent: 'Mozilla/5.0...',
-        reason: null,
-        changes: { consent_marketing: { old: false, new: true } },
-      },
-      {
-        id: '3',
-        created_at: new Date(Date.now() - 7200000).toISOString(),
-        user_email: 'dr.smith@chiroclinic.no',
-        user_name: 'Dr. John Smith',
-        user_role: 'PRACTITIONER',
-        action: 'CREATE',
-        resource_type: 'ENCOUNTER',
-        resource_id: 'enc-123',
-        resource_name: 'Clinical Encounter',
-        ip_address: '192.168.1.100',
-        user_agent: 'Mozilla/5.0...',
-        reason: null,
-        changes: null,
-      },
-      {
-        id: '4',
-        created_at: new Date(Date.now() - 10800000).toISOString(),
-        user_email: 'admin@chiroclinic.no',
-        user_name: 'Admin User',
-        user_role: 'ADMIN',
-        action: 'EXPORT',
-        resource_type: 'PATIENT',
-        resource_id: 'pat-002',
-        resource_name: 'Anna Larsen',
-        ip_address: '192.168.1.101',
-        user_agent: 'Mozilla/5.0...',
-        reason: 'GDPR Article 20 - Data Portability Request',
-        changes: null,
-      },
-      {
-        id: '5',
-        created_at: new Date(Date.now() - 14400000).toISOString(),
-        user_email: 'assistant@chiroclinic.no',
-        user_name: 'Maria Hansen',
-        user_role: 'ASSISTANT',
-        action: 'DELETE',
-        resource_type: 'APPOINTMENT',
-        resource_id: 'apt-456',
-        resource_name: 'Appointment',
-        ip_address: '192.168.1.102',
-        user_agent: 'Mozilla/5.0...',
-        reason: 'Patient requested cancellation',
-        changes: null,
-      },
-    ];
-
-    return { data: { logs: mockLogs, total: mockLogs.length } };
-  },
-};
+import { auditLogsAPI } from '../services/api';
 
 export default function AuditLogs() {
   const { t } = useTranslation('common');
@@ -120,15 +33,32 @@ export default function AuditLogs() {
     userRole: '',
     search: '',
   });
+  const [page, setPage] = useState(1);
   const [selectedLog, setSelectedLog] = useState(null);
 
-  // Fetch audit logs
+  const updateFilter = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setPage(1);
+  };
+
+  // Fetch audit logs from real backend
   const { data: logsData, isLoading } = useQuery({
-    queryKey: ['audit-logs', filters],
-    queryFn: () => mockAuditAPI.getAll(filters),
+    queryKey: ['audit-logs', filters, page],
+    queryFn: async () => {
+      const params = { page, limit: 50 };
+      if (filters.action) params.action = filters.action;
+      if (filters.resourceType) params.resourceType = filters.resourceType;
+      if (filters.userRole) params.userRole = filters.userRole;
+      if (filters.startDate) params.startDate = filters.startDate;
+      if (filters.endDate) params.endDate = filters.endDate;
+      if (filters.search) params.search = filters.search;
+      const res = await auditLogsAPI.getAll(params);
+      return res.data;
+    },
   });
 
-  const logs = logsData?.data?.logs || [];
+  const logs = logsData?.logs || [];
+  const totalPages = logsData?.totalPages || 1;
 
   const getActionIcon = (action) => {
     switch (action) {
@@ -220,7 +150,7 @@ export default function AuditLogs() {
             <input
               type="date"
               value={filters.startDate}
-              onChange={(e) => setFilters((prev) => ({ ...prev, startDate: e.target.value }))}
+              onChange={(e) => updateFilter('startDate', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -230,7 +160,7 @@ export default function AuditLogs() {
             <input
               type="date"
               value={filters.endDate}
-              onChange={(e) => setFilters((prev) => ({ ...prev, endDate: e.target.value }))}
+              onChange={(e) => updateFilter('endDate', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -240,7 +170,7 @@ export default function AuditLogs() {
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('action')}</label>
             <select
               value={filters.action}
-              onChange={(e) => setFilters((prev) => ({ ...prev, action: e.target.value }))}
+              onChange={(e) => updateFilter('action', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">{t('allActions')}</option>
@@ -259,7 +189,7 @@ export default function AuditLogs() {
             </label>
             <select
               value={filters.resourceType}
-              onChange={(e) => setFilters((prev) => ({ ...prev, resourceType: e.target.value }))}
+              onChange={(e) => updateFilter('resourceType', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">{t('allResources')}</option>
@@ -277,7 +207,7 @@ export default function AuditLogs() {
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('userRole')}</label>
             <select
               value={filters.userRole}
-              onChange={(e) => setFilters((prev) => ({ ...prev, userRole: e.target.value }))}
+              onChange={(e) => updateFilter('userRole', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">{t('allRoles')}</option>
@@ -296,7 +226,7 @@ export default function AuditLogs() {
                 type="text"
                 placeholder={t('searchLogs')}
                 value={filters.search}
-                onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+                onChange={(e) => updateFilter('search', e.target.value)}
                 className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -400,6 +330,31 @@ export default function AuditLogs() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-6 py-3 border-t border-gray-200 flex items-center justify-between bg-gray-50">
+            <p className="text-sm text-gray-700">
+              {t('page')} {page} / {totalPages} ({logsData?.total || 0} {t('total')})
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 hover:bg-gray-100"
+              >
+                {t('previous')}
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 hover:bg-gray-100"
+              >
+                {t('next')}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Detail Modal */}

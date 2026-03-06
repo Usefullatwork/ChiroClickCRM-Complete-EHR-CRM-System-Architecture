@@ -1049,6 +1049,12 @@ export const portalAPI = {
     apiClient.post(`/portal/patient/${patientId}/portal-access`, { pin }),
 };
 
+// Audit Logs (admin only)
+export const auditLogsAPI = {
+  getAll: (params) => apiClient.get('/audit-logs', { params }),
+  getById: (id) => apiClient.get(`/audit-logs/${id}`),
+};
+
 // Export API URL for streaming endpoints
 export { API_URL };
 
