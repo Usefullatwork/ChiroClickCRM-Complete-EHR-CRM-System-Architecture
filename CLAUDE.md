@@ -113,10 +113,10 @@ Full endpoint docs at `/api-docs` (Swagger).
 
 - `pdf.js` + `pdfGenerator.js` are split with divergent APIs (not merging yet)
 - `assessment/` BodyChart + SpineDiagram used by EasyAssessment (not consolidated with `anatomy/`)
-- `mobile-app/` exists but `routes/mobile.js` not registered in `server.js`
+- `mobile-app/` exists (routes/mobile.js now registered in server.js)
 - `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (kept for future)
-- Several stub routes remain: scheduler, kiosk, automations, bulkCommunication, notifications, patientPortal
-- i18n: 75+ hardcoded Norwegian strings in 6 components (audited, not yet extracted)
+- `services/ai.js` is now a shim re-exporting from `services/ai/` (5 modules)
+- i18n: ~75 hardcoded Norwegian strings in 6 components (partially extracted)
 
 ## Current State
 

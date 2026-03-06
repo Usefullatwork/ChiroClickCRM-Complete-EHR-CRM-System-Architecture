@@ -6,6 +6,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   User,
   Stethoscope,
@@ -46,6 +47,7 @@ export default function FollowUpTemplate({
   onLock,
   readOnly = false,
 }) {
+  const { t } = useTranslation('clinical');
   // Auto-save timer ref
   const autoSaveTimerRef = useRef(null);
   const [lastAutoSave, setLastAutoSave] = useState(null);
@@ -412,11 +414,12 @@ export default function FollowUpTemplate({
       {/* Header / Overskrift */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">Oppfolgingskonsultasjon</h2>
+          <h2 className="text-lg font-semibold text-gray-900">{t('followUpConsultation')}</h2>
           {patient && (
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {patient.firstName || patient.first_name} {patient.lastName || patient.last_name}
-              {followUpData.visit_number && ` - Besok #${followUpData.visit_number}`}
+              {followUpData.visit_number &&
+                ` - ${t('visitNumber', { number: followUpData.visit_number })}`}
             </p>
           )}
         </div>
@@ -425,12 +428,16 @@ export default function FollowUpTemplate({
           {lastAutoSave && (
             <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
               <CheckCircle className="w-3 h-3 text-green-500" />
-              Autolagret{' '}
-              {lastAutoSave.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}
+              {t('autoSavedAt', {
+                time: lastAutoSave.toLocaleTimeString('no-NO', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                }),
+              })}
             </span>
           )}
           {hasChanges && !readOnly && (
-            <span className="text-xs text-yellow-600">Ulagrede endringer</span>
+            <span className="text-xs text-yellow-600">{t('unsavedChanges')}</span>
           )}
           {!readOnly && (
             <>
@@ -440,14 +447,14 @@ export default function FollowUpTemplate({
                 className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
-                {saving ? 'Lagrer...' : 'Lagre'}
+                {saving ? t('saving') : t('save')}
               </button>
               <button
                 onClick={handleLock}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 <Lock className="w-4 h-4" />
-                Signer og las
+                {t('signAndLockNote')}
               </button>
             </>
           )}
@@ -456,19 +463,19 @@ export default function FollowUpTemplate({
 
       {/* Quick Progress Overview / Rask fremdriftsoversikt */}
       <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Pasientens fremgang</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('patientProgress')}</h3>
         <div className="grid grid-cols-3 gap-4">
           {/* Overall Progress */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Generell fremgang
+              {t('overallProgress')}
             </label>
             <div className="flex gap-2">
               <ProgressButton
                 value="improved"
                 currentValue={followUpData.subjective.overallProgress}
                 onChange={(v) => updateField('subjective', 'overallProgress', v)}
-                label="Bedre"
+                label={t('improved')}
                 icon={TrendingUp}
                 color="green"
               />
@@ -476,7 +483,7 @@ export default function FollowUpTemplate({
                 value="same"
                 currentValue={followUpData.subjective.overallProgress}
                 onChange={(v) => updateField('subjective', 'overallProgress', v)}
-                label="Uendret"
+                label={t('unchanged')}
                 icon={Minus}
                 color="yellow"
               />
@@ -484,7 +491,7 @@ export default function FollowUpTemplate({
                 value="worse"
                 currentValue={followUpData.subjective.overallProgress}
                 onChange={(v) => updateField('subjective', 'overallProgress', v)}
-                label="Verre"
+                label={t('worse')}
                 icon={TrendingDown}
                 color="red"
               />
@@ -494,7 +501,7 @@ export default function FollowUpTemplate({
           {/* Pain Level Comparison */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              VAS Smerte na: {followUpData.subjective.currentPainIntensity}/10
+              {t('vasPainNow', { value: followUpData.subjective.currentPainIntensity })}
             </label>
             <input
               type="range"
@@ -509,14 +516,16 @@ export default function FollowUpTemplate({
               className="w-full"
             />
             <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-              <span>Ingen smerte</span>
-              <span>Maksimal smerte</span>
+              <span>{t('noPain')}</span>
+              <span>{t('maxPain')}</span>
             </div>
           </div>
 
           {/* Visit Number */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Besoknummer</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('visitNumberLabel')}
+            </label>
             <input
               type="number"
               min="2"
@@ -530,30 +539,30 @@ export default function FollowUpTemplate({
       </div>
 
       {/* Subjective Section / Subjektiv seksjon */}
-      <Section id="subjective" title="Subjektiv - Fremgang siden sist" icon={User} color="blue">
+      <Section id="subjective" title={t('subjectiveProgressSinceLast')} icon={User} color="blue">
         <TextField
-          label="Beskrivelse av fremgang"
+          label={t('progressDescription')}
           value={followUpData.subjective.progressDescription}
           onChange={(v) => updateField('subjective', 'progressDescription', v)}
           rows={3}
-          placeholder="Hvordan har pasienten hatt det siden sist?"
+          placeholder={t('progressDescriptionPlaceholder')}
         />
         <TextField
-          label="Navaerende hovedklage"
+          label={t('currentChiefComplaint')}
           value={followUpData.subjective.chiefComplaint}
           onChange={(v) => updateField('subjective', 'chiefComplaint', v)}
-          placeholder="Hva er hovedplagen i dag?"
+          placeholder={t('currentChiefComplaintPlaceholder')}
         />
         <TextField
-          label="Funksjonelle endringer"
+          label={t('functionalChanges')}
           value={followUpData.subjective.functionalChanges}
           onChange={(v) => updateField('subjective', 'functionalChanges', v)}
-          placeholder="Endringer i daglige aktiviteter..."
+          placeholder={t('functionalChangesPlaceholder')}
         />
 
         {/* Compliance Section */}
         <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Etterlevelse av hjemmeprogram</h4>
+          <h4 className="text-sm font-medium text-gray-700 mb-3">{t('homeExerciseCompliance')}</h4>
           <div className="flex gap-2 mb-3">
             {['excellent', 'good', 'fair', 'poor'].map((level) => (
               <button
@@ -568,108 +577,115 @@ export default function FollowUpTemplate({
               >
                 {
                   {
-                    excellent: 'Utmerket',
-                    good: 'God',
-                    fair: 'Moderat',
-                    poor: 'Darlig',
+                    excellent: t('complianceExcellent'),
+                    good: t('complianceGood'),
+                    fair: t('complianceFair'),
+                    poor: t('compliancePoor'),
                   }[level]
                 }
               </button>
             ))}
           </div>
           <TextField
-            label="Kommentarer til etterlevelse"
+            label={t('complianceComments')}
             value={followUpData.subjective.complianceNotes}
             onChange={(v) => updateField('subjective', 'complianceNotes', v)}
             rows={1}
-            placeholder="Eventuelle utfordringer med ovelsene..."
+            placeholder={t('complianceCommentsPlaceholder')}
           />
         </div>
 
         <TextField
-          label="Nye symptomer"
+          label={t('newSymptoms')}
           value={followUpData.subjective.newSymptoms}
           onChange={(v) => updateField('subjective', 'newSymptoms', v)}
-          placeholder="Har det oppstatt nye symptomer?"
+          placeholder={t('newSymptomsPlaceholder')}
         />
         <TextField
-          label="Bivirkninger"
+          label={t('sideEffects')}
           value={followUpData.subjective.sideEffects}
           onChange={(v) => updateField('subjective', 'sideEffects', v)}
-          placeholder="Eventuelle reaksjoner pa behandling..."
+          placeholder={t('sideEffectsPlaceholder')}
         />
         <TextField
-          label="Sporsmal eller bekymringer"
+          label={t('questionsOrConcerns')}
           value={followUpData.subjective.questionsOrConcerns}
           onChange={(v) => updateField('subjective', 'questionsOrConcerns', v)}
-          placeholder="Hva lurer pasienten pa?"
+          placeholder={t('questionsOrConcernsPlaceholder')}
         />
       </Section>
 
       {/* Objective Section / Objektiv seksjon */}
-      <Section id="objective" title="Objektiv - Endringer i funn" icon={Stethoscope} color="green">
+      <Section
+        id="objective"
+        title={t('objectiveChangesInFindings')}
+        icon={Stethoscope}
+        color="green"
+      >
         <TextField
-          label="Generell observasjon"
+          label={t('generalObservation')}
           value={followUpData.objective.generalObservation}
           onChange={(v) => updateField('objective', 'generalObservation', v)}
-          placeholder="Hvordan ser pasienten ut i dag?"
+          placeholder={t('generalObservationPlaceholder')}
         />
         <TextField
-          label="Holdningsendringer"
+          label={t('posturalChanges')}
           value={followUpData.objective.posturalChanges}
           onChange={(v) => updateField('objective', 'posturalChanges', v)}
-          placeholder="Endringer i holdning siden sist..."
+          placeholder={t('posturalChangesPlaceholder')}
         />
         <TextField
-          label="Bevegelsesutslag (ROM) - Endringer"
+          label={t('romChanges')}
           value={followUpData.objective.rangeOfMotionChanges}
           onChange={(v) => updateField('objective', 'rangeOfMotionChanges', v)}
           rows={3}
-          placeholder="Endringer i bevegelighet..."
+          placeholder={t('romChangesPlaceholder')}
         />
         <TextField
-          label="Palpasjonsfunn"
+          label={t('palpationFindings')}
           value={followUpData.objective.palpationFindings}
           onChange={(v) => updateField('objective', 'palpationFindings', v)}
-          placeholder="Endringer i muskelspenning, omhet..."
+          placeholder={t('palpationFindingsPlaceholder')}
         />
         <TextField
-          label="Nevrologisk status"
+          label={t('neurologicalStatus')}
           value={followUpData.objective.neurologicalStatus}
           onChange={(v) => updateField('objective', 'neurologicalStatus', v)}
-          placeholder="Endringer i nevrologiske funn..."
+          placeholder={t('neurologicalStatusPlaceholder')}
         />
         <TextField
-          label="Funksjonelle tester"
+          label={t('functionalTests')}
           value={followUpData.objective.functionalTests}
           onChange={(v) => updateField('objective', 'functionalTests', v)}
-          placeholder="Resultater av funksjonelle tester..."
+          placeholder={t('functionalTestsPlaceholder')}
         />
         <TextField
-          label="Sammenligning med forrige konsultasjon"
+          label={t('comparisonToPrevious')}
           value={followUpData.objective.comparisonToPrevious}
           onChange={(v) => updateField('objective', 'comparisonToPrevious', v)}
           rows={2}
-          placeholder="Oppsummering av objektive endringer..."
+          placeholder={t('comparisonToPreviousPlaceholder')}
         />
       </Section>
 
       {/* Assessment Section / Vurderingsseksjon */}
       <Section
         id="assessment"
-        title="Vurdering - Oppdatert status"
+        title={t('assessmentUpdatedStatus')}
         icon={ClipboardCheck}
         color="purple"
       >
         {/* Progress Assessment */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Fremgangsvurdering</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('progressAssessment')}
+          </label>
           <div className="flex flex-wrap gap-2">
             {[
-              { value: 'on_track', label: 'Pa sporet', color: 'green' },
-              { value: 'faster_than_expected', label: 'Raskere enn forventet', color: 'blue' },
-              { value: 'slower_than_expected', label: 'Tregere enn forventet', color: 'yellow' },
-              { value: 'no_progress', label: 'Ingen fremgang', color: 'red' },
+              { value: 'on_track', label: t('onTrack'), color: 'green' },
+              { value: 'faster_than_expected', label: t('fasterThanExpected'), color: 'blue' },
+              { value: 'slower_than_expected', label: t('slowerThanExpected'), color: 'yellow' },
+              { value: 'no_progress', label: t('noProgress'), color: 'red' },
             ].map(({ value, label, color }) => (
               <button
                 key={value}
@@ -688,29 +704,29 @@ export default function FollowUpTemplate({
         </div>
 
         <TextField
-          label="Respons pa behandling"
+          label={t('responseToTreatment')}
           value={followUpData.assessment.responseToTreatment}
           onChange={(v) => updateField('assessment', 'responseToTreatment', v)}
           rows={2}
-          placeholder="Hvordan responderer pasienten pa behandlingen?"
+          placeholder={t('responseToTreatmentPlaceholder')}
         />
         <TextField
-          label="Diagnoseoppdatering"
+          label={t('diagnosisUpdate')}
           value={followUpData.assessment.diagnosisUpdate}
           onChange={(v) => updateField('assessment', 'diagnosisUpdate', v)}
-          placeholder="Eventuelle endringer i diagnose..."
+          placeholder={t('diagnosisUpdatePlaceholder')}
         />
         <TextField
-          label="Klinisk resonnement"
+          label={t('clinicalReasoning')}
           value={followUpData.assessment.clinicalReasoning}
           onChange={(v) => updateField('assessment', 'clinicalReasoning', v)}
           rows={3}
-          placeholder="Vurdering av tilstand og fremgang..."
+          placeholder={t('clinicalReasoningPlaceholder')}
         />
 
         {/* Red Flags / Rode flagg */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Rode flagg</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('redFlags')}</label>
           <div className="space-y-2">
             {(followUpData.assessment.redFlags || []).map((flag, index) => (
               <div
@@ -732,7 +748,7 @@ export default function FollowUpTemplate({
             {!readOnly && (
               <button
                 onClick={() => {
-                  const flag = prompt('Legg til rodt flagg:');
+                  const flag = prompt(t('addRedFlagPrompt'));
                   if (flag) {
                     addRedFlag(flag);
                   }
@@ -740,7 +756,7 @@ export default function FollowUpTemplate({
                 className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700"
               >
                 <Plus className="w-4 h-4" />
-                Legg til rodt flagg
+                {t('addRedFlag')}
               </button>
             )}
           </div>
@@ -748,36 +764,36 @@ export default function FollowUpTemplate({
 
         <div className="grid grid-cols-2 gap-4">
           <TextField
-            label="Prognose"
+            label={t('prognosis')}
             value={followUpData.assessment.prognosis}
             onChange={(v) => updateField('assessment', 'prognosis', v)}
             rows={1}
-            placeholder="Oppdatert prognose..."
+            placeholder={t('prognosisPlaceholder')}
           />
           <TextField
-            label="Reviderte forventninger"
+            label={t('revisedExpectations')}
             value={followUpData.assessment.revisedExpectations}
             onChange={(v) => updateField('assessment', 'revisedExpectations', v)}
             rows={1}
-            placeholder="Eventuelle endringer i forventninger..."
+            placeholder={t('revisedExpectationsPlaceholder')}
           />
         </div>
       </Section>
 
       {/* Diagnosis Codes Section / Diagnosekoder-seksjon */}
-      <Section id="codes" title="Diagnosekoder" icon={Activity} color="teal">
+      <Section id="codes" title={t('diagnosisCodes')} icon={Activity} color="teal">
         <div className="space-y-4">
           {/* ICD-10 Codes */}
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-medium text-gray-700">ICD-10 Koder</label>
+              <label className="text-sm font-medium text-gray-700">{t('icd10Codes')}</label>
               {!readOnly && (
                 <button
                   onClick={() => setShowCodePicker(true)}
                   className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
                 >
                   <Plus className="w-4 h-4" />
-                  Legg til kode
+                  {t('addCode')}
                 </button>
               )}
             </div>
@@ -797,7 +813,7 @@ export default function FollowUpTemplate({
               ))}
               {(!followUpData.icd10_codes || followUpData.icd10_codes.length === 0) && (
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                  Ingen koder lagt til
+                  {t('noCodesAdded')}
                 </span>
               )}
             </div>
@@ -806,48 +822,48 @@ export default function FollowUpTemplate({
       </Section>
 
       {/* Plan Section / Planseksjon */}
-      <Section id="plan" title="Plan - Videre behandling" icon={Target} color="orange">
+      <Section id="plan" title={t('planContinuedTreatment')} icon={Target} color="orange">
         <TextField
-          label="Behandling utfort i dag"
+          label={t('treatmentPerformedToday')}
           value={followUpData.plan.treatmentToday}
           onChange={(v) => updateField('plan', 'treatmentToday', v)}
           rows={3}
-          placeholder="Behandlingsteknikker brukt i dag..."
+          placeholder={t('treatmentPerformedTodayPlaceholder')}
         />
         <TextField
-          label="Teknikkmodifikasjoner"
+          label={t('techniqueModifications')}
           value={followUpData.plan.techniqueModifications}
           onChange={(v) => updateField('plan', 'techniqueModifications', v)}
-          placeholder="Endringer i behandlingstilnaerming..."
+          placeholder={t('techniqueModificationsPlaceholder')}
         />
         <TextField
-          label="Oppdaterte ovelser"
+          label={t('updatedExercises')}
           value={followUpData.plan.updatedExercises}
           onChange={(v) => updateField('plan', 'updatedExercises', v)}
-          placeholder="Nye eller justerte ovelser..."
+          placeholder={t('updatedExercisesPlaceholder')}
         />
         <TextField
-          label="Pasientundervisning"
+          label={t('patientEducation')}
           value={followUpData.plan.patientEducation}
           onChange={(v) => updateField('plan', 'patientEducation', v)}
-          placeholder="Informasjon gitt i dag..."
+          placeholder={t('patientEducationPlaceholder')}
         />
         <TextField
-          label="Rad for hjemmebruk"
+          label={t('homeAdvice')}
           value={followUpData.plan.homeAdvice}
           onChange={(v) => updateField('plan', 'homeAdvice', v)}
-          placeholder="Anbefalinger mellom behandlinger..."
+          placeholder={t('homeAdvicePlaceholder')}
         />
         <div className="grid grid-cols-2 gap-4">
           <InputField
-            label="Neste time"
+            label={t('nextAppointment')}
             type="date"
             value={followUpData.plan.nextAppointment}
             onChange={(v) => updateField('plan', 'nextAppointment', v)}
           />
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              Varighet i dag (minutter)
+              {t('durationTodayMinutes')}
             </label>
             <input
               type="number"
@@ -859,22 +875,22 @@ export default function FollowUpTemplate({
           </div>
         </div>
         <TextField
-          label="Justeringer i behandlingsplan"
+          label={t('treatmentPlanAdjustments')}
           value={followUpData.plan.treatmentPlanAdjustments}
           onChange={(v) => updateField('plan', 'treatmentPlanAdjustments', v)}
-          placeholder="Endringer i den overordnede planen..."
+          placeholder={t('treatmentPlanAdjustmentsPlaceholder')}
         />
         <TextField
-          label="Henvisninger"
+          label={t('referrals')}
           value={followUpData.plan.referrals}
           onChange={(v) => updateField('plan', 'referrals', v)}
-          placeholder="Eventuelle nye henvisninger..."
+          placeholder={t('referralsPlaceholder')}
         />
 
         {/* VAS Pain End */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            VAS Smerte etter behandling: {followUpData.vas_pain_end || 0}/10
+            {t('vasPainAfterTreatment', { value: followUpData.vas_pain_end || 0 })}
           </label>
           <input
             type="range"
@@ -901,16 +917,14 @@ export default function FollowUpTemplate({
               disabled={readOnly}
               className="rounded border-gray-300"
             />
-            <span className="text-sm font-medium text-gray-700">
-              Vurder utskriving/avslutning av behandling
-            </span>
+            <span className="text-sm font-medium text-gray-700">{t('considerDischarge')}</span>
           </label>
           {followUpData.plan.dischargeConsideration && (
             <TextField
-              label="Utskrivingsnotater"
+              label={t('dischargeNotes')}
               value={followUpData.plan.dischargeNotes}
               onChange={(v) => updateField('plan', 'dischargeNotes', v)}
-              placeholder="Grunner for utskriving, videre anbefalinger..."
+              placeholder={t('dischargeNotesPlaceholder')}
             />
           )}
         </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Activity, Eye, Brain, Target, RotateCw, ChevronDown, ChevronUp } from 'lucide-react';
 
 /**
@@ -6,6 +7,7 @@ import { Activity, Eye, Brain, Target, RotateCw, ChevronDown, ChevronUp } from '
  * For BPPV testing, VNG, balance testing, and vestibular rehabilitation planning
  */
 export default function VestibularAssessment({ data, onChange, readOnly = false }) {
+  const { t } = useTranslation('clinical');
   const [activeSection, setActiveSection] = useState('anamnese');
   const [expandedTests, setExpandedTests] = useState({
     bppv: true,
@@ -97,10 +99,10 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
   };
 
   const tabs = [
-    { id: 'anamnese', label: 'Anamnese', icon: Brain },
-    { id: 'testing', label: 'Testing', icon: Activity },
-    { id: 'diagnosis', label: 'Diagnose', icon: Target },
-    { id: 'treatment', label: 'Behandling', icon: RotateCw },
+    { id: 'anamnese', label: t('vestibularTabAnamnese'), icon: Brain },
+    { id: 'testing', label: t('vestibularTabTesting'), icon: Activity },
+    { id: 'diagnosis', label: t('vestibularTabDiagnosis'), icon: Target },
+    { id: 'treatment', label: t('vestibularTabTreatment'), icon: RotateCw },
   ];
 
   return (
@@ -132,13 +134,13 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
           <div className="space-y-6">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Brain className="w-5 h-5" />
-              Sykehistorie - Svimmelhet
+              {t('vestibularHistoryHeading')}
             </h3>
 
             {/* Type Svimmelhet */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Type Svimmelhet (flere valg mulig)
+                {t('vestibularDizzinessTypeLabel')}
               </label>
               <div className="space-y-2">
                 {[
@@ -172,7 +174,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
             {/* Fritekst beskrivelse */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Beskrivelse (pasientens egne ord)
+                {t('vestibularDescriptionLabel')}
               </label>
               <textarea
                 value={assessmentData.dizziness_description || ''}
@@ -187,7 +189,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
             {/* Debut */}
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Debut Dato</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('vestibularOnsetDate')}
+                </label>
                 <input
                   type="date"
                   value={assessmentData.onset_date || ''}
@@ -198,7 +202,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Hvordan oppstått
+                  {t('vestibularOnsetHow')}
                 </label>
                 <select
                   value={assessmentData.onset_description || ''}
@@ -206,7 +210,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                   disabled={readOnly}
                   className="w-full p-2 border rounded-md"
                 >
-                  <option value="">Velg...</option>
+                  <option value="">{t('vestibularSelectPlaceholder')}</option>
                   <option value="akutt">Akutt oppstått</option>
                   <option value="gradvis">Gradvis forverring</option>
                   <option value="våknet">Våknet med det</option>
@@ -218,7 +222,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
             {/* Utløsende hendelse */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Utløsende Hendelse
+                {t('vestibularTriggeringEvent')}
               </label>
               <select
                 value={assessmentData.onset_trigger || ''}
@@ -226,7 +230,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                 disabled={readOnly}
                 className="w-full p-2 border rounded-md"
               >
-                <option value="">Velg...</option>
+                <option value="">{t('vestibularSelectPlaceholder')}</option>
                 <option value="traume">Traume (fall, slag mot hodet)</option>
                 <option value="virus">Virus / Influensa / COVID-19</option>
                 <option value="ørebetennelse">Ørebetennelse</option>
@@ -237,7 +241,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
 
             {/* Tilleggsplager */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Tilleggsplager</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('vestibularAssociatedSymptoms')}
+              </label>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { key: 'hodepine', label: 'Hodepine' },
@@ -272,7 +278,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
           <div className="space-y-6">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Activity className="w-5 h-5" />
-              Klinisk Testing
+              {t('vestibularClinicalTesting')}
             </h3>
 
             {/* BPPV Testing */}
@@ -283,7 +289,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
               >
                 <span className="flex items-center gap-2">
                   <RotateCw className="w-4 h-4" />
-                  BPPV Testing (Posisjonstester)
+                  {t('vestibularBppvTesting')}
                 </span>
                 {expandedTests.bppv ? (
                   <ChevronUp className="w-4 h-4" />
@@ -300,7 +306,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                     <div className="grid grid-cols-2 gap-4">
                       {/* Høyre */}
                       <div className="bg-white p-3 rounded border">
-                        <h5 className="font-medium mb-2">Høyre Side</h5>
+                        <h5 className="font-medium mb-2">{t('vestibularRightSide')}</h5>
                         <label className="flex items-center gap-2 mb-2">
                           <input
                             type="checkbox"
@@ -315,14 +321,16 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                             disabled={readOnly}
                             className="rounded border-gray-300"
                           />
-                          <span className="text-sm font-medium">Nystagmus observert</span>
+                          <span className="text-sm font-medium">
+                            {t('vestibularNystagmusObserved')}
+                          </span>
                         </label>
 
                         {assessmentData.dix_hallpike_right?.nystagmus && (
                           <div className="space-y-2 ml-6">
                             <div>
                               <label className="text-xs text-gray-600 dark:text-gray-300">
-                                Type
+                                {t('vestibularType')}
                               </label>
                               <select
                                 value={assessmentData.dix_hallpike_right?.type || ''}
@@ -332,7 +340,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
-                                <option value="">Velg...</option>
+                                <option value="">{t('vestibularSelectPlaceholder')}</option>
                                 <option value="torsjon_geotrop">Torsjon geotropisk</option>
                                 <option value="upbeat">Upbeat (vertikal opp)</option>
                                 <option value="downbeat">Downbeat (vertikal ned)</option>
@@ -340,7 +348,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                             </div>
                             <div>
                               <label className="text-xs text-gray-600 dark:text-gray-300">
-                                Intensitet
+                                {t('vestibularIntensity')}
                               </label>
                               <select
                                 value={assessmentData.dix_hallpike_right?.intensity || ''}
@@ -354,7 +362,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
-                                <option value="">Velg...</option>
+                                <option value="">{t('vestibularSelectPlaceholder')}</option>
                                 <option value="mild">Mild</option>
                                 <option value="moderat">Moderat</option>
                                 <option value="kraftig">Kraftig</option>
@@ -362,7 +370,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                             </div>
                             <div>
                               <label className="text-xs text-gray-600 dark:text-gray-300">
-                                Karakter
+                                {t('vestibularCharacter')}
                               </label>
                               <select
                                 value={assessmentData.dix_hallpike_right?.character || ''}
@@ -376,7 +384,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
-                                <option value="">Velg...</option>
+                                <option value="">{t('vestibularSelectPlaceholder')}</option>
                                 <option value="uttrettbar">Uttrettbar (kanalithiasis)</option>
                                 <option value="vedvarende">Vedvarende (cupololithiasis)</option>
                               </select>
@@ -387,7 +395,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
 
                       {/* Venstre */}
                       <div className="bg-white p-3 rounded border">
-                        <h5 className="font-medium mb-2">Venstre Side</h5>
+                        <h5 className="font-medium mb-2">{t('vestibularLeftSide')}</h5>
                         <label className="flex items-center gap-2 mb-2">
                           <input
                             type="checkbox"
@@ -398,14 +406,16 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                             disabled={readOnly}
                             className="rounded border-gray-300"
                           />
-                          <span className="text-sm font-medium">Nystagmus observert</span>
+                          <span className="text-sm font-medium">
+                            {t('vestibularNystagmusObserved')}
+                          </span>
                         </label>
 
                         {assessmentData.dix_hallpike_left?.nystagmus && (
                           <div className="space-y-2 ml-6">
                             <div>
                               <label className="text-xs text-gray-600 dark:text-gray-300">
-                                Type
+                                {t('vestibularType')}
                               </label>
                               <select
                                 value={assessmentData.dix_hallpike_left?.type || ''}
@@ -415,7 +425,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
-                                <option value="">Velg...</option>
+                                <option value="">{t('vestibularSelectPlaceholder')}</option>
                                 <option value="torsjon_geotrop">Torsjon geotropisk</option>
                                 <option value="upbeat">Upbeat (vertikal opp)</option>
                                 <option value="downbeat">Downbeat (vertikal ned)</option>
@@ -423,7 +433,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                             </div>
                             <div>
                               <label className="text-xs text-gray-600 dark:text-gray-300">
-                                Intensitet
+                                {t('vestibularIntensity')}
                               </label>
                               <select
                                 value={assessmentData.dix_hallpike_left?.intensity || ''}
@@ -437,7 +447,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
-                                <option value="">Velg...</option>
+                                <option value="">{t('vestibularSelectPlaceholder')}</option>
                                 <option value="mild">Mild</option>
                                 <option value="moderat">Moderat</option>
                                 <option value="kraftig">Kraftig</option>
@@ -445,7 +455,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                             </div>
                             <div>
                               <label className="text-xs text-gray-600 dark:text-gray-300">
-                                Karakter
+                                {t('vestibularCharacter')}
                               </label>
                               <select
                                 value={assessmentData.dix_hallpike_left?.character || ''}
@@ -459,7 +469,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
-                                <option value="">Velg...</option>
+                                <option value="">{t('vestibularSelectPlaceholder')}</option>
                                 <option value="uttrettbar">Uttrettbar (kanalithiasis)</option>
                                 <option value="vedvarende">Vedvarende (cupololithiasis)</option>
                               </select>
@@ -476,7 +486,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                     <div className="grid grid-cols-2 gap-4">
                       {/* Høyre */}
                       <div className="bg-white p-3 rounded border">
-                        <h5 className="font-medium mb-2">Høyre Rotasjon</h5>
+                        <h5 className="font-medium mb-2">{t('vestibularRightRotation')}</h5>
                         <label className="flex items-center gap-2 mb-2">
                           <input
                             type="checkbox"
@@ -487,14 +497,16 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                             disabled={readOnly}
                             className="rounded border-gray-300"
                           />
-                          <span className="text-sm font-medium">Nystagmus observert</span>
+                          <span className="text-sm font-medium">
+                            {t('vestibularNystagmusObserved')}
+                          </span>
                         </label>
 
                         {assessmentData.supine_roll_right?.nystagmus && (
                           <div className="space-y-2 ml-6">
                             <div>
                               <label className="text-xs text-gray-600 dark:text-gray-300">
-                                Retning
+                                {t('vestibularDirection')}
                               </label>
                               <select
                                 value={assessmentData.supine_roll_right?.direction || ''}
@@ -508,14 +520,14 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
-                                <option value="">Velg...</option>
+                                <option value="">{t('vestibularSelectPlaceholder')}</option>
                                 <option value="geotrop">Geotropisk (mot bakken)</option>
                                 <option value="apogeotrop">Apogeotropisk (mot taket)</option>
                               </select>
                             </div>
                             <div>
                               <label className="text-xs text-gray-600 dark:text-gray-300">
-                                Intensitet
+                                {t('vestibularIntensity')}
                               </label>
                               <select
                                 value={assessmentData.supine_roll_right?.intensity || ''}
@@ -529,7 +541,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
-                                <option value="">Velg...</option>
+                                <option value="">{t('vestibularSelectPlaceholder')}</option>
                                 <option value="mild">Mild</option>
                                 <option value="moderat">Moderat</option>
                                 <option value="kraftig">Kraftig</option>
@@ -541,7 +553,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
 
                       {/* Venstre */}
                       <div className="bg-white p-3 rounded border">
-                        <h5 className="font-medium mb-2">Venstre Rotasjon</h5>
+                        <h5 className="font-medium mb-2">{t('vestibularLeftRotation')}</h5>
                         <label className="flex items-center gap-2 mb-2">
                           <input
                             type="checkbox"
@@ -552,14 +564,16 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                             disabled={readOnly}
                             className="rounded border-gray-300"
                           />
-                          <span className="text-sm font-medium">Nystagmus observert</span>
+                          <span className="text-sm font-medium">
+                            {t('vestibularNystagmusObserved')}
+                          </span>
                         </label>
 
                         {assessmentData.supine_roll_left?.nystagmus && (
                           <div className="space-y-2 ml-6">
                             <div>
                               <label className="text-xs text-gray-600 dark:text-gray-300">
-                                Retning
+                                {t('vestibularDirection')}
                               </label>
                               <select
                                 value={assessmentData.supine_roll_left?.direction || ''}
@@ -573,14 +587,14 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
-                                <option value="">Velg...</option>
+                                <option value="">{t('vestibularSelectPlaceholder')}</option>
                                 <option value="geotrop">Geotropisk (mot bakken)</option>
                                 <option value="apogeotrop">Apogeotropisk (mot taket)</option>
                               </select>
                             </div>
                             <div>
                               <label className="text-xs text-gray-600 dark:text-gray-300">
-                                Intensitet
+                                {t('vestibularIntensity')}
                               </label>
                               <select
                                 value={assessmentData.supine_roll_left?.intensity || ''}
@@ -594,7 +608,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                                 disabled={readOnly}
                                 className="w-full text-sm p-1 border rounded"
                               >
-                                <option value="">Velg...</option>
+                                <option value="">{t('vestibularSelectPlaceholder')}</option>
                                 <option value="mild">Mild</option>
                                 <option value="moderat">Moderat</option>
                                 <option value="kraftig">Kraftig</option>
@@ -619,7 +633,9 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                         disabled={readOnly}
                         className="rounded border-gray-300"
                       />
-                      <span className="text-sm font-medium">Downbeat nystagmus observert</span>
+                      <span className="text-sm font-medium">
+                        {t('vestibularDownbeatNystagmusObserved')}
+                      </span>
                     </label>
                     {assessmentData.deep_head_hang?.nystagmus && (
                       <textarea
@@ -630,7 +646,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                         disabled={readOnly}
                         rows={2}
                         className="w-full p-2 border rounded text-sm mt-2"
-                        placeholder="Notater..."
+                        placeholder={t('vestibularNotes')}
                       />
                     )}
                   </div>
@@ -646,7 +662,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
               >
                 <span className="flex items-center gap-2">
                   <Activity className="w-4 h-4" />
-                  Balanse & Cerebellare Tester
+                  {t('vestibularBalanceTests')}
                 </span>
                 {expandedTests.balance ? (
                   <ChevronUp className="w-4 h-4" />
@@ -728,7 +744,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
               >
                 <span className="flex items-center gap-2">
                   <Eye className="w-4 h-4" />
-                  Oculomotoriske Tester
+                  {t('vestibularOculomotorTests')}
                 </span>
                 {expandedTests.oculomotor ? (
                   <ChevronUp className="w-4 h-4" />
@@ -798,18 +814,20 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
           <div className="space-y-6">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <Target className="w-5 h-5" />
-              Diagnose & Vurdering
+              {t('vestibularDiagnosisHeading')}
             </h3>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Primærdiagnose</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('vestibularPrimaryDiagnosis')}
+              </label>
               <select
                 value={assessmentData.primary_diagnosis || ''}
                 onChange={(e) => handleChange('primary_diagnosis', e.target.value)}
                 disabled={readOnly}
                 className="w-full p-2 border rounded-md"
               >
-                <option value="">Velg diagnose...</option>
+                <option value="">{t('vestibularSelectDiagnosis')}</option>
                 <optgroup label="BPPV">
                   <option value="BPPV bakre hø">BPPV bakre buegang høyre</option>
                   <option value="BPPV bakre ve">BPPV bakre buegang venstre</option>
@@ -832,44 +850,44 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
             {/* BPPV Details */}
             {assessmentData.primary_diagnosis?.includes('BPPV') && (
               <div className="bg-blue-50 p-4 rounded-md space-y-3">
-                <h4 className="font-medium">BPPV Detaljer</h4>
+                <h4 className="font-medium">{t('vestibularBppvDetails')}</h4>
                 <div className="grid grid-cols-3 gap-3">
                   <div>
-                    <label className="block text-xs font-medium mb-1">Kanal</label>
+                    <label className="block text-xs font-medium mb-1">{t('vestibularCanal')}</label>
                     <select
                       value={assessmentData.bppv_details?.kanal || ''}
                       onChange={(e) => handleNestedChange('bppv_details', 'kanal', e.target.value)}
                       disabled={readOnly}
                       className="w-full p-2 border rounded text-sm"
                     >
-                      <option value="">Velg...</option>
+                      <option value="">{t('vestibularSelectPlaceholder')}</option>
                       <option value="bakre">Bakre (Posterior)</option>
                       <option value="horisontal">Horisontal (Lateral)</option>
                       <option value="fremre">Fremre (Anterior)</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium mb-1">Type</label>
+                    <label className="block text-xs font-medium mb-1">{t('vestibularType')}</label>
                     <select
                       value={assessmentData.bppv_details?.type || ''}
                       onChange={(e) => handleNestedChange('bppv_details', 'type', e.target.value)}
                       disabled={readOnly}
                       className="w-full p-2 border rounded text-sm"
                     >
-                      <option value="">Velg...</option>
+                      <option value="">{t('vestibularSelectPlaceholder')}</option>
                       <option value="kanalithiasis">Kanalithiasis (løse krystaller)</option>
                       <option value="cupololithiasis">Cupololithiasis (festede krystaller)</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium mb-1">Side</label>
+                    <label className="block text-xs font-medium mb-1">{t('vestibularSide')}</label>
                     <select
                       value={assessmentData.bppv_details?.side || ''}
                       onChange={(e) => handleNestedChange('bppv_details', 'side', e.target.value)}
                       disabled={readOnly}
                       className="w-full p-2 border rounded text-sm"
                     >
-                      <option value="">Velg...</option>
+                      <option value="">{t('vestibularSelectPlaceholder')}</option>
                       <option value="hø">Høyre</option>
                       <option value="ve">Venstre</option>
                       <option value="bilat">Bilateral</option>
@@ -882,7 +900,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
             {/* DHI Score */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                DHI Score (Dizziness Handicap Inventory 0-100)
+                {t('vestibularDhiScore')}
               </label>
               <input
                 type="number"
@@ -895,11 +913,11 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
               />
               {assessmentData.dhi_score !== null && (
                 <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-                  {assessmentData.dhi_score <= 30 && 'Mild funksjonsnedsettelse'}
+                  {assessmentData.dhi_score <= 30 && t('vestibularMildImpairment')}
                   {assessmentData.dhi_score > 30 &&
                     assessmentData.dhi_score <= 60 &&
-                    'Moderat funksjonsnedsettelse'}
-                  {assessmentData.dhi_score > 60 && 'Alvorlig funksjonsnedsettelse'}
+                    t('vestibularModerateImpairment')}
+                  {assessmentData.dhi_score > 60 && t('vestibularSevereImpairment')}
                 </p>
               )}
             </div>
@@ -914,7 +932,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                   disabled={readOnly}
                   className="rounded border-gray-300"
                 />
-                <span className="text-sm font-medium">Henvisning nødvendig</span>
+                <span className="text-sm font-medium">{t('vestibularReferralNeeded')}</span>
               </label>
               {assessmentData.referral_needed && (
                 <select
@@ -923,7 +941,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                   disabled={readOnly}
                   className="w-full p-2 border rounded-md"
                 >
-                  <option value="">Velg spesialist...</option>
+                  <option value="">{t('vestibularSelectSpecialist')}</option>
                   <option value="ØNH">ØNH (Øre-Nese-Hals)</option>
                   <option value="Nevrolog">Nevrolog</option>
                   <option value="Fastlege">Fastlege</option>
@@ -938,13 +956,13 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
           <div className="space-y-6">
             <h3 className="text-lg font-semibold flex items-center gap-2">
               <RotateCw className="w-5 h-5" />
-              Behandling & Oppfølging
+              {t('vestibularTreatmentHeading')}
             </h3>
 
             {/* Maneuvers */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Reposisjonsmanøvrer Utført
+                {t('vestibularManeuversPerformed')}
               </label>
               <div className="space-y-2">
                 {[
@@ -984,7 +1002,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
             {/* VRT Exercises */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                VRT Øvelser (Vestibulær Rehabilitering)
+                {t('vestibularVrtExercises')}
               </label>
               <div className="space-y-2">
                 {[
@@ -1019,7 +1037,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
             {/* Home Exercises */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Hjemmeøvelser / Instruksjoner
+                {t('vestibularHomeExercises')}
               </label>
               <textarea
                 value={assessmentData.home_exercises || ''}
@@ -1027,14 +1045,14 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                 disabled={readOnly}
                 rows={4}
                 className="w-full p-2 border rounded-md"
-                placeholder="Detaljerte instruksjoner til pasienten..."
+                placeholder={t('vestibularHomeExercisesPlaceholder')}
               />
             </div>
 
             {/* Follow-up Plan */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Oppfølgingsplan
+                {t('vestibularFollowUpPlan')}
               </label>
               <textarea
                 value={assessmentData.follow_up_plan || ''}
@@ -1042,7 +1060,7 @@ export default function VestibularAssessment({ data, onChange, readOnly = false 
                 disabled={readOnly}
                 rows={3}
                 className="w-full p-2 border rounded-md"
-                placeholder="Kontroll om X dager, reevaluering, etc."
+                placeholder={t('vestibularFollowUpPlaceholder')}
               />
             </div>
           </div>
