@@ -159,13 +159,16 @@ export default function DataCurationTab() {
 
       {/* Type Distribution */}
       {stats?.byType?.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-4">
-          <h3 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2 flex items-center gap-2">
             <BarChart3 className="w-4 h-4" /> Fordeling etter type
           </h3>
           <div className="flex flex-wrap gap-2">
             {stats.byType.map((t) => (
-              <span key={t.suggestion_type} className="px-2 py-1 bg-gray-100 rounded text-xs">
+              <span
+                key={t.suggestion_type}
+                className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded text-xs"
+              >
                 {t.suggestion_type}: {t.count} ({t.pending} ventende)
               </span>
             ))}
@@ -174,13 +177,13 @@ export default function DataCurationTab() {
       )}
 
       {/* Filters */}
-      <div className="bg-white rounded-lg shadow p-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
         <div className="flex flex-wrap items-center gap-3">
           <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
           <select
             value={filters.type}
             onChange={(e) => handleFilterChange('type', e.target.value)}
-            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
+            className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
           >
             {SUGGESTION_TYPES.map((t) => (
               <option key={t.value} value={t.value}>
@@ -191,7 +194,7 @@ export default function DataCurationTab() {
           <select
             value={filters.status}
             onChange={(e) => handleFilterChange('status', e.target.value)}
-            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
+            className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
           >
             {STATUS_OPTIONS.map((s) => (
               <option key={s.value} value={s.value}>
@@ -202,7 +205,7 @@ export default function DataCurationTab() {
           <select
             value={filters.minRating}
             onChange={(e) => handleFilterChange('minRating', e.target.value)}
-            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
+            className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
           >
             <option value="">Alle vurderinger</option>
             <option value="1">1+</option>
@@ -215,13 +218,13 @@ export default function DataCurationTab() {
             type="date"
             value={filters.startDate}
             onChange={(e) => handleFilterChange('startDate', e.target.value)}
-            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
+            className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
           />
           <input
             type="date"
             value={filters.endDate}
             onChange={(e) => handleFilterChange('endDate', e.target.value)}
-            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
+            className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
           />
         </div>
       </div>
@@ -250,7 +253,7 @@ export default function DataCurationTab() {
       )}
 
       {/* Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         {feedbackQuery.isLoading ? (
           <div className="p-6 text-gray-500 dark:text-gray-400">Laster...</div>
         ) : feedback.length === 0 ? (
@@ -262,7 +265,7 @@ export default function DataCurationTab() {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b bg-gray-50">
+                <tr className="border-b bg-gray-50 dark:bg-gray-700">
                   <th className="py-3 px-3 text-left">
                     <input
                       type="checkbox"
@@ -330,7 +333,7 @@ export default function DataCurationTab() {
           <button
             onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
-            className="px-3 py-1.5 border rounded-lg text-sm disabled:opacity-50"
+            className="px-3 py-1.5 border dark:border-gray-600 rounded-lg text-sm disabled:opacity-50 dark:text-gray-200"
           >
             Forrige
           </button>
@@ -340,7 +343,7 @@ export default function DataCurationTab() {
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
-            className="px-3 py-1.5 border rounded-lg text-sm disabled:opacity-50"
+            className="px-3 py-1.5 border dark:border-gray-600 rounded-lg text-sm disabled:opacity-50 dark:text-gray-200"
           >
             Neste
           </button>
@@ -372,12 +375,14 @@ function FeedbackRow({
 
   return (
     <>
-      <tr className="border-b hover:bg-gray-50">
+      <tr className="border-b hover:bg-gray-50 dark:hover:bg-gray-700">
         <td className="py-3 px-3">
           <input type="checkbox" checked={selected} onChange={onToggleSelect} className="rounded" />
         </td>
         <td className="py-3 px-3">
-          <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{item.suggestion_type}</span>
+          <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">
+            {item.suggestion_type}
+          </span>
         </td>
         <td className="py-3 px-3 max-w-xs">
           <button onClick={onToggleExpand} className="flex items-center gap-1 text-left">
@@ -429,14 +434,14 @@ function FeedbackRow({
 
       {/* Expanded Row */}
       {expanded && (
-        <tr className="bg-gray-50 border-b">
+        <tr className="bg-gray-50 dark:bg-gray-700 border-b">
           <td colSpan={8} className="p-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                   Original forslag
                 </p>
-                <div className="p-3 bg-white rounded border text-sm whitespace-pre-wrap">
+                <div className="p-3 bg-white dark:bg-gray-800 rounded border text-sm whitespace-pre-wrap">
                   {item.original_suggestion}
                 </div>
               </div>
@@ -444,7 +449,7 @@ function FeedbackRow({
                 <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                   Brukerens korreksjon
                 </p>
-                <div className="p-3 bg-white rounded border text-sm whitespace-pre-wrap">
+                <div className="p-3 bg-white dark:bg-gray-800 rounded border text-sm whitespace-pre-wrap">
                   {item.user_correction || (
                     <span className="text-gray-400 dark:text-gray-300">Ingen korreksjon</span>
                   )}
@@ -488,7 +493,7 @@ function FeedbackRow({
               </button>
               <button
                 onClick={onCancelEdit}
-                className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm hover:bg-gray-50"
+                className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm hover:bg-gray-50 dark:hover:bg-gray-600 dark:text-gray-200"
               >
                 Avbryt
               </button>

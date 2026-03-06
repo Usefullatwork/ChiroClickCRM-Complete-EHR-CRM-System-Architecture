@@ -93,7 +93,7 @@ export default function PlaygroundTab() {
   return (
     <div className="space-y-6">
       {/* Prompt Input */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
           <TestTube className="w-5 h-5" />
           Modell-lekeplass
@@ -107,7 +107,7 @@ export default function PlaygroundTab() {
               <button
                 key={p.label}
                 onClick={() => applyPreset(p.prompt)}
-                className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-medium transition-colors"
+                className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-xs font-medium transition-colors dark:text-gray-200"
               >
                 {p.label}
               </button>
@@ -121,13 +121,13 @@ export default function PlaygroundTab() {
           onChange={(e) => setPrompt(e.target.value)}
           rows={4}
           placeholder="Skriv en prompt for å teste modellen..."
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm dark:bg-gray-700 dark:text-gray-200"
         />
 
         {/* Controls Row */}
         <div className="flex flex-wrap items-center gap-4 mt-4">
           {/* Mode Toggle */}
-          <div className="flex bg-gray-100 rounded-lg p-0.5">
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
             <button
               onClick={() => setSideBySide(false)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
@@ -155,7 +155,7 @@ export default function PlaygroundTab() {
             <select
               value={modelA}
               onChange={(e) => setModelA(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
             >
               {MODELS.map((m) => (
                 <option key={m.value} value={m.value}>
@@ -169,7 +169,7 @@ export default function PlaygroundTab() {
                 <select
                   value={modelB}
                   onChange={(e) => setModelB(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
                 >
                   {MODELS.map((m) => (
                     <option key={m.value} value={m.value}>
@@ -235,8 +235,8 @@ export default function PlaygroundTab() {
 
 function ResultCard({ model, result, loading, error }) {
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="px-4 py-3 bg-gray-50 border-b flex items-center justify-between">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b flex items-center justify-between">
         <span className="font-medium text-sm font-mono">{model}</span>
         {result && (
           <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
@@ -267,7 +267,7 @@ function ResultCard({ model, result, loading, error }) {
                 Prompt: {result.prompt}
               </div>
             )}
-            <div className="whitespace-pre-wrap text-sm font-mono bg-gray-50 rounded-lg p-3 max-h-96 overflow-y-auto">
+            <div className="whitespace-pre-wrap text-sm font-mono bg-gray-50 dark:bg-gray-700 rounded-lg p-3 max-h-96 overflow-y-auto">
               {result.response}
             </div>
           </div>

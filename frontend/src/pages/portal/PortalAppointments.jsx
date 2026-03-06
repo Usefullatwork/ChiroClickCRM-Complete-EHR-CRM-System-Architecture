@@ -19,8 +19,6 @@ import {
 import { patientPortalAPI } from '../../services/api';
 import logger from '../../utils/logger';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
-
 const VISIT_TYPE_LABELS = {
   initial: 'Forstegangs',
   follow_up: 'Oppfolging',
@@ -73,11 +71,7 @@ export default function PortalAppointments() {
   const handleCancelAppointment = async (appointmentId) => {
     try {
       setCancelingId(appointmentId);
-      await fetch(`${API_URL}/patient-portal/appointments/${appointmentId}/cancel`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-      });
+      await patientPortalAPI.cancelAppointment(appointmentId);
       setAppointments((prev) =>
         prev.map((a) => (a.id === appointmentId ? { ...a, status: 'cancelled' } : a))
       );
@@ -93,12 +87,7 @@ export default function PortalAppointments() {
     e.preventDefault();
     try {
       setRequestStatus('sending');
-      await fetch(`${API_URL}/patient-portal/appointments/request`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestForm),
-      });
+      await patientPortalAPI.requestAppointment(requestForm);
       setRequestStatus('sent');
       setRequestForm({ preferredDate: '', preferredTime: '', reason: '' });
       setTimeout(() => {

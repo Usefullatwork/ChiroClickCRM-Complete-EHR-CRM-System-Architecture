@@ -18,7 +18,7 @@ const AI_TRAINING_DIR = path.join(PROJECT_ROOT, 'ai-training');
 const MODELS_CACHE_DIR = path.join(AI_TRAINING_DIR, 'models-cache');
 const _SCRIPTS_DIR = path.join(PROJECT_ROOT, 'scripts');
 
-const MODEL_NAMES = ['chiro-no-sft-dpo-v5', 'chiro-no-lora-v5', 'chiro-fast', 'chiro-medical'];
+const MODEL_NAMES = ['chiro-no-sft-dpo-v6', 'chiro-no-sft-dpo-v5', 'chiro-fast', 'chiro-medical'];
 
 /**
  * Check if Ollama is running and get model status
@@ -29,23 +29,35 @@ export async function getStatus() {
     models: {},
     totalModels: 0,
     missingModels: 0,
+    allOllamaModels: [],
   };
 
   try {
     const output = execSync('ollama list', { encoding: 'utf-8', timeout: 10000 });
     result.ollamaRunning = true;
 
+    // Parse all chiro-* models from Ollama output
+    const lines = output.split('\n').filter((l) => l.trim());
+    for (const line of lines) {
+      const match = line.match(/^(\S+)\s+.*?(\d+\.?\d*\s*[GMKT]B)/i);
+      if (match) {
+        const modelName = match[1].split(':')[0];
+        if (modelName.startsWith('chiro-')) {
+          result.allOllamaModels.push({ name: modelName, size: match[2] });
+        }
+      }
+    }
+
+    // Check expected models
     for (const name of MODEL_NAMES) {
       const found = output.toLowerCase().includes(name);
-      // Extract size from listing if found
       let size = null;
       if (found) {
-        const lines = output.split('\n');
         for (const line of lines) {
           if (line.toLowerCase().includes(name)) {
-            const match = line.match(/(\d+\.?\d*\s*[GMKT]B)/i);
-            if (match) {
-              size = match[1];
+            const sizeMatch = line.match(/(\d+\.?\d*\s*[GMKT]B)/i);
+            if (sizeMatch) {
+              size = sizeMatch[1];
             }
           }
         }
@@ -65,36 +77,64 @@ export async function getStatus() {
 }
 
 /**
+ * Recursively find all .jsonl files under a directory
+ */
+function findJsonlFiles(dir, basePath = dir) {
+  const results = [];
+  try {
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+      if (entry.isDirectory() && !entry.name.startsWith('.') && entry.name !== 'node_modules') {
+        results.push(...findJsonlFiles(fullPath, basePath));
+      } else if (entry.isFile() && entry.name.endsWith('.jsonl')) {
+        results.push({
+          fullPath,
+          relativePath: path.relative(basePath, fullPath).replace(/\\/g, '/'),
+        });
+      }
+    }
+  } catch {
+    // Directory may not exist
+  }
+  return results;
+}
+
+/**
  * List training data files and example counts
  */
 export function getTrainingData() {
   const files = [];
+  const categories = {};
   let totalExamples = 0;
 
   try {
-    const jsonlFiles = fs.readdirSync(AI_TRAINING_DIR).filter((f) => f.endsWith('.jsonl'));
+    const dataDir = path.join(AI_TRAINING_DIR, 'data');
+    const jsonlFiles = findJsonlFiles(dataDir, dataDir);
 
-    for (const file of jsonlFiles) {
-      const filePath = path.join(AI_TRAINING_DIR, file);
-      const content = fs.readFileSync(filePath, 'utf-8');
+    for (const { fullPath, relativePath } of jsonlFiles) {
+      const content = fs.readFileSync(fullPath, 'utf-8');
       const lines = content.split('\n').filter((l) => l.trim());
       const exampleCount = lines.length;
-      const stat = fs.statSync(filePath);
+      const stat = fs.statSync(fullPath);
+      const category = relativePath.split('/')[0] || 'root';
 
       files.push({
-        name: file,
+        name: relativePath,
+        category,
         examples: exampleCount,
         sizeBytes: stat.size,
         sizeKB: Math.round(stat.size / 1024),
         modified: stat.mtime,
       });
       totalExamples += exampleCount;
+      categories[category] = (categories[category] || 0) + exampleCount;
     }
   } catch (error) {
     logger.error('Error reading training data:', error.message);
   }
 
-  return { files, totalExamples };
+  return { files, totalExamples, categories };
 }
 
 /**

@@ -132,8 +132,8 @@ export default function PipelineTab() {
 
       {/* 6-Step Progress Tracker */}
       {(pipelineRunning || pipelineFailed) && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-sm font-medium text-gray-700 mb-4">Fremdrift</h3>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-4">Fremdrift</h3>
           <div className="flex items-center justify-between">
             {PIPELINE_STEPS.map((step, i) => {
               const stepStatus = getStepStatus(step.key);
@@ -148,7 +148,7 @@ export default function PipelineTab() {
                             ? 'bg-blue-500 text-white animate-pulse'
                             : stepStatus === 'failed'
                               ? 'bg-red-500 text-white'
-                              : 'bg-gray-200 text-gray-500 dark:text-gray-400'
+                              : 'bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400'
                       }`}
                     >
                       {stepStatus === 'done' ? (
@@ -168,7 +168,7 @@ export default function PipelineTab() {
                   {i < PIPELINE_STEPS.length - 1 && (
                     <div
                       className={`w-12 h-0.5 mx-1 ${
-                        stepStatus === 'done' ? 'bg-green-400' : 'bg-gray-200'
+                        stepStatus === 'done' ? 'bg-green-400' : 'bg-gray-200 dark:bg-gray-600'
                       }`}
                     />
                   )}
@@ -180,18 +180,20 @@ export default function PipelineTab() {
       )}
 
       {/* Trigger Card */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
           <Play className="w-5 h-5" />
           Start trening
         </h3>
         <div className="flex flex-wrap items-end gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Modell</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+              Modell
+            </label>
             <select
               value={selectedModel}
               onChange={(e) => setSelectedModel(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
             >
               {MODEL_OPTIONS.map((m) => (
                 <option key={m.value} value={m.value}>
@@ -238,7 +240,7 @@ export default function PipelineTab() {
       </div>
 
       {/* Retraining History */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
           <Clock className="w-5 h-5" />
           Treningshistorikk
@@ -251,7 +253,7 @@ export default function PipelineTab() {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b bg-gray-50">
+                <tr className="border-b bg-gray-50 dark:bg-gray-700">
                   <th className="py-2 px-3 text-left font-medium text-gray-600 dark:text-gray-300">
                     Dato
                   </th>
@@ -271,7 +273,7 @@ export default function PipelineTab() {
               </thead>
               <tbody>
                 {history.map((event) => (
-                  <tr key={event.id} className="border-b hover:bg-gray-50">
+                  <tr key={event.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="py-2 px-3 text-gray-600 dark:text-gray-300">
                       {new Date(event.created_at).toLocaleString('nb-NO', {
                         month: 'short',
@@ -281,7 +283,7 @@ export default function PipelineTab() {
                       })}
                     </td>
                     <td className="py-2 px-3">
-                      <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">
+                      <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">
                         {event.trigger_type}
                       </span>
                     </td>
@@ -301,7 +303,7 @@ export default function PipelineTab() {
                         </button>
                       )}
                       {expandedEvent === event.id && event.test_results && (
-                        <pre className="mt-2 p-2 bg-gray-100 rounded text-xs overflow-x-auto">
+                        <pre className="mt-2 p-2 bg-gray-100 dark:bg-gray-700 rounded text-xs overflow-x-auto">
                           {JSON.stringify(event.test_results, null, 2)}
                         </pre>
                       )}
@@ -316,7 +318,7 @@ export default function PipelineTab() {
 
       {/* Model Versions & Rollback */}
       {status?.modelVersions && status.modelVersions.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
             <Activity className="w-5 h-5" />
             Modellversjoner
@@ -339,7 +341,7 @@ export default function PipelineTab() {
                   <button
                     onClick={() => rollbackMutation.mutate(v.version)}
                     disabled={rollbackMutation.isPending}
-                    className="px-3 py-1 border border-gray-300 rounded text-sm hover:bg-gray-50 flex items-center gap-1"
+                    className="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded text-sm hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-1 dark:text-gray-200"
                   >
                     <RotateCcw className="w-3 h-3" /> Tilbakerull
                   </button>
@@ -351,7 +353,7 @@ export default function PipelineTab() {
       )}
 
       {/* RLAIF Section */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
           <Zap className="w-5 h-5" />
           RLAIF (AI-assistert feedback)

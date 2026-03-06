@@ -223,12 +223,34 @@ export default function ModelsTab({
           <>
             <div className="mb-4">
               <span className="text-2xl font-bold text-blue-600">
-                {trainingData?.totalExamples || 0}
+                {trainingData?.totalExamples?.toLocaleString('nb-NO') || 0}
               </span>
               <span className="text-gray-600 dark:text-gray-300 ml-2">totale eksempler</span>
+              <span className="text-gray-400 dark:text-gray-500 ml-2 text-sm">
+                ({trainingData?.files?.length || 0} filer)
+              </span>
             </div>
 
-            <div className="space-y-2 mb-6">
+            {/* Category summary */}
+            {trainingData?.categories && Object.keys(trainingData.categories).length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+                {Object.entries(trainingData.categories)
+                  .sort((a, b) => b[1] - a[1])
+                  .map(([cat, count]) => (
+                    <div
+                      key={cat}
+                      className="border dark:border-gray-600 rounded-lg p-2 text-center"
+                    >
+                      <div className="text-lg font-bold text-gray-900 dark:text-white">
+                        {count.toLocaleString('nb-NO')}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">{cat}</div>
+                    </div>
+                  ))}
+              </div>
+            )}
+
+            <div className="space-y-2 mb-6 max-h-64 overflow-y-auto">
               {trainingData?.files?.map((file) => (
                 <div
                   key={file.name}
@@ -241,7 +263,7 @@ export default function ModelsTab({
                     </span>
                   </div>
                   <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
-                    <span>{file.examples} eksempler</span>
+                    <span>{file.examples.toLocaleString('nb-NO')} eksempler</span>
                     <span>{file.sizeKB} KB</span>
                   </div>
                 </div>

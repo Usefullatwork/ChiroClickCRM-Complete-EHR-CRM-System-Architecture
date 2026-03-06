@@ -37,7 +37,7 @@ const CHART_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#e
 
 function StatCard({ label, value, color = 'gray' }) {
   const colorClasses = {
-    gray: 'text-gray-900',
+    gray: 'text-gray-900 dark:text-white',
     green: 'text-green-700',
     red: 'text-red-700',
     blue: 'text-blue-700',
@@ -216,7 +216,7 @@ export default function AnalyticsTab() {
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
+            className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
           >
             <option value="7">Siste 7 dager</option>
             <option value="30">Siste 30 dager</option>
@@ -227,7 +227,7 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Model Comparison Chart */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <BarChart3 className="w-5 h-5" />
@@ -236,7 +236,7 @@ export default function AnalyticsTab() {
           {comparison.length > 0 && (
             <button
               onClick={exportComparisonCSV}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               <Download className="w-4 h-4" />
               CSV
@@ -264,7 +264,7 @@ export default function AnalyticsTab() {
 
       {/* A/B Model Routing View */}
       {comparison.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
             <BarChart3 className="w-5 h-5" />
             A/B Modellsammenligning - Detaljert
@@ -283,7 +283,7 @@ export default function AnalyticsTab() {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b bg-gray-50">
+                <tr className="border-b bg-gray-50 dark:bg-gray-700">
                   <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
                     Modell
                   </th>
@@ -306,7 +306,10 @@ export default function AnalyticsTab() {
               </thead>
               <tbody>
                 {comparison.map((c) => (
-                  <tr key={c.model_name} className="border-b hover:bg-gray-50">
+                  <tr
+                    key={c.model_name}
+                    className="border-b hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
                     <td className="py-3 px-4 font-mono text-sm font-medium">{c.model_name}</td>
                     <td className="py-3 px-4 text-right">{c.total_suggestions}</td>
                     <td className="py-3 px-4 text-right">
@@ -355,7 +358,7 @@ export default function AnalyticsTab() {
       {/* Usage Volume + Task Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Daily Request Volume */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
             Daglig bruk
@@ -388,7 +391,7 @@ export default function AnalyticsTab() {
         </div>
 
         {/* Task Type Distribution */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
             <Activity className="w-5 h-5" />
             Oppgavefordeling
@@ -421,7 +424,7 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Red Flag Accuracy */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <Target className="w-5 h-5" />
           Red Flag - noyaktighet
@@ -454,13 +457,13 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Recent Suggestions Table */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold">Siste AI-forslag</h2>
           {suggestions.length > 0 && (
             <button
               onClick={exportSuggestionsCSV}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               <Download className="w-4 h-4" />
               CSV
@@ -496,7 +499,7 @@ export default function AnalyticsTab() {
               </thead>
               <tbody>
                 {suggestions.map((s) => (
-                  <tr key={s.id} className="border-b hover:bg-gray-50">
+                  <tr key={s.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="py-2 px-3 text-gray-600 dark:text-gray-300">
                       {new Date(s.created_at).toLocaleString('nb-NO', {
                         month: 'short',
@@ -506,7 +509,9 @@ export default function AnalyticsTab() {
                       })}
                     </td>
                     <td className="py-2 px-3">
-                      <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{s.task_type}</span>
+                      <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">
+                        {s.task_type}
+                      </span>
                     </td>
                     <td className="py-2 px-3 font-mono text-xs">{s.model_name}</td>
                     <td className="py-2 px-3">
@@ -527,7 +532,7 @@ export default function AnalyticsTab() {
                         </span>
                       )}
                       {s.accepted === null && (
-                        <span className="text-gray-500 dark:text-gray-400 bg-gray-50 px-2 py-0.5 rounded text-xs">
+                        <span className="text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-0.5 rounded text-xs">
                           Venter
                         </span>
                       )}
@@ -541,7 +546,7 @@ export default function AnalyticsTab() {
       </div>
 
       {/* A/B Testing Controls */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <FlaskConical className="w-5 h-5" />
           A/B-testing konfigurasjon
@@ -560,7 +565,7 @@ export default function AnalyticsTab() {
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-mono text-sm font-medium">{model}</span>
                   <span
-                    className={`px-2 py-0.5 rounded text-xs font-medium ${config.enabled ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-500 dark:text-gray-400'}`}
+                    className={`px-2 py-0.5 rounded text-xs font-medium ${config.enabled ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}
                   >
                     {config.enabled ? 'Aktiv' : 'Inaktiv'}
                   </span>
@@ -577,7 +582,7 @@ export default function AnalyticsTab() {
                   </div>
                 </div>
                 {config.enabled && (
-                  <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                  <div className="mt-2 w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                     <div
                       className="bg-teal-600 h-2 rounded-full"
                       style={{ width: `${100 - config.loraPercent}%` }}
@@ -608,7 +613,7 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Cost per Suggestion */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <DollarSign className="w-5 h-5" />
           Kostnad per forslag
@@ -630,13 +635,13 @@ export default function AnalyticsTab() {
                   <span className="text-sm text-gray-600 dark:text-gray-300 w-36 shrink-0">
                     {item.task_type}
                   </span>
-                  <div className="flex-1 bg-gray-100 rounded-full h-5 relative">
+                  <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-full h-5 relative">
                     <div
                       className="bg-blue-500 h-5 rounded-full"
                       style={{ width: `${Math.max(barWidth, 2)}%` }}
                     />
                   </div>
-                  <span className="text-sm font-mono text-gray-700 w-24 text-right">
+                  <span className="text-sm font-mono text-gray-700 dark:text-gray-200 w-24 text-right">
                     ${parseFloat(item.avg_cost_usd || 0).toFixed(4)}
                   </span>
                   <span className="text-xs text-gray-400 dark:text-gray-300 w-16 text-right">
@@ -650,7 +655,7 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Provider Value Comparison */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <BarChart3 className="w-5 h-5" />
           Leverandorsammenligning
@@ -663,7 +668,7 @@ export default function AnalyticsTab() {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b bg-gray-50">
+                <tr className="border-b bg-gray-50 dark:bg-gray-700">
                   <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
                     Leverandor
                   </th>
@@ -686,7 +691,7 @@ export default function AnalyticsTab() {
               </thead>
               <tbody>
                 {providerData.map((p) => (
-                  <tr key={p.provider} className="border-b hover:bg-gray-50">
+                  <tr key={p.provider} className="border-b hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="py-3 px-4 font-medium capitalize">{p.provider}</td>
                     <td className="py-3 px-4 text-right">{p.total_suggestions}</td>
                     <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
@@ -710,7 +715,7 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Cache Trends */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <Database className="w-5 h-5" />
           Cache-trender

@@ -8,8 +8,6 @@ import { User, ChevronLeft, Loader2, AlertCircle, CheckCircle, Edit3, Save, X } 
 import { patientPortalAPI } from '../../services/api';
 import logger from '../../utils/logger';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
-
 export default function PortalProfile() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -43,12 +41,7 @@ export default function PortalProfile() {
     try {
       setSaving(true);
       setError(null);
-      await fetch(`${API_URL}/patient-portal/profile`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editForm),
-      });
+      await patientPortalAPI.updateProfile(editForm);
       setProfile((prev) => ({ ...prev, ...editForm }));
       setSaved(true);
       setEditing(false);
