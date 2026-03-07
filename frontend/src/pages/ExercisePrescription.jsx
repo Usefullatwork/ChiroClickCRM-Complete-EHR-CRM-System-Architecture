@@ -133,9 +133,9 @@ export default function ExercisePrescription() {
     }
   }, [existingPrescription]);
 
-  const exercises = exercisesData?.data || [];
-  const categories = categoriesData?.data || [];
-  const templates = templatesData?.data || [];
+  const exercises = exercisesData?.data?.data || exercisesData?.data || [];
+  const categories = categoriesData?.data?.data || categoriesData?.data || [];
+  const templates = templatesData?.data?.data || templatesData?.data || [];
 
   /**
    * Handle adding exercise to prescription

@@ -231,8 +231,10 @@ export default function DataCurationTab() {
 
       {/* Bulk Action Bar */}
       {selectedIds.size > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex items-center justify-between">
-          <span className="text-sm text-blue-800 font-medium">{selectedIds.size} valgt</span>
+        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3 flex items-center justify-between">
+          <span className="text-sm text-blue-800 dark:text-blue-300 font-medium">
+            {selectedIds.size} valgt
+          </span>
           <div className="flex gap-2">
             <button
               onClick={() => handleBulk('approve')}
@@ -408,14 +410,14 @@ function FeedbackRow({
             <button
               onClick={onApprove}
               disabled={isApproving}
-              className="p-1.5 text-green-600 hover:bg-green-50 rounded"
+              className="p-1.5 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded"
               title="Godkjenn"
             >
               <CheckCircle2 className="w-4 h-4" />
             </button>
             <button
               onClick={onStartEdit}
-              className="p-1.5 text-blue-600 hover:bg-blue-50 rounded"
+              className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
               title="Rediger og godkjenn"
             >
               <Edit3 className="w-4 h-4" />
@@ -423,7 +425,7 @@ function FeedbackRow({
             <button
               onClick={onReject}
               disabled={isRejecting}
-              className="p-1.5 text-red-600 hover:bg-red-50 rounded"
+              className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
               title="Avvis"
             >
               <XCircle className="w-4 h-4" />
@@ -473,7 +475,7 @@ function FeedbackRow({
 
       {/* Edit Row */}
       {editing && (
-        <tr className="bg-blue-50 border-b">
+        <tr className="bg-blue-50 dark:bg-blue-900/20 border-b dark:border-gray-600">
           <td colSpan={8} className="p-4">
             <p className="text-xs font-medium text-gray-600 dark:text-gray-300 mb-2">
               Rediger tekst for treningsdata:
@@ -482,7 +484,7 @@ function FeedbackRow({
               value={editText}
               onChange={(e) => onEditChange(e.target.value)}
               rows={4}
-              className="w-full px-3 py-2 border border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm font-mono"
+              className="w-full px-3 py-2 border border-blue-300 dark:border-blue-600 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm font-mono dark:bg-gray-700 dark:text-gray-100"
             />
             <div className="flex gap-2 mt-2">
               <button
@@ -507,11 +509,13 @@ function FeedbackRow({
 
 function StatBadge({ label, value, color }) {
   const colors = {
-    yellow: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    green: 'bg-green-50 border-green-200 text-green-800',
-    red: 'bg-red-50 border-red-200 text-red-800',
-    blue: 'bg-blue-50 border-blue-200 text-blue-800',
-    gray: 'bg-gray-50 border-gray-200 text-gray-800',
+    yellow:
+      'bg-yellow-50 dark:bg-yellow-900/20 border-yellow-200 dark:border-yellow-700 text-yellow-800 dark:text-yellow-300',
+    green:
+      'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700 text-green-800 dark:text-green-300',
+    red: 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700 text-red-800 dark:text-red-300',
+    blue: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700 text-blue-800 dark:text-blue-300',
+    gray: 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600 text-gray-800 dark:text-gray-200',
   };
   return (
     <div className={`border rounded-lg p-3 text-center ${colors[color]}`}>

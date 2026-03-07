@@ -132,7 +132,7 @@ export default function PlaygroundTab() {
               onClick={() => setSideBySide(false)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 !sideBySide
-                  ? 'bg-white shadow-sm text-blue-700'
+                  ? 'bg-white dark:bg-gray-600 shadow-sm text-blue-700 dark:text-blue-300'
                   : 'text-gray-600 dark:text-gray-300'
               }`}
             >
@@ -142,7 +142,9 @@ export default function PlaygroundTab() {
             <button
               onClick={() => setSideBySide(true)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                sideBySide ? 'bg-white shadow-sm text-blue-700' : 'text-gray-600 dark:text-gray-300'
+                sideBySide
+                  ? 'bg-white dark:bg-gray-600 shadow-sm text-blue-700 dark:text-blue-300'
+                  : 'text-gray-600 dark:text-gray-300'
               }`}
             >
               <Columns className="w-4 h-4" />
@@ -225,7 +227,7 @@ export default function PlaygroundTab() {
 
       {/* Error display */}
       {testMutationA.isError && !resultA && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg text-sm text-red-800 dark:text-red-300">
           Feil: {testMutationA.error?.response?.data?.error || testMutationA.error?.message}
         </div>
       )}

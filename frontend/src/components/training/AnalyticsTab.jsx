@@ -44,7 +44,7 @@ function StatCard({ label, value, color = 'gray' }) {
   };
 
   return (
-    <div className="border rounded-lg p-4 text-center">
+    <div className="border dark:border-gray-600 rounded-lg p-4 text-center">
       <div className={`text-2xl font-bold ${colorClasses[color]}`}>{value}</div>
       <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{label}</div>
     </div>
@@ -271,8 +271,8 @@ export default function AnalyticsTab() {
           </h2>
 
           {comparison.some((c) => parseInt(c.total_feedback) < 30) && (
-            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm text-amber-800">
+            <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+              <p className="text-sm text-amber-800 dark:text-amber-300">
                 <AlertCircle className="w-4 h-4 inline mr-1" />
                 Statistisk usikre resultater — noen modeller har under 30 tilbakemeldinger. Vent til
                 flere data er samlet inn for palitelige sammenligninger.
@@ -316,10 +316,10 @@ export default function AnalyticsTab() {
                       <span
                         className={`px-2 py-0.5 rounded text-xs font-medium ${
                           parseFloat(c.approval_rate) >= 80
-                            ? 'bg-green-100 text-green-700'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
                             : parseFloat(c.approval_rate) >= 60
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-red-100 text-red-700'
+                              ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                              : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
                         }`}
                       >
                         {c.approval_rate}%
@@ -344,9 +344,11 @@ export default function AnalyticsTab() {
             </table>
           </div>
 
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800 font-medium mb-1">Modellruting (MODEL_ROUTING)</p>
-            <p className="text-xs text-blue-700">
+          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+            <p className="text-sm text-blue-800 dark:text-blue-300 font-medium mb-1">
+              Modellruting (MODEL_ROUTING)
+            </p>
+            <p className="text-xs text-blue-700 dark:text-blue-400">
               Oppgaver rutes automatisk til den best egnede modellen basert pa type: Norsk tekst
               &rarr; chiro-norwegian, Medisinsk &rarr; chiro-medical, Hurtig &rarr; chiro-fast,
               Generell &rarr; chiro-no. Konfigureres via miljovaribler.
@@ -476,7 +478,7 @@ export default function AnalyticsTab() {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b">
+                <tr className="border-b dark:border-gray-600">
                   <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
                     Tidspunkt
                   </th>
@@ -522,12 +524,12 @@ export default function AnalyticsTab() {
                     </td>
                     <td className="py-2 px-3">
                       {s.accepted === true && (
-                        <span className="text-green-700 bg-green-50 px-2 py-0.5 rounded text-xs">
+                        <span className="text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded text-xs">
                           Godkjent
                         </span>
                       )}
                       {s.accepted === false && (
-                        <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded text-xs">
+                        <span className="text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 px-2 py-0.5 rounded text-xs">
                           Avvist
                         </span>
                       )}
@@ -560,12 +562,12 @@ export default function AnalyticsTab() {
             {Object.entries(abTesting).map(([model, config]) => (
               <div
                 key={model}
-                className={`border rounded-lg p-4 ${config.enabled ? 'border-teal-300 bg-teal-50' : 'border-gray-200'}`}
+                className={`border rounded-lg p-4 ${config.enabled ? 'border-teal-300 dark:border-teal-700 bg-teal-50 dark:bg-teal-900/20' : 'border-gray-200 dark:border-gray-600'}`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-mono text-sm font-medium">{model}</span>
                   <span
-                    className={`px-2 py-0.5 rounded text-xs font-medium ${config.enabled ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}
+                    className={`px-2 py-0.5 rounded text-xs font-medium ${config.enabled ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}
                   >
                     {config.enabled ? 'Aktiv' : 'Inaktiv'}
                   </span>
@@ -593,15 +595,17 @@ export default function AnalyticsTab() {
             ))}
 
             {comparison.length >= 2 && (
-              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800 font-medium mb-1">Signifikansindikator</p>
+              <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-300 font-medium mb-1">
+                  Signifikansindikator
+                </p>
                 {comparison.every((c) => parseInt(c.total_feedback) >= 30) ? (
-                  <p className="text-xs text-green-700">
+                  <p className="text-xs text-green-700 dark:text-green-400">
                     Tilstrekkelig data for sammenligning (
                     {comparison.map((c) => c.total_feedback).join(' / ')} tilbakemeldinger)
                   </p>
                 ) : (
-                  <p className="text-xs text-amber-700">
+                  <p className="text-xs text-amber-700 dark:text-amber-400">
                     Utilstrekkelig data — trenger minst 30 tilbakemeldinger per modell (na:{' '}
                     {comparison.map((c) => c.total_feedback).join(' / ')})
                   </p>

@@ -26,6 +26,7 @@ import {
   CalendarClock,
 } from 'lucide-react';
 import { dashboardAPI, appointmentsAPI, followUpsAPI } from '../services/api';
+import { unwrap } from '../utils/api-helpers';
 import {
   useTranslation,
   formatDateWithWeekday,
@@ -72,8 +73,6 @@ export default function Dashboard() {
     queryFn: () => followUpsAPI.getPatientsNeedingFollowUp(),
   });
 
-  // Axios wraps response in .data, API wraps payload in {success, data}
-  const unwrap = (resp) => resp?.data?.data ?? resp?.data;
   const stats = unwrap(statsResponse);
   const appointments = unwrap(appointmentsResponse)?.appointments || [];
   const followUpRaw = unwrap(followUpPatientsResponse);

@@ -73,8 +73,9 @@ export default function PatientDetail() {
     queryFn: () => encountersAPI.getByPatient(id),
   });
 
-  const patient = patientResponse?.data;
-  const encounters = encountersResponse?.data?.encounters || [];
+  const patient = patientResponse?.data?.data || patientResponse?.data;
+  const encountersRaw = encountersResponse?.data?.data || encountersResponse?.data;
+  const encounters = encountersRaw?.encounters || [];
 
   // Update patient mutation
   const updateMutation = useMutation({

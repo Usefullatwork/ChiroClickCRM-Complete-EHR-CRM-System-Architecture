@@ -99,10 +99,10 @@ export default function PipelineTab() {
       <div
         className={`rounded-lg p-4 border ${
           pipelineRunning
-            ? 'bg-blue-50 border-blue-200'
+            ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-700'
             : pipelineFailed
-              ? 'bg-red-50 border-red-200'
-              : 'bg-green-50 border-green-200'
+              ? 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-700'
+              : 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-700'
         }`}
       >
         <div className="flex items-center gap-3">
@@ -228,12 +228,12 @@ export default function PipelineTab() {
           </button>
         </div>
         {triggerMutation.isError && (
-          <div className="mt-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+          <div className="mt-3 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg text-sm text-red-800 dark:text-red-300">
             {triggerMutation.error?.response?.data?.error || triggerMutation.error?.message}
           </div>
         )}
         {triggerMutation.isSuccess && (
-          <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
+          <div className="mt-3 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-700 rounded-lg text-sm text-green-800 dark:text-green-300">
             Trening startet{dryRun ? ' (torkjoring)' : ''}.
           </div>
         )}
@@ -325,14 +325,17 @@ export default function PipelineTab() {
           </h3>
           <div className="space-y-2">
             {status.modelVersions.map((v) => (
-              <div key={v.id} className="flex items-center justify-between border rounded-lg p-3">
+              <div
+                key={v.id}
+                className="flex items-center justify-between border dark:border-gray-600 rounded-lg p-3"
+              >
                 <div>
                   <span className="font-medium text-sm">{v.model_name}</span>
                   <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">
                     v{v.version}
                   </span>
                   {v.is_active && (
-                    <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">
+                    <span className="ml-2 px-2 py-0.5 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded text-xs">
                       Aktiv
                     </span>
                   )}
@@ -359,20 +362,22 @@ export default function PipelineTab() {
           RLAIF (AI-assistert feedback)
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-          <div className="border rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-blue-700">{rlaifStats?.totalPairs || 0}</div>
+          <div className="border dark:border-gray-600 rounded-lg p-4 text-center">
+            <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+              {rlaifStats?.totalPairs || 0}
+            </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Preferansepar generert
             </div>
           </div>
-          <div className="border rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-green-700">
+          <div className="border dark:border-gray-600 rounded-lg p-4 text-center">
+            <div className="text-2xl font-bold text-green-700 dark:text-green-400">
               {rlaifStats?.totalEvaluations || 0}
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">Evalueringer</div>
           </div>
-          <div className="border rounded-lg p-4 text-center">
-            <div className="text-2xl font-bold text-purple-700">
+          <div className="border dark:border-gray-600 rounded-lg p-4 text-center">
+            <div className="text-2xl font-bold text-purple-700 dark:text-purple-400">
               {rlaifStats?.avgQualityScore
                 ? `${(rlaifStats.avgQualityScore * 100).toFixed(0)}%`
                 : '-'}
@@ -401,11 +406,23 @@ export default function PipelineTab() {
 
 function StatusBadge({ status }) {
   const config = {
-    completed: { bg: 'bg-green-100 text-green-700', icon: CheckCircle2 },
-    failed: { bg: 'bg-red-100 text-red-700', icon: XCircle },
-    in_progress: { bg: 'bg-blue-100 text-blue-700', icon: RefreshCw },
-    pending: { bg: 'bg-yellow-100 text-yellow-700', icon: Clock },
-    rolled_back: { bg: 'bg-orange-100 text-orange-700', icon: RotateCcw },
+    completed: {
+      bg: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300',
+      icon: CheckCircle2,
+    },
+    failed: { bg: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300', icon: XCircle },
+    in_progress: {
+      bg: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300',
+      icon: RefreshCw,
+    },
+    pending: {
+      bg: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300',
+      icon: Clock,
+    },
+    rolled_back: {
+      bg: 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300',
+      icon: RotateCcw,
+    },
   };
   const c = config[status] || config.pending;
   const Icon = c.icon;

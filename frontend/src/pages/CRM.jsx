@@ -172,7 +172,8 @@ export default function CRM() {
           crmAPI.getWaitlist(),
           patientsAPI.getAll({ limit: 1000 }),
         ]);
-        const entries = wRes.data?.entries || wRes.data || [];
+        const wData = wRes.data?.data || wRes.data;
+        const entries = wData?.entries || (Array.isArray(wData) ? wData : []);
         setWaitlistData(
           entries.map((e) => ({
             id: e.id,
@@ -188,7 +189,8 @@ export default function CRM() {
             notificationsSent: e.notification_count || 0,
           }))
         );
-        const patients = pRes.data?.patients || pRes.data || [];
+        const pData = pRes.data?.data || pRes.data;
+        const patients = pData?.patients || (Array.isArray(pData) ? pData : []);
         setPatientsList(patients);
       } catch (err) {
         logger.error('Failed to fetch waitlist:', err);

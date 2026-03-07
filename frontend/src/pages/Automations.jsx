@@ -301,7 +301,8 @@ export default function Automations() {
   const executions = executionsData?.executions || [];
   const stats = statsData || {};
   const testPatients = patientsData?.data?.patients || [];
-  const staff = staffData?.data || [];
+  const staffRaw = staffData?.data?.data || staffData?.data;
+  const staff = Array.isArray(staffRaw) ? staffRaw : [];
 
   // Mutations
   const createMutation = useMutation({
