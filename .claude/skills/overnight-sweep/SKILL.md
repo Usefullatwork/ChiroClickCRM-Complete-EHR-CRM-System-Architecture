@@ -60,6 +60,28 @@ Search for WCAG violations in JSX files:
 - Inconsistent date/time formatting
 - Missing translations
 
+## Pass 9: MEDIUM — Tech Debt Scan
+
+Run the `/tech-debt` command scans:
+- Hardcoded Norwegian strings (i18n debt vs 676 baseline)
+- TODO/FIXME/HACK comments
+- Files >500 lines, functions >80 lines
+- Skipped tests without explanation
+
+## Pass 10: LOW — Dependency Audit
+
+Run the `/dep-audit` command:
+- `npm audit` on backend and frontend
+- Check for outdated major versions
+- Flag copyleft licenses in production deps
+
+## Pass 11: LOW — i18n Coverage
+
+Run the `/i18n-scan` command:
+- Count hardcoded Norwegian strings in frontend
+- Compare against 676-string baseline
+- Report regression or progress
+
 ## REPORT FORMAT
 
 Write the full report to `reports/weekly/sweep-{date}.md` with:
