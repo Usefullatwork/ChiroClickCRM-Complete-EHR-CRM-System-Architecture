@@ -3,7 +3,7 @@
  * Fixed sidebar with always-visible patient info + tabbed content area
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -62,9 +62,6 @@ export default function PatientDetail() {
   const { data: patientResponse, isLoading } = useQuery({
     queryKey: ['patient', id],
     queryFn: () => patientsAPI.getById(id),
-    onSuccess: (data) => {
-      setFormData(data.data);
-    },
   });
 
   // Fetch encounters
@@ -74,6 +71,13 @@ export default function PatientDetail() {
   });
 
   const patient = patientResponse?.data?.data || patientResponse?.data;
+
+  // Sync formData when patient data loads (replaces deprecated onSuccess)
+  useEffect(() => {
+    if (patientResponse?.data) {
+      setFormData(patientResponse.data?.data || patientResponse.data);
+    }
+  }, [patientResponse]);
   const encountersRaw = encountersResponse?.data?.data || encountersResponse?.data;
   const encounters = encountersRaw?.encounters || [];
 

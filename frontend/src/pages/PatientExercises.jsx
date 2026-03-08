@@ -5,10 +5,11 @@
  * Displays and manages patient's customized exercise programs
  */
 
-import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Dumbbell, Plus, Search, ChevronRight } from 'lucide-react';
+import { exercisesAPI } from '../services/api';
 
 /**
  * PatientExercises Component
@@ -19,18 +20,38 @@ import { Dumbbell, Plus, Search, ChevronRight } from 'lucide-react';
 export default function PatientExercises() {
   const { patientId } = useParams();
   const navigate = useNavigate();
-  const _queryClient = useQueryClient();
 
   // State for filters and search
-  // Tilstand for filtrering og sok
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
 
-  // Placeholder for exercise programs data
-  // Plassholder for treningsprogram-data
-  const exercisePrograms = [];
-  const isLoading = false;
+  // Fetch exercise programs from API
+  const { data: exercisesResponse, isLoading } = useQuery({
+    queryKey: ['patient-exercises', patientId],
+    queryFn: () => exercisesAPI.getPatientExercises(patientId),
+    enabled: !!patientId,
+  });
+
+  const allPrograms = exercisesResponse?.data?.data || exercisesResponse?.data || [];
+
+  // Filter programs based on search and filters
+  const exercisePrograms = useMemo(() => {
+    let filtered = Array.isArray(allPrograms) ? allPrograms : [];
+    if (searchTerm) {
+      const lower = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (p) => p.name?.toLowerCase().includes(lower) || p.description?.toLowerCase().includes(lower)
+      );
+    }
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter((p) => p.status?.toLowerCase() === statusFilter);
+    }
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter((p) => p.category?.toLowerCase() === categoryFilter);
+    }
+    return filtered;
+  }, [allPrograms, searchTerm, statusFilter, categoryFilter]);
 
   /**
    * Handle creating new exercise prescription

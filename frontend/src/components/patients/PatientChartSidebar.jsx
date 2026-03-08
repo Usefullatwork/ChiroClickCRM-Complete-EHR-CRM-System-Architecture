@@ -52,9 +52,9 @@ export default function PatientChartSidebar({
     : t?.('sidebar.none') || 'Ingen';
 
   const [needles, adjustments, neck] = [
-    getPref(patient.pref_needles),
-    getPref(patient.pref_adjustments),
-    getPref(patient.pref_neck),
+    getPref(patient.treatment_pref_needles),
+    getPref(patient.treatment_pref_adjustments),
+    getPref(patient.treatment_pref_neck_adjustments),
   ];
 
   return (

@@ -105,34 +105,34 @@ export default function NewPatient() {
 
     // Required fields
     if (!formData.solvit_id?.trim()) {
-      newErrors.solvit_id = 'SolvIt ID is required';
+      newErrors.solvit_id = t('validation.solvitIdRequired');
     }
     if (!formData.first_name?.trim()) {
-      newErrors.first_name = 'First name is required';
+      newErrors.first_name = t('validation.firstNameRequired');
     }
     if (!formData.last_name?.trim()) {
-      newErrors.last_name = 'Last name is required';
+      newErrors.last_name = t('validation.lastNameRequired');
     }
     if (!formData.date_of_birth) {
-      newErrors.date_of_birth = 'Date of birth is required';
+      newErrors.date_of_birth = t('validation.dobRequired');
     }
     if (!formData.gender) {
-      newErrors.gender = 'Gender is required';
+      newErrors.gender = t('validation.genderRequired');
     }
 
     // Date validation
     if (formData.date_of_birth && new Date(formData.date_of_birth) > new Date()) {
-      newErrors.date_of_birth = 'Date of birth cannot be in the future';
+      newErrors.date_of_birth = t('validation.dobFuture');
     }
 
     // Phone validation (Norwegian format)
     if (formData.phone && !/^(\+47)?[0-9]{8}$/.test(formData.phone.replace(/\s/g, ''))) {
-      newErrors.phone = 'Phone must be a valid Norwegian phone number (8 digits)';
+      newErrors.phone = t('validation.phoneInvalid');
     }
 
     // Email validation
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Email must be valid';
+      newErrors.email = t('validation.emailInvalid');
     }
 
     setErrors(newErrors);
@@ -187,13 +187,13 @@ export default function NewPatient() {
           <button
             onClick={() => navigate('/patients')}
             className="p-2 hover:bg-gray-100 rounded-lg"
-            aria-label="Back to patients"
+            aria-label={t('backToPatients')}
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{t('newPatient')}</h1>
-            <p className="text-gray-600 dark:text-gray-300">Create a new patient record</p>
+            <p className="text-gray-600 dark:text-gray-300">{t('newPatientDesc')}</p>
           </div>
         </div>
       </div>
@@ -203,7 +203,7 @@ export default function NewPatient() {
         <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
           <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
           <div>
-            <p className="font-semibold text-red-900">Error</p>
+            <p className="font-semibold text-red-900">{t('validation.error')}</p>
             <p className="text-red-800">{errors.general}</p>
           </div>
         </div>
@@ -212,10 +212,12 @@ export default function NewPatient() {
       {/* Form */}
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Basic Information */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <User className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-            <h2 className="text-lg font-semibold">{t('personalInfo')}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {t('personalInfo')}
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -246,7 +248,7 @@ export default function NewPatient() {
                   errors.gender ? 'border-red-500' : 'border-gray-300'
                 }`}
               >
-                <option value="">Select gender</option>
+                <option value="">{t('selectGender')}</option>
                 <option value="MALE">{t('male')}</option>
                 <option value="FEMALE">{t('female')}</option>
                 <option value="OTHER">{t('other')}</option>
@@ -310,27 +312,31 @@ export default function NewPatient() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('category')}
+              </label>
               <select
                 value={formData.category}
                 onChange={(e) => handleChange('category', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Not set</option>
+                <option value="">{t('notSet')}</option>
                 <option value="OSLO">Oslo</option>
-                <option value="OUTSIDE_OSLO">Outside Oslo</option>
-                <option value="TRAVELING">Traveling</option>
-                <option value="REFERRED">Referred</option>
+                <option value="OUTSIDE_OSLO">{t('outsideOslo')}</option>
+                <option value="TRAVELING">{t('traveling')}</option>
+                <option value="REFERRED">{t('referred')}</option>
               </select>
             </div>
           </div>
         </div>
 
         {/* Contact Information */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <Phone className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-            <h2 className="text-lg font-semibold">{t('contactInfo')}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+              {t('contactInfo')}
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -373,16 +379,18 @@ export default function NewPatient() {
                 onChange={(e) => handleChange('preferred_contact_method', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Not set</option>
+                <option value="">{t('notSet')}</option>
                 <option value="SMS">{t('sms')}</option>
                 <option value="EMAIL">{t('email')}</option>
                 <option value="PHONE">{t('phone')}</option>
-                <option value="NO_CONTACT">Do not contact</option>
+                <option value="NO_CONTACT">{t('noContact')}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Language</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('language')}
+              </label>
               <select
                 value={formData.language}
                 onChange={(e) => handleChange('language', e.target.value)}
@@ -397,15 +405,17 @@ export default function NewPatient() {
         </div>
 
         {/* Address */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <MapPin className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-            <h2 className="text-lg font-semibold">{t('address')}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('address')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('streetAddress')}
+              </label>
               <input
                 type="text"
                 value={formData.address.street}
@@ -442,10 +452,10 @@ export default function NewPatient() {
         </div>
 
         {/* Clinical Information */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex items-center gap-2 mb-4">
             <FileText className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-            <h2 className="text-lg font-semibold">{t('clinical')}</h2>
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-white">{t('clinical')}</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -463,25 +473,25 @@ export default function NewPatient() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Treatment Type (Behandlingstype)
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('treatmentType')}
               </label>
               <select
                 value={formData.treatment_type}
                 onChange={(e) => handleChange('treatment_type', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">Not set</option>
+                <option value="">{t('notSet')}</option>
                 <option value="KIROPRAKTOR">Kiropraktor</option>
                 <option value="NEVROBEHANDLING">Nevrobehandling</option>
                 <option value="MUSKELBEHANDLING">Muskelbehandling</option>
-                <option value="OTHER">Other</option>
+                <option value="OTHER">{t('other')}</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Preferred Therapist
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('preferredTherapist')}
               </label>
               <input
                 type="text"
@@ -493,8 +503,8 @@ export default function NewPatient() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Referral Source
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                {t('referralSource')}
               </label>
               <input
                 type="text"
@@ -519,8 +529,10 @@ export default function NewPatient() {
         </div>
 
         {/* Consent */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold mb-4">{t('consentGiven')}</h2>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+            {t('consentGiven')}
+          </h2>
 
           <div className="space-y-3">
             <label className="flex items-center gap-3">
@@ -530,7 +542,7 @@ export default function NewPatient() {
                 onChange={(e) => handleChange('consent_sms', e.target.checked)}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">Consent to SMS notifications</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{t('consentSms')}</span>
             </label>
 
             <label className="flex items-center gap-3">
@@ -540,7 +552,7 @@ export default function NewPatient() {
                 onChange={(e) => handleChange('consent_email', e.target.checked)}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">Consent to email notifications</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{t('consentEmail')}</span>
             </label>
 
             <label className="flex items-center gap-3">
@@ -550,7 +562,9 @@ export default function NewPatient() {
                 onChange={(e) => handleChange('consent_data_storage', e.target.checked)}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">Consent to data storage (GDPR required)</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                {t('consentDataStorage')}
+              </span>
             </label>
 
             <label className="flex items-center gap-3">
@@ -560,7 +574,9 @@ export default function NewPatient() {
                 onChange={(e) => handleChange('consent_marketing', e.target.checked)}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">Consent to marketing communications</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">
+                {t('consentMarketing')}
+              </span>
             </label>
 
             <label className="flex items-center gap-3">
@@ -570,7 +586,7 @@ export default function NewPatient() {
                 onChange={(e) => handleChange('consent_video_marketing', e.target.checked)}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">Consent to video marketing</span>
+              <span className="text-sm text-gray-700 dark:text-gray-300">{t('consentVideo')}</span>
             </label>
           </div>
         </div>
@@ -721,16 +737,16 @@ export default function NewPatient() {
             onClick={() => navigate('/patients')}
             className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
-            Cancel
+            {t('cancel')}
           </button>
           <button
             type="submit"
             data-testid="new-patient-submit"
             disabled={createMutation.isPending}
-            className="flex items-center gap-2 px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+            className="flex items-center gap-2 px-6 py-2 text-white bg-teal-600 rounded-lg hover:bg-teal-700 disabled:bg-gray-400"
           >
             <Save className="w-4 h-4" />
-            {createMutation.isPending ? 'Creating...' : t('createPatient')}
+            {createMutation.isPending ? t('creating') : t('createPatient')}
           </button>
         </div>
       </form>
