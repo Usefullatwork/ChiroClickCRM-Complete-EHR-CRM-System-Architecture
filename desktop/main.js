@@ -313,7 +313,9 @@ function createMenu() {
         {
           label: 'Documentation',
           click: () => {
-            shell.openExternal('https://github.com/ChiroClick/chiroclickehr/wiki');
+            if (mainWindow) {
+              mainWindow.loadURL(`http://localhost:${BACKEND_PORT}/help`);
+            }
           },
         },
         { type: 'separator' },
