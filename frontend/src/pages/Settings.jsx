@@ -11,6 +11,7 @@ import {
   Dumbbell,
   Loader2,
   ToggleLeft,
+  Package,
 } from 'lucide-react';
 import { organizationAPI, usersAPI, clinicalSettingsAPI } from '../services/api';
 import { useTranslation } from '../i18n';
@@ -29,6 +30,7 @@ const TrainingDataExport = lazy(() => import('../components/settings/TrainingDat
 const ClinicalSettings = lazy(() => import('../components/settings/ClinicalSettings'));
 const ExerciseSettings = lazy(() => import('../components/settings/ExerciseSettings'));
 const AutoAcceptSettings = lazy(() => import('../components/settings/AutoAcceptSettings'));
+const ModuleManager = lazy(() => import('../components/settings/ModuleManager'));
 
 // Default clinical preferences
 const DEFAULT_CLINICAL_PREFS = {
@@ -246,6 +248,12 @@ export default function Settings() {
       label: t('autoAccept'),
       activeClass: 'border-teal-600 text-teal-600',
     },
+    {
+      id: 'modules',
+      icon: Package,
+      label: t('moduleManagement', 'Modules'),
+      activeClass: 'border-teal-600 text-teal-600',
+    },
   ];
 
   return (
@@ -353,6 +361,8 @@ export default function Settings() {
         {activeTab === 'exercises' && <ExerciseSettings lang={lang} />}
 
         {activeTab === 'autoaccept' && <AutoAcceptSettings />}
+
+        {activeTab === 'modules' && <ModuleManager />}
       </Suspense>
 
       {/* Invite User Modal */}

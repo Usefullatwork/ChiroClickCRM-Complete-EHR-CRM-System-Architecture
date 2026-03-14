@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import DashboardLayout from './components/layouts/DashboardLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -8,6 +8,7 @@ import { setOrganizationId, getApiBaseUrl } from './services/api';
 import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
 import KeyboardShortcutsModal from './components/common/KeyboardShortcutsModal';
 import { useTranslation } from './i18n';
+import { FeatureModuleProvider, useFeatureModule } from './context/FeatureModuleContext';
 
 // Lazy load all pages for code splitting
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -67,6 +68,20 @@ function PageLoader() {
       </div>
     </div>
   );
+}
+
+function ModuleRoute({ module, children }) {
+  const { isModuleEnabled } = useFeatureModule();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isModuleEnabled(module)) {
+      navigate('/', { replace: true });
+    }
+  }, [module, isModuleEnabled, navigate]);
+
+  if (!isModuleEnabled(module)) return null;
+  return children;
 }
 
 function App() {
@@ -190,7 +205,9 @@ function App() {
           path="/"
           element={
             <Suspense fallback={<PageLoader />}>
-              <DashboardLayout />
+              <FeatureModuleProvider>
+                <DashboardLayout />
+              </FeatureModuleProvider>
             </Suspense>
           }
         >
@@ -294,7 +311,9 @@ function App() {
             path="communications"
             element={
               <PageErrorBoundary pageName={t('communications')}>
-                <Communications />
+                <ModuleRoute module="crm_marketing">
+                  <Communications />
+                </ModuleRoute>
               </PageErrorBoundary>
             }
           />
@@ -318,7 +337,9 @@ function App() {
             path="kpi"
             element={
               <PageErrorBoundary pageName={t('kpi')}>
-                <KPI />
+                <ModuleRoute module="analytics_reporting">
+                  <KPI />
+                </ModuleRoute>
               </PageErrorBoundary>
             }
           />
@@ -334,7 +355,9 @@ function App() {
             path="training"
             element={
               <PageErrorBoundary pageName={t('aiTraining')}>
-                <Training />
+                <ModuleRoute module="clinical_ai">
+                  <Training />
+                </ModuleRoute>
               </PageErrorBoundary>
             }
           />
@@ -350,7 +373,9 @@ function App() {
             path="templates"
             element={
               <PageErrorBoundary pageName={t('templates')}>
-                <Templates />
+                <ModuleRoute module="advanced_clinical">
+                  <Templates />
+                </ModuleRoute>
               </PageErrorBoundary>
             }
           />
@@ -366,7 +391,9 @@ function App() {
             path="crm"
             element={
               <PageErrorBoundary pageName={t('crm')}>
-                <CRM />
+                <ModuleRoute module="crm_marketing">
+                  <CRM />
+                </ModuleRoute>
               </PageErrorBoundary>
             }
           />
@@ -374,7 +401,9 @@ function App() {
             path="macros"
             element={
               <PageErrorBoundary pageName={t('macros')}>
-                <Macros />
+                <ModuleRoute module="advanced_clinical">
+                  <Macros />
+                </ModuleRoute>
               </PageErrorBoundary>
             }
           />
