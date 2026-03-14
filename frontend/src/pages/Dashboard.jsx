@@ -17,6 +17,7 @@ import {
   Bell,
   Brain,
   AlertCircle,
+  AlertTriangle,
   Mail,
   CreditCard,
   Activity,
@@ -198,11 +199,12 @@ export default function Dashboard() {
     {
       label: t('aiInsights'),
       value: stats?.aiRedFlags || 0,
-      icon: Brain,
-      bgClass: 'bg-teal-50',
-      iconClass: 'text-teal-600',
+      icon: AlertTriangle,
+      bgClass: (stats?.aiRedFlags || 0) > 0 ? 'bg-red-50' : 'bg-slate-50',
+      iconClass: (stats?.aiRedFlags || 0) > 0 ? 'text-red-600' : 'text-slate-400',
       trend: stats?.aiTrend,
       trendLabel: t('redFlagsToday'),
+      urgent: (stats?.aiRedFlags || 0) > 0,
     },
     {
       label: t('pendingFollowUps'),
@@ -328,6 +330,7 @@ export default function Dashboard() {
               iconClass={stat.iconClass}
               trend={stat.trend}
               trendLabel={stat.trendLabel}
+              urgent={stat.urgent}
             />
           ))}
         </div>

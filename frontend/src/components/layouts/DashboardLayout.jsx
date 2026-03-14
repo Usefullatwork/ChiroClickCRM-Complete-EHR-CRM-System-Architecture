@@ -26,6 +26,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { useTranslation } from '../../i18n';
+import { useFeatureModule } from '../../context/FeatureModuleContext';
 import LanguageSwitcher from '../LanguageSwitcher';
 import DesktopStatusBar from '../desktop/DesktopStatusBar';
 import useTheme from '../../hooks/useTheme';
@@ -72,17 +73,17 @@ const CORE_NAV = [
   { key: 'patients', href: '/patients', icon: Users },
   { key: 'calendar', href: '/calendar', icon: CalendarDays },
   { key: 'patientFlow', href: '/patient-flow', icon: Kanban },
-  { key: 'communications', href: '/communications', icon: MessageSquare },
+  { key: 'communications', href: '/communications', icon: MessageSquare, module: 'crm_marketing' },
   { key: 'followUps', href: '/follow-ups', icon: CheckCircle2 },
   { key: 'financial', href: '/financial', icon: DollarSign },
 ];
 
 // Admin items separated visually
 const ADMIN_NAV = [
-  { key: 'templates', href: '/templates', icon: BookOpen },
-  { key: 'macros', href: '/macros', icon: Zap },
-  { key: 'crm', href: '/crm', icon: HeartHandshake },
-  { key: 'aiTraining', href: '/training', icon: Brain },
+  { key: 'templates', href: '/templates', icon: BookOpen, module: 'advanced_clinical' },
+  { key: 'macros', href: '/macros', icon: Zap, module: 'advanced_clinical' },
+  { key: 'crm', href: '/crm', icon: HeartHandshake, module: 'crm_marketing' },
+  { key: 'aiTraining', href: '/training', icon: Brain, module: 'clinical_ai' },
   { key: 'settings', href: '/settings', icon: Settings },
 ];
 
@@ -115,6 +116,7 @@ export default function DashboardLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation('navigation');
+  const { isModuleEnabled } = useFeatureModule();
   const { isDark, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
@@ -205,7 +207,7 @@ export default function DashboardLayout() {
 
           <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Main navigation">
             <ul className="space-y-1">
-              {CORE_NAV.map((item) => (
+              {CORE_NAV.filter((i) => !i.module || isModuleEnabled(i.module)).map((item) => (
                 <NavItem
                   key={item.key}
                   item={item}
@@ -220,7 +222,7 @@ export default function DashboardLayout() {
               Admin
             </p>
             <ul className="space-y-1">
-              {ADMIN_NAV.map((item) => (
+              {ADMIN_NAV.filter((i) => !i.module || isModuleEnabled(i.module)).map((item) => (
                 <NavItem
                   key={item.key}
                   item={item}
@@ -272,7 +274,7 @@ export default function DashboardLayout() {
           {/* Navigation - Core */}
           <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Main navigation">
             <ul className="space-y-0.5">
-              {CORE_NAV.map((item) => (
+              {CORE_NAV.filter((i) => !i.module || isModuleEnabled(i.module)).map((item) => (
                 <NavItem key={item.key} item={item} isActive={isActive} t={t} />
               ))}
             </ul>
@@ -283,7 +285,7 @@ export default function DashboardLayout() {
               Admin
             </p>
             <ul className="space-y-0.5">
-              {ADMIN_NAV.map((item) => (
+              {ADMIN_NAV.filter((i) => !i.module || isModuleEnabled(i.module)).map((item) => (
                 <NavItem key={item.key} item={item} isActive={isActive} t={t} />
               ))}
             </ul>

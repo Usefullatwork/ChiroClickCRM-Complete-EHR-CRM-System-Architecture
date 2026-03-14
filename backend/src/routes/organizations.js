@@ -14,6 +14,8 @@ import {
   inviteUserSchema,
   updateOrganizationSettingsSchema,
 } from '../validators/organization.validators.js';
+import { query } from '../config/database.js';
+import logger from '../utils/logger.js';
 
 const router = express.Router();
 
@@ -385,5 +387,83 @@ router.get(
   validate(getOrganizationSchema),
   organizationController.checkOrganizationLimits
 );
+
+/**
+ * @swagger
+ * /organizations/{id}/modules:
+ *   patch:
+ *     summary: Update enabled modules for organization
+ *     tags: [Organizations]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               modules:
+ *                 type: object
+ *     responses:
+ *       200:
+ *         description: Modules updated
+ *       403:
+ *         description: Admin access required
+ */
+router.patch('/:id/modules', requireRole(['ADMIN']), async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { modules } = req.body;
+
+    const VALID_MODULES = [
+      'core_ehr',
+      'clinical_ai',
+      'exercise_rx',
+      'patient_portal',
+      'crm_marketing',
+      'advanced_clinical',
+      'analytics_reporting',
+      'multi_location',
+    ];
+
+    const invalidModules = Object.keys(modules || {}).filter((m) => !VALID_MODULES.includes(m));
+    if (invalidModules.length > 0) {
+      return res.status(400).json({ error: 'INVALID_MODULES', invalid: invalidModules });
+    }
+
+    if (modules && modules.core_ehr === false) {
+      return res.status(400).json({ error: 'CANNOT_DISABLE_CORE' });
+    }
+
+    const result = await query(
+      `UPDATE organizations
+       SET settings = jsonb_set(COALESCE(settings, '{}'::jsonb), '{enabled_modules}', $1::jsonb),
+           updated_at = NOW()
+       WHERE id = $2
+       RETURNING id, settings`,
+      [JSON.stringify(modules), id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Organization not found' });
+    }
+
+    const { clearModuleCache } = await import('../middleware/featureGate.js');
+    clearModuleCache(id);
+
+    res.json({ success: true, modules: result.rows[0].settings?.enabled_modules });
+  } catch (err) {
+    logger.error('Failed to update modules:', { error: err.message });
+    res.status(500).json({ error: 'Failed to update modules' });
+  }
+});
 
 export default router;
