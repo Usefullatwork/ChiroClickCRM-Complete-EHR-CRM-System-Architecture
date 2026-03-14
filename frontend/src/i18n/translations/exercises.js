@@ -130,6 +130,9 @@ export const exercises = {
     portalGreeting: 'Hi, {name}!',
     portalFooterContact: 'For questions, contact your practitioner',
     portalFooterBrand: 'ChiroClick EHR',
+    exerciseLoadError: 'Could not load exercises',
+    exerciseProgramSaved: 'Exercise program saved!',
+    exercisePdfError: 'Could not download PDF handout',
   },
   no: {
     title: 'Øvelser',
@@ -262,5 +265,8 @@ export const exercises = {
     portalGreeting: 'Hei, {name}!',
     portalFooterContact: 'Ved spørsmål, kontakt din behandler',
     portalFooterBrand: 'ChiroClick EHR',
+    exerciseLoadError: 'Kunne ikke laste øvelser',
+    exerciseProgramSaved: 'Øvelsesprogram lagret!',
+    exercisePdfError: 'Kunne ikke laste ned PDF-handout',
   },
 };

@@ -6,6 +6,7 @@
 import express from 'express';
 import * as crmController from '../controllers/crm.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import { requireModule } from '../middleware/featureGate.js';
 import validate from '../middleware/validation.js';
 import { asyncHandler } from '../middleware/errorHandler.js';
 import {
@@ -33,6 +34,7 @@ const router = express.Router();
 // All CRM routes require authentication and organization context
 router.use(requireAuth);
 router.use(requireOrganization);
+router.use(requireModule('crm_marketing'));
 
 /**
  * @swagger

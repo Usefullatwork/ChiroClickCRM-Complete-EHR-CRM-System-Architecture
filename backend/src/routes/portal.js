@@ -8,6 +8,7 @@
 import express from 'express';
 import { query } from '../config/database.js';
 import { requireAuth, requireOrganization } from '../middleware/auth.js';
+import { requireModule } from '../middleware/featureGate.js';
 import logger from '../utils/logger.js';
 import crypto from 'crypto';
 
@@ -30,6 +31,7 @@ router.get('/health', (req, res) => {
 // All routes below require practitioner/admin auth
 router.use(requireAuth);
 router.use(requireOrganization);
+router.use(requireModule('patient_portal'));
 
 /**
  * @swagger

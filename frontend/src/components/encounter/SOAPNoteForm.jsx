@@ -15,6 +15,7 @@ const ActivatorMethodPanel = lazy(() => import('../examination/ActivatorMethodPa
 const FacialLinesChart = lazy(() => import('../examination/FacialLinesChart'));
 import { DiagnosisPanel } from './DiagnosisPanel';
 import { TaksterPanel } from './TaksterPanel';
+import { useFeatureModule } from '../../context/FeatureModuleContext';
 
 // Lazy-load heavy sub-components (only rendered conditionally)
 const ExercisePanel = lazy(() => import('../exercises/ExercisePanel'));
@@ -83,6 +84,8 @@ export function SOAPNoteForm({
   suggestedCodes,
   suggestedCMTCode,
 }) {
+  const { isModuleEnabled } = useFeatureModule();
+
   // --- SECTION DEFINITIONS ---
 
   const subjectiveSection = (
@@ -599,55 +602,57 @@ export function SOAPNoteForm({
         />
 
         {/* Exercises & Advice */}
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm font-medium text-slate-700">Hjemme{'\u00F8'}velser</span>
-            <button
-              onClick={() => setShowExercisePanel(!showExercisePanel)}
+        {isModuleEnabled('exercise_rx') && (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-slate-700">Hjemme{'\u00F8'}velser</span>
+              <button
+                onClick={() => setShowExercisePanel(!showExercisePanel)}
+                disabled={isSigned}
+                className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors disabled:opacity-50 flex items-center gap-1.5"
+              >
+                <Activity className="w-3.5 h-3.5" />
+                {showExercisePanel ? 'Skjul \u00F8velsesbibliotek' : 'Velg fra bibliotek'}
+              </button>
+            </div>
+            {showExercisePanel && (
+              <Suspense
+                fallback={
+                  <div className="animate-pulse bg-green-50 rounded-lg h-24 border border-green-200" />
+                }
+              >
+                <div className="border border-green-200 rounded-lg overflow-hidden">
+                  <ExercisePanel
+                    patientId={patientId}
+                    encounterId={encounterId}
+                    onExercisesChange={(exercises) => {
+                      const exerciseText = exercises
+                        .map(
+                          (e) =>
+                            `${e.name_no || e.name_en}: ${e.sets || 3}x${e.reps || 10}, ${e.frequency || 'daglig'}`
+                        )
+                        .join('\n');
+                      updateField('plan', 'exercises', exerciseText);
+                    }}
+                    compact={true}
+                  />
+                </div>
+              </Suspense>
+            )}
+            <EnhancedClinicalTextarea
+              value={encounterData.plan.exercises}
+              onChange={(val) => updateField('plan', 'exercises', val)}
+              placeholder="Hjemme\u00F8velser og r\u00E5d... (eller velg fra biblioteket over)"
+              label="Hjemme\u00F8velser"
+              section="plan"
+              field="exercises"
               disabled={isSigned}
-              className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors disabled:opacity-50 flex items-center gap-1.5"
-            >
-              <Activity className="w-3.5 h-3.5" />
-              {showExercisePanel ? 'Skjul \u00F8velsesbibliotek' : 'Velg fra bibliotek'}
-            </button>
+              rows={3}
+              showVoiceInput={true}
+              showAIButton={false}
+            />
           </div>
-          {showExercisePanel && (
-            <Suspense
-              fallback={
-                <div className="animate-pulse bg-green-50 rounded-lg h-24 border border-green-200" />
-              }
-            >
-              <div className="border border-green-200 rounded-lg overflow-hidden">
-                <ExercisePanel
-                  patientId={patientId}
-                  encounterId={encounterId}
-                  onExercisesChange={(exercises) => {
-                    const exerciseText = exercises
-                      .map(
-                        (e) =>
-                          `${e.name_no || e.name_en}: ${e.sets || 3}x${e.reps || 10}, ${e.frequency || 'daglig'}`
-                      )
-                      .join('\n');
-                    updateField('plan', 'exercises', exerciseText);
-                  }}
-                  compact={true}
-                />
-              </div>
-            </Suspense>
-          )}
-          <EnhancedClinicalTextarea
-            value={encounterData.plan.exercises}
-            onChange={(val) => updateField('plan', 'exercises', val)}
-            placeholder="Hjemme\u00F8velser og r\u00E5d... (eller velg fra biblioteket over)"
-            label="Hjemme\u00F8velser"
-            section="plan"
-            field="exercises"
-            disabled={isSigned}
-            rows={3}
-            showVoiceInput={true}
-            showAIButton={false}
-          />
-        </div>
+        )}
 
         {/* Follow-up */}
         <div className="flex items-center gap-4 pt-3 border-t border-slate-100">

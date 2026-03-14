@@ -8,8 +8,10 @@ import { X, Dumbbell, AlertCircle, Check, Download, Loader2 } from 'lucide-react
 import ExerciseLibrary from './ExerciseLibrary';
 import ExercisePrescription from './ExercisePrescription';
 import api from '../../services/api';
+import { useTranslation } from '../../i18n';
 
 const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSaved }) => {
+  const { t } = useTranslation('exercises');
   // State
   const [exercises, setExercises] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -38,7 +40,7 @@ const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSa
       });
       setExercises(response.data.data || []);
     } catch (err) {
-      setError('Kunne ikke laste øvelser');
+      setError(t('exerciseLoadError', 'Kunne ikke laste øvelser'));
     } finally {
       setLoading(false);
     }
@@ -90,7 +92,7 @@ const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSa
         deliveryMethod: 'portal',
       });
 
-      setSuccess('Øvelsesprogram lagret!');
+      setSuccess(t('exerciseProgramSaved', 'Øvelsesprogram lagret!'));
       setTimeout(() => setSuccess(null), 3000);
 
       if (onPrescriptionSaved) {
@@ -248,7 +250,7 @@ const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSa
       setSuccess('PDF-handout lastet ned!');
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      setError('Kunne ikke laste ned PDF-handout');
+      setError(t('exercisePdfError', 'Kunne ikke laste ned PDF-handout'));
     } finally {
       setDownloadingPDF(false);
     }

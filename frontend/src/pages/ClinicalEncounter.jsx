@@ -78,17 +78,7 @@ const macros = {
   '.begr': 'Begrenset respons. Vurderer alternativ tiln\u00E6rming. ',
 };
 
-const keyboardShortcuts = {
-  'Ctrl+S': 'Lagre notat',
-  'Ctrl+Shift+S': 'Lagre og signer',
-  'Ctrl+1': 'G\u00E5 til Subjektivt',
-  'Ctrl+2': 'G\u00E5 til Objektivt',
-  'Ctrl+3': 'G\u00E5 til Vurdering',
-  'Ctrl+4': 'G\u00E5 til Plan',
-  'Ctrl+T': '\u00C5pne maler',
-  'Ctrl+L': 'SALT - Kopier fra forrige',
-  Esc: 'Lukk dialoger',
-};
+// keyboardShortcuts is now built inside the component via useMemo + t()
 
 // ---------------------------
 
@@ -150,6 +140,21 @@ export default function ClinicalEncounter() {
         t('qp_p_ergonomicGuidance'),
         t('qp_p_followUpOneWeek'),
       ],
+    }),
+    [t]
+  );
+
+  const keyboardShortcuts = useMemo(
+    () => ({
+      'Ctrl+S': t('shortcut_save', 'Lagre notat'),
+      'Ctrl+Shift+S': t('shortcut_saveAndSign', 'Lagre og signer'),
+      'Ctrl+1': t('shortcut_goToSubjective', 'Gå til Subjektivt'),
+      'Ctrl+2': t('shortcut_goToObjective', 'Gå til Objektivt'),
+      'Ctrl+3': t('shortcut_goToAssessment', 'Gå til Vurdering'),
+      'Ctrl+4': t('shortcut_goToPlan', 'Gå til Plan'),
+      'Ctrl+T': t('shortcut_openTemplates', 'Åpne maler'),
+      'Ctrl+L': t('shortcut_saltCopy', 'SALT - Kopier fra forrige'),
+      Esc: t('shortcut_closeDialogs', 'Lukk dialoger'),
     }),
     [t]
   );

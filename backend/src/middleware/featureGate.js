@@ -26,6 +26,7 @@ async function getOrgModules(organizationId) {
 export function requireModule(moduleName) {
   return async (req, res, next) => {
     if (moduleName === 'core_ehr') return next();
+    if (process.env.DEV_SKIP_AUTH === 'true') return next();
 
     const organizationId = req.user?.organization_id || req.user?.organizationId;
     if (!organizationId) {

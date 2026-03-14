@@ -30,6 +30,16 @@ export const clinical = {
     switchToSOAP: 'Switch to standard SOAP',
     riskLevel: 'Risk level',
     fillSoapForAI: 'Fill in subjective and objective findings for AI suggestions.',
+    // Keyboard shortcuts
+    shortcut_save: 'Save note',
+    shortcut_saveAndSign: 'Save and sign',
+    shortcut_goToSubjective: 'Go to Subjective',
+    shortcut_goToObjective: 'Go to Objective',
+    shortcut_goToAssessment: 'Go to Assessment',
+    shortcut_goToPlan: 'Go to Plan',
+    shortcut_openTemplates: 'Open templates',
+    shortcut_saltCopy: 'SALT - Copy from previous',
+    shortcut_closeDialogs: 'Close dialogs',
     // VestibularAssessment UI
     vestibularTabAnamnese: 'History',
     vestibularTabTesting: 'Testing',
@@ -336,6 +346,16 @@ export const clinical = {
     switchToSOAP: 'Bytt til standard SOAP',
     riskLevel: 'Risikonivå',
     fillSoapForAI: 'Fyll ut subjektive og objektive funn for AI-forslag.',
+    // Keyboard shortcuts
+    shortcut_save: 'Lagre notat',
+    shortcut_saveAndSign: 'Lagre og signer',
+    shortcut_goToSubjective: 'Gå til Subjektivt',
+    shortcut_goToObjective: 'Gå til Objektivt',
+    shortcut_goToAssessment: 'Gå til Vurdering',
+    shortcut_goToPlan: 'Gå til Plan',
+    shortcut_openTemplates: 'Åpne maler',
+    shortcut_saltCopy: 'SALT - Kopier fra forrige',
+    shortcut_closeDialogs: 'Lukk dialoger',
     // VestibularAssessment UI
     vestibularTabAnamnese: 'Anamnese',
     vestibularTabTesting: 'Testing',
