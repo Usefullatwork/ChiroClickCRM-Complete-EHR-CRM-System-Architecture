@@ -1,7 +1,8 @@
 /** @type {import('tailwindcss').Config} */
 
-// Colors used in dynamic class patterns throughout the codebase.
-// The safelist ensures Tailwind never purges these in production.
+// Targeted safelist for dynamic class patterns (StatusBadge, calendar type colors).
+// Only safelist colors/shades actually used in dynamic interpolation.
+// Reduced from 850+ to ~120 classes — rest are discovered statically by Tailwind.
 const safelistColors = [
   'blue',
   'green',
@@ -11,16 +12,9 @@ const safelistColors = [
   'red',
   'yellow',
   'amber',
-  'indigo',
-  'cyan',
-  'emerald',
-  'rose',
-  'violet',
-  'sky',
-  'pink',
   'gray',
 ];
-const safelistShades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900];
+const safelistShades = [50, 100, 500, 600, 700];
 
 function buildSafelist() {
   const list = [];
@@ -29,8 +23,6 @@ function buildSafelist() {
       list.push(`bg-${color}-${shade}`);
       list.push(`text-${color}-${shade}`);
       list.push(`border-${color}-${shade}`);
-      list.push(`hover:bg-${color}-${shade}`);
-      list.push(`hover:border-${color}-${shade}`);
     }
   }
   return list;
@@ -106,6 +98,21 @@ export default {
           DEFAULT: 'hsl(var(--info))',
           foreground: 'hsl(var(--info-foreground))',
         },
+      },
+      fontSize: {
+        caption: 'var(--text-caption)',
+        body: 'var(--text-body)',
+        heading: 'var(--text-heading)',
+        title: 'var(--text-title)',
+        display: 'var(--text-display)',
+      },
+      spacing: {
+        xs: 'var(--space-xs)',
+        'sm-token': 'var(--space-sm)',
+        'md-token': 'var(--space-md)',
+        'lg-token': 'var(--space-lg)',
+        'xl-token': 'var(--space-xl)',
+        '2xl-token': 'var(--space-2xl)',
       },
       borderRadius: {
         lg: 'var(--radius)',

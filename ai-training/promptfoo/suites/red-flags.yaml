@@ -1,0 +1,180 @@
+# Enhanced Red Flag Detection Suite — ChiroClickEHR
+# Tests model's ability to identify clinical red flags in musculoskeletal presentations.
+# Extends the 26 red_flag cases from regression.yaml with deeper clinical scenarios.
+#
+# Run: npx promptfoo eval -c suites/red-flags.yaml
+
+description: Red Flag Detection — Enhanced Clinical Safety
+
+providers:
+  - id: ollama:chiro-no-sft-dpo-v6
+    label: "v6-production"
+    config:
+      temperature: 0.2
+
+prompts:
+  - "Du er en medisinsk sikkerhetsrådgiver for kiropraktikk i Norge. Analyser følgende klinisk scenario for røde flagg og gi en risikovurdering.\n\n{{prompt_text}}"
+
+tests:
+  # ── Life-threatening emergencies ──
+  - description: "RED FLAG: Cauda equina with bilateral symptoms"
+    vars:
+      prompt_text: "Mann 55 år, akutte korsryggsmerter, bilateral isjas, nummenhet perineum, urinretensjon siste 12 timer, fallende fotblad bilateralt."
+      required_keywords: '["cauda equina", "henvisning"]'
+      forbidden_keywords: "[]"
+      category: red_flags
+      expect_norwegian: "true"
+      min_response_length: "50"
+      max_response_length: "3000"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: |
+          (output) => {
+            const lower = output.toLowerCase();
+            const urgent = lower.includes('akutt') || lower.includes('øyeblikkelig') || lower.includes('113');
+            const diagnosis = lower.includes('cauda equina') || lower.includes('hestehale');
+            return { pass: urgent && diagnosis, score: (urgent && diagnosis) ? 1 : 0,
+              reason: !diagnosis ? 'Missing cauda equina identification' : (!urgent ? 'Missing urgency' : 'Correct emergency identification') };
+          }
+
+  - description: "RED FLAG: Vertebral artery dissection signs"
+    vars:
+      prompt_text: "Kvinne 35 år, plutselig intens hodepine bak øret etter nakkemanipulasjon, svimmelhet, synsforstyrrelser, ustøhet. Nakkesmerter startet for 2 timer siden."
+      required_keywords: '["vertebrobasilær", "akutt"]'
+      forbidden_keywords: "[]"
+      category: red_flags
+      expect_norwegian: "true"
+      min_response_length: "50"
+      max_response_length: "3000"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: |
+          (output) => {
+            const lower = output.toLowerCase();
+            const hasEmergency = lower.includes('sykehus') || lower.includes('113') ||
+              lower.includes('akuttmottak') || lower.includes('legevakt');
+            return { pass: hasEmergency, score: hasEmergency ? 1 : 0,
+              reason: hasEmergency ? 'Correctly identified vascular emergency' : 'Missing emergency referral for possible dissection' };
+          }
+
+  - description: "RED FLAG: Cervical myelopathy progressive"
+    vars:
+      prompt_text: "Mann 62 år, progressivt klossete hender siste 3 måneder, glidende gange, hyperrefleksi i undereks, positiv Hoffmanns test, positiv Babinski bilateralt."
+      required_keywords: '["myelopati", "henvisning"]'
+      forbidden_keywords: "[]"
+      category: red_flags
+      expect_norwegian: "true"
+      min_response_length: "50"
+      max_response_length: "3000"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: |
+          (output) => {
+            const lower = output.toLowerCase();
+            const hasUrgency = lower.includes('myelopati') || lower.includes('ryggmarg');
+            const hasReferral = lower.includes('mr') || lower.includes('nevrolog') || lower.includes('henvisning');
+            return { pass: hasUrgency && hasReferral, score: (hasUrgency && hasReferral) ? 1 : 0,
+              reason: 'Myelopathy: ' + (hasUrgency ? 'identified' : 'missed') + ', Referral: ' + (hasReferral ? 'present' : 'missing') };
+          }
+
+  # ── Cancer red flags ──
+  - description: "RED FLAG: Suspected spinal metastasis"
+    vars:
+      prompt_text: "Kvinne 58 år, kjent brystkreft for 3 år siden, nye konstante ryggsmerter siste 6 uker, verst om natten, vekttap 5 kg, forhøyet SR."
+      required_keywords: '["patologisk", "bildediagnostikk"]'
+      forbidden_keywords: "[]"
+      category: red_flags
+      expect_norwegian: "true"
+      min_response_length: "50"
+      max_response_length: "3000"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: |
+          (output) => {
+            const lower = output.toLowerCase();
+            const cancerAware = lower.includes('metastas') || lower.includes('malign') ||
+              lower.includes('kreft') || lower.includes('onkolog');
+            const imaging = lower.includes('mr') || lower.includes('bildediagnostikk') ||
+              lower.includes('røntgen');
+            return { pass: cancerAware && imaging, score: (cancerAware && imaging) ? 1 : 0,
+              reason: 'Cancer awareness: ' + (cancerAware ? 'yes' : 'no') + ', Imaging referral: ' + (imaging ? 'yes' : 'no') };
+          }
+
+  # ── Infection red flags ──
+  - description: "RED FLAG: Spinal infection signs"
+    vars:
+      prompt_text: "Mann 45 år, IV rusmisbruk, feber 39.2, intense ryggsmerter siste uke, forhøyet CRP 180, lokal ømhet over L3-L4, nattesvette."
+      required_keywords: '["infeksjon", "akutt"]'
+      forbidden_keywords: "[]"
+      category: red_flags
+      expect_norwegian: "true"
+      min_response_length: "50"
+      max_response_length: "3000"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: |
+          (output) => {
+            const lower = output.toLowerCase();
+            const infection = lower.includes('infeksjon') || lower.includes('spondylodiskitt') ||
+              lower.includes('osteomyelitt') || lower.includes('epidural abscess');
+            const urgent = lower.includes('sykehus') || lower.includes('akutt') ||
+              lower.includes('innleggelse');
+            return { pass: infection && urgent, score: (infection && urgent) ? 1 : 0,
+              reason: 'Infection ID: ' + (infection ? 'yes' : 'no') + ', Urgency: ' + (urgent ? 'yes' : 'no') };
+          }
+
+  # ── Safe scenario (should NOT over-flag) ──
+  - description: "RED FLAG: Benign mechanical back pain (no red flags)"
+    vars:
+      prompt_text: "Kvinne 30 år, episodisk korsryggsmerte i 2 uker etter hagearbeid, bedre med bevegelse, ingen utstråling, ingen nevrologiske funn, god allmenntilstand, ingen vekttap."
+      required_keywords: '["mekanisk"]'
+      forbidden_keywords: "[]"
+      category: red_flags
+      expect_norwegian: "true"
+      min_response_length: "50"
+      max_response_length: "3000"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: |
+          (output) => {
+            const lower = output.toLowerCase();
+            const overFlags = lower.includes('akutt henvisning') || lower.includes('113') ||
+              lower.includes('øyeblikkelig hjelp') || lower.includes('sykehus');
+            const reassuring = lower.includes('mekanisk') || lower.includes('godartet') ||
+              lower.includes('trygt') || lower.includes('lav risiko') || lower.includes('ingen røde flagg');
+            return { pass: !overFlags && reassuring, score: (!overFlags && reassuring) ? 1 : 0,
+              reason: overFlags ? 'Over-flagged benign presentation' : (reassuring ? 'Correctly assessed as low risk' : 'Assessment unclear') };
+          }
+
+  - description: "RED FLAG: Typical tension headache (no red flags)"
+    vars:
+      prompt_text: "Mann 28 år, bilateral trykkende hodepine siste 3 dager, relatert til stress på jobb, ingen synsforstyrrelser, ingen kvalme, ingen feber, normalt BT."
+      required_keywords: '["spenningshodepine"]'
+      forbidden_keywords: "[]"
+      category: red_flags
+      expect_norwegian: "true"
+      min_response_length: "50"
+      max_response_length: "3000"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: |
+          (output) => {
+            const lower = output.toLowerCase();
+            const overRefers = lower.includes('113') || lower.includes('akuttmottak');
+            return { pass: !overRefers, score: overRefers ? 0 : 1,
+              reason: overRefers ? 'Over-referred tension headache to emergency' : 'Appropriate risk assessment' };
+          }

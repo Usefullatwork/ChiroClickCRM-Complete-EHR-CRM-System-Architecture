@@ -36,6 +36,17 @@ import {
 } from './guardrails.js';
 
 import { augmentWithRAG, ragService, RAG_ENABLED } from './ragRetrieval.js';
+import { recordLearning } from './sessionMemory.js';
+import {
+  SPELL_CHECK_PROMPT,
+  SOAP_PROMPTS,
+  buildDiagnosisPrompt,
+  RED_FLAG_PROMPT,
+  CLINICAL_SUMMARY_PROMPT,
+  JOURNAL_ORGANIZATION_PROMPT,
+  MERGE_NOTES_PROMPT,
+  SMS_CONSTRAINT,
+} from './systemPrompts.js';
 
 import axios from 'axios';
 
@@ -167,19 +178,19 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
 
   // Step 2: Augment with RAG context if enabled
   const { augmentedPrompt, ragContext } = useRAG
-    ? await augmentWithRAG(sanitizedPrompt, clinicalContext, { organizationId, patientId })
+    ? await augmentWithRAG(sanitizedPrompt, clinicalContext, {
+        organizationId,
+        patientId,
+        taskType,
+      })
     : { augmentedPrompt: sanitizedPrompt, ragContext: null };
 
   // Step 2b: Add length constraints for communication/SMS tasks
   let effectiveSystemPrompt = systemPrompt;
   if (taskType === 'patient_communication') {
-    const smsConstraint =
-      'VIKTIG: Skriv en kort SMS-melding. Maks 160 tegn (én SMS). ' +
-      'Bruk direkte, vennlig språk. Ingen hilsener, ingen signatur, bare selve meldingen. ' +
-      'Svar KUN med selve SMS-teksten.';
     effectiveSystemPrompt = effectiveSystemPrompt
-      ? `${effectiveSystemPrompt}\n\n${smsConstraint}`
-      : smsConstraint;
+      ? `${effectiveSystemPrompt}\n\n${SMS_CONSTRAINT}`
+      : SMS_CONSTRAINT;
   }
 
   // Step 3: Generate completion via AI provider
@@ -209,6 +220,9 @@ const generateCompletion = async (prompt, systemPrompt = null, options = {}) => 
       requestDurationMs: providerResult.durationMs || null,
       abVariant,
     }).catch((err) => logger.warn('Failed to log AI suggestion:', err.message));
+
+    // Record session learning (non-blocking)
+    recordLearning(organizationId, patientId, taskType, rawOutput, { confidence });
   }
 
   // Step 4: Filter output through guardrails
@@ -288,14 +302,10 @@ export const spellCheckNorwegian = async (text) => {
     return { original: text, corrected: text, hasChanges: false, aiAvailable: false };
   }
 
-  const systemPrompt = `Du er en norsk språkassistent som er spesialisert på kiropraktisk medisinsk terminologi.
-Korriger stavefeil og grammatiske feil i den følgende kliniske teksten.
-Behold alle medisinske fagtermer. Svar kun med den korrigerte teksten uten forklaringer.`;
-
   const prompt = `Korriger følgende tekst:\n\n${text}`;
 
   try {
-    const result = await generateCompletion(prompt, systemPrompt, {
+    const result = await generateCompletion(prompt, SPELL_CHECK_PROMPT, {
       maxTokens: 1000,
       temperature: 0.3,
       taskType: 'spell_check',
@@ -330,47 +340,24 @@ export const generateSOAPSuggestions = async (chiefComplaint, section = 'subject
     return { section, chiefComplaint, suggestion: '', aiAvailable: false };
   }
 
-  let systemPrompt;
-  let prompt;
-
-  switch (section) {
-    case 'subjective':
-      systemPrompt = `Du er en erfaren kiropraktor i Norge. Generer relevante subjektive funn basert på pasientens hovedplage.
-      Inkluder: sykehistorie, debut, smertebeskrivelse, forverrende/lindrende faktorer.
-      Skriv på norsk i punktform.`;
-      prompt = `Hovedplage: ${chiefComplaint}\n\nGenerer subjektive funn:`;
-      break;
-
-    case 'objective':
-      systemPrompt = `Du er en erfaren kiropraktor. Generer relevante objektive funn og tester basert på pasientens hovedplage.
-      Inkluder: observasjon, palpasjon, bevegelighet (ROM), ortopediske tester.
-      Skriv på norsk i punktform.`;
-      prompt = `Hovedplage: ${chiefComplaint}\n\nGenerer objektive funn:`;
-      break;
-
-    case 'assessment':
-      systemPrompt = `Du er en erfaren kiropraktor. Generer klinisk vurdering basert på pasientens hovedplage.
-      Inkluder: differensialdiagnose, prognose, klinisk resonnement.
-      Skriv på norsk.`;
-      prompt = `Hovedplage: ${chiefComplaint}\n\nGenerer vurdering:`;
-      break;
-
-    case 'plan':
-      systemPrompt = `Du er en erfaren kiropraktor. Generer behandlingsplan basert på pasientens hovedplage.
-      Inkluder: behandling, øvelser, råd, oppfølging.
-      Skriv på norsk i punktform.`;
-      prompt = `Hovedplage: ${chiefComplaint}\n\nGenerer plan:`;
-      break;
-
-    default:
-      return {
-        section,
-        chiefComplaint,
-        suggestion: '',
-        error: 'Invalid section',
-        aiAvailable: false,
-      };
+  const systemPrompt = SOAP_PROMPTS[section];
+  if (!systemPrompt) {
+    return {
+      section,
+      chiefComplaint,
+      suggestion: '',
+      error: 'Invalid section',
+      aiAvailable: false,
+    };
   }
+
+  const sectionLabels = {
+    subjective: 'subjektive funn',
+    objective: 'objektive funn',
+    assessment: 'vurdering',
+    plan: 'plan',
+  };
+  const prompt = `Hovedplage: ${chiefComplaint}\n\nGenerer ${sectionLabels[section]}:`;
 
   try {
     const result = await generateCompletion(prompt, systemPrompt, {
@@ -426,13 +413,7 @@ export const suggestDiagnosisCodes = async (soapData) => {
   }
 
   const codesText = availableCodes.map((c) => `${c.code} - ${c.description_no}`).join('\n');
-
-  const systemPrompt = `Du er en kiropraktor-assistent. Basert på kliniske funn, foreslå de mest relevante ICPC-2 diagnosekodene.
-
-Tilgjengelige ICPC-2 koder:
-${codesText}
-
-Svar kun med de mest relevante kodene (1-3 stykker) og en kort forklaring.`;
+  const systemPrompt = buildDiagnosisPrompt(codesText);
 
   const prompt = `Kliniske funn:
 Subjektivt: ${subjective?.chief_complaint || ''} ${subjective?.history || ''}
@@ -534,17 +515,6 @@ export const analyzeRedFlags = async (patientData, soapData) => {
     };
   }
 
-  const systemPrompt = `Du er en kiropraktor-sikkerhetsassistent. Analyser pasientdata og kliniske funn for røde flagg.
-
-Røde flagg inkluderer:
-- Malignitet (vekttap, nattlige smerter, tidligere kreft)
-- Infeksjon (feber, immunsuppresjon)
-- Cauda equina (blære-/tarmforstyrrelser, sadelformet nummenhet)
-- Fraktur (betydelig trauma, osteoporose)
-- Inflammatoriske tilstander (morgenstivhet, ung alder)
-
-Vurder om pasienten kan behandles sikkert eller bør henvises.`;
-
   const prompt = `Pasient:
 Alder: ${patientData.age || 'ukjent'}
 Sykehistorie: ${patientData.medical_history || 'ingen'}
@@ -561,7 +531,7 @@ ${redFlagsDetected.length > 0 ? `MERK: Følgende røde flagg ble oppdaget automa
 Analyser røde flagg og gi anbefaling:`;
 
   try {
-    const result = await generateCompletion(prompt, systemPrompt, {
+    const result = await generateCompletion(prompt, RED_FLAG_PROMPT, {
       maxTokens: 400,
       temperature: 0.4,
       taskType: 'red_flag_analysis',
@@ -626,9 +596,6 @@ export const generateClinicalSummary = async (encounter) => {
     return { summary: '', encounterId: encounter.id, aiAvailable: false };
   }
 
-  const systemPrompt = `Du er en kiropraktor-assistent. Generer et kort, profesjonelt klinisk sammendrag på norsk.
-Sammendraget skal være kortfattet og egnet for journalføring eller henvisningsbrev.`;
-
   const prompt = `Generer sammendrag av følgende konsultasjon:
 
 SUBJEKTIVT:
@@ -651,7 +618,7 @@ Oppfølging: ${encounter.plan?.follow_up || ''}
 Generer kort sammendrag (2-3 setninger):`;
 
   try {
-    const result = await generateCompletion(prompt, systemPrompt, {
+    const result = await generateCompletion(prompt, CLINICAL_SUMMARY_PROMPT, {
       maxTokens: 200,
       temperature: 0.6,
       taskType: 'clinical_summary',
@@ -703,119 +670,6 @@ export const organizeOldJournalNotes = async (noteContent, patientContext = {}) 
     };
   }
 
-  const systemPrompt = `Du er en erfaren kiropraktor-assistent som er ekspert på å organisere og strukturere gamle journalnotater.
-
-Din oppgave er å analysere ustrukturerte journalnotater og strukturere dem i et klinisk format MED utdrag av HANDLINGSOPPGAVER.
-
-STEG 1: Analyser og ekstraher informasjon
-- Identifiser datoer (konsultasjonsdato, symptomstart, etc.)
-- Ekstraher symptomer, plager og sykehistorie
-- Finn objektive funn, undersøkelser og tester
-- Identifiser diagnoser (ICPC-2/ICD-10 koder hvis nevnt)
-- Ekstraher behandling og tiltak
-- Finn oppfølging og plan
-
-STEG 2: Ekstraher HANDLINGSOPPGAVER (VIKTIG!)
-Identifiser alle oppgaver som må følges opp:
-- Oppfølgingsavtaler som skal bookes
-- Telefonsamtaler som må gjøres
-- Brev/epikrise som skal sendes
-- Resepter som skal fornyes
-- Henvisninger som trengs
-- Prøvesvar som må følges opp
-- Påminnelser til pasient
-
-For hver oppgave, identifiser:
-- Type (FOLLOW_UP, CALL_PATIENT, SEND_NOTE, PRESCRIPTION, REFERRAL, TEST_RESULT, REMINDER)
-- Tittel og beskrivelse
-- Tidsfrist hvis nevnt
-- Prioritet (LOW, MEDIUM, HIGH, URGENT)
-- Original tekst fra notatet
-
-STEG 3: Ekstraher KOMMUNIKASJONSHISTORIKK
-Finn tidligere kommunikasjon nevnt i notatet:
-- Telefonsamtaler (dato, innhold)
-- SMS/e-poster sendt/mottatt
-- Brev/epikriser sendt
-- Personlig kontakt
-
-STEG 4: Organiser i SOAP-format
-[samme som før]
-
-STEG 5: Identifiser MANGLENDE INFORMASJON
-Hva mangler for fullstendig klinisk dokumentasjon?
-
-Svar i JSON-format:
-{
-  "structured_data": {
-    "dates": ["YYYY-MM-DD"],
-    "chief_complaints": ["..."],
-    "symptoms": ["..."],
-    "findings": ["..."],
-    "diagnoses": ["..."],
-    "treatments": ["..."],
-    "follow_up": "..."
-  },
-  "soap": {
-    "subjective": {
-      "chief_complaint": "...",
-      "history": "...",
-      "aggravating_factors": "...",
-      "relieving_factors": "..."
-    },
-    "objective": {
-      "observation": "...",
-      "palpation": "...",
-      "rom": "...",
-      "ortho_tests": "...",
-      "measurements": {}
-    },
-    "assessment": {
-      "clinical_reasoning": "...",
-      "differential_diagnoses": ["..."],
-      "prognosis": "..."
-    },
-    "plan": {
-      "treatment": "...",
-      "home_exercises": "...",
-      "advice": "...",
-      "follow_up": "..."
-    }
-  },
-  "actionable_items": [
-    {
-      "type": "FOLLOW_UP",
-      "title": "Book oppfølging om 2 uker",
-      "description": "Pasient skal komme tilbake for kontroll",
-      "due_date": "YYYY-MM-DD",
-      "priority": "MEDIUM",
-      "original_text": "Kommer tilbake om 2 uker for kontroll"
-    }
-  ],
-  "communication_history": [
-    {
-      "type": "PHONE_CALL",
-      "date": "YYYY-MM-DD",
-      "direction": "OUTGOING",
-      "subject": "Oppfølging",
-      "content": "Ringte pasient ang. viderehenvising",
-      "original_text": "Ringte pasient 12.01"
-    }
-  ],
-  "missing_information": [
-    {
-      "field": "diagnosis_code",
-      "importance": "HIGH",
-      "can_be_inferred": true
-    }
-  ],
-  "tags": ["urgent", "referral_needed", "requires_callback"],
-  "suggested_encounter_type": "FOLLOWUP",
-  "suggested_date": "YYYY-MM-DD",
-  "confidence_score": 0.85,
-  "notes": "Eventuelle merknader om noteringen"
-}`;
-
   const prompt = `Pasientkontekst:
 Navn: ${patientContext.first_name || ''} ${patientContext.last_name || ''}
 Alder: ${patientContext.age || 'ukjent'}
@@ -831,7 +685,7 @@ VIKTIG: Identifiser ALLE handlingsoppgaver som må følges opp!
 Svar kun med JSON.`;
 
   try {
-    const completionResult = await generateCompletion(prompt, systemPrompt, {
+    const completionResult = await generateCompletion(prompt, JOURNAL_ORGANIZATION_PROMPT, {
       maxTokens: 2000,
       temperature: 0.4,
       taskType: 'journal_organization',
@@ -949,17 +803,6 @@ export const mergeOrganizedNotes = async (organizedNotes, patientContext = {}) =
     };
   }
 
-  const systemPrompt = `Du er en erfaren kiropraktor-assistent. Din oppgave er å samle og konsolidere flere journalnotater til en omfattende, kronologisk journalpost.
-
-Prinsipper:
-- Behold all viktig klinisk informasjon
-- Organiser kronologisk (eldst først)
-- Identifiser utviklingstrender (bedring/forverring)
-- Fjern duplikater
-- Lag et samlet klinisk bilde
-
-Svar i SOAP-format på norsk, med tydelig tidslinje.`;
-
   const notesText = organizedNotes
     .map(
       (note, index) =>
@@ -976,7 +819,7 @@ ${notesText}
 Lag ett samlet, kronologisk SOAP-notat som fanger hele pasienthistorikken.`;
 
   try {
-    const mergeResult = await generateCompletion(prompt, systemPrompt, {
+    const mergeResult = await generateCompletion(prompt, MERGE_NOTES_PROMPT, {
       maxTokens: 2000,
       temperature: 0.5,
       taskType: 'clinical_summary',

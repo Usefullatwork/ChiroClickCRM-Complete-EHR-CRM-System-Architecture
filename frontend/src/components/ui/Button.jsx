@@ -22,6 +22,8 @@ export const Button = ({
       'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 shadow-sm dark:bg-red-500 dark:hover:bg-red-600',
     outline:
       'border border-slate-200 hover:bg-slate-100 text-slate-900 dark:border-slate-600 dark:hover:bg-slate-700 dark:text-slate-100',
+    subtle:
+      'bg-slate-100 text-slate-700 hover:bg-slate-200 focus:ring-teal-500 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700',
   };
 
   const sizes = {
@@ -34,6 +36,7 @@ export const Button = ({
     <button
       className={`${baseStyle} ${variants[variant]} ${sizes[size]} ${className}`}
       disabled={disabled || loading}
+      aria-busy={loading || undefined}
       {...props}
     >
       {loading ? (

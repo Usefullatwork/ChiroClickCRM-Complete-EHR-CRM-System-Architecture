@@ -4,6 +4,8 @@
  */
 
 import logger from '../../utils/logger.js';
+import { buildTieredContext, TIERED_ENABLED } from './contextManager.js';
+import { getSessionContext } from './sessionMemory.js';
 
 const RAG_ENABLED = process.env.RAG_ENABLED !== 'false';
 
@@ -21,14 +23,40 @@ try {
  * @returns {{ augmentedPrompt: string, ragContext: object|null }}
  */
 export const augmentWithRAG = async (sanitizedPrompt, clinicalContext, options = {}) => {
-  const { organizationId, patientId } = options;
+  const { organizationId, patientId, taskType } = options;
 
+  let prompt = sanitizedPrompt;
+  let ragContext = null;
+
+  // Step 1: Add tiered patient context if enabled
+  if (TIERED_ENABLED && patientId && organizationId) {
+    try {
+      const tiered = await buildTieredContext(taskType || 'general', { patientId, organizationId });
+      if (tiered.contextText) {
+        prompt = `${tiered.contextText}\n\n${prompt}`;
+        logger.debug('Tiered context added', {
+          tiers: tiered.tiers,
+          tokenEstimate: tiered.tokenEstimate,
+        });
+      }
+
+      // Also inject session learnings
+      const sessionCtx = getSessionContext(organizationId, patientId);
+      if (sessionCtx) {
+        prompt = `${sessionCtx}\n\n${prompt}`;
+      }
+    } catch (tieredError) {
+      logger.warn('Tiered context load failed, continuing:', tieredError.message);
+    }
+  }
+
+  // Step 2: Add RAG context if enabled
   if (!RAG_ENABLED || !ragService || !organizationId) {
-    return { augmentedPrompt: sanitizedPrompt, ragContext: null };
+    return { augmentedPrompt: prompt, ragContext };
   }
 
   try {
-    const ragResult = await ragService.augmentPrompt(sanitizedPrompt, clinicalContext, {
+    const ragResult = await ragService.augmentPrompt(prompt, clinicalContext, {
       organizationId,
       patientId,
       maxChunks: 3,
@@ -52,7 +80,7 @@ export const augmentWithRAG = async (sanitizedPrompt, clinicalContext, options =
     logger.warn('RAG augmentation failed, proceeding without context:', ragError.message);
   }
 
-  return { augmentedPrompt: sanitizedPrompt, ragContext: null };
+  return { augmentedPrompt: prompt, ragContext };
 };
 
 export { ragService, RAG_ENABLED };
