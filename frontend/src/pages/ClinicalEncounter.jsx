@@ -45,60 +45,7 @@ const ComplianceScan = lazy(() => import('../components/clinical/Encounter/Compl
 
 // --- STATIC DATA ---
 
-const quickPhrases = {
-  subjective: [
-    'Bedring siden sist',
-    'Betydelig bedring',
-    'Ingen endring',
-    'Noe verre',
-    'Betydelig verre',
-    'Verre om morgenen',
-    'Verre om kvelden',
-    'Varierende gjennom dagen',
-    'Konstante smerter',
-    'Smerter ved l\u00F8ft',
-    'Smerter ved sitting',
-    'Smerter ved gange',
-    'Smerter ved b\u00F8ying',
-    'Stivhet etter hvile',
-    'Utstråling til ben',
-    'Utstråling til arm',
-    'Nummenhet/prikking',
-    'Hodepine assosiert',
-  ],
-  objective: [
-    'Normal ROM alle retninger',
-    'Redusert fleksjon',
-    'Redusert ekstensjon',
-    'Redusert rotasjon bilat',
-    'Redusert lateralfleksjon',
-    'Muskelspasme palperes',
-    'Triggerpunkt identifisert',
-    '\u00D8mhet over fasettledd',
-    'Segmentell dysfunksjon',
-    'Positiv SLR venstre',
-    'Positiv SLR h\u00F8yre',
-    'Negativ SLR bilat',
-    "Positiv Kemp's test",
-    'Positiv facettbelastning',
-  ],
-  assessment: [
-    'God respons p\u00E5 behandling',
-    'Moderat respons',
-    'Begrenset respons',
-    'Stabil tilstand',
-    'Progresjon som forventet',
-    'Vurderer henvisning',
-  ],
-  plan: [
-    'Fortsett n\u00E5v\u00E6rende behandlingsplan',
-    '\u00D8kt behandlingsfrekvens',
-    'Redusert behandlingsfrekvens',
-    'Hjemme\u00F8velser gjennomg\u00E5tt',
-    'Ergonomisk veiledning gitt',
-    'Kontroll om 1 uke',
-  ],
-};
+// quickPhrases is now built inside the component via useMemo + t()
 
 const macros = {
   '.bs': 'Bedring siden sist. ',
@@ -148,6 +95,65 @@ const keyboardShortcuts = {
 export default function ClinicalEncounter() {
   const { patientId, encounterId } = useParams();
   const { t } = useTranslation('clinical');
+
+  const quickPhrases = useMemo(
+    () => ({
+      subjective: [
+        t('qp_s_improvementSinceLast'),
+        t('qp_s_significantImprovement'),
+        t('qp_s_noChange'),
+        t('qp_s_somewhatWorse'),
+        t('qp_s_significantlyWorse'),
+        t('qp_s_worseInMorning'),
+        t('qp_s_worseInEvening'),
+        t('qp_s_varyingThroughDay'),
+        t('qp_s_constantPain'),
+        t('qp_s_painWithLifting'),
+        t('qp_s_painWithSitting'),
+        t('qp_s_painWithWalking'),
+        t('qp_s_painWithBending'),
+        t('qp_s_stiffnessAfterRest'),
+        t('qp_s_radiationToLeg'),
+        t('qp_s_radiationToArm'),
+        t('qp_s_numbnessOrTingling'),
+        t('qp_s_associatedHeadache'),
+      ],
+      objective: [
+        t('qp_o_normalRomAll'),
+        t('qp_o_reducedFlexion'),
+        t('qp_o_reducedExtension'),
+        t('qp_o_reducedRotationBilat'),
+        t('qp_o_reducedLateralFlexion'),
+        t('qp_o_muscleSpasm'),
+        t('qp_o_triggerPointIdentified'),
+        t('qp_o_facetJointTenderness'),
+        t('qp_o_segmentalDysfunction'),
+        t('qp_o_positiveSLRLeft'),
+        t('qp_o_positiveSLRRight'),
+        t('qp_o_negativeSLRBilat'),
+        t('qp_o_positiveKempsTest'),
+        t('qp_o_positiveFacetLoading'),
+      ],
+      assessment: [
+        t('qp_a_goodResponse'),
+        t('qp_a_moderateResponse'),
+        t('qp_a_limitedResponse'),
+        t('qp_a_stableCondition'),
+        t('qp_a_progressionAsExpected'),
+        t('qp_a_considerReferral'),
+      ],
+      plan: [
+        t('qp_p_continuePlan'),
+        t('qp_p_increasedFrequency'),
+        t('qp_p_reducedFrequency'),
+        t('qp_p_homeExercisesReviewed'),
+        t('qp_p_ergonomicGuidance'),
+        t('qp_p_followUpOneWeek'),
+      ],
+    }),
+    [t]
+  );
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 

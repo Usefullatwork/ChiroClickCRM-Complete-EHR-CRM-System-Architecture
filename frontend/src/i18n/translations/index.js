@@ -14,6 +14,7 @@ import { exercises } from './exercises';
 import { validation } from './validation';
 import { analytics } from './analytics';
 import { ai } from './ai';
+import { portal } from './portal';
 
 export const translations = {
   common,
@@ -32,4 +33,5 @@ export const translations = {
   validation,
   analytics,
   ai,
+  portal,
 };

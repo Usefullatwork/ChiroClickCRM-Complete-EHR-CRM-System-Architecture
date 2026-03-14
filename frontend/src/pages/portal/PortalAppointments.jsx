@@ -3,7 +3,7 @@
  * View upcoming, request new, cancel existing, past history
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Calendar,
@@ -17,27 +17,12 @@ import {
   History,
 } from 'lucide-react';
 import { patientPortalAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 import logger from '../../utils/logger';
-
-const VISIT_TYPE_LABELS = {
-  initial: 'Forstegangs',
-  follow_up: 'Oppfolging',
-  reassessment: 'Ny vurdering',
-  emergency: 'Akutt',
-  consultation: 'Konsultasjon',
-};
-
-const STATUS_STYLES = {
-  scheduled: { label: 'Planlagt', cls: 'bg-blue-100 text-blue-700' },
-  confirmed: { label: 'Bekreftet', cls: 'bg-green-100 text-green-700' },
-  checked_in: { label: 'Innsjekket', cls: 'bg-teal-100 text-teal-700' },
-  completed: { label: 'Gjennomfort', cls: 'bg-gray-100 text-gray-600 dark:text-gray-300' },
-  cancelled: { label: 'Avlyst', cls: 'bg-red-100 text-red-600' },
-  no_show: { label: 'Ikke mott', cls: 'bg-yellow-100 text-yellow-700' },
-};
 
 export default function PortalAppointments() {
   const navigate = useNavigate();
+  const { t } = useTranslation('appointments');
   const [loading, setLoading] = useState(true);
   const [appointments, setAppointments] = useState([]);
   const [error, setError] = useState(null);
@@ -51,6 +36,32 @@ export default function PortalAppointments() {
   });
   const [requestStatus, setRequestStatus] = useState(null);
 
+  const VISIT_TYPE_LABELS = useMemo(
+    () => ({
+      initial: t('portalVisitInitial'),
+      follow_up: t('portalVisitFollowUp'),
+      reassessment: t('portalVisitReassessment'),
+      emergency: t('portalVisitEmergency'),
+      consultation: t('portalVisitConsultation'),
+    }),
+    [t]
+  );
+
+  const STATUS_STYLES = useMemo(
+    () => ({
+      scheduled: { label: t('portalStatusScheduled'), cls: 'bg-blue-100 text-blue-700' },
+      confirmed: { label: t('portalStatusConfirmed'), cls: 'bg-green-100 text-green-700' },
+      checked_in: { label: t('portalStatusCheckedIn'), cls: 'bg-teal-100 text-teal-700' },
+      completed: {
+        label: t('portalStatusCompleted'),
+        cls: 'bg-gray-100 text-gray-600 dark:text-gray-300',
+      },
+      cancelled: { label: t('portalStatusCancelled'), cls: 'bg-red-100 text-red-600' },
+      no_show: { label: t('portalStatusNoShow'), cls: 'bg-yellow-100 text-yellow-700' },
+    }),
+    [t]
+  );
+
   useEffect(() => {
     loadAppointments();
   }, []);
@@ -62,7 +73,7 @@ export default function PortalAppointments() {
       setAppointments(res.data?.appointments || []);
     } catch (err) {
       logger.error('Failed to load appointments:', err);
-      setError('Kunne ikke laste timer');
+      setError(t('portalCouldNotLoad'));
     } finally {
       setLoading(false);
     }
@@ -77,7 +88,7 @@ export default function PortalAppointments() {
       );
     } catch (err) {
       logger.error('Failed to cancel appointment:', err);
-      setError('Kunne ikke avlyse timen');
+      setError(t('portalCancelFailed'));
     } finally {
       setCancelingId(null);
     }
@@ -129,14 +140,14 @@ export default function PortalAppointments() {
             <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
           <div className="flex-1">
-            <h1 className="font-bold text-gray-900">Mine timer</h1>
+            <h1 className="font-bold text-gray-900">{t('portalMyAppointments')}</h1>
           </div>
           <button
             onClick={() => setShowRequestForm(true)}
             className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            Be om time
+            {t('portalRequestAppointment')}
           </button>
         </div>
       </header>
@@ -156,7 +167,7 @@ export default function PortalAppointments() {
         {showRequestForm && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="font-semibold text-gray-900">Be om ny time</h2>
+              <h2 className="font-semibold text-gray-900">{t('portalRequestNew')}</h2>
               <button
                 onClick={() => {
                   setShowRequestForm(false);
@@ -171,16 +182,16 @@ export default function PortalAppointments() {
             {requestStatus === 'sent' ? (
               <div className="text-center py-4">
                 <CheckCircle className="w-10 h-10 text-green-500 mx-auto mb-2" />
-                <p className="font-medium text-gray-900">Foresprsel sendt!</p>
+                <p className="font-medium text-gray-900">{t('portalRequestSent')}</p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Klinikken tar kontakt for bekreftelse.
+                  {t('portalClinicConfirm')}
                 </p>
               </div>
             ) : (
               <form onSubmit={handleRequestAppointment} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Onsket dato
+                    {t('portalPreferredDate')}
                   </label>
                   <input
                     type="date"
@@ -195,7 +206,7 @@ export default function PortalAppointments() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Onsket tidspunkt
+                    {t('portalPreferredTime')}
                   </label>
                   <select
                     value={requestForm.preferredTime}
@@ -204,20 +215,20 @@ export default function PortalAppointments() {
                     }
                     className="w-full px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                   >
-                    <option value="">Fleksibel</option>
-                    <option value="morning">Morgen (08-12)</option>
-                    <option value="afternoon">Ettermiddag (12-16)</option>
-                    <option value="evening">Kveld (16-18)</option>
+                    <option value="">{t('portalFlexible')}</option>
+                    <option value="morning">{t('portalMorning')}</option>
+                    <option value="afternoon">{t('portalAfternoon')}</option>
+                    <option value="evening">{t('portalEvening')}</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Grunn for timen
+                    {t('portalAppointmentReason')}
                   </label>
                   <textarea
                     value={requestForm.reason}
                     onChange={(e) => setRequestForm((f) => ({ ...f, reason: e.target.value }))}
-                    placeholder="Beskriv kort hva timen gjelder..."
+                    placeholder={t('portalReasonPlaceholder')}
                     rows={3}
                     className="w-full px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base resize-none"
                   />
@@ -230,16 +241,14 @@ export default function PortalAppointments() {
                   {requestStatus === 'sending' ? (
                     <>
                       <Loader2 className="w-4 h-4 animate-spin" />
-                      Sender...
+                      {t('portalSending')}
                     </>
                   ) : (
-                    'Send foresprsel'
+                    t('portalSendRequest')
                   )}
                 </button>
                 {requestStatus === 'error' && (
-                  <p className="text-sm text-red-600 text-center">
-                    Kunne ikke sende foresprsel. Prov igjen.
-                  </p>
+                  <p className="text-sm text-red-600 text-center">{t('portalSendFailed')}</p>
                 )}
               </form>
             )}
@@ -249,12 +258,12 @@ export default function PortalAppointments() {
         {/* Upcoming appointments */}
         <div>
           <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 px-1 mb-3">
-            Kommende timer
+            {t('portalUpcoming')}
           </h2>
           {upcoming.length === 0 ? (
             <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-gray-100">
               <Calendar className="w-12 h-12 text-gray-200 mx-auto mb-3" />
-              <p className="text-gray-500 dark:text-gray-400">Ingen kommende timer</p>
+              <p className="text-gray-500 dark:text-gray-400">{t('portalNoUpcoming')}</p>
             </div>
           ) : (
             <div className="space-y-3">
@@ -281,7 +290,7 @@ export default function PortalAppointments() {
                           <span>
                             {VISIT_TYPE_LABELS[appt.visit_type] ||
                               appt.visit_type ||
-                              'Konsultasjon'}
+                              t('portalVisitConsultation')}
                           </span>
                         </div>
                         <span
@@ -299,7 +308,7 @@ export default function PortalAppointments() {
                           {cancelingId === appt.id ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
-                            'Avlys'
+                            t('portalCancel')
                           )}
                         </button>
                       )}
@@ -319,7 +328,8 @@ export default function PortalAppointments() {
               className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-gray-700 px-1 mb-3"
             >
               <History className="w-4 h-4" />
-              {showPast ? 'Skjul' : 'Vis'} tidligere timer ({past.length})
+              {showPast ? t('portalHidePast') : t('portalShowPast')} {t('portalPastAppointments')} (
+              {past.length})
             </button>
             {showPast && (
               <div className="space-y-2">
@@ -341,7 +351,7 @@ export default function PortalAppointments() {
                           </p>
                           <p className="text-xs text-gray-500 dark:text-gray-400">
                             {appt.appointment_time?.slice(0, 5)} &bull;{' '}
-                            {VISIT_TYPE_LABELS[appt.visit_type] || 'Konsultasjon'}
+                            {VISIT_TYPE_LABELS[appt.visit_type] || t('portalVisitConsultation')}
                           </p>
                         </div>
                         <span
@@ -361,7 +371,7 @@ export default function PortalAppointments() {
 
       {/* Footer */}
       <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-300">
-        <p>Ved sporsmal, kontakt din behandler</p>
+        <p>{t('portalFooterContact')}</p>
       </footer>
     </div>
   );
