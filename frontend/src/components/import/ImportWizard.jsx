@@ -608,7 +608,7 @@ export default function ImportWizard({
           <Alert variant="warning">
             <div className="flex items-center justify-between">
               <span>{importResults.errors.length} errors occurred during import</span>
-              <Button variant="ghost" size="sm" onClick={() => setShowErrorsModal(true)}>
+              <Button variant="subtle" size="sm" onClick={() => setShowErrorsModal(true)}>
                 {t.importResults.viewErrors}
               </Button>
             </div>

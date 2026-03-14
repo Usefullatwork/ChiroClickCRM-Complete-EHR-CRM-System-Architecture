@@ -845,10 +845,10 @@ export default function CSVColumnMapper({
                   </div>
                 </div>
                 <div className="flex gap-2">
-                  <Button variant="ghost" size="sm" icon={RefreshCw} onClick={handleAutoDetect}>
+                  <Button variant="subtle" size="sm" icon={RefreshCw} onClick={handleAutoDetect}>
                     {t.autoDetect}
                   </Button>
-                  <Button variant="ghost" size="sm" icon={Trash2} onClick={handleClearMappings}>
+                  <Button variant="subtle" size="sm" icon={Trash2} onClick={handleClearMappings}>
                     {t.clearMappings}
                   </Button>
                   <Button

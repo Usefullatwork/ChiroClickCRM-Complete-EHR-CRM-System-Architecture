@@ -237,7 +237,7 @@ export const KPIDashboard = () => {
               {/* Date navigator */}
               <div className="flex items-center gap-3">
                 <Button
-                  variant="ghost"
+                  variant="subtle"
                   size="sm"
                   onClick={() =>
                     timeRange === 'month' ? handleMonthChange(-1) : handleYearChange(-1)
@@ -249,7 +249,7 @@ export const KPIDashboard = () => {
                   {formatDateRange()}
                 </span>
                 <Button
-                  variant="ghost"
+                  variant="subtle"
                   size="sm"
                   onClick={() =>
                     timeRange === 'month' ? handleMonthChange(1) : handleYearChange(1)

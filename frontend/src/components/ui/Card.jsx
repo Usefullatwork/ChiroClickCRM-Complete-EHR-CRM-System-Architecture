@@ -1,6 +1,6 @@
 export const Card = ({ children, className = '', hover = false }) => (
   <div
-    className={`bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm ${hover ? 'hover:shadow-md transition-shadow' : ''} ${className}`}
+    className={`bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-soft-sm ${hover ? 'hover:shadow-soft transition-shadow' : ''} ${className}`}
   >
     {children}
   </div>
