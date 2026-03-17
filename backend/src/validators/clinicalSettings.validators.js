@@ -57,3 +57,20 @@ export const updateTestSettingsSchema = {
 export const updateLetterSettingsSchema = {
   body: Joi.object().min(1),
 };
+
+/**
+ * Panel configuration validation
+ */
+const panelItemSchema = Joi.object({
+  id: Joi.string().required(),
+  visible: Joi.boolean().required(),
+  order: Joi.number().integer().min(0).required(),
+  pinned: Joi.boolean().default(false),
+});
+
+export const updatePanelConfigSchema = {
+  body: Joi.object({
+    panels: Joi.array().items(panelItemSchema).min(1).required(),
+    presetName: Joi.string().max(100).allow('').default(''),
+  }),
+};

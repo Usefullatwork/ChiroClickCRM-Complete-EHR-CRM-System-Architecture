@@ -342,6 +342,8 @@ import aiCostRoutes from './routes/aiCost.js';
 import batchRoutes from './routes/batch.js';
 import mobileRoutes from './routes/mobile.js';
 import auditLogRoutes from './routes/auditLogs.js';
+import slashCommandRoutes from './routes/slashCommands.js';
+import complianceRulesRoutes from './routes/complianceRules.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
@@ -386,6 +388,8 @@ app.use(`/api/${API_VERSION}/batch`, batchRoutes);
 app.use(`/api/${API_VERSION}/errors`, errorReportRoutes);
 app.use(`/api/${API_VERSION}/mobile`, mobileRoutes);
 app.use(`/api/${API_VERSION}/audit-logs`, auditLogRoutes);
+app.use(`/api/${API_VERSION}/slash-commands`, slashCommandRoutes);
+app.use(`/api/${API_VERSION}/compliance-rules`, complianceRulesRoutes);
 
 // Portal routes (public - no auth required for patient access)
 app.use(`/api/${API_VERSION}/portal`, portalRoutes);
