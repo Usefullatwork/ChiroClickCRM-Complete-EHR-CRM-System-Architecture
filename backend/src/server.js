@@ -28,6 +28,12 @@ import { correlationId } from './middleware/correlationId.js';
 // Load environment variables
 const _result = dotenv.config();
 
+// CRITICAL: Refuse to start if DEV_SKIP_AUTH is enabled in production
+if (process.env.NODE_ENV === 'production' && process.env.DEV_SKIP_AUTH === 'true') {
+  logger.error('FATAL: DEV_SKIP_AUTH=true is not allowed in production. Aborting.');
+  process.exit(1);
+}
+
 // Initialize Express app
 const app = express();
 const httpServer = createServer(app);

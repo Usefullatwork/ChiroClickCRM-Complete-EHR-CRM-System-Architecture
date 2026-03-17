@@ -22,7 +22,9 @@ export const DOMAIN_EVENTS = {
   // ============================================================================
   // CLINICAL EVENTS
   // ============================================================================
+  ENCOUNTER_CREATED: 'encounter.created',
   ENCOUNTER_STARTED: 'encounter.started',
+  ENCOUNTER_SIGNED: 'encounter.signed',
   ENCOUNTER_COMPLETED: 'encounter.completed',
   ENCOUNTER_AMENDED: 'encounter.amended',
   TREATMENT_PRESCRIBED: 'treatment.prescribed',
@@ -209,6 +211,16 @@ export const EventFactory = {
     new DomainEvent(DOMAIN_EVENTS.MODEL_TRAINING_COMPLETED, { modelName, metrics }, metadata),
 
   // Clinical Events
+  encounterCreated: (encounterId, patientId, encounterType, metadata) =>
+    new DomainEvent(
+      DOMAIN_EVENTS.ENCOUNTER_CREATED,
+      { encounterId, patientId, encounterType },
+      metadata
+    ),
+
+  encounterSigned: (encounterId, patientId, signedBy, metadata) =>
+    new DomainEvent(DOMAIN_EVENTS.ENCOUNTER_SIGNED, { encounterId, patientId, signedBy }, metadata),
+
   encounterCompleted: (encounterId, patientId, diagnoses, treatments, metadata) =>
     new DomainEvent(
       DOMAIN_EVENTS.ENCOUNTER_COMPLETED,
