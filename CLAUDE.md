@@ -121,7 +121,7 @@ Full endpoint docs at `/api-docs` (Swagger).
 ## Current State
 
 - **Backend**: 2,059 tests (87 suites), 0 lint errors
-- **Frontend**: 974 tests (45 suites), 0 lint errors
+- **Frontend**: 974 tests (45 suites), 0 lint errors, 0 failures
 - **E2E**: 88 tests (11 Playwright specs)
 - **CI**: All 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
 - **GDPR**: 55 tests pass (erasure, access, portability, consent audit trail)
