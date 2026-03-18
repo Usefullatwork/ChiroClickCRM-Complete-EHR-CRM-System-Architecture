@@ -13,6 +13,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { ChevronRight, ChevronDown, ChevronUp, Eye, Edit, Trash2 } from 'lucide-react';
 import useMediaQuery from '../../hooks/useMediaQuery';
+import { useTranslation } from '../../i18n';
 
 /**
  * ResponsiveTable Component
@@ -37,7 +38,7 @@ export default function ResponsiveTable({
   onView,
   onEdit,
   onDelete,
-  emptyMessage = 'Ingen data funnet',
+  emptyMessage,
   loading = false,
   keyField = 'id',
   mobileView = 'auto',
@@ -45,6 +46,8 @@ export default function ResponsiveTable({
   striped = false,
   className = '',
 }) {
+  const { t } = useTranslation('common');
+  const resolvedEmptyMessage = emptyMessage || t('noDataFound', 'Ingen data funnet');
   const { isMobile, _isTablet } = useMediaQuery();
   const scrollRef = useRef(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -101,7 +104,9 @@ export default function ResponsiveTable({
       <div className={`bg-white rounded-lg border border-gray-200 ${className}`}>
         <div className="p-8 text-center">
           <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
-          <p className="mt-2 text-gray-500 dark:text-gray-400">Laster data...</p>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">
+            {t('loadingData', 'Laster data...')}
+          </p>
         </div>
       </div>
     );
@@ -111,7 +116,9 @@ export default function ResponsiveTable({
   if (data.length === 0) {
     return (
       <div className={`bg-white rounded-lg border border-gray-200 ${className}`}>
-        <div className="p-8 text-center text-gray-500 dark:text-gray-400">{emptyMessage}</div>
+        <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+          {resolvedEmptyMessage}
+        </div>
       </div>
     );
   }
@@ -191,7 +198,7 @@ export default function ResponsiveTable({
                           className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors min-h-[44px]"
                         >
                           <Eye className="w-4 h-4" />
-                          Vis
+                          {t('view', 'Vis')}
                         </button>
                       )}
                       {onEdit && (
@@ -203,7 +210,7 @@ export default function ResponsiveTable({
                           className="flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 active:bg-gray-300 transition-colors min-h-[44px]"
                         >
                           <Edit className="w-4 h-4" />
-                          Rediger
+                          {t('edit', 'Rediger')}
                         </button>
                       )}
                       {onDelete && (
@@ -266,7 +273,7 @@ export default function ResponsiveTable({
               ))}
               {hasActions && (
                 <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider w-24 sm:w-32">
-                  <span className="sr-only">Handlinger</span>
+                  <span className="sr-only">{t('actionsScreenReader', 'Handlinger')}</span>
                 </th>
               )}
             </tr>
@@ -302,7 +309,7 @@ export default function ResponsiveTable({
                             onView(row);
                           }}
                           className="p-2 text-gray-500 dark:text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
-                          title="Vis"
+                          title={t('view', 'Vis')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -314,7 +321,7 @@ export default function ResponsiveTable({
                             onEdit(row);
                           }}
                           className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
-                          title="Rediger"
+                          title={t('edit', 'Rediger')}
                         >
                           <Edit className="w-4 h-4" />
                         </button>
@@ -326,7 +333,7 @@ export default function ResponsiveTable({
                             onDelete(row);
                           }}
                           className="p-2 text-gray-500 dark:text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center"
-                          title="Slett"
+                          title={t('delete', 'Slett')}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -350,7 +357,7 @@ export default function ResponsiveTable({
 export function ResponsiveDataList({
   items = [],
   renderItem,
-  emptyMessage = 'Ingen elementer funnet',
+  emptyMessage,
   loading = false,
   keyField = 'id',
   className = '',

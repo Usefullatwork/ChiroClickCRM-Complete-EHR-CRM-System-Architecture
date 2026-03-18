@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { formatDate, formatPhone, calculateAge } from '../../lib/utils';
 import StatusBadge from '../ui/StatusBadge';
+import { useTranslation } from '../../i18n';
 
 const PREF_ICONS = {
   ok: ['text-green-600', '\u2713'],
@@ -33,9 +34,17 @@ export default function PatientChartSidebar({
   encounters = [],
   isEditing,
   onNavigate,
-  t,
-  lang,
+  t: tProp,
+  lang: langProp,
 }) {
+  const { t: tHook } = useTranslation('patients');
+  const t = (key, fallback) => {
+    if (tProp) {
+      const result = tProp(key);
+      if (result && result !== key) return result;
+    }
+    return tHook(key, fallback);
+  };
   if (!patient) return null;
 
   const age = calculateAge(patient.date_of_birth);
@@ -49,7 +58,7 @@ export default function PatientChartSidebar({
       : '-';
   const nextAppointment = patient.next_appointment
     ? formatDate(patient.next_appointment)
-    : t?.('sidebar.none') || 'Ingen';
+    : t('sidebarNone', 'Ingen');
 
   const [needles, adjustments, neck] = [
     getPref(patient.pref_needles),
@@ -68,7 +77,7 @@ export default function PatientChartSidebar({
           {patient.first_name} {patient.last_name}
         </h2>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          {age != null && `${age} ${t?.('sidebar.years') || 'ar'}`}
+          {age != null && `${age} ${t('sidebarYears', 'år')}`}
           {patient.solvit_id && ` \u00b7 ID: ${patient.solvit_id}`}
         </p>
         <div className="mt-1.5">
@@ -86,8 +95,8 @@ export default function PatientChartSidebar({
           <a
             href={`tel:${patient.phone}`}
             className="p-2 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 dark:bg-teal-900/30 dark:text-teal-300 dark:hover:bg-teal-900/50 transition-colors"
-            title={t?.('sidebar.call') || 'Ring'}
-            aria-label={t?.('sidebar.call') || 'Ring'}
+            title={t('sidebarCall', 'Ring')}
+            aria-label={t('sidebarCall', 'Ring')}
           >
             <Phone className="w-4 h-4" />
           </a>
@@ -95,24 +104,24 @@ export default function PatientChartSidebar({
         <button
           onClick={() => onNavigate(`/patients/${patient.id}/communications`)}
           className="p-2 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 dark:bg-teal-900/30 dark:text-teal-300 dark:hover:bg-teal-900/50 transition-colors"
-          title={t?.('sidebar.sms') || 'SMS'}
-          aria-label={t?.('sidebar.sms') || 'SMS'}
+          title={t('sidebarSms', 'SMS')}
+          aria-label={t('sidebarSms', 'SMS')}
         >
           <MessageSquare className="w-4 h-4" />
         </button>
         <button
           onClick={() => onNavigate(`/appointments/new?patient=${patient.id}`)}
           className="p-2 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 dark:bg-teal-900/30 dark:text-teal-300 dark:hover:bg-teal-900/50 transition-colors"
-          title={t?.('sidebar.book') || 'Bestill time'}
-          aria-label={t?.('sidebar.book') || 'Bestill time'}
+          title={t('sidebarBook', 'Bestill time')}
+          aria-label={t('sidebarBook', 'Bestill time')}
         >
           <Calendar className="w-4 h-4" />
         </button>
         <button
           onClick={() => onNavigate(`/patients/${patient.id}/encounter`)}
           className="p-2 rounded-lg bg-teal-50 text-teal-700 hover:bg-teal-100 dark:bg-teal-900/30 dark:text-teal-300 dark:hover:bg-teal-900/50 transition-colors"
-          title={t?.('sidebar.journal') || 'Journal'}
-          aria-label={t?.('sidebar.journal') || 'Journal'}
+          title={t('sidebarJournal', 'Journal')}
+          aria-label={t('sidebarJournal', 'Journal')}
         >
           <FileText className="w-4 h-4" />
         </button>
@@ -124,7 +133,7 @@ export default function PatientChartSidebar({
           <div className="rounded-lg bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800 p-3">
             <div className="flex items-center gap-1.5 text-red-700 dark:text-red-400 text-sm font-medium mb-1">
               <AlertTriangle className="w-4 h-4" />
-              {t?.('sidebar.redFlags') || 'Rode flagg'}
+              {t('sidebarRedFlags', 'Røde flagg')}
             </div>
             <ul className="space-y-0.5">
               {patient.red_flags.map((flag, i) => (
@@ -138,7 +147,7 @@ export default function PatientChartSidebar({
           <div className="rounded-lg bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-800 p-3 flex items-center gap-1.5">
             <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
             <span className="text-sm text-green-700 dark:text-green-300">
-              {t?.('sidebar.noRedFlags') || 'Ingen rode flagg'}
+              {t('sidebarNoRedFlags', 'Ingen røde flagg')}
             </span>
           </div>
         )}
@@ -147,7 +156,7 @@ export default function PatientChartSidebar({
       {/* Contact Info */}
       <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700 space-y-1.5">
         <h3 className="text-xs font-medium text-gray-400 dark:text-gray-300 uppercase tracking-wider mb-2">
-          {t?.('sidebar.contact') || 'Kontakt'}
+          {t('sidebarContact', 'Kontakt')}
         </h3>
         {patient.phone && (
           <p className="text-sm text-gray-700 dark:text-gray-300 flex items-center gap-2">
@@ -163,7 +172,7 @@ export default function PatientChartSidebar({
         )}
         {patient.preferred_contact && (
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            {t?.('sidebar.preferred') || 'Foretrukket'}: {patient.preferred_contact}
+            {t('sidebarPreferred', 'Foretrukket')}: {patient.preferred_contact}
           </p>
         )}
       </div>
@@ -171,20 +180,20 @@ export default function PatientChartSidebar({
       {/* Treatment Preferences */}
       <div className="px-5 py-4 border-b border-gray-200 dark:border-gray-700">
         <h3 className="text-xs font-medium text-gray-400 dark:text-gray-300 uppercase tracking-wider mb-2">
-          {t?.('sidebar.preferences') || 'Preferanser'}
+          {t('sidebarPreferences', 'Preferanser')}
         </h3>
         <div className="space-y-1">
           <p className="text-sm text-gray-700 dark:text-gray-300">
             <span className={`font-medium ${needles[0]}`}>{needles[1]}</span>{' '}
-            {t?.('sidebar.prefNeedles') || 'Naler'}
+            {t('sidebarPrefNeedles', 'Nåler')}
           </p>
           <p className="text-sm text-gray-700 dark:text-gray-300">
             <span className={`font-medium ${adjustments[0]}`}>{adjustments[1]}</span>{' '}
-            {t?.('sidebar.prefAdjustments') || 'Justeringer'}
+            {t('sidebarPrefAdjustments', 'Justeringer')}
           </p>
           <p className="text-sm text-gray-700 dark:text-gray-300">
             <span className={`font-medium ${neck[0]}`}>{neck[1]}</span>{' '}
-            {t?.('sidebar.prefNeck') || 'Nakkemanipulasjon'}
+            {t('sidebarPrefNeck', 'Nakkemanipulasjon')}
           </p>
         </div>
       </div>
@@ -192,31 +201,29 @@ export default function PatientChartSidebar({
       {/* Quick Stats */}
       <div className="px-5 py-4">
         <h3 className="text-xs font-medium text-gray-400 dark:text-gray-300 uppercase tracking-wider mb-2">
-          {t?.('sidebar.stats') || 'Statistikk'}
+          {t('sidebarStats', 'Statistikk')}
         </h3>
         <dl className="space-y-1.5 text-sm">
           <div className="flex justify-between">
             <dt className="text-gray-500 dark:text-gray-400">
-              {t?.('sidebar.totalVisits') || 'Besok totalt'}
+              {t('sidebarTotalVisits', 'Besøk totalt')}
             </dt>
             <dd className="font-medium text-gray-900 dark:text-white">{totalVisits}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-gray-500 dark:text-gray-400">
-              {t?.('sidebar.lastVisit') || 'Siste besok'}
+              {t('sidebarLastVisit', 'Siste besøk')}
             </dt>
             <dd className="font-medium text-gray-900 dark:text-white">{lastVisit}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-gray-500 dark:text-gray-400">
-              {t?.('sidebar.nextAppt') || 'Neste time'}
+              {t('sidebarNextAppt', 'Neste time')}
             </dt>
             <dd className="font-medium text-gray-900 dark:text-white">{nextAppointment}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-gray-500 dark:text-gray-400">
-              {t?.('sidebar.status') || 'Status'}
-            </dt>
+            <dt className="text-gray-500 dark:text-gray-400">{t('sidebarStatus', 'Status')}</dt>
             <dd>
               <StatusBadge status={patient.status || 'active'} size="xs" />
             </dd>

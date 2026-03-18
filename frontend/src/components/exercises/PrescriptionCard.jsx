@@ -6,6 +6,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslation } from '../../i18n';
 import {
   GripVertical,
   Trash2,
@@ -54,6 +55,7 @@ const PrescriptionCard = ({
   getDifficultyLabel,
 }) => {
   const [_showNotes, _setShowNotes] = useState(false);
+  const { t } = useTranslation('exercises');
 
   // Helper to increment/decrement values
   const adjustValue = (field, currentValue, delta, min = 1, max = 100) => {
@@ -126,7 +128,7 @@ const PrescriptionCard = ({
                   onClick={onMoveUp}
                   disabled={!canMoveUp}
                   className="p-1.5 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed"
-                  title="Flytt opp"
+                  title={t('moveUp', 'Flytt opp')}
                 >
                   <ChevronUp className="w-4 h-4" />
                 </button>
@@ -134,21 +136,21 @@ const PrescriptionCard = ({
                   onClick={onMoveDown}
                   disabled={!canMoveDown}
                   className="p-1.5 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed"
-                  title="Flytt ned"
+                  title={t('moveDown', 'Flytt ned')}
                 >
                   <ChevronDown className="w-4 h-4" />
                 </button>
                 <button
                   onClick={onToggleExpand}
                   className={`p-1.5 rounded transition-colors ${isExpanded ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 text-gray-500 dark:text-gray-400'}`}
-                  title="Rediger"
+                  title={t('editBtn', 'Rediger')}
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button
                   onClick={onRemove}
                   className="p-1.5 hover:bg-red-50 rounded text-gray-400 dark:text-gray-300 hover:text-red-500"
-                  title="Fjern"
+                  title={t('remove', 'Fjern')}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -268,7 +270,7 @@ const PrescriptionCard = ({
           {(exercise.instructions_norwegian || exercise.instructions) && (
             <div className="pt-4">
               <h5 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-                Standard instruksjoner
+                {t('standardInstructions', 'Standard instruksjoner')}
               </h5>
               <p className="text-sm text-gray-700 bg-white p-3 rounded-lg border border-gray-200">
                 {exercise.instructions_norwegian || exercise.instructions}
@@ -279,12 +281,15 @@ const PrescriptionCard = ({
           {/* Custom Instructions */}
           <div>
             <h5 className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
-              Spesielle instruksjoner til pasienten
+              {t('specialInstructionsForPatient', 'Spesielle instruksjoner til pasienten')}
             </h5>
             <textarea
               value={exercise.customInstructions || ''}
               onChange={(e) => onUpdate('customInstructions', e.target.value)}
-              placeholder="Legg til egne instruksjoner eller tilpasninger for denne pasienten..."
+              placeholder={t(
+                'customInstructionsPlaceholder',
+                'Legg til egne instruksjoner eller tilpasninger for denne pasienten...'
+              )}
               rows={3}
               className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
             />

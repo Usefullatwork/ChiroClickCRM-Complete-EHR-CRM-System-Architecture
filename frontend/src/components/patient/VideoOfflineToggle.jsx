@@ -24,54 +24,9 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { useOffline } from '../../hooks/useOffline';
+import { useTranslation } from '../../i18n';
 
 import logger from '../../utils/logger';
-// =============================================================================
-// TRANSLATIONS
-// =============================================================================
-
-const TRANSLATIONS = {
-  no: {
-    saveForOffline: 'Lagre for frakoblet bruk',
-    removeOffline: 'Fjern fra frakoblet',
-    downloading: 'Laster ned...',
-    saved: 'Lagret',
-    savingVideo: 'Lagrer video for frakoblet bruk',
-    removingVideo: 'Fjerner fra frakoblet lagring',
-    videoSaved: 'Video lagret for frakoblet bruk',
-    videoRemoved: 'Video fjernet fra frakoblet lagring',
-    downloadAll: 'Last ned alle videoer',
-    removeAll: 'Fjern alle videoer',
-    storageUsed: 'brukt',
-    offlineAvailable: 'Tilgjengelig frakoblet',
-    notAvailableOffline: 'Ikke tilgjengelig frakoblet',
-    downloadFailed: 'Kunne ikke laste ned video',
-    noVideos: 'Ingen videoer a laste ned',
-    videosToDownload: 'videoer kan lastes ned',
-    videoCached: 'video lagret',
-    videosCached: 'videoer lagret',
-  },
-  en: {
-    saveForOffline: 'Save for offline',
-    removeOffline: 'Remove offline',
-    downloading: 'Downloading...',
-    saved: 'Saved',
-    savingVideo: 'Saving video for offline use',
-    removingVideo: 'Removing from offline storage',
-    videoSaved: 'Video saved for offline use',
-    videoRemoved: 'Video removed from offline storage',
-    downloadAll: 'Download all videos',
-    removeAll: 'Remove all videos',
-    storageUsed: 'used',
-    offlineAvailable: 'Available offline',
-    notAvailableOffline: 'Not available offline',
-    downloadFailed: 'Failed to download video',
-    noVideos: 'No videos to download',
-    videosToDownload: 'videos can be downloaded',
-    videoCached: 'video saved',
-    videosCached: 'videos saved',
-  },
-};
 
 // =============================================================================
 // SINGLE VIDEO TOGGLE
@@ -98,7 +53,7 @@ export function VideoOfflineToggle({
   onCached,
   onRemoved,
 }) {
-  const t = TRANSLATIONS[lang] || TRANSLATIONS.no;
+  const { t } = useTranslation('exercises');
 
   const { cacheVideo, removeCachedVideo, checkVideoCached, isOnline } = useOffline();
 
@@ -135,7 +90,7 @@ export function VideoOfflineToggle({
       } else {
         // Add to cache
         if (!isOnline) {
-          setError(t.downloadFailed);
+          setError(t('downloadFailed', 'Kunne ikke laste ned video'));
           return;
         }
 
@@ -146,12 +101,12 @@ export function VideoOfflineToggle({
             onCached(videoUrl, exerciseId);
           }
         } else {
-          setError(t.downloadFailed);
+          setError(t('downloadFailed', 'Kunne ikke laste ned video'));
         }
       }
     } catch (err) {
       logger.error('Error toggling video cache:', err);
-      setError(t.downloadFailed);
+      setError(t('downloadFailed', 'Kunne ikke laste ned video'));
     } finally {
       setIsLoading(false);
     }
@@ -179,7 +134,7 @@ export function VideoOfflineToggle({
             ${isLoading ? 'opacity-50 cursor-wait' : ''}
             ${!isOnline && !isCached ? 'opacity-50 cursor-not-allowed' : ''}
           `}
-          title={isCached ? t.saved : t.saveForOffline}
+          title={isCached ? t('saved', 'Lagret') : t('saveForOffline', 'Lagre for frakoblet bruk')}
         >
           {isLoading ? (
             <Loader2 className="w-5 h-5 animate-spin" />
@@ -195,7 +150,9 @@ export function VideoOfflineToggle({
       return (
         <label className="flex items-center gap-3 cursor-pointer">
           <span className="text-sm text-gray-700">
-            {isCached ? t.offlineAvailable : t.saveForOffline}
+            {isCached
+              ? t('offlineAvailable', 'Tilgjengelig frakoblet')
+              : t('saveForOffline', 'Lagre for frakoblet bruk')}
           </span>
           <button
             onClick={handleToggle}
@@ -242,17 +199,17 @@ export function VideoOfflineToggle({
             {isLoading ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                {t.downloading}
+                {t('downloading', 'Laster ned...')}
               </>
             ) : isCached ? (
               <>
                 <Check className="w-4 h-4" />
-                {t.saved}
+                {t('saved', 'Lagret')}
               </>
             ) : (
               <>
                 <Download className="w-4 h-4" />
-                {t.saveForOffline}
+                {t('saveForOffline', 'Lagre for frakoblet bruk')}
               </>
             )}
           </button>
@@ -281,7 +238,7 @@ export function VideoOfflineToggle({
  * @param {string} props.lang - Language
  */
 export function VideoOfflineManager({ exercises, lang = 'no' }) {
-  const t = TRANSLATIONS[lang] || TRANSLATIONS.no;
+  const { t } = useTranslation('exercises');
 
   const {
     isOnline,
@@ -376,19 +333,22 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
             <Video className="w-5 h-5 text-blue-600" />
           </div>
           <div>
-            <h3 className="font-medium text-gray-900">Frakoblet video</h3>
+            <h3 className="font-medium text-gray-900">{t('offlineVideo', 'Frakoblet video')}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {cachedUrls.size > 0 ? (
                 <>
-                  {cachedUrls.size} {cachedUrls.size === 1 ? t.videoCached : t.videosCached}
+                  {cachedUrls.size}{' '}
+                  {cachedUrls.size === 1
+                    ? t('videoCached', 'video lagret')
+                    : t('videosCached', 'videoer lagret')}
                   {cachedVideoSize > 0 && (
                     <span className="ml-1">
-                      ({formatSize(cachedVideoSize)} {t.storageUsed})
+                      ({formatSize(cachedVideoSize)} {t('storageUsed', 'brukt')})
                     </span>
                   )}
                 </>
               ) : (
-                `${videosWithUrls.length} ${t.videosToDownload}`
+                `${videosWithUrls.length} ${t('videosToDownload', 'videoer kan lastes ned')}`
               )}
             </p>
           </div>
@@ -441,7 +401,7 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
             ) : (
               <Download className="w-4 h-4" />
             )}
-            {t.downloadAll} ({uncachedCount})
+            {t('downloadAll', 'Last ned alle videoer')} ({uncachedCount})
           </button>
         )}
 
@@ -460,7 +420,7 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
             ) : (
               <Trash2 className="w-4 h-4" />
             )}
-            {t.removeAll}
+            {t('removeAll', 'Fjern alle videoer')}
           </button>
         )}
       </div>
@@ -470,7 +430,7 @@ export function VideoOfflineManager({ exercises, lang = 'no' }) {
         <div className="mt-3 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
           <HardDrive className="w-3 h-3" />
           <span>
-            {formatSize(cachedVideoSize)} {t.storageUsed}
+            {formatSize(cachedVideoSize)} {t('storageUsed', 'brukt')}
           </span>
         </div>
       )}

@@ -12,137 +12,7 @@
  */
 
 import { useState, useMemo } from 'react';
-
-// =============================================================================
-// TRANSLATIONS
-// =============================================================================
-
-const TRANSLATIONS = {
-  en: {
-    treatmentPlan: 'Treatment Plan',
-    newPlan: 'New Treatment Plan',
-    editPlan: 'Edit Plan',
-    activePlan: 'Active Plan',
-    completedPlans: 'Completed Plans',
-    noPlan: 'No active treatment plan',
-    createPlan: 'Create Treatment Plan',
-    diagnosis: 'Diagnosis',
-    chiefComplaint: 'Chief Complaint',
-    startDate: 'Start Date',
-    expectedDuration: 'Expected Duration',
-    weeks: 'weeks',
-    totalVisits: 'Total Visits',
-    visitsCompleted: 'Visits Completed',
-    visitsRemaining: 'Visits Remaining',
-    progress: 'Progress',
-    phase: 'Phase',
-    phases: 'Phases',
-    goals: 'Goals',
-    addGoal: 'Add Goal',
-    goalDescription: 'Goal Description',
-    targetDate: 'Target Date',
-    achieved: 'Achieved',
-    pending: 'Pending',
-    frequency: 'Visit Frequency',
-    perWeek: 'per week',
-    nextReeval: 'Next Re-evaluation',
-    notes: 'Notes',
-    save: 'Save Plan',
-    cancel: 'Cancel',
-    delete: 'Delete Plan',
-    complete: 'Mark Complete',
-    reactivate: 'Reactivate',
-    templates: 'Templates',
-    useTemplate: 'Use Template',
-    customPlan: 'Custom Plan',
-    acuteCare: 'Acute Care',
-    correctiveCare: 'Corrective Care',
-    maintenanceCare: 'Maintenance Care',
-    rehabilitative: 'Rehabilitative',
-    painRelief: 'Pain Relief',
-    functionRestoration: 'Function Restoration',
-    stabilization: 'Stabilization',
-    wellness: 'Wellness',
-    initialIntensive: 'Initial/Intensive',
-    corrective: 'Corrective',
-    maintenance: 'Maintenance',
-    dischargeCriteria: 'Discharge Criteria',
-    contraindications: 'Contraindications',
-    precautions: 'Precautions',
-    homeExercises: 'Home Exercises',
-    recommendations: 'Recommendations',
-    visitHistory: 'Visit History',
-    daysAgo: 'days ago',
-    today: 'Today',
-    tomorrow: 'Tomorrow',
-    overdue: 'Overdue',
-    onTrack: 'On Track',
-    aheadOfSchedule: 'Ahead of Schedule',
-    behindSchedule: 'Behind Schedule',
-  },
-  no: {
-    treatmentPlan: 'Behandlingsplan',
-    newPlan: 'Ny behandlingsplan',
-    editPlan: 'Rediger plan',
-    activePlan: 'Aktiv plan',
-    completedPlans: 'Fullførte planer',
-    noPlan: 'Ingen aktiv behandlingsplan',
-    createPlan: 'Opprett behandlingsplan',
-    diagnosis: 'Diagnose',
-    chiefComplaint: 'Hovedplage',
-    startDate: 'Startdato',
-    expectedDuration: 'Forventet varighet',
-    weeks: 'uker',
-    totalVisits: 'Totale besøk',
-    visitsCompleted: 'Besøk fullført',
-    visitsRemaining: 'Besøk gjenstående',
-    progress: 'Fremgang',
-    phase: 'Fase',
-    phases: 'Faser',
-    goals: 'Mål',
-    addGoal: 'Legg til mål',
-    goalDescription: 'Målbeskrivelse',
-    targetDate: 'Måldato',
-    achieved: 'Oppnådd',
-    pending: 'Venter',
-    frequency: 'Besøksfrekvens',
-    perWeek: 'per uke',
-    nextReeval: 'Neste evaluering',
-    notes: 'Notater',
-    save: 'Lagre plan',
-    cancel: 'Avbryt',
-    delete: 'Slett plan',
-    complete: 'Merk fullført',
-    reactivate: 'Reaktiver',
-    templates: 'Maler',
-    useTemplate: 'Bruk mal',
-    customPlan: 'Tilpasset plan',
-    acuteCare: 'Akuttbehandling',
-    correctiveCare: 'Korrigerende behandling',
-    maintenanceCare: 'Vedlikeholdsbehandling',
-    rehabilitative: 'Rehabilitering',
-    painRelief: 'Smertelindring',
-    functionRestoration: 'Funksjonsgjennoppretting',
-    stabilization: 'Stabilisering',
-    wellness: 'Velvære',
-    initialIntensive: 'Initial/Intensiv',
-    corrective: 'Korrigerende',
-    maintenance: 'Vedlikehold',
-    dischargeCriteria: 'Utskrivningskriterier',
-    contraindications: 'Kontraindikasjoner',
-    precautions: 'Forsiktighetsregler',
-    homeExercises: 'Hjemmeøvelser',
-    recommendations: 'Anbefalinger',
-    visitHistory: 'Besøkshistorikk',
-    daysAgo: 'dager siden',
-    today: 'I dag',
-    tomorrow: 'I morgen',
-    overdue: 'Forsinket',
-    onTrack: 'På skjema',
-    aheadOfSchedule: 'Foran skjema',
-    behindSchedule: 'Bak skjema',
-  },
-};
+import { useTranslation } from '../../i18n';
 
 // =============================================================================
 // PLAN TEMPLATES
@@ -299,7 +169,7 @@ export const PLAN_TEMPLATES = {
  * Phase Progress Card
  */
 function PhaseCard({ phase, index, currentPhaseIndex, _visits, lang }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('exercises');
   const isActive = index === currentPhaseIndex;
   const isComplete = index < currentPhaseIndex;
 
@@ -329,12 +199,12 @@ function PhaseCard({ phase, index, currentPhaseIndex, _visits, lang }) {
           <span className="font-semibold text-gray-900 dark:text-white">{phase.name[lang]}</span>
         </div>
         <span className="text-sm text-gray-500 dark:text-gray-400">
-          {phase.weeks} {t.weeks}
+          {phase.weeks} {t('weeksLabel', 'uker')}
         </span>
       </div>
 
       <div className="text-sm text-gray-600 dark:text-gray-400 mb-2">
-        {phase.frequency} × {t.perWeek}
+        {phase.frequency} × {t('perWeek', 'per uke')}
       </div>
 
       <ul className="space-y-1">
@@ -353,7 +223,7 @@ function PhaseCard({ phase, index, currentPhaseIndex, _visits, lang }) {
  * Goal Tracker
  */
 function GoalTracker({ goals, onToggle, lang }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('exercises');
 
   return (
     <div className="space-y-3">
@@ -384,7 +254,7 @@ function GoalTracker({ goals, onToggle, lang }) {
             </div>
             {goal.targetDate && (
               <div className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                {t.targetDate}:{' '}
+                {t('targetDate', 'Måldato')}:{' '}
                 {new Date(goal.targetDate).toLocaleDateString(lang === 'no' ? 'nb-NO' : 'en-US')}
               </div>
             )}
@@ -399,14 +269,14 @@ function GoalTracker({ goals, onToggle, lang }) {
  * Visit Progress Bar
  */
 function VisitProgress({ completed, total, lang }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('exercises');
   const percentage = (completed / total) * 100;
 
   return (
     <div className="space-y-2">
       <div className="flex justify-between text-sm">
         <span className="text-gray-600 dark:text-gray-400">
-          {completed} / {total} {t.visitsCompleted.toLowerCase()}
+          {completed} / {total} {t('visitsCompleted', 'Besøk fullført').toLowerCase()}
         </span>
         <span className="font-medium text-gray-900 dark:text-white">{Math.round(percentage)}%</span>
       </div>
@@ -424,7 +294,7 @@ function VisitProgress({ completed, total, lang }) {
  * Template Selector
  */
 function TemplateSelector({ onSelect, lang }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('exercises');
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -440,13 +310,13 @@ function TemplateSelector({ onSelect, lang }) {
           </p>
           <div className="flex items-center gap-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
             <span>
-              {template.duration} {t.weeks}
+              {template.duration} {t('weeksLabel', 'uker')}
             </span>
             <span>
-              {template.totalVisits} {t.totalVisits.toLowerCase()}
+              {template.totalVisits} {t('totalVisits', 'Totale besøk').toLowerCase()}
             </span>
             <span>
-              {template.phases.length} {t.phases.toLowerCase()}
+              {template.phases.length} {t('phasesLabel', 'Faser').toLowerCase()}
             </span>
           </div>
         </button>
@@ -456,11 +326,11 @@ function TemplateSelector({ onSelect, lang }) {
         onClick={() => onSelect(null)}
         className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-500 text-left transition-all"
       >
-        <h4 className="font-semibold text-gray-900 dark:text-white">{t.customPlan}</h4>
+        <h4 className="font-semibold text-gray-900 dark:text-white">
+          {t('customPlan', 'Tilpasset plan')}
+        </h4>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-          {lang === 'en'
-            ? 'Create a fully customized treatment plan'
-            : 'Opprett en helt tilpasset behandlingsplan'}
+          {t('createCustomPlan', 'Opprett en helt tilpasset behandlingsplan')}
         </p>
       </button>
     </div>
@@ -472,7 +342,7 @@ function TemplateSelector({ onSelect, lang }) {
 // =============================================================================
 
 export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lang = 'en' }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('exercises');
   const [isEditing, setIsEditing] = useState(!plan);
   const [showTemplates, setShowTemplates] = useState(!plan);
   const [formData, setFormData] = useState(
@@ -545,8 +415,12 @@ export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lan
   if (showTemplates) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">{t.newPlan}</h2>
-        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">{t.templates}</h3>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+          {t('newPlan', 'Ny behandlingsplan')}
+        </h2>
+        <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">
+          {t('templates', 'Maler')}
+        </h3>
         <TemplateSelector onSelect={handleTemplateSelect} lang={lang} />
       </div>
     );
@@ -557,7 +431,9 @@ export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lan
       {/* Header */}
       <div className="p-6 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">{t.treatmentPlan}</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            {t('treatmentPlan', 'Behandlingsplan')}
+          </h2>
           <div className="flex items-center gap-2">
             {!isEditing ? (
               <>
@@ -565,13 +441,13 @@ export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lan
                   onClick={() => setIsEditing(true)}
                   className="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
                 >
-                  {t.editPlan}
+                  {t('editPlan', 'Rediger plan')}
                 </button>
                 <button
                   onClick={() => setShowTemplates(true)}
                   className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  {t.newPlan}
+                  {t('newPlan', 'Ny behandlingsplan')}
                 </button>
               </>
             ) : (
@@ -580,13 +456,13 @@ export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lan
                   onClick={() => setIsEditing(false)}
                   className="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
                 >
-                  {t.cancel}
+                  {t('cancelBtn', 'Avbryt')}
                 </button>
                 <button
                   onClick={handleSave}
                   className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
-                  {t.save}
+                  {t('savePlan', 'Lagre plan')}
                 </button>
               </>
             )}
@@ -599,7 +475,7 @@ export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lan
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.diagnosis}
+              {t('diagnosisLabel', 'Diagnose')}
             </label>
             {isEditing ? (
               <input
@@ -614,7 +490,7 @@ export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lan
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.chiefComplaint}
+              {t('chiefComplaint', 'Hovedplage')}
             </label>
             {isEditing ? (
               <input
@@ -631,7 +507,9 @@ export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lan
 
         {/* Visit Progress */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t.progress}</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+            {t('progressLabel', 'Fremgang')}
+          </h3>
           <VisitProgress
             completed={formData.visitsCompleted}
             total={formData.totalVisits}
@@ -642,7 +520,9 @@ export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lan
         {/* Phases */}
         {formData.phases && formData.phases.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t.phases}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+              {t('phasesLabel', 'Faser')}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {formData.phases.map((phase, index) => (
                 <PhaseCard
@@ -661,7 +541,9 @@ export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lan
         {/* Goals */}
         {formData.goals && formData.goals.length > 0 && (
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t.goals}</h3>
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+              {t('goalsLabel', 'Mål')}
+            </h3>
             <GoalTracker goals={formData.goals} onToggle={handleGoalToggle} lang={lang} />
           </div>
         )}
@@ -669,7 +551,7 @@ export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lan
         {/* Notes */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            {t.notes}
+            {t('notesLabel', 'Notater')}
           </label>
           {isEditing ? (
             <textarea

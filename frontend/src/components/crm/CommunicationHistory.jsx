@@ -21,8 +21,10 @@ import {
 import { crmAPI } from '../../services/api';
 import toast from '../../utils/toast';
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 
 const CommunicationHistory = () => {
+  const { t } = useTranslation('communications');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedType, setSelectedType] = useState('ALL');
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -33,24 +35,53 @@ const CommunicationHistory = () => {
 
   // Communication types
   const commTypes = [
-    { id: 'ALL', label: 'Alle', icon: FileText, color: 'bg-gray-500' },
-    { id: 'EMAIL', label: 'E-post', icon: Mail, color: 'bg-blue-500' },
+    { id: 'ALL', label: t('commTypeAll', 'Alle'), icon: FileText, color: 'bg-gray-500' },
+    { id: 'EMAIL', label: t('commTypeEmail', 'E-post'), icon: Mail, color: 'bg-blue-500' },
     { id: 'SMS', label: 'SMS', icon: MessageSquare, color: 'bg-green-500' },
-    { id: 'PHONE', label: 'Telefon', icon: Phone, color: 'bg-purple-500' },
+    { id: 'PHONE', label: t('commTypePhone', 'Telefon'), icon: Phone, color: 'bg-purple-500' },
     { id: 'VIDEO', label: 'Video', icon: Video, color: 'bg-orange-500' },
-    { id: 'APPOINTMENT', label: 'Timebestilling', icon: Calendar, color: 'bg-teal-500' },
+    {
+      id: 'APPOINTMENT',
+      label: t('commTypeAppointment', 'Timebestilling'),
+      icon: Calendar,
+      color: 'bg-teal-500',
+    },
   ];
 
   // Status configurations
   const statusConfig = {
-    SENT: { label: 'Sendt', color: 'bg-blue-100 text-blue-700', icon: Send },
-    DELIVERED: { label: 'Levert', color: 'bg-green-100 text-green-700', icon: CheckCircle },
-    OPENED: { label: 'Åpnet', color: 'bg-purple-100 text-purple-700', icon: CheckCircle },
-    CLICKED: { label: 'Klikket', color: 'bg-indigo-100 text-indigo-700', icon: CheckCircle },
-    FAILED: { label: 'Feilet', color: 'bg-red-100 text-red-700', icon: XCircle },
-    BOUNCED: { label: 'Returnert', color: 'bg-orange-100 text-orange-700', icon: AlertCircle },
-    COMPLETED: { label: 'Fullført', color: 'bg-green-100 text-green-700', icon: CheckCircle },
-    MISSED: { label: 'Ikke Besvart', color: 'bg-red-100 text-red-700', icon: XCircle },
+    SENT: { label: t('statusSent', 'Sendt'), color: 'bg-blue-100 text-blue-700', icon: Send },
+    DELIVERED: {
+      label: t('statusDelivered', 'Levert'),
+      color: 'bg-green-100 text-green-700',
+      icon: CheckCircle,
+    },
+    OPENED: {
+      label: t('statusOpened', 'Åpnet'),
+      color: 'bg-purple-100 text-purple-700',
+      icon: CheckCircle,
+    },
+    CLICKED: {
+      label: t('statusClicked', 'Klikket'),
+      color: 'bg-indigo-100 text-indigo-700',
+      icon: CheckCircle,
+    },
+    FAILED: { label: t('statusFailed', 'Feilet'), color: 'bg-red-100 text-red-700', icon: XCircle },
+    BOUNCED: {
+      label: t('statusBounced', 'Returnert'),
+      color: 'bg-orange-100 text-orange-700',
+      icon: AlertCircle,
+    },
+    COMPLETED: {
+      label: t('statusCompleted', 'Fullført'),
+      color: 'bg-green-100 text-green-700',
+      icon: CheckCircle,
+    },
+    MISSED: {
+      label: t('statusMissed', 'Ikke Besvart'),
+      color: 'bg-red-100 text-red-700',
+      icon: XCircle,
+    },
   };
 
   // Fetch communications from API
@@ -146,7 +177,9 @@ const CommunicationHistory = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        <span className="ml-2 text-gray-600 dark:text-gray-300">Laster kommunikasjonslogg...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">
+          {t('loadingCommLog', 'Laster kommunikasjonslogg...')}
+        </span>
       </div>
     );
   }
@@ -161,7 +194,7 @@ const CommunicationHistory = () => {
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
         >
-          Prøv igjen
+          {t('tryAgain', 'Prøv igjen')}
         </button>
       </div>
     );
@@ -172,9 +205,11 @@ const CommunicationHistory = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Kommunikasjonslogg</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {t('commLogTitle', 'Kommunikasjonslogg')}
+          </h2>
           <p className="text-gray-600 dark:text-gray-300">
-            All kommunikasjon med pasienter på ett sted
+            {t('commLogSubtitle', 'All kommunikasjon med pasienter på ett sted')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -183,14 +218,14 @@ const CommunicationHistory = () => {
             className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center gap-2"
           >
             <Download className="w-4 h-4" />
-            Eksporter
+            {t('export', 'Eksporter')}
           </button>
           <button
             onClick={() => setShowNewMessage(true)}
             className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
-            Ny Melding
+            {t('newMessage', 'Ny Melding')}
           </button>
         </div>
       </div>
@@ -204,7 +239,7 @@ const CommunicationHistory = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">Totalt</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{t('totalLabel', 'Totalt')}</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -214,7 +249,7 @@ const CommunicationHistory = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.emails}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">E-poster</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{t('emailsLabel', 'E-poster')}</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -234,7 +269,7 @@ const CommunicationHistory = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.calls}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">Samtaler</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{t('callsLabel', 'Samtaler')}</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -244,7 +279,7 @@ const CommunicationHistory = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.thisWeek}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">Denne Uken</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{t('thisWeek', 'Denne Uken')}</p>
         </div>
       </div>
 
@@ -256,7 +291,7 @@ const CommunicationHistory = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
               <input
                 type="text"
-                placeholder="Søk etter pasient eller emne..."
+                placeholder={t('searchPatientOrSubject', 'Søk etter pasient eller emne...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -374,15 +409,19 @@ const CommunicationHistory = () => {
       {showNewMessage && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-lg">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Ny Melding</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">
+              {t('newMessage', 'Ny Melding')}
+            </h3>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Meldingstype</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('messageType', 'Meldingstype')}
+                </label>
                 <div className="flex gap-2">
                   {[
-                    { id: 'EMAIL', label: 'E-post', icon: Mail },
+                    { id: 'EMAIL', label: t('commTypeEmail', 'E-post'), icon: Mail },
                     { id: 'SMS', label: 'SMS', icon: MessageSquare },
-                    { id: 'PHONE', label: 'Telefonnotat', icon: Phone },
+                    { id: 'PHONE', label: t('phoneNote', 'Telefonnotat'), icon: Phone },
                   ].map((type) => {
                     const Icon = type.icon;
                     return (
@@ -399,37 +438,45 @@ const CommunicationHistory = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Pasient</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('patientLabel', 'Pasient')}
+                </label>
                 <input
                   type="text"
-                  placeholder="Skriv pasientnavn..."
+                  placeholder={t('typePatientName', 'Skriv pasientnavn...')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Emne</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('subject', 'Emne')}
+                </label>
                 <input
                   type="text"
-                  placeholder="Emne for meldingen..."
+                  placeholder={t('subjectForMessage', 'Emne for meldingen...')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Melding</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('message', 'Melding')}
+                </label>
                 <textarea
                   rows={4}
-                  placeholder="Skriv din melding her..."
+                  placeholder={t('writeMessageHere', 'Skriv din melding her...')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Vedlegg</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('attachments', 'Vedlegg')}
+                </label>
                 <div className="border-2 border-dashed border-gray-200 rounded-lg p-4 text-center">
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Dra og slipp filer her, eller klikk for å velge
+                    {t('dragDropFiles', 'Dra og slipp filer her, eller klikk for å velge')}
                   </p>
                 </div>
               </div>
@@ -440,14 +487,14 @@ const CommunicationHistory = () => {
                 onClick={() => setShowNewMessage(false)}
                 className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
               >
-                Avbryt
+                {t('cancel', 'Avbryt')}
               </button>
               <button
                 onClick={() => setShowNewMessage(false)}
                 className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4" />
-                Send
+                {t('send', 'Send')}
               </button>
             </div>
           </div>
@@ -459,7 +506,9 @@ const CommunicationHistory = () => {
         <div className="fixed inset-y-0 right-0 w-96 bg-white shadow-2xl border-l border-gray-200 z-50 overflow-y-auto">
           <div className="p-6">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-lg font-bold text-gray-900">Meldingsdetaljer</h3>
+              <h3 className="text-lg font-bold text-gray-900">
+                {t('messageDetails', 'Meldingsdetaljer')}
+              </h3>
               <button
                 onClick={() => setSelectedPatient(null)}
                 className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
@@ -494,27 +543,33 @@ const CommunicationHistory = () => {
 
               {/* Patient */}
               <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500 dark:text-gray-400">Pasient</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t('patientLabel', 'Pasient')}
+                </p>
                 <p className="font-medium text-gray-900">{selectedPatient.patientName}</p>
               </div>
 
               {/* Subject */}
               {selectedPatient.subject && (
                 <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Emne</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('subject', 'Emne')}</p>
                   <p className="font-medium text-gray-900">{selectedPatient.subject}</p>
                 </div>
               )}
 
               {/* Content */}
               <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Innhold</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                  {t('content', 'Innhold')}
+                </p>
                 <p className="text-gray-900 whitespace-pre-wrap">{selectedPatient.content}</p>
               </div>
 
               {/* Status */}
               <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-500 dark:text-gray-400">Status</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t('statusLabel', 'Status')}
+                </p>
                 {(() => {
                   const status = statusConfig[selectedPatient.status];
                   const StatusIcon = status?.icon;
@@ -532,7 +587,9 @@ const CommunicationHistory = () => {
               {/* Attachments */}
               {selectedPatient.attachments && (
                 <div className="p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Vedlegg</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
+                    {t('attachments', 'Vedlegg')}
+                  </p>
                   <div className="space-y-2">
                     {selectedPatient.attachments.map((file) => (
                       <button
@@ -552,10 +609,10 @@ const CommunicationHistory = () => {
               <div className="space-y-2 pt-4">
                 <button className="w-full px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center justify-center gap-2">
                   <Send className="w-4 h-4" />
-                  Svar
+                  {t('reply', 'Svar')}
                 </button>
                 <button className="w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">
-                  Se Pasientprofil
+                  {t('viewPatientProfile', 'Se Pasientprofil')}
                 </button>
               </div>
             </div>

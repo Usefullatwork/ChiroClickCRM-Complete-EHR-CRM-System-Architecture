@@ -26,7 +26,9 @@ import {
 import { crmAPI } from '../../services/api';
 
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 const PatientLifecycle = () => {
+  const { t } = useTranslation('crm');
   const [selectedStage, setSelectedStage] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('lastVisit');
@@ -203,7 +205,9 @@ const PatientLifecycle = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        <span className="ml-2 text-gray-600 dark:text-gray-300">Laster pasientdata...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">
+          {t('loadingPatientData', 'Laster pasientdata...')}
+        </span>
       </div>
     );
   }
@@ -218,7 +222,7 @@ const PatientLifecycle = () => {
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
         >
-          Prøv igjen
+          {t('tryAgain', 'Prøv igjen')}
         </button>
       </div>
     );
@@ -229,9 +233,11 @@ const PatientLifecycle = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Pasientlivssyklus</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {t('lifecycleTitle', 'Pasientlivssyklus')}
+          </h2>
           <p className="text-gray-600 dark:text-gray-300">
-            Segmentér og følg opp pasienter basert på engasjement
+            {t('lifecycleSubtitle', 'Segmentér og følg opp pasienter basert på engasjement')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -284,7 +290,7 @@ const PatientLifecycle = () => {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
               <input
                 type="text"
-                placeholder="Søk etter pasient..."
+                placeholder={t('searchPatient', 'Søk etter pasient...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -296,10 +302,10 @@ const PatientLifecycle = () => {
             onChange={(e) => setSortBy(e.target.value)}
             className="px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
-            <option value="lastVisit">Siste Besøk</option>
-            <option value="name">Navn</option>
-            <option value="engagement">Engasjement</option>
-            <option value="value">Livstidsverdi</option>
+            <option value="lastVisit">{t('sortLastVisit', 'Siste Besøk')}</option>
+            <option value="name">{t('sortName', 'Navn')}</option>
+            <option value="engagement">{t('sortEngagement', 'Engasjement')}</option>
+            <option value="value">{t('sortLifetimeValue', 'Livstidsverdi')}</option>
           </select>
         </div>
       </div>
@@ -310,28 +316,28 @@ const PatientLifecycle = () => {
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                Pasient
+                {t('thPatient', 'Pasient')}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                Status
+                {t('thStatus', 'Status')}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                Engasjement
+                {t('thEngagement', 'Engasjement')}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                Siste Besøk
+                {t('thLastVisit', 'Siste Besøk')}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                Neste Time
+                {t('thNextAppointment', 'Neste Time')}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                Besøk
+                {t('thVisits', 'Besøk')}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                Livstidsverdi
+                {t('thLifetimeValue', 'Livstidsverdi')}
               </th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                Handlinger
+                {t('thActions', 'Handlinger')}
               </th>
             </tr>
           </thead>
@@ -401,7 +407,9 @@ const PatientLifecycle = () => {
                       <span
                         className={`block text-xs ${days > 45 ? 'text-red-500' : 'text-gray-500 dark:text-gray-400'}`}
                       >
-                        {days === 0 ? 'I dag' : `${days} dager siden`}
+                        {days === 0
+                          ? t('today', 'I dag')
+                          : `${days} ${t('daysAgo', 'dager siden')}`}
                       </span>
                     </div>
                   </td>
@@ -411,7 +419,7 @@ const PatientLifecycle = () => {
                         {formatDate(patient.nextAppointment)}
                       </span>
                     ) : (
-                      <span className="text-red-500">Ingen time</span>
+                      <span className="text-red-500">{t('noAppointment', 'Ingen time')}</span>
                     )}
                   </td>
                   <td className="px-4 py-3">

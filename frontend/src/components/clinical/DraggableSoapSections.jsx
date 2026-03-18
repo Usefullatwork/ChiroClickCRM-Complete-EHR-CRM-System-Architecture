@@ -21,6 +21,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Maximize2, Minimize2, Eye, EyeOff, Settings, RotateCcw } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 // Default SOAP sections with Norwegian labels
 const DEFAULT_SECTIONS = [
@@ -211,6 +212,7 @@ const DraggableSoapSections = ({
   collapsedSections: initialCollapsed,
   hiddenSections: initialHidden,
 }) => {
+  const { t } = useTranslation('clinical');
   // State
   const [sections, setSections] = useState(DEFAULT_SECTIONS);
   const [collapsedSections, setCollapsedSections] = useState(new Set(initialCollapsed || []));
@@ -351,12 +353,12 @@ const DraggableSoapSections = ({
     <div className="relative">
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
-        <h3 className="font-medium text-gray-900">SOAP-notater</h3>
+        <h3 className="font-medium text-gray-900">{t('draggableSoapTitle', 'SOAP-notater')}</h3>
 
         <div className="flex items-center gap-2">
           {hiddenSections.size > 0 && (
             <button onClick={showAllHidden} className="text-xs text-blue-600 hover:underline">
-              Vis skjulte ({hiddenSections.size})
+              {t('draggableShowHidden', 'Vis skjulte')} ({hiddenSections.size})
             </button>
           )}
 
@@ -395,17 +397,22 @@ const DraggableSoapSections = ({
       {showSettings && (
         <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium text-gray-900">Tilpass seksjoner</h4>
+            <h4 className="font-medium text-gray-900">
+              {t('draggableCustomize', 'Tilpass seksjoner')}
+            </h4>
             <button
               onClick={handleReset}
               className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900"
             >
               <RotateCcw className="w-3 h-3" />
-              Tilbakestill
+              {t('draggableReset', 'Tilbakestill')}
             </button>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-            Dra seksjonene for å endre rekkefølge. Klikk på øye-ikonet for å skjule.
+            {t(
+              'draggableInstructions',
+              'Dra seksjonene for å endre rekkefølge. Klikk på øye-ikonet for å skjule.'
+            )}
           </p>
           <div className="flex flex-wrap gap-2">
             {sections.map((section) => (
@@ -453,8 +460,8 @@ const DraggableSoapSections = ({
             onClick={showAllHidden}
             className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900"
           >
-            {hiddenSections.size} seksjon{hiddenSections.size !== 1 ? 'er' : ''} skjult - klikk for
-            å vise
+            {hiddenSections.size}{' '}
+            {t('draggableHiddenCount', 'seksjon(er) skjult - klikk for å vise')}
           </button>
         </div>
       )}

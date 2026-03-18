@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { treatmentPlansAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 
 export default function TreatmentPlanProgress({
   patientId,
@@ -16,41 +17,7 @@ export default function TreatmentPlanProgress({
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);
   const [_error, setError] = useState(null);
-
-  const t =
-    lang === 'no'
-      ? {
-          title: 'Behandlingsplaner',
-          activePlans: 'Aktive planer',
-          noPlans: 'Ingen aktive behandlingsplaner',
-          createPlan: 'Opprett plan',
-          sessions: 'besøk',
-          completed: 'fullført',
-          milestones: 'milepæler',
-          achieved: 'oppnådd',
-          viewDetails: 'Se detaljer',
-          progress: 'Fremgang',
-          status: 'Status',
-          active: 'Aktiv',
-          paused: 'Pauset',
-          draft: 'Utkast',
-        }
-      : {
-          title: 'Treatment Plans',
-          activePlans: 'Active Plans',
-          noPlans: 'No active treatment plans',
-          createPlan: 'Create Plan',
-          sessions: 'sessions',
-          completed: 'completed',
-          milestones: 'milestones',
-          achieved: 'achieved',
-          viewDetails: 'View Details',
-          progress: 'Progress',
-          status: 'Status',
-          active: 'Active',
-          paused: 'Paused',
-          draft: 'Draft',
-        };
+  const { t } = useTranslation('exercises');
 
   useEffect(() => {
     if (!patientId) {
@@ -90,23 +57,27 @@ export default function TreatmentPlanProgress({
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
       <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-        <h3 className="font-semibold text-gray-900 dark:text-white">{t.title}</h3>
+        <h3 className="font-semibold text-gray-900 dark:text-white">
+          {t('treatmentPlans', 'Behandlingsplaner')}
+        </h3>
         {onNewPlan && (
           <button onClick={onNewPlan} className="text-sm text-blue-600 hover:text-blue-800">
-            + {t.createPlan}
+            + {t('createPlan', 'Opprett plan')}
           </button>
         )}
       </div>
 
       {plans.length === 0 ? (
         <div className="p-6 text-center">
-          <p className="text-gray-500 dark:text-gray-400 mb-3">{t.noPlans}</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-3">
+            {t('noActivePlans', 'Ingen aktive behandlingsplaner')}
+          </p>
           {onNewPlan && (
             <button
               onClick={onNewPlan}
               className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              {t.createPlan}
+              {t('createPlan', 'Opprett plan')}
             </button>
           )}
         </div>
@@ -137,7 +108,13 @@ export default function TreatmentPlanProgress({
                           : 'bg-gray-100 text-gray-700'
                     }`}
                   >
-                    {t[plan.status] || plan.status}
+                    {plan.status === 'active'
+                      ? t('statusActive', 'Aktiv')
+                      : plan.status === 'paused'
+                        ? t('paused', 'Pauset')
+                        : plan.status === 'draft'
+                          ? t('draft', 'Utkast')
+                          : plan.status}
                   </span>
                 </div>
 
@@ -145,7 +122,8 @@ export default function TreatmentPlanProgress({
                 <div className="mb-2">
                   <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
                     <span>
-                      {plan.completed_sessions} / {plan.total_sessions} {t.sessions}
+                      {plan.completed_sessions} / {plan.total_sessions}{' '}
+                      {t('sessionsLabel', 'besøk')}
                     </span>
                     <span>{percentage}%</span>
                   </div>
@@ -162,7 +140,7 @@ export default function TreatmentPlanProgress({
                     onClick={() => onViewPlan(plan.id)}
                     className="text-xs text-blue-600 hover:text-blue-800"
                   >
-                    {t.viewDetails} &rarr;
+                    {t('viewDetails', 'Se detaljer')} &rarr;
                   </button>
                 )}
               </div>

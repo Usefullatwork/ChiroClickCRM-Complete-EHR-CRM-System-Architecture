@@ -38,6 +38,7 @@ import VCardImport from './VCardImport';
 import { api } from '../../api/client';
 
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 // Norwegian translations
 const TRANSLATIONS = {
   en: {
@@ -197,6 +198,7 @@ export default function ImportWizard({
   const [showErrorsModal, setShowErrorsModal] = useState(false);
   const [dragActive, setDragActive] = useState(false);
 
+  const { t: i18nT } = useTranslation('common');
   const t = TRANSLATIONS[language] || TRANSLATIONS.no;
 
   // Import mutation for patients
@@ -501,7 +503,7 @@ export default function ImportWizard({
             <p className="text-2xl font-bold text-teal-600">
               {validation?.valid?.length || data.length}
             </p>
-            <p className="text-sm text-teal-700">Ready to Import</p>
+            <p className="text-sm text-teal-700">{i18nT('readyToImport', 'Klar til import')}</p>
           </div>
           <div className="p-4 bg-red-50 rounded-lg text-center">
             <p className="text-2xl font-bold text-red-600">{validation?.invalid?.length || 0}</p>
@@ -509,14 +511,14 @@ export default function ImportWizard({
           </div>
           <div className="p-4 bg-amber-50 rounded-lg text-center">
             <p className="text-2xl font-bold text-amber-600">{validation?.warnings?.length || 0}</p>
-            <p className="text-sm text-amber-700">Warnings</p>
+            <p className="text-sm text-amber-700">{i18nT('warnings', 'Advarsler')}</p>
           </div>
         </div>
 
         {/* Data preview */}
         <Card>
           <CardHeader>
-            <h3 className="font-semibold">Data Preview</h3>
+            <h3 className="font-semibold">{i18nT('dataPreview', 'Forhåndsvisning')}</h3>
           </CardHeader>
           <CardBody className="p-0">
             <div className="overflow-x-auto max-h-64">
@@ -607,7 +609,12 @@ export default function ImportWizard({
         {importResults.errors.length > 0 && (
           <Alert variant="warning">
             <div className="flex items-center justify-between">
-              <span>{importResults.errors.length} errors occurred during import</span>
+              <span>
+                {i18nT('errorsOccurred', '{count} feil oppstod under import').replace(
+                  '{count}',
+                  importResults.errors.length
+                )}
+              </span>
               <Button variant="ghost" size="sm" onClick={() => setShowErrorsModal(true)}>
                 {t.importResults.viewErrors}
               </Button>

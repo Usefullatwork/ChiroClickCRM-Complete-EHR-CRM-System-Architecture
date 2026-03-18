@@ -28,6 +28,7 @@ import {
   X,
 } from 'lucide-react';
 import useMediaQuery from '../../hooks/useMediaQuery';
+import { useTranslation } from '../../i18n';
 
 /**
  * SOAPTemplate Component
@@ -51,6 +52,7 @@ export default function SOAPTemplate({
   readOnly = false,
 }) {
   const { isMobile, _isTablet } = useMediaQuery();
+  const { t } = useTranslation('clinical');
 
   // State for SOAP sections
   // Tilstand for SOAP-seksjoner
@@ -314,7 +316,9 @@ export default function SOAPTemplate({
       {/* Header / Overskrift */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">SOAP Notat</h2>
+          <h2 className="text-lg font-semibold text-gray-900">
+            {t('soapNoteTitle', 'SOAP Notat')}
+          </h2>
           {patient && (
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               {patient.firstName} {patient.lastName}
@@ -330,8 +334,8 @@ export default function SOAPTemplate({
               className="flex items-center justify-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 min-h-[44px] touch-manipulation"
             >
               <Copy className="w-4 h-4" />
-              <span className="hidden sm:inline">Bruk mal</span>
-              <span className="sm:hidden">Mal</span>
+              <span className="hidden sm:inline">{t('soapApplyTemplate', 'Bruk mal')}</span>
+              <span className="sm:hidden">{t('soapTemplateMobile', 'Mal')}</span>
             </button>
           )}
           {!readOnly && (
@@ -342,15 +346,15 @@ export default function SOAPTemplate({
                 className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 active:bg-gray-100 disabled:opacity-50 min-h-[44px] touch-manipulation flex-1 sm:flex-none"
               >
                 <Save className="w-4 h-4" />
-                {saving ? 'Lagrer...' : 'Lagre'}
+                {saving ? t('saving', 'Lagrer...') : t('save', 'Lagre')}
               </button>
               <button
                 onClick={handleLock}
                 className="flex items-center justify-center gap-2 px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 min-h-[44px] touch-manipulation flex-1 sm:flex-none"
               >
                 <Lock className="w-4 h-4" />
-                <span className="hidden sm:inline">Signer og las</span>
-                <span className="sm:hidden">Signer</span>
+                <span className="hidden sm:inline">{t('signAndLock', 'Signer og lås')}</span>
+                <span className="sm:hidden">{t('soapSignMobile', 'Signer')}</span>
               </button>
             </>
           )}
@@ -358,31 +362,36 @@ export default function SOAPTemplate({
       </div>
 
       {/* Subjective Section / Subjektiv seksjon */}
-      <Section id="subjective" title="S - Subjektiv" icon={User} color="blue">
+      <Section
+        id="subjective"
+        title={t('soapSubjectiveTitle', 'S - Subjektiv')}
+        icon={User}
+        color="blue"
+      >
         <TextField
-          label="Hovedklage"
+          label={t('soapChiefComplaint', 'Hovedklage')}
           value={soapData.subjective.chiefComplaint}
           onChange={(v) => updateField('subjective', 'chiefComplaint', v)}
-          placeholder="Pasientens hovedklage..."
+          placeholder={t('soapChiefComplaintPlaceholder', 'Pasientens hovedklage...')}
         />
         <TextField
-          label="Sykehistorie (HPI)"
+          label={t('soapHpi', 'Sykehistorie (HPI)')}
           value={soapData.subjective.historyOfPresentIllness}
           onChange={(v) => updateField('subjective', 'historyOfPresentIllness', v)}
           rows={3}
-          placeholder="Detaljer om navarende plager..."
+          placeholder={t('soapHpiPlaceholder', 'Detaljer om nåværende plager...')}
         />
         {/* Stack on mobile, 2 columns on larger screens */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           <TextField
-            label="Smertelokalisering"
+            label={t('soapPainLocation', 'Smertelokalisering')}
             value={soapData.subjective.painLocation}
             onChange={(v) => updateField('subjective', 'painLocation', v)}
             rows={1}
-            placeholder="Hvor er smerten?"
+            placeholder={t('soapPainLocationPlaceholder', 'Hvor er smerten?')}
           />
           <InputField
-            label="Smerteintensitet (0-10)"
+            label={t('soapPainIntensity', 'Smerteintensitet (0-10)')}
             type="number"
             value={soapData.subjective.painIntensity}
             onChange={(v) => updateField('subjective', 'painIntensity', v)}
@@ -390,111 +399,123 @@ export default function SOAPTemplate({
           />
         </div>
         <TextField
-          label="Forverrende faktorer"
+          label={t('soapAggravatingFactors', 'Forverrende faktorer')}
           value={soapData.subjective.aggravatingFactors}
           onChange={(v) => updateField('subjective', 'aggravatingFactors', v)}
-          placeholder="Hva forverrer plagene?"
+          placeholder={t('soapAggravatingPlaceholder', 'Hva forverrer plagene?')}
         />
         <TextField
-          label="Lindrende faktorer"
+          label={t('soapRelievingFactors', 'Lindrende faktorer')}
           value={soapData.subjective.relievingFactors}
           onChange={(v) => updateField('subjective', 'relievingFactors', v)}
-          placeholder="Hva lindrer plagene?"
+          placeholder={t('soapRelievingPlaceholder', 'Hva lindrer plagene?')}
         />
         <TextField
-          label="Funksjonsbegrensninger"
+          label={t('soapFunctionalLimitations', 'Funksjonsbegrensninger')}
           value={soapData.subjective.functionalLimitations}
           onChange={(v) => updateField('subjective', 'functionalLimitations', v)}
-          placeholder="Hvordan pavirker dette dagliglivet?"
+          placeholder={t('soapFunctionalPlaceholder', 'Hvordan påvirker dette dagliglivet?')}
         />
       </Section>
 
       {/* Objective Section / Objektiv seksjon */}
-      <Section id="objective" title="O - Objektiv" icon={Stethoscope} color="green">
+      <Section
+        id="objective"
+        title={t('soapObjectiveTitle', 'O - Objektiv')}
+        icon={Stethoscope}
+        color="green"
+      >
         {/* Vital signs - 2 cols on mobile, 4 cols on desktop */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <InputField
-            label="Blodtrykk"
+            label={t('soapBloodPressure', 'Blodtrykk')}
             value={soapData.objective.vitalSigns?.bloodPressure}
             onChange={(v) => updateNestedField('objective', 'vitalSigns', 'bloodPressure', v)}
             placeholder="120/80"
           />
           <InputField
-            label="Puls"
+            label={t('soapPulse', 'Puls')}
             value={soapData.objective.vitalSigns?.pulse}
             onChange={(v) => updateNestedField('objective', 'vitalSigns', 'pulse', v)}
             placeholder="72"
           />
           <InputField
-            label="Resp. frekvens"
+            label={t('soapRespRate', 'Resp. frekvens')}
             value={soapData.objective.vitalSigns?.respiratoryRate}
             onChange={(v) => updateNestedField('objective', 'vitalSigns', 'respiratoryRate', v)}
             placeholder="16"
           />
           <InputField
-            label="Temperatur"
+            label={t('soapTemperature', 'Temperatur')}
             value={soapData.objective.vitalSigns?.temperature}
             onChange={(v) => updateNestedField('objective', 'vitalSigns', 'temperature', v)}
             placeholder="36.8"
           />
         </div>
         <TextField
-          label="Observasjon"
+          label={t('soapObservation', 'Observasjon')}
           value={soapData.objective.observation}
           onChange={(v) => updateField('objective', 'observation', v)}
-          placeholder="Visuell observasjon av pasienten..."
+          placeholder={t('soapObservationPlaceholder', 'Visuell observasjon av pasienten...')}
         />
         <TextField
-          label="Palpasjon"
+          label={t('soapPalpation', 'Palpasjon')}
           value={soapData.objective.palpation}
           onChange={(v) => updateField('objective', 'palpation', v)}
-          placeholder="Funn ved palpasjon..."
+          placeholder={t('soapPalpationPlaceholder', 'Funn ved palpasjon...')}
         />
         <TextField
-          label="Bevegelsesutslag (ROM)"
+          label={t('soapRom', 'Bevegelsesutslag (ROM)')}
           value={soapData.objective.rangeOfMotion}
           onChange={(v) => updateField('objective', 'rangeOfMotion', v)}
-          placeholder="Aktiv og passiv ROM..."
+          placeholder={t('soapRomPlaceholder', 'Aktiv og passiv ROM...')}
         />
         <TextField
-          label="Nevrologisk undersokelse"
+          label={t('soapNeurologicalExam', 'Nevrologisk undersøkelse')}
           value={soapData.objective.neurologicalExam}
           onChange={(v) => updateField('objective', 'neurologicalExam', v)}
-          placeholder="Reflekser, styrke, sensibilitet..."
+          placeholder={t('soapNeurologicalPlaceholder', 'Reflekser, styrke, sensibilitet...')}
         />
         <TextField
-          label="Ortopediske tester"
+          label={t('soapOrthopedicTests', 'Ortopediske tester')}
           value={soapData.objective.orthopedicTests}
           onChange={(v) => updateField('objective', 'orthopedicTests', v)}
-          placeholder="Spesifikke tester utfort..."
+          placeholder={t('soapOrthopedicPlaceholder', 'Spesifikke tester utført...')}
         />
       </Section>
 
       {/* Assessment Section / Vurderingsseksjon */}
-      <Section id="assessment" title="A - Vurdering" icon={ClipboardCheck} color="purple">
+      <Section
+        id="assessment"
+        title={t('soapAssessmentTitle', 'A - Vurdering')}
+        icon={ClipboardCheck}
+        color="purple"
+      >
         <TextField
-          label="Diagnose"
+          label={t('soapDiagnosis', 'Diagnose')}
           value={soapData.assessment.diagnosis}
           onChange={(v) => updateField('assessment', 'diagnosis', v)}
-          placeholder="Primar diagnose med ICD-10 kode..."
+          placeholder={t('soapDiagnosisPlaceholder', 'Primærdiagnose med ICD-10 kode...')}
         />
         <TextField
-          label="Differensialdiagnoser"
+          label={t('soapDifferentialDiagnosis', 'Differensialdiagnoser')}
           value={soapData.assessment.differentialDiagnosis}
           onChange={(v) => updateField('assessment', 'differentialDiagnosis', v)}
-          placeholder="Andre mulige diagnoser..."
+          placeholder={t('soapDiffDiagPlaceholder', 'Andre mulige diagnoser...')}
         />
         <TextField
-          label="Klinisk vurdering"
+          label={t('soapClinicalImpression', 'Klinisk vurdering')}
           value={soapData.assessment.clinicalImpression}
           onChange={(v) => updateField('assessment', 'clinicalImpression', v)}
           rows={3}
-          placeholder="Samlet klinisk vurdering..."
+          placeholder={t('soapClinicalImpressionPlaceholder', 'Samlet klinisk vurdering...')}
         />
 
         {/* Red Flags / Rode flagg */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Rode flagg</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('soapRedFlags', 'Røde flagg')}
+          </label>
           <div className="space-y-2">
             {(soapData.assessment.redFlags || []).map((flag, index) => (
               <div
@@ -531,7 +552,7 @@ export default function SOAPTemplate({
                           setRedFlagInput('');
                         }
                       }}
-                      placeholder="Skriv inn rod flagg..."
+                      placeholder={t('soapRedFlagPlaceholder', 'Skriv inn rødt flagg...')}
                       className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-500 min-h-[44px]"
                       autoFocus
                     />
@@ -557,7 +578,7 @@ export default function SOAPTemplate({
                     className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700 py-2 min-h-[44px] touch-manipulation"
                   >
                     <Plus className="w-4 h-4" />
-                    Legg til rod flagg
+                    {t('soapAddRedFlag', 'Legg til rødt flagg')}
                   </button>
                 )}
               </>
@@ -566,51 +587,51 @@ export default function SOAPTemplate({
         </div>
 
         <TextField
-          label="Prognose"
+          label={t('prognosis', 'Prognose')}
           value={soapData.assessment.prognosis}
           onChange={(v) => updateField('assessment', 'prognosis', v)}
-          placeholder="Forventet forlop og varighet..."
+          placeholder={t('soapPrognosisPlaceholder', 'Forventet forløp og varighet...')}
         />
       </Section>
 
       {/* Plan Section / Planseksjon */}
-      <Section id="plan" title="P - Plan" icon={Target} color="orange">
+      <Section id="plan" title={t('soapPlanTitle', 'P - Plan')} icon={Target} color="orange">
         <TextField
-          label="Behandling"
+          label={t('soapTreatment', 'Behandling')}
           value={soapData.plan.treatment}
           onChange={(v) => updateField('plan', 'treatment', v)}
           rows={3}
-          placeholder="Utfort behandling og teknikker..."
+          placeholder={t('soapTreatmentPlaceholder', 'Utført behandling og teknikker...')}
         />
         <TextField
-          label="Ovelser/Hjemmeoppgaver"
+          label={t('soapExercises', 'Øvelser/Hjemmeoppgaver')}
           value={soapData.plan.exercises}
           onChange={(v) => updateField('plan', 'exercises', v)}
-          placeholder="Ovelser forskrevet til pasienten..."
+          placeholder={t('soapExercisesPlaceholder', 'Øvelser forskrevet til pasienten...')}
         />
         <TextField
-          label="Pasientundervisning"
+          label={t('patientEducation', 'Pasientundervisning')}
           value={soapData.plan.patientEducation}
           onChange={(v) => updateField('plan', 'patientEducation', v)}
-          placeholder="Informasjon gitt til pasienten..."
+          placeholder={t('soapPatientEdPlaceholder', 'Informasjon gitt til pasienten...')}
         />
         <TextField
-          label="Oppfolging"
+          label={t('soapFollowUp', 'Oppfølging')}
           value={soapData.plan.followUp}
           onChange={(v) => updateField('plan', 'followUp', v)}
-          placeholder="Neste time og oppfolgingsplan..."
+          placeholder={t('soapFollowUpPlaceholder', 'Neste time og oppfølgingsplan...')}
         />
         <TextField
-          label="Henvisning"
+          label={t('soapReferral', 'Henvisning')}
           value={soapData.plan.referrals}
           onChange={(v) => updateField('plan', 'referrals', v)}
-          placeholder="Eventuelle henvisninger..."
+          placeholder={t('soapReferralPlaceholder', 'Eventuelle henvisninger...')}
         />
         <TextField
-          label="Mal"
+          label={t('soapGoals', 'Mål')}
           value={soapData.plan.goals}
           onChange={(v) => updateField('plan', 'goals', v)}
-          placeholder="Kortsiktige og langsiktige mal..."
+          placeholder={t('soapGoalsPlaceholder', 'Kortsiktige og langsiktige mål...')}
         />
       </Section>
 
@@ -623,7 +644,7 @@ export default function SOAPTemplate({
             }`}
           >
             <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white z-10">
-              <h3 className="font-semibold text-gray-900">Velg mal</h3>
+              <h3 className="font-semibold text-gray-900">{t('soapSelectTemplate', 'Velg mal')}</h3>
               <button
                 onClick={() => setShowTemplateSelector(false)}
                 className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center touch-manipulation"
@@ -651,7 +672,7 @@ export default function SOAPTemplate({
                 </div>
               ) : (
                 <p className="text-center text-gray-500 dark:text-gray-400 py-8">
-                  Ingen maler tilgjengelig
+                  {t('soapNoTemplates', 'Ingen maler tilgjengelig')}
                 </p>
               )}
             </div>
@@ -663,7 +684,7 @@ export default function SOAPTemplate({
                   onClick={() => setShowTemplateSelector(false)}
                   className="w-full py-3 text-gray-700 font-medium bg-white border border-gray-300 rounded-xl hover:bg-gray-50 active:bg-gray-100 min-h-[48px] touch-manipulation"
                 >
-                  Avbryt
+                  {t('soapCancel', 'Avbryt')}
                 </button>
               </div>
             )}
