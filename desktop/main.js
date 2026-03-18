@@ -117,7 +117,6 @@ function startBackend() {
     PORT: String(BACKEND_PORT),
     DB_ENGINE: 'pglite',
     CACHE_ENGINE: 'memory',
-    DEV_SKIP_AUTH: 'true',
     DATA_DIR: dataDir,
     FRONTEND_DIST: getResourcePath('frontend/dist'),
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || defaultKey,
