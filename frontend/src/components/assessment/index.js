@@ -13,7 +13,7 @@ export {
   ORTHO_TESTS_OPTIONS,
   NEURO_TESTS_OPTIONS,
   TREATMENT_OPTIONS,
-  EXERCISE_OPTIONS
+  EXERCISE_OPTIONS,
 } from './QuickCheckboxGrid';
 
 // Smart text inputs with phrase macros
@@ -24,14 +24,11 @@ export {
   HISTORY_PHRASES,
   CLINICAL_REASONING_PHRASES,
   FOLLOW_UP_PHRASES,
-  ADVICE_PHRASES
+  ADVICE_PHRASES,
 } from './SmartTextInput';
 
 // Inline AI generation button
-export {
-  default as InlineAIButton,
-  InlineAIButtonCompact
-} from './InlineAIButton';
+export { default as InlineAIButton, InlineAIButtonCompact } from './InlineAIButton';
 
 // Body diagram for pain location
 export { default as BodyDiagram, QuickRegionSelect } from './BodyDiagram';
@@ -59,7 +56,7 @@ export {
   generateAssessmentNarrative,
   generatePlanNarrative,
   generateFullNarrative,
-  generateEncounterSummary
+  generateEncounterSummary,
 } from './NarrativeGenerator';
 
 // Interactive Body Chart with drawing tools (Jane App style)
@@ -68,7 +65,7 @@ export {
   BodyChartCompact,
   BodyChartGallery,
   BODY_VIEWS,
-  CHART_COLORS
+  CHART_COLORS,
 } from './BodyChart';
 
 // Template Library with discipline categories (Jane App style)
@@ -76,7 +73,7 @@ export {
   default as TemplateLibrary,
   TemplateLibraryCompact,
   DISCIPLINES,
-  TEMPLATE_DATABASE
+  TEMPLATE_DATABASE,
 } from './TemplateLibrary';
 
 // =============================================================================
@@ -84,17 +81,10 @@ export {
 // =============================================================================
 
 // SALT - Same As Last Treatment (ChiroTouch style)
-export {
-  default as SALTButton,
-  SALTButtonCompact
-} from './SALTButton';
+export { default as SALTButton, SALTButtonCompact } from './SALTButton';
 
 // Hot Button Macro Matrix (ChiroTouch style)
-export {
-  default as MacroMatrix,
-  MacroMatrixInline,
-  DEFAULT_MACROS
-} from './MacroMatrix';
+export { default as MacroMatrix, MacroMatrixInline, DEFAULT_MACROS } from './MacroMatrix';
 
 // Slash Commands text expansion (Jane App style)
 export {
@@ -102,7 +92,7 @@ export {
   useSlashCommands,
   SlashCommandMenu,
   SlashCommandReference,
-  DEFAULT_COMMANDS
+  DEFAULT_COMMANDS,
 } from './SlashCommands';
 
 // =============================================================================
@@ -116,7 +106,7 @@ export {
   checkCompliance,
   TREATMENT_QUALIFIERS,
   DIAGNOSIS_TREATMENT_RULES,
-  RED_FLAGS
+  RED_FLAGS,
 } from './ComplianceEngine';
 
 // Print Preview with narrative formatting (Attorney Test)
@@ -126,29 +116,15 @@ export {
   generateObjectiveNarrative as generatePrintObjective,
   generateAssessmentNarrative as generatePrintAssessment,
   generatePlanNarrative as generatePrintPlan,
-  generateSpinalNarrative
+  generateSpinalNarrative,
 } from './PrintPreview';
-
-// =============================================================================
-// INTERNATIONALIZATION (English & Norwegian)
-// =============================================================================
-
-// Translations for all assessment components
-export {
-  TRANSLATIONS,
-  t,
-  createTranslator,
-  getSection,
-  DEFAULT_LANGUAGE,
-  AVAILABLE_LANGUAGES
-} from './translations';
 
 // Bilingual macro content
 export {
   MACRO_CONTENT,
   getMacroContent,
   getCategoryMacros,
-  buildMacroMatrix
+  buildMacroMatrix,
 } from './macroContent';
 
 // =============================================================================
@@ -156,21 +132,10 @@ export {
 // =============================================================================
 
 // Intake-to-Subjective Parser (Rheo-style)
-export {
-  default as IntakeParser,
-  IntakeParserButton,
-  IntakeParserInline
-} from './IntakeParser';
+export { default as IntakeParser, IntakeParserButton, IntakeParserInline } from './IntakeParser';
 
 // AI Scribe - Voice-to-Note (Ambient Documentation)
-export {
-  default as AIScribe,
-  AIScribeButton,
-  AIScribeCompact
-} from './AIScribe';
+export { default as AIScribe, AIScribeButton, AIScribeCompact } from './AIScribe';
 
 // AI Settings Panel
-export {
-  default as AISettings,
-  AIStatusIndicator
-} from './AISettings';
+export { default as AISettings, AIStatusIndicator } from './AISettings';

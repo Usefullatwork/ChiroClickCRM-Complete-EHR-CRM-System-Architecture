@@ -8,7 +8,6 @@ import {
   generateFullNarrative,
   generateEncounterSummary,
 } from '../components/assessment/NarrativeGenerator';
-import { createTranslator } from '../components/assessment/translations';
 
 /**
  * Custom hook that consolidates all EasyAssessment state.
@@ -36,7 +35,6 @@ export default function useEasyAssessmentState() {
   const [showAIScribe, setShowAIScribe] = useState(false);
   const [showAISettings, setShowAISettings] = useState(false);
   const [showIntakeParser, setShowIntakeParser] = useState(false);
-  const tr = createTranslator(language);
 
   // AI status query
   const { data: aiStatus } = useQuery({
@@ -441,8 +439,6 @@ export default function useEasyAssessmentState() {
     // Language
     language,
     setLanguage,
-    tr,
-
     // Macro state
     macroFavorites,
     setMacroFavorites,

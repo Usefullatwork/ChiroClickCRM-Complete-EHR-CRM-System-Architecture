@@ -173,6 +173,16 @@ export const clinical = {
     considerDischarge: 'Consider discharge/end of treatment',
     dischargeNotes: 'Discharge notes',
     dischargeNotesPlaceholder: 'Reasons for discharge, further recommendations...',
+    // Note quality service keys
+    missingChiefComplaint: 'Chief complaint is missing',
+    missingObjectiveFindings: 'Objective findings are missing',
+    missingClinicalReasoning: 'Clinical reasoning is missing',
+    missingDiagnosisCode: 'Diagnosis code is missing',
+    missingTreatment: 'Treatment is missing',
+    addSubjectiveDetails: 'Add more details to the subjective section',
+    documentObjectiveFindings: 'Document objective findings',
+    addClinicalAssessment: 'Add clinical assessment',
+    addTreatmentPlan: 'Add treatment plan or follow-up',
   },
   no: {
     clinicalEncounter: 'Klinisk konsultasjon',
@@ -343,5 +353,15 @@ export const clinical = {
     considerDischarge: 'Vurder utskriving/avslutning av behandling',
     dischargeNotes: 'Utskrivingsnotater',
     dischargeNotesPlaceholder: 'Grunner for utskriving, videre anbefalinger...',
+    // Note quality service keys
+    missingChiefComplaint: 'Hovedklage mangler',
+    missingObjectiveFindings: 'Objektive funn mangler',
+    missingClinicalReasoning: 'Klinisk vurdering mangler',
+    missingDiagnosisCode: 'Diagnosekode mangler',
+    missingTreatment: 'Behandling mangler',
+    addSubjectiveDetails: 'Legg til mer detaljer i subjektiv seksjon',
+    documentObjectiveFindings: 'Dokumenter objektive funn',
+    addClinicalAssessment: 'Legg til klinisk vurdering',
+    addTreatmentPlan: 'Legg til behandlingsplan eller oppfølging',
   },
 };

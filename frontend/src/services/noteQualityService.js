@@ -99,7 +99,7 @@ export function checkCompleteness(soapData, encounterType = 'FOLLOWUP') {
   if (subj.chief_complaint && subj.chief_complaint.trim().length >= 3) {
     subjScore += 60;
   } else {
-    missing.push('Hovedklage / Chief complaint');
+    missing.push('missingChiefComplaint');
   }
   if (subj.history && subj.history.trim()) {
     subjScore += 15;
@@ -121,7 +121,7 @@ export function checkCompleteness(soapData, encounterType = 'FOLLOWUP') {
   const objFields = ['observation', 'palpation', 'rom', 'ortho_tests', 'neuro_tests', 'posture'];
   const filledObjFields = objFields.filter((f) => obj[f] && obj[f].trim());
   if (filledObjFields.length === 0 && encounterType === 'INITIAL') {
-    missing.push('Objektive funn / Objective findings');
+    missing.push('missingObjectiveFindings');
   }
   objScore = Math.min((filledObjFields.length / objFields.length) * 100, 100);
   if (encounterType === 'INITIAL' && filledObjFields.length < 2) {
@@ -135,7 +135,7 @@ export function checkCompleteness(soapData, encounterType = 'FOLLOWUP') {
   if (assess.clinical_reasoning && assess.clinical_reasoning.trim()) {
     assessScore += 50;
   } else if (encounterType === 'INITIAL') {
-    missing.push('Klinisk vurdering / Clinical reasoning');
+    missing.push('missingClinicalReasoning');
   }
   if (assess.differential_diagnosis && assess.differential_diagnosis.trim()) {
     assessScore += 20;
@@ -151,7 +151,7 @@ export function checkCompleteness(soapData, encounterType = 'FOLLOWUP') {
   // Diagnosis codes
   const hasDiagnosis = soapData.icpc_codes?.length > 0 || soapData.icd10_codes?.length > 0;
   if (!hasDiagnosis && encounterType === 'INITIAL') {
-    missing.push('Diagnosekode / Diagnosis code');
+    missing.push('missingDiagnosisCode');
   }
   if (hasDiagnosis) {
     sectionScores.assessment = Math.min(sectionScores.assessment + 10, 100);
@@ -163,7 +163,7 @@ export function checkCompleteness(soapData, encounterType = 'FOLLOWUP') {
   if (plan.treatment && plan.treatment.trim()) {
     planScore += 40;
   } else if (encounterType === 'INITIAL') {
-    missing.push('Behandling / Treatment');
+    missing.push('missingTreatment');
   }
   if (plan.exercises && plan.exercises.trim()) {
     planScore += 20;
@@ -259,16 +259,16 @@ export function generateSuggestions(result, encounterType = 'FOLLOWUP') {
   const suggestions = [];
 
   if (result.sectionScores.subjective < 60) {
-    suggestions.push('Legg til mer detaljer i subjektiv seksjon');
+    suggestions.push('addSubjectiveDetails');
   }
   if (result.sectionScores.objective === 0 && encounterType !== 'MAINTENANCE') {
-    suggestions.push('Dokumenter objektive funn');
+    suggestions.push('documentObjectiveFindings');
   }
   if (result.sectionScores.assessment < 30) {
-    suggestions.push('Legg til klinisk vurdering');
+    suggestions.push('addClinicalAssessment');
   }
   if (result.sectionScores.plan < 30) {
-    suggestions.push('Legg til behandlingsplan eller oppfølging');
+    suggestions.push('addTreatmentPlan');
   }
 
   return suggestions;
