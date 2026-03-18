@@ -61,6 +61,13 @@
         "filter": [
           "**/*"
         ]
+      },
+      {
+        "from": "../database",
+        "to": "database",
+        "filter": [
+          "**/*"
+        ]
       }
     ]
   },
