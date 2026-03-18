@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import VimeoPlayer from './VimeoPlayer';
 import useMediaQuery from '../../hooks/useMediaQuery';
+import { useTranslation } from '../../i18n';
 
 const ExerciseLibrary = ({
   exercises = [],
@@ -45,6 +46,7 @@ const ExerciseLibrary = ({
   loading = false,
 }) => {
   const { isMobile, _isTablet, prefersReducedMotion } = useMediaQuery();
+  const { t } = useTranslation('exercises');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedBodyRegion, setSelectedBodyRegion] = useState('all');
@@ -165,7 +167,7 @@ const ExerciseLibrary = ({
           <div className="flex items-center gap-2 min-w-0">
             <Dumbbell className="w-5 h-5 text-blue-600 flex-shrink-0" />
             <h2 className="text-base sm:text-lg font-semibold text-gray-900 truncate">
-              Øvelsesbibliotek
+              {t('exerciseLibraryHeading', 'Øvelsesbibliotek')}
             </h2>
             <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 flex-shrink-0">
               ({filteredExercises.length})
@@ -206,7 +208,7 @@ const ExerciseLibrary = ({
                 className="flex items-center gap-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors text-sm min-h-[40px] sm:min-h-[44px] touch-manipulation"
               >
                 <Plus className="w-4 h-4" />
-                <span className="hidden sm:inline">Ny øvelse</span>
+                <span className="hidden sm:inline">{t('newExercise', 'Ny øvelse')}</span>
               </button>
             )}
           </div>
@@ -221,7 +223,7 @@ const ExerciseLibrary = ({
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Søk etter øvelser..."
+              placeholder={t('searchExercisesPlaceholder', 'Søk etter øvelser...')}
               className="w-full pl-10 pr-4 py-2.5 sm:py-2 border border-gray-200 rounded-lg text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
@@ -241,7 +243,7 @@ const ExerciseLibrary = ({
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
                 }`}
               >
-                Alle
+                {t('all', 'Alle')}
               </button>
               {categories.map((cat) => (
                 <button
@@ -331,7 +333,7 @@ const ExerciseLibrary = ({
                   onClick={clearFilters}
                   className="text-sm text-blue-600 hover:text-blue-700 underline self-start sm:self-center py-2 min-h-[44px] sm:min-h-[36px] touch-manipulation"
                 >
-                  Nullstill filtre
+                  {t('resetFilters', 'Nullstill filtre')}
                 </button>
               )}
             </div>
@@ -348,16 +350,18 @@ const ExerciseLibrary = ({
         ) : filteredExercises.length === 0 ? (
           <div className="text-center py-12">
             <Dumbbell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500 dark:text-gray-400">Ingen øvelser funnet</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              {t('noExercisesFound', 'Ingen øvelser funnet')}
+            </p>
             <p className="text-sm text-gray-400 dark:text-gray-300 mb-4">
-              Prøv å endre søkekriteriene
+              {t('tryChangingCriteria', 'Prøv å endre søkekriteriene')}
             </p>
             {(searchTerm || activeFilterCount > 0) && (
               <button
                 onClick={clearFilters}
                 className="px-4 py-2 text-sm text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors min-h-[44px] touch-manipulation"
               >
-                Nullstill filtre
+                {t('resetFilters', 'Nullstill filtre')}
               </button>
             )}
           </div>
@@ -692,7 +696,9 @@ const ExerciseLibrary = ({
 
               {/* Description */}
               <div className="prose prose-sm max-w-none">
-                <h4 className="text-sm font-medium text-gray-700 mb-2">Beskrivelse</h4>
+                <h4 className="text-sm font-medium text-gray-700 mb-2">
+                  {t('description', 'Beskrivelse')}
+                </h4>
                 <p className="text-gray-600 dark:text-gray-300 whitespace-pre-line text-sm sm:text-base leading-relaxed">
                   {detailExercise.description_norwegian || detailExercise.description}
                 </p>
@@ -703,7 +709,9 @@ const ExerciseLibrary = ({
                 detailExercise.reps_default ||
                 detailExercise.hold_seconds) && (
                 <div className="mt-4 pt-4 border-t border-gray-100">
-                  <h4 className="text-sm font-medium text-gray-700 mb-3">Standard parametere</h4>
+                  <h4 className="text-sm font-medium text-gray-700 mb-3">
+                    {t('defaultParams', 'Standard parametere')}
+                  </h4>
                   <div className="grid grid-cols-3 gap-3 text-sm">
                     {detailExercise.sets_default && (
                       <div className="flex flex-col items-center p-3 bg-gray-50 rounded-lg">
@@ -767,12 +775,12 @@ const ExerciseLibrary = ({
                   {isSelected(detailExercise.id) ? (
                     <>
                       <Check className="w-4 h-4" />
-                      Fjern fra program
+                      {t('removeFromProgram', 'Fjern fra program')}
                     </>
                   ) : (
                     <>
                       <Plus className="w-4 h-4" />
-                      Legg til i program
+                      {t('addToProgram', 'Legg til i program')}
                     </>
                   )}
                 </button>

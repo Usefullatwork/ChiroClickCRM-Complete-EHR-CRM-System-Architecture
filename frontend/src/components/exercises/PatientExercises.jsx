@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { exercisesAPI } from '../../services/api';
 import { useConfirm } from '../ui/ConfirmDialog';
+import { useTranslation } from '../../i18n';
 import {
   Activity,
   Check,
@@ -459,6 +460,7 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
 export const PatientExercises = ({ patientId, patientName }) => {
   const queryClient = useQueryClient();
   const confirm = useConfirm();
+  const { t } = useTranslation('exercises');
 
   // State
   const [statusFilter, setStatusFilter] = useState('active');
@@ -511,21 +513,24 @@ export const PatientExercises = ({ patientId, patientName }) => {
   };
 
   const handleDiscontinue = async (prescription) => {
-    const reason = window.prompt('Årsak til avbrudd (valgfritt):');
+    const reason = window.prompt(t('discontinueReason', 'Årsak til avbrudd (valgfritt):'));
     if (reason !== null) {
       discontinueMutation.mutate({
         prescriptionId: prescription.id,
-        reason: reason || 'Avbrutt av behandler',
+        reason: reason || t('discontinuedByProvider', 'Avbrutt av behandler'),
       });
     }
   };
 
   const handleComplete = async (prescription) => {
     const ok = await confirm({
-      title: 'Fullfør øvelse',
-      description: `Merk "${prescription.exercise_name}" som fullført?`,
+      title: t('completeExercise', 'Fullfør øvelse'),
+      description: t(
+        'completeExerciseConfirm',
+        `Merk "${prescription.exercise_name}" som fullført?`
+      ).replace('{name}', prescription.exercise_name),
       variant: 'warning',
-      confirmText: 'Fullfør',
+      confirmText: t('completeBtn', 'Fullfør'),
     });
     if (ok) {
       completeMutation.mutate(prescription.id);
@@ -538,7 +543,9 @@ export const PatientExercises = ({ patientId, patientName }) => {
       <div className="p-6 border-b bg-white">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Øvelsesprogram</h1>
+            <h1 className="text-2xl font-bold text-slate-800">
+              {t('exerciseProgram', 'Øvelsesprogram')}
+            </h1>
             {patientName && (
               <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{patientName}</p>
             )}
@@ -546,11 +553,11 @@ export const PatientExercises = ({ patientId, patientName }) => {
           <div className="flex items-center gap-2">
             <button className="px-4 py-2 text-sm font-medium text-slate-700 border rounded-lg hover:bg-slate-50 flex items-center gap-2">
               <Printer className="w-4 h-4" />
-              Skriv ut
+              {t('printBtn', 'Skriv ut')}
             </button>
             <button className="px-4 py-2 text-sm font-medium text-slate-700 border rounded-lg hover:bg-slate-50 flex items-center gap-2">
               <Mail className="w-4 h-4" />
-              Send til pasient
+              {t('sendToPatient', 'Send til pasient')}
             </button>
           </div>
         </div>
@@ -559,7 +566,7 @@ export const PatientExercises = ({ patientId, patientName }) => {
         <div className="grid grid-cols-4 gap-4 mb-4">
           <div className="p-4 bg-green-50 rounded-lg">
             <span className="text-2xl font-bold text-green-700">{activeCount}</span>
-            <p className="text-sm text-green-600">Aktive øvelser</p>
+            <p className="text-sm text-green-600">{t('activeExercises', 'Aktive øvelser')}</p>
           </div>
           <div className="p-4 bg-blue-50 rounded-lg">
             <span className="text-2xl font-bold text-blue-700">
@@ -571,17 +578,19 @@ export const PatientExercises = ({ patientId, patientName }) => {
                 : 0}
               %
             </span>
-            <p className="text-sm text-blue-600">Gj.snitt etterlevelse</p>
+            <p className="text-sm text-blue-600">{t('avgCompliance', 'Gj.snitt etterlevelse')}</p>
           </div>
           <div className="p-4 bg-purple-50 rounded-lg">
             <span className="text-2xl font-bold text-purple-700">
               {prescriptions.filter((p) => p.status === 'completed').length}
             </span>
-            <p className="text-sm text-purple-600">Fullførte</p>
+            <p className="text-sm text-purple-600">{t('completedLabel', 'Fullførte')}</p>
           </div>
           <div className="p-4 bg-slate-50 rounded-lg">
             <span className="text-2xl font-bold text-slate-700">{prescriptions.length}</span>
-            <p className="text-sm text-slate-600 dark:text-slate-300">Totalt foreskrevet</p>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              {t('totalPrescribed', 'Totalt foreskrevet')}
+            </p>
           </div>
         </div>
 
@@ -597,7 +606,7 @@ export const PatientExercises = ({ patientId, patientName }) => {
                   : 'bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
               }`}
             >
-              {status === 'all' ? 'Alle' : STATUS_LABELS[status]}
+              {status === 'all' ? t('all', 'Alle') : STATUS_LABELS[status]}
             </button>
           ))}
         </div>
@@ -613,12 +622,12 @@ export const PatientExercises = ({ patientId, patientName }) => {
           <div className="text-center py-16">
             <Activity className="w-16 h-16 mx-auto text-slate-300 mb-4" />
             <h3 className="text-lg font-medium text-slate-600 dark:text-slate-300">
-              Ingen øvelser
+              {t('noExercisesLabel', 'Ingen øvelser')}
             </h3>
             <p className="text-sm text-slate-400 dark:text-slate-300 mt-1">
               {statusFilter === 'active'
-                ? 'Pasienten har ingen aktive øvelser'
-                : 'Ingen øvelser matcher filteret'}
+                ? t('patientNoActiveExercises', 'Pasienten har ingen aktive øvelser')
+                : t('noExercisesMatchFilter', 'Ingen øvelser matcher filteret')}
             </p>
           </div>
         ) : (

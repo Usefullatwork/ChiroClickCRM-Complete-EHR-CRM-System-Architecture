@@ -7,6 +7,7 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { ChevronDown, ChevronRight, FileText, RefreshCw, Activity } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 // Regional test definitions - Norwegian
 const REGIONAL_TESTS = {
@@ -372,9 +373,9 @@ function TestItem({ test, value, onChange, isExtra = false }) {
                 ? 'bg-amber-500 text-white'
                 : 'bg-gray-100 text-gray-500 dark:text-gray-400 hover:bg-amber-100 hover:text-amber-600'
             }`}
-            title="Positiv"
+            title={t('regionalPositive', 'Positiv')}
           >
-            Positiv
+            {t('regionalPositive', 'Positiv')}
           </button>
           <button
             onClick={() => onChange(test.id, value === false ? null : false)}
@@ -383,9 +384,9 @@ function TestItem({ test, value, onChange, isExtra = false }) {
                 ? 'bg-green-500 text-white'
                 : 'bg-gray-100 text-gray-500 dark:text-gray-400 hover:bg-green-100 hover:text-green-600'
             }`}
-            title="Negativ"
+            title={t('regionalNegative', 'Negativ')}
           >
-            Negativ
+            {t('regionalNegative', 'Negativ')}
           </button>
         </div>
         <div className="flex-1 min-w-0">
@@ -452,9 +453,11 @@ function RegionPanel({ region, values = {}, onChange, expanded, onToggle }) {
         <div className="flex items-center gap-3">
           {totalTested > 0 && (
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              {totalTested} tester
+              {totalTested} {t('regionalTests', 'tester')}
               {positiveCount > 0 && (
-                <span className="text-amber-600 font-medium ml-1">({positiveCount} positiv)</span>
+                <span className="text-amber-600 font-medium ml-1">
+                  ({positiveCount} {t('regionalPositiveLower', 'positiv')})
+                </span>
               )}
             </span>
           )}
@@ -468,7 +471,8 @@ function RegionPanel({ region, values = {}, onChange, expanded, onToggle }) {
           <div>
             <h4 className="text-sm font-semibold text-gray-600 dark:text-gray-300 mb-2 flex items-center gap-2">
               <Activity className="w-4 h-4" />
-              Normale tester ({normalCount}/{region.normalTests.length})
+              {t('regionalNormalTests', 'Normale tester')} ({normalCount}/
+              {region.normalTests.length})
             </h4>
             <div className="space-y-2">
               {region.normalTests.map((test) => (
@@ -493,7 +497,7 @@ function RegionPanel({ region, values = {}, onChange, expanded, onToggle }) {
               ) : (
                 <ChevronRight className="w-4 h-4" />
               )}
-              Ekstra tester ({extraCount}/{region.extraTests.length})
+              {t('regionalExtraTests', 'Ekstra tester')} ({extraCount}/{region.extraTests.length})
             </button>
 
             {showExtra && (
@@ -525,6 +529,7 @@ export default function RegionalExamination({
   onGenerateReport,
   _readOnly = false,
 }) {
+  const { t } = useTranslation('clinical');
   const [expandedRegions, setExpandedRegions] = useState({});
 
   const handleRegionToggle = (regionId) => {
@@ -637,9 +642,11 @@ export default function RegionalExamination({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-gray-800">Regional undersøkelse</h2>
+          <h2 className="text-lg font-semibold text-gray-800">
+            {t('regionalExamTitle', 'Regional undersøkelse')}
+          </h2>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Full kroppsundersøkelse organisert etter region
+            {t('regionalExamSubtitle', 'Full kroppsundersøkelse organisert etter region')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -649,7 +656,7 @@ export default function RegionalExamination({
                       border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
-            Nullstill
+            {t('regionalReset', 'Nullstill')}
           </button>
           <button
             onClick={handleGenerateReport}
@@ -657,7 +664,7 @@ export default function RegionalExamination({
                       rounded-lg hover:bg-blue-700 transition-colors"
           >
             <FileText className="w-4 h-4" />
-            Generer rapport
+            {t('regionalGenerateReport', 'Generer rapport')}
           </button>
         </div>
       </div>
@@ -672,7 +679,8 @@ export default function RegionalExamination({
           }`}
         >
           <p className="text-sm font-medium">
-            {summary.totalTested} tester utført • {summary.totalPositive} positive funn
+            {summary.totalTested} {t('regionalTestsPerformed', 'tester utført')} •{' '}
+            {summary.totalPositive} {t('regionalPositiveFindings', 'positive funn')}
           </p>
           {summary.regions.length > 0 && (
             <div className="flex flex-wrap gap-2 mt-2">

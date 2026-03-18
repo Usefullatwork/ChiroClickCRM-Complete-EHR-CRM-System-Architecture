@@ -15,6 +15,7 @@ import TextExpansionPopup from './TextExpansionPopup';
 import { Sparkles, Loader2, Mic, MicOff, Square } from 'lucide-react';
 import { aiAPI } from '../../services/api';
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 
 const log = logger.scope('ClinicalTextarea');
 
@@ -110,6 +111,7 @@ export default function EnhancedClinicalTextarea({
   const [voiceSupported, setVoiceSupported] = useState(false);
   const [interimTranscript, setInterimTranscript] = useState('');
   const [voiceError, setVoiceError] = useState(null);
+  const { t } = useTranslation('clinical');
 
   // Check voice support on mount
   useEffect(() => {
@@ -172,10 +174,10 @@ export default function EnhancedClinicalTextarea({
       log.error('Speech recognition error', { error: event.error });
       setVoiceError(
         event.error === 'not-allowed'
-          ? 'Mikrofontilgang nektet'
+          ? t('voiceMicDenied', 'Mikrofontilgang nektet')
           : event.error === 'no-speech'
-            ? 'Ingen tale oppdaget'
-            : `Feil: ${event.error}`
+            ? t('voiceNoSpeech', 'Ingen tale oppdaget')
+            : `${t('voiceError', 'Feil')}: ${event.error}`
       );
       setIsListening(false);
     };
@@ -400,7 +402,8 @@ export default function EnhancedClinicalTextarea({
         <label className="block text-sm font-medium text-gray-700 mb-1">
           {label}
           <span className="ml-2 text-xs text-gray-400 dark:text-gray-300 font-normal">
-            .xx makro · /xxx kommando{voiceSupported && showVoiceInput ? ' · 🎤 diktering' : ''}
+            {t('textareaHint', '.xx makro · /xxx kommando')}
+            {voiceSupported && showVoiceInput ? ` · 🎤 ${t('textareaDictation', 'diktering')}` : ''}
           </span>
         </label>
       )}
@@ -454,7 +457,11 @@ export default function EnhancedClinicalTextarea({
                   ? 'bg-red-500 text-white animate-pulse hover:bg-red-600'
                   : 'text-gray-400 dark:text-gray-300 hover:text-red-500 hover:bg-red-50'
               }`}
-              title={isListening ? 'Stopp diktering (Esc)' : 'Start diktering'}
+              title={
+                isListening
+                  ? t('voiceStopDictation', 'Stopp diktering (Esc)')
+                  : t('voiceStartDictation', 'Start diktering')
+              }
               type="button"
             >
               {isListening ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
@@ -467,7 +474,7 @@ export default function EnhancedClinicalTextarea({
               onClick={() => onAIGenerate(section, field)}
               disabled={disabled}
               className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors disabled:opacity-50"
-              title="Generer med AI"
+              title={t('generateWithAI', 'Generer med AI')}
               type="button"
             >
               <Sparkles className="w-4 h-4" />
@@ -483,7 +490,7 @@ export default function EnhancedClinicalTextarea({
         {/* Tab hint for AI suggestion */}
         {aiSuggestion && !isListening && (
           <div className="absolute bottom-2 right-2 text-xs text-gray-400 dark:text-gray-300 bg-gray-100 px-1.5 py-0.5 rounded">
-            Tab for å akseptere
+            {t('tabToAccept', 'Tab for å akseptere')}
           </div>
         )}
 
@@ -491,7 +498,7 @@ export default function EnhancedClinicalTextarea({
         {isListening && (
           <div className="absolute bottom-2 left-2 flex items-center gap-2 text-xs text-red-600 bg-red-50 px-2 py-1 rounded">
             <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
-            Lytter... (Esc for å stoppe)
+            {t('voiceListening', 'Lytter... (Esc for å stoppe)')}
           </div>
         )}
       </div>
@@ -547,7 +554,7 @@ export default function EnhancedClinicalTextarea({
           ))}
           {quickPhrases.length > 8 && (
             <span className="px-2 py-1 text-xs text-gray-400 dark:text-gray-300">
-              +{quickPhrases.length - 8} mer
+              +{quickPhrases.length - 8} {t('textareaMore', 'mer')}
             </span>
           )}
         </div>

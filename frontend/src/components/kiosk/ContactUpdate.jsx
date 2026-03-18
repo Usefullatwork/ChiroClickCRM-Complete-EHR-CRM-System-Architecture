@@ -5,28 +5,10 @@
 
 import { useState } from 'react';
 import { Phone, Mail, ArrowRight, SkipForward } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
-const TRANSLATIONS = {
-  en: {
-    title: 'Is your contact information correct?',
-    subtitle: 'Please verify your phone number and email',
-    phone: 'Phone',
-    email: 'Email',
-    noChanges: 'No changes',
-    save: 'Save & Continue',
-  },
-  no: {
-    title: 'Er kontaktinformasjonen din riktig?',
-    subtitle: 'Bekreft telefonnummer og e-post',
-    phone: 'Telefon',
-    email: 'E-post',
-    noChanges: 'Ingen endringer',
-    save: 'Lagre og fortsett',
-  },
-};
-
-export default function ContactUpdate({ appointment, lang = 'no', onNext, onBack: _onBack }) {
-  const t = TRANSLATIONS[lang];
+export default function ContactUpdate({ appointment, onNext, onBack: _onBack }) {
+  const { t } = useTranslation('kiosk');
   const [phone, setPhone] = useState(appointment?.phone || '');
   const [email, setEmail] = useState(appointment?.email || '');
 
@@ -41,15 +23,19 @@ export default function ContactUpdate({ appointment, lang = 'no', onNext, onBack
   return (
     <div className="flex flex-col h-full">
       <div className="text-center mb-8">
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">{t.title}</h1>
-        <p className="text-lg text-slate-500 dark:text-slate-400">{t.subtitle}</p>
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">
+          {t('contactTitle', 'Er kontaktinformasjonen din riktig?')}
+        </h1>
+        <p className="text-lg text-slate-500 dark:text-slate-400">
+          {t('contactSubtitle', 'Bekreft telefonnummer og e-post')}
+        </p>
       </div>
 
       <div className="flex-1 space-y-6 max-w-md mx-auto w-full">
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
             <Phone className="w-4 h-4" />
-            {t.phone}
+            {t('contactPhone', 'Telefon')}
           </label>
           <input
             type="tel"
@@ -63,7 +49,7 @@ export default function ContactUpdate({ appointment, lang = 'no', onNext, onBack
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">
             <Mail className="w-4 h-4" />
-            {t.email}
+            {t('contactEmail', 'E-post')}
           </label>
           <input
             type="email"
@@ -80,7 +66,7 @@ export default function ContactUpdate({ appointment, lang = 'no', onNext, onBack
           onClick={handleSave}
           className="w-full py-4 bg-teal-600 text-white text-xl font-bold rounded-2xl hover:bg-teal-700 transition-colors flex items-center justify-center gap-3"
         >
-          {t.save}
+          {t('saveAndContinue', 'Lagre og fortsett')}
           <ArrowRight className="w-6 h-6" />
         </button>
         <button
@@ -88,7 +74,7 @@ export default function ContactUpdate({ appointment, lang = 'no', onNext, onBack
           className="w-full py-3 bg-slate-100 text-slate-600 dark:text-slate-300 text-lg font-medium rounded-2xl hover:bg-slate-200 transition-colors flex items-center justify-center gap-2"
         >
           <SkipForward className="w-5 h-5" />
-          {t.noChanges}
+          {t('noChanges', 'Ingen endringer')}
         </button>
       </div>
     </div>

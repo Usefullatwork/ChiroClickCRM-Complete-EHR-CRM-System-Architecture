@@ -21,6 +21,7 @@ import {
   ClipboardCheck,
   Activity,
 } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 /**
  * NotePreview Component
@@ -101,6 +102,8 @@ export default function NotePreview({
       minute: '2-digit',
     });
   };
+
+  const { t } = useTranslation('clinical');
 
   if (!note && !isLoading) {
     return null;
@@ -187,7 +190,7 @@ export default function NotePreview({
                 {isLocked && (
                   <span className="flex items-center gap-1 px-2 py-0.5 text-xs font-medium rounded bg-green-100 text-green-800">
                     <Lock className="w-3 h-3" />
-                    Signert
+                    {t('notePreviewSigned', 'Signert')}
                   </span>
                 )}
               </div>
@@ -205,7 +208,7 @@ export default function NotePreview({
                 className="flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 <Edit className="w-4 h-4" />
-                Rediger
+                {t('notePreviewEdit', 'Rediger')}
               </button>
             )}
             <button
@@ -213,20 +216,20 @@ export default function NotePreview({
               className="flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               <Printer className="w-4 h-4" />
-              Skriv ut
+              {t('notePreviewPrint', 'Skriv ut')}
             </button>
             <button
               onClick={() => onExport(note?.id)}
               className="flex items-center gap-2 px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               <Download className="w-4 h-4" />
-              Last ned
+              {t('notePreviewDownload', 'Last ned')}
             </button>
             {!isLocked && (
               <button
                 onClick={() => onDelete(note?.id)}
                 className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                title="Slett notat"
+                title={t('notePreviewDelete', 'Slett notat')}
               >
                 <Trash2 className="w-4 h-4" />
               </button>
@@ -242,7 +245,9 @@ export default function NotePreview({
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-              <span className="ml-3 text-gray-500 dark:text-gray-400">Laster notat...</span>
+              <span className="ml-3 text-gray-500 dark:text-gray-400">
+                {t('notePreviewLoading', 'Laster notat...')}
+              </span>
             </div>
           ) : (
             <>
@@ -455,7 +460,9 @@ export default function NotePreview({
                   <div className="flex items-center gap-3 text-green-700">
                     <CheckCircle className="w-5 h-5" />
                     <div>
-                      <p className="font-medium">Signert og last</p>
+                      <p className="font-medium">
+                        {t('notePreviewSignedAndLocked', 'Signert og låst')}
+                      </p>
                       <p className="text-sm text-green-600">
                         {note?.signed_by_name && `Signert av ${note.signed_by_name}`}
                         {note?.signed_at && ` - ${formatDateTime(note.signed_at)}`}

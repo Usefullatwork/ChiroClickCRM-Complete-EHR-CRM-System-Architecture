@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
-import { t } from '../assessment/translations';
+import { useTranslation } from '../../i18n';
 import {
   FileText,
   User,
@@ -185,13 +185,15 @@ function InputField({
 
 // Main SickNoteGenerator Component
 export default function SickNoteGenerator({
-  language = 'no', // Default to Norwegian for sick notes
+  language = 'no', // Kept for backwards compat
   initialData = null,
   patientData = null,
   practitionerData = null,
   onSave,
   _onSubmitToNav,
 }) {
+  const { t, lang } = useTranslation('assessment');
+
   const [data, setData] = useState(() => {
     const defaultData = initialData || getDefaultSickNoteData();
 
@@ -236,81 +238,77 @@ export default function SickNoteGenerator({
   const getDiagnosisName = useCallback(
     (code) => {
       const diagnosis = COMMON_DIAGNOSES.find((d) => d.code === code);
-      return diagnosis ? diagnosis.name[language] : code;
+      return diagnosis ? diagnosis.name[lang] : code;
     },
-    [language]
+    [lang]
   );
 
   // Generate printable document
   const generateDocument = useCallback(() => {
-    const today = new Date().toLocaleDateString(language === 'no' ? 'nb-NO' : 'en-GB');
+    const today = new Date().toLocaleDateString(lang === 'no' ? 'nb-NO' : 'en-GB');
 
     return `
-${language === 'no' ? 'SYKEMELDING' : 'SICK NOTE'}
+${t('sickNoteTitle', 'Sykemelding').toUpperCase()}
 ${'='.repeat(60)}
 
-${language === 'no' ? 'PASIENTOPPLYSNINGER' : 'PATIENT INFORMATION'}
+${t('sickNotePatientInfo', 'Pasientopplysninger').toUpperCase()}
 ${'-'.repeat(30)}
-${t('sickNote', 'name', language)}: ${data.patient.name}
-${t('sickNote', 'personalId', language)}: ${data.patient.personalId}
-${t('sickNote', 'dateOfBirth', language)}: ${data.patient.dateOfBirth}
-${t('sickNote', 'address', language)}: ${data.patient.address}
-${t('sickNote', 'employer', language)}: ${data.patient.employer}
-${t('sickNote', 'occupation', language)}: ${data.patient.occupation}
+${t('sickNoteName', 'Navn')}: ${data.patient.name}
+${t('sickNotePersonalId', 'Fødselsnummer')}: ${data.patient.personalId}
+${t('sickNoteDateOfBirth', 'Fødselsdato')}: ${data.patient.dateOfBirth}
+${t('sickNoteAddress', 'Adresse')}: ${data.patient.address}
+${t('sickNoteEmployer', 'Arbeidsgiver')}: ${data.patient.employer}
+${t('sickNoteOccupation', 'Yrke')}: ${data.patient.occupation}
 
-${language === 'no' ? 'DIAGNOSE' : 'DIAGNOSIS'}
+${t('sickNoteDiagnosis', 'Diagnose').toUpperCase()}
 ${'-'.repeat(30)}
-${t('sickNote', 'mainDiagnosis', language)}: ${data.clinical.mainDiagnosisCode} - ${getDiagnosisName(data.clinical.mainDiagnosisCode)}
-${data.clinical.secondaryDiagnosisCode ? `${t('sickNote', 'secondaryDiagnosis', language)}: ${data.clinical.secondaryDiagnosisCode} - ${getDiagnosisName(data.clinical.secondaryDiagnosisCode)}` : ''}
+${t('sickNoteMainDiagnosis', 'Hoveddiagnose')}: ${data.clinical.mainDiagnosisCode} - ${getDiagnosisName(data.clinical.mainDiagnosisCode)}
+${data.clinical.secondaryDiagnosisCode ? `${t('sickNoteSecondaryDiagnosis', 'Bidiagnose')}: ${data.clinical.secondaryDiagnosisCode} - ${getDiagnosisName(data.clinical.secondaryDiagnosisCode)}` : ''}
 
-${t('sickNote', 'clinicalFindings', language)}:
+${t('sickNoteClinicalFindings', 'Kliniske funn')}:
 ${data.clinical.clinicalFindings}
 
-${language === 'no' ? 'SYKMELDINGSPERIODE' : 'SICK LEAVE PERIOD'}
+${t('sickNotePeriod', 'Sykmeldingsperiode').toUpperCase()}
 ${'-'.repeat(30)}
-${t('sickNote', 'startDate', language)}: ${data.period.startDate}
-${t('sickNote', 'endDate', language)}: ${data.period.endDate}
-${t('sickNote', 'duration', language)}: ${durationDays} ${t('sickNote', 'days', language)}
-${language === 'no' ? 'Grad' : 'Grade'}: ${data.period.workCapacity}%
+${t('sickNoteStartDate', 'Startdato')}: ${data.period.startDate}
+${t('sickNoteEndDate', 'Sluttdato')}: ${data.period.endDate}
+${t('sickNoteDuration', 'Varighet')}: ${durationDays} ${t('sickNoteDays', 'dager')}
+${t('sickNoteWorkCapacity', 'Arbeidsevne')}: ${data.period.workCapacity}%
 
-${data.period.isRetroactive ? `${t('sickNote', 'retroactive', language)}: ${data.period.retroactiveFrom}` : ''}
+${data.period.isRetroactive ? `${t('sickNoteRetroactive', 'Tilbakedatert')}: ${data.period.retroactiveFrom}` : ''}
 
-${language === 'no' ? 'ARBEIDSEVNE' : 'WORK CAPACITY'}
+${t('sickNoteActivityRestrictions', 'Aktivitetsbegrensninger').toUpperCase()}
 ${'-'.repeat(30)}
 ${
   data.restrictions.cannotWork
-    ? language === 'no'
-      ? 'Pasienten kan ikke jobbe i sykmeldingsperioden.'
-      : 'Patient cannot work during sick leave period.'
-    : language === 'no'
-      ? 'Pasienten kan jobbe med tilrettelegging.'
-      : 'Patient can work with accommodations.'
+    ? t('sickNoteCannotWorkStatement', 'Pasienten kan ikke jobbe i sykmeldingsperioden.')
+    : t('sickNoteCanWorkStatement', 'Pasienten kan jobbe med tilrettelegging.')
 }
 
-${data.restrictions.restrictionDetails ? `${t('sickNote', 'activityRestrictions', language)}:\n${data.restrictions.restrictionDetails}` : ''}
+${data.restrictions.restrictionDetails ? `${t('sickNoteActivityRestrictions', 'Aktivitetsbegrensninger')}:\n${data.restrictions.restrictionDetails}` : ''}
 
-${data.restrictions.ergonomicAdvice ? `${t('sickNote', 'ergonomicAdvice', language)}:\n${data.restrictions.ergonomicAdvice}` : ''}
+${data.restrictions.ergonomicAdvice ? `${t('sickNoteErgonomicAdvice', 'Ergonomiske råd')}:\n${data.restrictions.ergonomicAdvice}` : ''}
 
-${language === 'no' ? 'OPPFØLGING' : 'FOLLOW-UP'}
+${t('sickNoteFollowUp', 'Oppfølging').toUpperCase()}
 ${'-'.repeat(30)}
-${t('sickNote', 'expectedRecovery', language)}: ${data.followUp.expectedRecovery}
-${data.followUp.followUpDate ? `${t('sickNote', 'followUpDate', language)}: ${data.followUp.followUpDate}` : ''}
-${data.followUp.treatmentPlan ? `${t('sickNote', 'treatmentPlan', language)}:\n${data.followUp.treatmentPlan}` : ''}
+${t('sickNoteExpectedRecovery', 'Forventet bedring')}: ${data.followUp.expectedRecovery}
+${data.followUp.followUpDate ? `${t('sickNoteFollowUpDate', 'Oppfølgingsdato')}: ${data.followUp.followUpDate}` : ''}
+${data.followUp.treatmentPlan ? `${t('sickNoteTreatmentPlan', 'Behandlingsplan')}:\n${data.followUp.treatmentPlan}` : ''}
 
-${language === 'no' ? 'BEHANDLER' : 'PRACTITIONER'}
+${t('sickNoteAttestation', 'Behandlerattestasjon').toUpperCase()}
 ${'-'.repeat(30)}
 ${data.practitioner.name}
-${t('sickNote', 'chiropractor', language)}
-${t('sickNote', 'licenseNumber', language)}: ${data.practitioner.hprNumber}
+${t('sickNoteChiropractor', 'Kiropraktor')}
+${t('sickNoteLicenseNumber', 'HPR-nummer')}: ${data.practitioner.hprNumber}
 ${data.practitioner.clinicName}
 ${data.practitioner.clinicAddress}
-${t('sickNote', 'phone', language)}: ${data.practitioner.phone}
+${t('sickNotePhone', 'Telefon')}: ${data.practitioner.phone}
 
-${t('sickNote', 'date', language)}: ${today}
+${t('sickNoteDate', 'Dato')}: ${today}
 
 ${'='.repeat(60)}
     `.trim();
-  }, [data, language, durationDays, getDiagnosisName]);
+  }, [data, lang, t, durationDays, getDiagnosisName]);
 
   // Copy to clipboard
   const copyToClipboard = useCallback(async () => {
@@ -323,7 +321,7 @@ ${'='.repeat(60)}
     printWindow.document.write(`
       <html>
         <head>
-          <title>${language === 'no' ? 'Sykemelding' : 'Sick Note'}</title>
+          <title>${t('sickNoteTitle', 'Sykemelding')}</title>
           <style>
             body { font-family: 'Courier New', monospace; font-size: 12px; padding: 20px; }
             pre { white-space: pre-wrap; }
@@ -336,7 +334,7 @@ ${'='.repeat(60)}
     `);
     printWindow.document.close();
     printWindow.print();
-  }, [generateDocument, language]);
+  }, [generateDocument, t]);
 
   // Handle save
   const handleSave = useCallback(() => {
@@ -353,10 +351,10 @@ ${'='.repeat(60)}
           <div>
             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <FileText className="w-7 h-7 text-blue-600" />
-              {t('sickNote', 'title', language)}
+              {t('sickNoteTitle', 'Sykemelding')}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              {t('sickNote', 'subtitle', language)}
+              {t('sickNoteSubtitle', 'NAV-kompatibel sykmeldingsdokumentasjon')}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -368,7 +366,7 @@ ${'='.repeat(60)}
                   : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
               }`}
             >
-              {t('sickNote', 'preview', language)}
+              {t('sickNotePreview', 'Forhåndsvis')}
             </button>
           </div>
         </div>
@@ -387,39 +385,39 @@ ${'='.repeat(60)}
           /* Edit Mode */
           <>
             {/* Patient Information */}
-            <Section title={t('sickNote', 'patientInfo', language)} icon={User}>
+            <Section title={t('sickNotePatientInfo', 'Pasientopplysninger')} icon={User}>
               <div className="grid grid-cols-2 gap-4">
                 <InputField
-                  label={t('sickNote', 'name', language)}
+                  label={t('sickNoteName', 'Navn')}
                   value={data.patient.name}
                   onChange={(v) => updateSection('patient', 'name', v)}
                   required
                 />
                 <InputField
-                  label={t('sickNote', 'personalId', language)}
+                  label={t('sickNotePersonalId', 'Fødselsnummer')}
                   value={data.patient.personalId}
                   onChange={(v) => updateSection('patient', 'personalId', v)}
-                  placeholder={language === 'no' ? '11 siffer' : '11 digits'}
+                  placeholder={t('sickNotePersonalIdPlaceholder', '11 siffer')}
                   required
                 />
                 <InputField
-                  label={t('sickNote', 'dateOfBirth', language)}
+                  label={t('sickNoteDateOfBirth', 'Fødselsdato')}
                   type="date"
                   value={data.patient.dateOfBirth}
                   onChange={(v) => updateSection('patient', 'dateOfBirth', v)}
                 />
                 <InputField
-                  label={t('sickNote', 'address', language)}
+                  label={t('sickNoteAddress', 'Adresse')}
                   value={data.patient.address}
                   onChange={(v) => updateSection('patient', 'address', v)}
                 />
                 <InputField
-                  label={t('sickNote', 'employer', language)}
+                  label={t('sickNoteEmployer', 'Arbeidsgiver')}
                   value={data.patient.employer}
                   onChange={(v) => updateSection('patient', 'employer', v)}
                 />
                 <InputField
-                  label={t('sickNote', 'occupation', language)}
+                  label={t('sickNoteOccupation', 'Yrke')}
                   value={data.patient.occupation}
                   onChange={(v) => updateSection('patient', 'occupation', v)}
                 />
@@ -427,12 +425,12 @@ ${'='.repeat(60)}
             </Section>
 
             {/* Diagnosis */}
-            <Section title={t('sickNote', 'diagnosis', language)} icon={Stethoscope}>
+            <Section title={t('sickNoteDiagnosis', 'Diagnose')} icon={Stethoscope}>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('sickNote', 'mainDiagnosis', language)} (ICPC-2)
+                      {t('sickNoteMainDiagnosis', 'Hoveddiagnose')} (ICPC-2)
                       <span className="text-red-500 ml-1">*</span>
                     </label>
                     <select
@@ -442,19 +440,17 @@ ${'='.repeat(60)}
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     >
-                      <option value="">
-                        {language === 'no' ? 'Velg diagnose...' : 'Select diagnosis...'}
-                      </option>
+                      <option value="">{t('sickNoteSelectDiagnosis', 'Velg diagnose...')}</option>
                       {COMMON_DIAGNOSES.map((d) => (
                         <option key={d.code} value={d.code}>
-                          {d.code} - {d.name[language]}
+                          {d.code} - {d.name[lang]}
                         </option>
                       ))}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('sickNote', 'secondaryDiagnosis', language)} (ICPC-2)
+                      {t('sickNoteSecondaryDiagnosis', 'Bidiagnose')} (ICPC-2)
                     </label>
                     <select
                       value={data.clinical.secondaryDiagnosisCode}
@@ -463,10 +459,10 @@ ${'='.repeat(60)}
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     >
-                      <option value="">{language === 'no' ? 'Ingen' : 'None'}</option>
+                      <option value="">{t('none', 'Ingen')}</option>
                       {COMMON_DIAGNOSES.map((d) => (
                         <option key={d.code} value={d.code}>
-                          {d.code} - {d.name[language]}
+                          {d.code} - {d.name[lang]}
                         </option>
                       ))}
                     </select>
@@ -474,36 +470,35 @@ ${'='.repeat(60)}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('sickNote', 'clinicalFindings', language)}
+                    {t('sickNoteClinicalFindings', 'Kliniske funn')}
                   </label>
                   <textarea
                     value={data.clinical.clinicalFindings}
                     onChange={(e) => updateSection('clinical', 'clinicalFindings', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     rows={3}
-                    placeholder={
-                      language === 'no'
-                        ? 'Beskriv kliniske funn som støtter diagnosen...'
-                        : 'Describe clinical findings supporting the diagnosis...'
-                    }
+                    placeholder={t(
+                      'sickNoteClinicalFindingsPlaceholder',
+                      'Beskriv kliniske funn som støtter diagnosen...'
+                    )}
                   />
                 </div>
               </div>
             </Section>
 
             {/* Period */}
-            <Section title={t('sickNote', 'period', language)} icon={Calendar}>
+            <Section title={t('sickNotePeriod', 'Sykmeldingsperiode')} icon={Calendar}>
               <div className="space-y-4">
                 <div className="grid grid-cols-3 gap-4">
                   <InputField
-                    label={t('sickNote', 'startDate', language)}
+                    label={t('sickNoteStartDate', 'Startdato')}
                     type="date"
                     value={data.period.startDate}
                     onChange={(v) => updateSection('period', 'startDate', v)}
                     required
                   />
                   <InputField
-                    label={t('sickNote', 'endDate', language)}
+                    label={t('sickNoteEndDate', 'Sluttdato')}
                     type="date"
                     value={data.period.endDate}
                     onChange={(v) => updateSection('period', 'endDate', v)}
@@ -511,17 +506,17 @@ ${'='.repeat(60)}
                   />
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('sickNote', 'duration', language)}
+                      {t('sickNoteDuration', 'Varighet')}
                     </label>
                     <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm text-gray-700">
-                      {durationDays} {t('sickNote', 'days', language)}
+                      {durationDays} {t('sickNoteDays', 'dager')}
                     </div>
                   </div>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('sickNote', 'workCapacity', language)}
+                    {t('sickNoteWorkCapacity', 'Arbeidsevne')}
                   </label>
                   <div className="flex flex-wrap gap-2">
                     {WORK_CAPACITY_OPTIONS.map((option) => (
@@ -535,7 +530,7 @@ ${'='.repeat(60)}
                             : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                         }`}
                       >
-                        {option.label[language]}
+                        {option.label[lang]}
                       </button>
                     ))}
                   </div>
@@ -549,7 +544,7 @@ ${'='.repeat(60)}
                       onChange={(e) => updateSection('period', 'isRetroactive', e.target.checked)}
                       className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm">{t('sickNote', 'retroactive', language)}</span>
+                    <span className="text-sm">{t('sickNoteRetroactive', 'Tilbakedatert')}</span>
                   </label>
                   {data.period.isRetroactive && (
                     <InputField
@@ -565,7 +560,7 @@ ${'='.repeat(60)}
 
             {/* Work Restrictions */}
             <Section
-              title={t('sickNote', 'activityRestrictions', language)}
+              title={t('sickNoteActivityRestrictions', 'Aktivitetsbegrensninger')}
               icon={AlertTriangle}
               defaultOpen={false}
             >
@@ -582,7 +577,7 @@ ${'='.repeat(60)}
                       }}
                       className="w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm">{t('sickNote', 'cannotWork', language)}</span>
+                    <span className="text-sm">{t('sickNoteCannotWork', 'Kan ikke jobbe')}</span>
                   </label>
                   <label className="flex items-center gap-2">
                     <input
@@ -595,7 +590,9 @@ ${'='.repeat(60)}
                       }}
                       className="w-4 h-4 border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm">{t('sickNote', 'restrictedDuties', language)}</span>
+                    <span className="text-sm">
+                      {t('sickNoteRestrictedDuties', 'Tilrettelagte oppgaver')}
+                    </span>
                   </label>
                 </div>
 
@@ -607,17 +604,16 @@ ${'='.repeat(60)}
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     rows={2}
-                    placeholder={
-                      language === 'no'
-                        ? 'Beskriv hvilke arbeidsoppgaver pasienten kan utføre...'
-                        : 'Describe what work tasks the patient can perform...'
-                    }
+                    placeholder={t(
+                      'sickNoteRestrictionDetailsPlaceholder',
+                      'Beskriv hvilke arbeidsoppgaver pasienten kan utføre...'
+                    )}
                   />
                 )}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('sickNote', 'ergonomicAdvice', language)}
+                    {t('sickNoteErgonomicAdvice', 'Ergonomiske råd')}
                   </label>
                   <textarea
                     value={data.restrictions.ergonomicAdvice}
@@ -626,27 +622,22 @@ ${'='.repeat(60)}
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     rows={2}
-                    placeholder={
-                      language === 'no'
-                        ? 'Ergonomiske råd til arbeidsgiver...'
-                        : 'Ergonomic advice for employer...'
-                    }
+                    placeholder={t(
+                      'sickNoteErgonomicAdvicePlaceholder',
+                      'Ergonomiske råd til arbeidsgiver...'
+                    )}
                   />
                 </div>
               </div>
             </Section>
 
             {/* Follow-up */}
-            <Section
-              title={language === 'no' ? 'Oppfølging' : 'Follow-up'}
-              icon={Clock}
-              defaultOpen={false}
-            >
+            <Section title={t('sickNoteFollowUp', 'Oppfølging')} icon={Clock} defaultOpen={false}>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {t('sickNote', 'expectedRecovery', language)}
+                      {t('sickNoteExpectedRecovery', 'Forventet bedring')}
                     </label>
                     <select
                       value={data.followUp.expectedRecovery}
@@ -655,26 +646,16 @@ ${'='.repeat(60)}
                       }
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     >
-                      <option value="">{language === 'no' ? 'Velg...' : 'Select...'}</option>
-                      <option value="1-2-weeks">
-                        {language === 'no' ? '1-2 uker' : '1-2 weeks'}
-                      </option>
-                      <option value="2-4-weeks">
-                        {language === 'no' ? '2-4 uker' : '2-4 weeks'}
-                      </option>
-                      <option value="4-8-weeks">
-                        {language === 'no' ? '4-8 uker' : '4-8 weeks'}
-                      </option>
-                      <option value="8-12-weeks">
-                        {language === 'no' ? '8-12 uker' : '8-12 weeks'}
-                      </option>
-                      <option value="uncertain">
-                        {language === 'no' ? 'Usikkert' : 'Uncertain'}
-                      </option>
+                      <option value="">{t('sickNoteSelectOption', 'Velg...')}</option>
+                      <option value="1-2-weeks">{t('sickNote1to2Weeks', '1-2 uker')}</option>
+                      <option value="2-4-weeks">{t('sickNote2to4Weeks', '2-4 uker')}</option>
+                      <option value="4-8-weeks">{t('sickNote4to8Weeks', '4-8 uker')}</option>
+                      <option value="8-12-weeks">{t('sickNote8to12Weeks', '8-12 uker')}</option>
+                      <option value="uncertain">{t('sickNoteUncertain', 'Usikkert')}</option>
                     </select>
                   </div>
                   <InputField
-                    label={t('sickNote', 'followUpDate', language)}
+                    label={t('sickNoteFollowUpDate', 'Oppfølgingsdato')}
                     type="date"
                     value={data.followUp.followUpDate}
                     onChange={(v) => updateSection('followUp', 'followUpDate', v)}
@@ -682,16 +663,14 @@ ${'='.repeat(60)}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('sickNote', 'treatmentPlan', language)}
+                    {t('sickNoteTreatmentPlan', 'Behandlingsplan')}
                   </label>
                   <textarea
                     value={data.followUp.treatmentPlan}
                     onChange={(e) => updateSection('followUp', 'treatmentPlan', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     rows={2}
-                    placeholder={
-                      language === 'no' ? 'Videre behandlingsplan...' : 'Further treatment plan...'
-                    }
+                    placeholder={t('sickNoteTreatmentPlanPlaceholder', 'Videre behandlingsplan...')}
                   />
                 </div>
               </div>
@@ -699,36 +678,36 @@ ${'='.repeat(60)}
 
             {/* Practitioner Info */}
             <Section
-              title={t('sickNote', 'attestation', language)}
+              title={t('sickNoteAttestation', 'Behandlerattestasjon')}
               icon={Building2}
               defaultOpen={false}
             >
               <div className="grid grid-cols-2 gap-4">
                 <InputField
-                  label={t('sickNote', 'attestedBy', language)}
+                  label={t('sickNoteAttestedBy', 'Attestert av')}
                   value={data.practitioner.name}
                   onChange={(v) => updateSection('practitioner', 'name', v)}
                   required
                 />
                 <InputField
-                  label={t('sickNote', 'licenseNumber', language)}
+                  label={t('sickNoteLicenseNumber', 'HPR-nummer')}
                   value={data.practitioner.hprNumber}
                   onChange={(v) => updateSection('practitioner', 'hprNumber', v)}
                   placeholder="HPR-nummer"
                   required
                 />
                 <InputField
-                  label={t('sickNote', 'clinicName', language)}
+                  label={t('sickNoteClinicName', 'Klinikknavn')}
                   value={data.practitioner.clinicName}
                   onChange={(v) => updateSection('practitioner', 'clinicName', v)}
                 />
                 <InputField
-                  label={t('sickNote', 'clinicAddress', language)}
+                  label={t('sickNoteClinicAddress', 'Klinikkadresse')}
                   value={data.practitioner.clinicAddress}
                   onChange={(v) => updateSection('practitioner', 'clinicAddress', v)}
                 />
                 <InputField
-                  label={t('sickNote', 'phone', language)}
+                  label={t('sickNotePhone', 'Telefon')}
                   value={data.practitioner.phone}
                   onChange={(v) => updateSection('practitioner', 'phone', v)}
                 />
@@ -747,14 +726,14 @@ ${'='.repeat(60)}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               <Copy className="w-4 h-4" />
-              {t('common', 'copy', language)}
+              {t('copy', 'Kopier')}
             </button>
             <button
               onClick={printDocument}
               className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               <Printer className="w-4 h-4" />
-              {t('sickNote', 'print', language)}
+              {t('sickNotePrint', 'Skriv ut')}
             </button>
           </div>
           <div className="flex gap-2">
@@ -763,7 +742,7 @@ ${'='.repeat(60)}
               className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
             >
               <CheckCircle className="w-4 h-4" />
-              {t('common', 'save', language)}
+              {t('save', 'Lagre')}
             </button>
           </div>
         </div>

@@ -9,6 +9,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import SOAPTemplate from '../../components/notes/SOAPTemplate';
 import { createMockSOAPData, createMockPatient } from '../setup';
 
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({
+    t: (key, fallback) => fallback || key,
+    lang: 'no',
+    setLang: vi.fn(),
+    getBilingual: (obj) => obj?.['no'] || obj?.['en'] || obj,
+  }),
+}));
+
 describe('SOAPTemplate Component', () => {
   const mockPatient = createMockPatient();
   const mockInitialData = createMockSOAPData();
@@ -62,13 +71,13 @@ describe('SOAPTemplate Component', () => {
     it('should render save and sign buttons when not read-only', () => {
       render(<SOAPTemplate onSave={mockOnSave} onLock={mockOnLock} />);
       expect(screen.getByText('Lagre')).toBeInTheDocument();
-      expect(screen.getByText('Signer og las')).toBeInTheDocument();
+      expect(screen.getByText('Signer og lås')).toBeInTheDocument();
     });
 
     it('should hide action buttons when read-only', () => {
       render(<SOAPTemplate readOnly={true} onSave={mockOnSave} onLock={mockOnLock} />);
       expect(screen.queryByText('Lagre')).not.toBeInTheDocument();
-      expect(screen.queryByText('Signer og las')).not.toBeInTheDocument();
+      expect(screen.queryByText('Signer og lås')).not.toBeInTheDocument();
     });
   });
 
@@ -154,7 +163,7 @@ describe('SOAPTemplate Component', () => {
 
     it('should render neurological exam field', () => {
       render(<SOAPTemplate />);
-      expect(screen.getByText('Nevrologisk undersokelse')).toBeInTheDocument();
+      expect(screen.getByText('Nevrologisk undersøkelse')).toBeInTheDocument();
     });
 
     it('should render orthopedic tests field', () => {
@@ -185,7 +194,7 @@ describe('SOAPTemplate Component', () => {
 
     it('should render red flags section', () => {
       render(<SOAPTemplate />);
-      expect(screen.getByText('Rode flagg')).toBeInTheDocument();
+      expect(screen.getByText('Røde flagg')).toBeInTheDocument();
     });
 
     it('should render prognosis field', () => {
@@ -208,12 +217,12 @@ describe('SOAPTemplate Component', () => {
 
     it('should show add red flag button', () => {
       render(<SOAPTemplate />);
-      expect(screen.getByText('Legg til rod flagg')).toBeInTheDocument();
+      expect(screen.getByText('Legg til rødt flagg')).toBeInTheDocument();
     });
 
     it('should hide add red flag button when read-only', () => {
       render(<SOAPTemplate readOnly={true} />);
-      expect(screen.queryByText('Legg til rod flagg')).not.toBeInTheDocument();
+      expect(screen.queryByText('Legg til rødt flagg')).not.toBeInTheDocument();
     });
   });
 
@@ -229,7 +238,7 @@ describe('SOAPTemplate Component', () => {
 
     it('should render exercises field', () => {
       render(<SOAPTemplate />);
-      expect(screen.getByText('Ovelser/Hjemmeoppgaver')).toBeInTheDocument();
+      expect(screen.getByText('Øvelser/Hjemmeoppgaver')).toBeInTheDocument();
     });
 
     it('should render patient education field', () => {
@@ -239,7 +248,7 @@ describe('SOAPTemplate Component', () => {
 
     it('should render follow-up field', () => {
       render(<SOAPTemplate />);
-      expect(screen.getByText('Oppfolging')).toBeInTheDocument();
+      expect(screen.getByText('Oppfølging')).toBeInTheDocument();
     });
 
     it('should render referrals field', () => {
@@ -249,7 +258,7 @@ describe('SOAPTemplate Component', () => {
 
     it('should render goals field', () => {
       render(<SOAPTemplate />);
-      expect(screen.getByText('Mal')).toBeInTheDocument();
+      expect(screen.getByText('Mål')).toBeInTheDocument();
     });
   });
 
@@ -376,7 +385,7 @@ describe('SOAPTemplate Component', () => {
     it('should call onLock when sign button is clicked', async () => {
       render(<SOAPTemplate onLock={mockOnLock} />);
 
-      const lockButton = screen.getByText('Signer og las');
+      const lockButton = screen.getByText('Signer og lås');
       fireEvent.click(lockButton);
 
       await waitFor(() => {
@@ -502,7 +511,7 @@ describe('SOAPTemplate Component', () => {
 
       expect(screen.getByText('Test red flag')).toBeInTheDocument();
       // Add red flag button should not be present
-      expect(screen.queryByText('Legg til rod flagg')).not.toBeInTheDocument();
+      expect(screen.queryByText('Legg til rødt flagg')).not.toBeInTheDocument();
     });
   });
 
@@ -534,7 +543,7 @@ describe('SOAPTemplate Component', () => {
 
       // Verify placeholders are present (indicating proper field setup)
       expect(screen.getByPlaceholderText('Pasientens hovedklage...')).toBeInTheDocument();
-      expect(screen.getByPlaceholderText('Primar diagnose med ICD-10 kode...')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Primærdiagnose med ICD-10 kode...')).toBeInTheDocument();
     });
   });
 });

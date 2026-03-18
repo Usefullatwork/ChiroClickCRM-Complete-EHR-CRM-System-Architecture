@@ -19,6 +19,7 @@ import {
   Filter,
   BarChart3,
 } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 import {
   useCurationFeedback,
   useCurationStats,
@@ -27,27 +28,29 @@ import {
   useBulkCurationAction,
 } from '../../hooks/useAITraining';
 
-const SUGGESTION_TYPES = [
-  { value: '', label: 'Alle typer' },
-  { value: 'soap_subjective', label: 'Subjektiv' },
-  { value: 'soap_objective', label: 'Objektiv' },
-  { value: 'soap_assessment', label: 'Vurdering' },
-  { value: 'soap_plan', label: 'Plan' },
-  { value: 'diagnosis_code', label: 'Diagnose' },
-  { value: 'red_flag', label: 'Red flag' },
-  { value: 'spelling', label: 'Stavekontroll' },
-  { value: 'communication', label: 'Kommunikasjon' },
+// Labels will be resolved via t() in the component
+const SUGGESTION_TYPE_KEYS = [
+  { value: '', key: 'curationAllTypes' },
+  { value: 'soap_subjective', key: 'curationSubjective' },
+  { value: 'soap_objective', key: 'curationObjective' },
+  { value: 'soap_assessment', key: 'curationAssessment' },
+  { value: 'soap_plan', key: 'curationPlan' },
+  { value: 'diagnosis_code', key: 'curationDiagnosis' },
+  { value: 'red_flag', key: 'curationRedFlag' },
+  { value: 'spelling', key: 'curationSpelling' },
+  { value: 'communication', key: 'curationCommunication' },
 ];
 
-const STATUS_OPTIONS = [
-  { value: 'pending', label: 'Ventende' },
-  { value: 'approved', label: 'Godkjent' },
-  { value: 'rejected', label: 'Avvist' },
-  { value: 'exported', label: 'Eksportert' },
-  { value: 'all', label: 'Alle' },
+const STATUS_OPTION_KEYS = [
+  { value: 'pending', key: 'curationPending' },
+  { value: 'approved', key: 'curationApproved' },
+  { value: 'rejected', key: 'curationRejected' },
+  { value: 'exported', key: 'curationExported' },
+  { value: 'all', key: 'curationAll' },
 ];
 
 export default function DataCurationTab() {
+  const { t } = useTranslation('settings');
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState({
     type: '',
@@ -149,11 +152,23 @@ export default function DataCurationTab() {
       {/* Stats Bar */}
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-          <StatBadge label="Ventende" value={stats.pending} color="yellow" />
-          <StatBadge label="Godkjent" value={stats.approved} color="green" />
-          <StatBadge label="Avvist" value={stats.rejected} color="red" />
-          <StatBadge label="Eksportert" value={stats.exported} color="blue" />
-          <StatBadge label="Totalt" value={stats.total} color="gray" />
+          <StatBadge
+            label={t('curationPending', 'Ventende')}
+            value={stats.pending}
+            color="yellow"
+          />
+          <StatBadge
+            label={t('curationApproved', 'Godkjent')}
+            value={stats.approved}
+            color="green"
+          />
+          <StatBadge label={t('curationRejected', 'Avvist')} value={stats.rejected} color="red" />
+          <StatBadge
+            label={t('curationExported', 'Eksportert')}
+            value={stats.exported}
+            color="blue"
+          />
+          <StatBadge label={t('curationTotal', 'Totalt')} value={stats.total} color="gray" />
         </div>
       )}
 
@@ -161,7 +176,7 @@ export default function DataCurationTab() {
       {stats?.byType?.length > 0 && (
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
           <h3 className="text-sm font-medium text-gray-700 dark:text-gray-200 mb-2 flex items-center gap-2">
-            <BarChart3 className="w-4 h-4" /> Fordeling etter type
+            <BarChart3 className="w-4 h-4" /> {t('curationDistribution', 'Fordeling etter type')}
           </h3>
           <div className="flex flex-wrap gap-2">
             {stats.byType.map((t) => (
@@ -185,9 +200,9 @@ export default function DataCurationTab() {
             onChange={(e) => handleFilterChange('type', e.target.value)}
             className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
           >
-            {SUGGESTION_TYPES.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
+            {SUGGESTION_TYPE_KEYS.map((st) => (
+              <option key={st.value} value={st.value}>
+                {t(st.key, st.key)}
               </option>
             ))}
           </select>
@@ -196,9 +211,9 @@ export default function DataCurationTab() {
             onChange={(e) => handleFilterChange('status', e.target.value)}
             className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
           >
-            {STATUS_OPTIONS.map((s) => (
+            {STATUS_OPTION_KEYS.map((s) => (
               <option key={s.value} value={s.value}>
-                {s.label}
+                {t(s.key, s.key)}
               </option>
             ))}
           </select>
@@ -207,7 +222,7 @@ export default function DataCurationTab() {
             onChange={(e) => handleFilterChange('minRating', e.target.value)}
             className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
           >
-            <option value="">Alle vurderinger</option>
+            <option value="">{t('curationAllRatings', 'Alle vurderinger')}</option>
             <option value="1">1+</option>
             <option value="2">2+</option>
             <option value="3">3+</option>
@@ -233,7 +248,7 @@ export default function DataCurationTab() {
       {selectedIds.size > 0 && (
         <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg p-3 flex items-center justify-between">
           <span className="text-sm text-blue-800 dark:text-blue-300 font-medium">
-            {selectedIds.size} valgt
+            {selectedIds.size} {t('curationSelected', 'valgt')}
           </span>
           <div className="flex gap-2">
             <button
@@ -241,14 +256,14 @@ export default function DataCurationTab() {
               disabled={bulkMutation.isPending}
               className="px-3 py-1.5 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700 disabled:bg-gray-400"
             >
-              Godkjenn alle
+              {t('curationApproveAll', 'Godkjenn alle')}
             </button>
             <button
               onClick={() => handleBulk('reject')}
               disabled={bulkMutation.isPending}
               className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700 disabled:bg-gray-400"
             >
-              Avvis alle
+              {t('curationRejectAll', 'Avvis alle')}
             </button>
           </div>
         </div>
@@ -257,11 +272,13 @@ export default function DataCurationTab() {
       {/* Table */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         {feedbackQuery.isLoading ? (
-          <div className="p-6 text-gray-500 dark:text-gray-400">Laster...</div>
+          <div className="p-6 text-gray-500 dark:text-gray-400">
+            {t('curationLoading', 'Laster...')}
+          </div>
         ) : feedback.length === 0 ? (
           <div className="p-6 text-gray-500 dark:text-gray-400 text-center">
             <Database className="w-8 h-8 mx-auto mb-2 text-gray-300" />
-            Ingen tilbakemeldinger funnet med valgte filtre.
+            {t('curationNoFeedback', 'Ingen tilbakemeldinger funnet med valgte filtre.')}
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -337,17 +354,17 @@ export default function DataCurationTab() {
             disabled={page === 1}
             className="px-3 py-1.5 border dark:border-gray-600 rounded-lg text-sm disabled:opacity-50 dark:text-gray-200"
           >
-            Forrige
+            {t('curationPrevious', 'Forrige')}
           </button>
           <span className="text-sm text-gray-600 dark:text-gray-300">
-            Side {page} av {totalPages}
+            {t('curationPage', 'Side')} {page} {t('curationOf', 'av')} {totalPages}
           </span>
           <button
             onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
             disabled={page === totalPages}
             className="px-3 py-1.5 border dark:border-gray-600 rounded-lg text-sm disabled:opacity-50 dark:text-gray-200"
           >
-            Neste
+            {t('curationNext', 'Neste')}
           </button>
         </div>
       )}

@@ -10,32 +10,9 @@
 
 import { useState, useCallback } from 'react';
 import { Search, Loader2, AlertCircle } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 import logger from '../../utils/logger';
-const TRANSLATIONS = {
-  en: {
-    title: 'Check In',
-    subtitle: 'Enter your last name or phone number',
-    placeholder: 'Last name or phone...',
-    searchButton: 'Search',
-    searching: 'Searching...',
-    noResults: 'No appointment found for today',
-    tryAgain: 'Please check with reception',
-    selectAppointment: 'Select your appointment',
-    appointmentAt: 'Appointment at',
-  },
-  no: {
-    title: 'Sjekk inn',
-    subtitle: 'Skriv inn etternavn eller telefonnummer',
-    placeholder: 'Etternavn eller telefon...',
-    searchButton: 'Søk',
-    searching: 'Søker...',
-    noResults: 'Ingen avtale funnet for i dag',
-    tryAgain: 'Vennligst sjekk med resepsjonen',
-    selectAppointment: 'Velg din avtale',
-    appointmentAt: 'Avtale kl.',
-  },
-};
 
 const APPOINTMENT_TYPE_LABELS = {
   en: {
@@ -58,9 +35,9 @@ const APPOINTMENT_TYPE_LABELS = {
   },
 };
 
-export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v1' }) {
-  const t = TRANSLATIONS[lang];
-  const typeLabels = APPOINTMENT_TYPE_LABELS[lang];
+export default function PatientLookup({ onSelect, apiBase = '/api/v1' }) {
+  const { t, lang } = useTranslation('kiosk');
+  const typeLabels = APPOINTMENT_TYPE_LABELS[lang] || APPOINTMENT_TYPE_LABELS.no;
 
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
@@ -97,7 +74,7 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
       setResults(data.appointments || []);
     } catch (err) {
       logger.error('Kiosk lookup error:', err);
-      setError(lang === 'no' ? 'Søk mislyktes. Prøv igjen.' : 'Search failed. Please try again.');
+      setError(t('searchFailed', 'Søk mislyktes. Prøv igjen.'));
       setResults([]);
     } finally {
       setLoading(false);
@@ -114,8 +91,12 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
     <div className="flex flex-col h-full">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-3">{t.title}</h1>
-        <p className="text-xl text-slate-500 dark:text-slate-400">{t.subtitle}</p>
+        <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-3">
+          {t('lookupTitle', 'Sjekk inn')}
+        </h1>
+        <p className="text-xl text-slate-500 dark:text-slate-400">
+          {t('lookupSubtitle', 'Skriv inn etternavn eller telefonnummer')}
+        </p>
       </div>
 
       {/* Search input */}
@@ -125,7 +106,7 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={t.placeholder}
+          placeholder={t('lookupPlaceholder', 'Etternavn eller telefon...')}
           className="w-full text-2xl md:text-3xl p-5 md:p-6 border-2 border-slate-200 rounded-2xl
                      text-center focus:border-teal-500 focus:ring-4 focus:ring-teal-100
                      outline-none transition-all"
@@ -146,12 +127,12 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
         {loading ? (
           <>
             <Loader2 className="w-6 h-6 animate-spin" />
-            {t.searching}
+            {t('searching', 'Søker...')}
           </>
         ) : (
           <>
             <Search className="w-6 h-6" />
-            {t.searchButton}
+            {t('searchButton', 'Søk')}
           </>
         )}
       </button>
@@ -168,7 +149,7 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
       {results.length > 0 && (
         <div className="mt-8 flex-1 overflow-y-auto">
           <p className="text-lg text-slate-600 dark:text-slate-300 mb-4 text-center">
-            {t.selectAppointment}
+            {t('selectAppointment', 'Velg din avtale')}
           </p>
           <div className="space-y-3">
             {results.map((apt) => (
@@ -184,14 +165,14 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
                 </div>
                 <div className="text-lg text-slate-500 dark:text-slate-400 mt-1 flex items-center gap-2">
                   <span className="font-medium">
-                    {t.appointmentAt} {formatTime(apt.startTime)}
+                    {t('appointmentAt', 'Avtale kl.')} {formatTime(apt.startTime)}
                   </span>
                   <span className="text-slate-300">•</span>
                   <span>{typeLabels[apt.appointmentType] || apt.appointmentType}</span>
                 </div>
                 {apt.phoneLastFour && (
                   <div className="text-sm text-slate-400 dark:text-slate-300 mt-1">
-                    {lang === 'no' ? 'Telefon slutter på' : 'Phone ends with'} ...
+                    {t('phoneEndsWith', 'Telefon slutter på')} ...
                     {apt.phoneLastFour}
                   </div>
                 )}
@@ -205,8 +186,12 @@ export default function PatientLookup({ onSelect, lang = 'no', apiBase = '/api/v
       {results.length === 0 && searched && !loading && !error && (
         <div className="mt-8 p-6 bg-amber-50 rounded-2xl border border-amber-200 text-center">
           <div className="text-4xl mb-3">🤔</div>
-          <p className="text-xl text-amber-800 font-medium">{t.noResults}</p>
-          <p className="text-lg text-amber-600 mt-2">{t.tryAgain}</p>
+          <p className="text-xl text-amber-800 font-medium">
+            {t('lookupNoResults', 'Ingen avtale funnet for i dag')}
+          </p>
+          <p className="text-lg text-amber-600 mt-2">
+            {t('lookupTryAgain', 'Vennligst sjekk med resepsjonen')}
+          </p>
         </div>
       )}
     </div>

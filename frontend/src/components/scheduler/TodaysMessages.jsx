@@ -6,25 +6,47 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { schedulerAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 
 const STATUS_STYLES = {
-  sent: { label: 'Sendt', className: 'bg-blue-100 text-blue-700' },
-  delivered: { label: 'Levert', className: 'bg-green-100 text-green-700' },
-  failed: { label: 'Feilet', className: 'bg-red-100 text-red-700' },
-  pending: { label: 'Venter', className: 'bg-amber-100 text-amber-700' },
-  read: { label: 'Lest', className: 'bg-teal-100 text-teal-700' },
-  approved: { label: 'Godkjent', className: 'bg-green-100 text-green-700' },
-  cancelled: { label: 'Avbrutt', className: 'bg-slate-100 text-slate-500 dark:text-slate-400' },
+  sent: { labelKey: 'statusSent', labelFallback: 'Sendt', className: 'bg-blue-100 text-blue-700' },
+  delivered: {
+    labelKey: 'statusDelivered',
+    labelFallback: 'Levert',
+    className: 'bg-green-100 text-green-700',
+  },
+  failed: {
+    labelKey: 'statusFailed',
+    labelFallback: 'Feilet',
+    className: 'bg-red-100 text-red-700',
+  },
+  pending: {
+    labelKey: 'statusPending',
+    labelFallback: 'Venter',
+    className: 'bg-amber-100 text-amber-700',
+  },
+  read: { labelKey: 'statusRead', labelFallback: 'Lest', className: 'bg-teal-100 text-teal-700' },
+  approved: {
+    labelKey: 'statusApproved',
+    labelFallback: 'Godkjent',
+    className: 'bg-green-100 text-green-700',
+  },
+  cancelled: {
+    labelKey: 'statusCancelled',
+    labelFallback: 'Avbrutt',
+    className: 'bg-slate-100 text-slate-500 dark:text-slate-400',
+  },
 };
 
-const TYPE_LABELS = {
-  all: 'Alle',
-  sms: 'SMS',
-  email: 'E-post',
-  push: 'Push',
+const TYPE_LABEL_KEYS = {
+  all: { key: 'allFilter', fallback: 'Alle' },
+  sms: { key: 'smsFilter', fallback: 'SMS' },
+  email: { key: 'emailFilter', fallback: 'E-post' },
+  push: { key: 'pushFilter', fallback: 'Push' },
 };
 
 const TodaysMessages = () => {
+  const { t } = useTranslation('common');
   const queryClient = useQueryClient();
   const [typeFilter, setTypeFilter] = useState('all');
   const [selectedIds, setSelectedIds] = useState(new Set());
@@ -109,9 +131,11 @@ const TodaysMessages = () => {
   return (
     <div className="border rounded-lg bg-white shadow-sm">
       <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-        <h3 className="text-lg font-medium text-slate-800">Dagens meldinger</h3>
+        <h3 className="text-lg font-medium text-slate-800">
+          {t('todaysMessagesTitle', 'Dagens meldinger')}
+        </h3>
         <div className="flex items-center gap-2">
-          {Object.entries(TYPE_LABELS).map(([key, label]) => (
+          {Object.entries(TYPE_LABEL_KEYS).map(([key, labelDef]) => (
             <button
               key={key}
               onClick={() => setTypeFilter(key)}
@@ -121,7 +145,7 @@ const TodaysMessages = () => {
                   : 'bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
               }`}
             >
-              {label}
+              {t(labelDef.key, labelDef.fallback)}
             </button>
           ))}
         </div>
@@ -136,11 +160,17 @@ const TodaysMessages = () => {
               className="text-xs px-2 py-1 bg-white border border-slate-200 rounded hover:bg-slate-50"
             >
               {selectedIds.size === pendingMessages.length
-                ? 'Fjern valg'
-                : `Velg alle (${pendingMessages.length})`}
+                ? t('deselectAllBtn', 'Fjern valg')
+                : t('selectAllPending', 'Velg alle ({count})').replace(
+                    '{count}',
+                    pendingMessages.length
+                  )}
             </button>
             <span className="text-xs text-amber-700">
-              {pendingMessages.length} venter på godkjenning
+              {t('waitingApproval', '{count} venter på godkjenning').replace(
+                '{count}',
+                pendingMessages.length
+              )}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -149,7 +179,9 @@ const TodaysMessages = () => {
               disabled={selectedIds.size === 0 || sendMutation.isPending}
               className="text-xs px-3 py-1 bg-teal-600 text-white rounded hover:bg-teal-700 disabled:opacity-50 transition-colors"
             >
-              {sendMutation.isPending ? 'Sender...' : `Send valgte (${selectedIds.size})`}
+              {sendMutation.isPending
+                ? t('sending', 'Sender...')
+                : t('sendSelected', 'Send valgte ({count})').replace('{count}', selectedIds.size)}
             </button>
           </div>
         </div>
@@ -157,26 +189,27 @@ const TodaysMessages = () => {
 
       {messages.length === 0 ? (
         <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">
-          Ingen meldinger i dag.
+          {t('noMessagesToday', 'Ingen meldinger i dag.')}
         </div>
       ) : (
         <>
           {/* Summary Bar */}
           <div className="px-4 py-2 bg-slate-50 border-b border-slate-100 flex gap-4 text-xs text-slate-600 dark:text-slate-300">
             <span>
-              Totalt: <strong>{messages.length}</strong>
+              {t('totalLabel', 'Totalt')}: <strong>{messages.length}</strong>
             </span>
             <span>
-              Levert:{' '}
+              {t('deliveredLabel', 'Levert')}:{' '}
               <strong>
                 {messages.filter((m) => m.status === 'delivered' || m.status === 'read').length}
               </strong>
             </span>
             <span>
-              Venter: <strong>{pendingMessages.length}</strong>
+              {t('waitingLabel', 'Venter')}: <strong>{pendingMessages.length}</strong>
             </span>
             <span className="text-red-600">
-              Feilet: <strong>{messages.filter((m) => m.status === 'failed').length}</strong>
+              {t('failedLabel', 'Feilet')}:{' '}
+              <strong>{messages.filter((m) => m.status === 'failed').length}</strong>
             </span>
           </div>
 
@@ -205,11 +238,14 @@ const TodaysMessages = () => {
                             {msg.type || 'sms'}
                           </span>
                           <span className="text-sm font-medium text-slate-800 truncate">
-                            {msg.recipient_name || msg.recipient || 'Ukjent'}
+                            {msg.recipient_name || msg.recipient || t('unknownRecipient', 'Ukjent')}
                           </span>
                         </div>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 truncate">
-                          {msg.subject || msg.message || msg.content || 'Ingen innhold'}
+                          {msg.subject ||
+                            msg.message ||
+                            msg.content ||
+                            t('noContent', 'Ingen innhold')}
                         </p>
                         {msg.sent_at && (
                           <p className="text-xs text-slate-400 dark:text-slate-300 mt-0.5">
@@ -229,19 +265,19 @@ const TodaysMessages = () => {
                             disabled={sendMutation.isPending}
                             className="text-xs px-2 py-1 bg-teal-600 text-white rounded hover:bg-teal-700 disabled:opacity-50"
                           >
-                            Send
+                            {t('sendBtn', 'Send')}
                           </button>
                           <button
                             onClick={() => handleCancelMessage(msg.id)}
                             disabled={cancelMutation.isPending}
                             className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 disabled:opacity-50"
                           >
-                            Avbryt
+                            {t('cancelBtn', 'Avbryt')}
                           </button>
                         </>
                       )}
                       <span className={`text-xs px-2 py-1 rounded ${status.className}`}>
-                        {status.label}
+                        {t(status.labelKey, status.labelFallback)}
                       </span>
                     </div>
                   </div>

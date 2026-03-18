@@ -17,9 +17,11 @@ import {
   X,
 } from 'lucide-react';
 import api from '../../services/api';
+import { useTranslation } from '../../i18n';
 
 import logger from '../../utils/logger';
 const AutoAcceptSettings = () => {
+  const { t } = useTranslation('settings');
   // State
   const [settings, setSettings] = useState({
     autoAcceptAppointments: false,
@@ -97,7 +99,7 @@ const AutoAcceptSettings = () => {
       }
     } catch (err) {
       logger.error('Error loading settings:', err);
-      setError('Kunne ikke laste innstillinger');
+      setError(t('couldNotLoadSettings', 'Kunne ikke laste innstillinger'));
     } finally {
       setLoading(false);
     }
@@ -122,11 +124,11 @@ const AutoAcceptSettings = () => {
 
       await api.put('/auto-accept/settings', settings);
 
-      setSuccess('Innstillinger lagret!');
+      setSuccess(t('settingsSaved', 'Innstillinger lagret!'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       logger.error('Error saving settings:', err);
-      setError('Kunne ikke lagre innstillinger');
+      setError(t('couldNotSaveSettings', 'Kunne ikke lagre innstillinger'));
     } finally {
       setSaving(false);
     }
@@ -153,9 +155,11 @@ const AutoAcceptSettings = () => {
     <div className="max-w-4xl mx-auto p-6">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="text-2xl font-semibold text-gray-900">Auto-godkjenning</h1>
+        <h1 className="text-2xl font-semibold text-gray-900">
+          {t('autoApproval', 'Auto-godkjenning')}
+        </h1>
         <p className="text-gray-600 dark:text-gray-300 mt-1">
-          Konfigurer automatisk godkjenning av avtaler og henvisninger
+          {t('autoApprovalDesc', 'Konfigurer automatisk godkjenning av avtaler og henvisninger')}
         </p>
       </div>
 
@@ -191,9 +195,9 @@ const AutoAcceptSettings = () => {
                 <Calendar className="w-5 h-5 text-blue-600" />
               </div>
               <div className="text-left">
-                <h2 className="font-medium text-gray-900">Avtaler</h2>
+                <h2 className="font-medium text-gray-900">{t('appointments', 'Avtaler')}</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Automatisk bekreft nye timebestillinger
+                  {t('autoConfirmBookings', 'Automatisk bekreft nye timebestillinger')}
                 </p>
               </div>
             </div>
@@ -205,7 +209,7 @@ const AutoAcceptSettings = () => {
                     : 'bg-gray-100 text-gray-600 dark:text-gray-300'
                 }`}
               >
-                {settings.autoAcceptAppointments ? 'Aktiv' : 'Inaktiv'}
+                {settings.autoAcceptAppointments ? t('active', 'Aktiv') : t('inactive', 'Inaktiv')}
               </span>
               {expandedSection === 'appointments' ? (
                 <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
@@ -220,7 +224,7 @@ const AutoAcceptSettings = () => {
               {/* Enable Toggle */}
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-gray-700">
-                  Aktiver auto-godkjenning av avtaler
+                  {t('enableAutoApprovalAppointments', 'Aktiver auto-godkjenning av avtaler')}
                 </label>
                 <button
                   onClick={() =>
@@ -246,7 +250,7 @@ const AutoAcceptSettings = () => {
                   {/* Delay */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Forsinkelse før auto-godkjenning
+                      {t('delayBeforeAutoApproval', 'Forsinkelse før auto-godkjenning')}
                     </label>
                     <div className="flex items-center gap-2">
                       <input
@@ -262,19 +266,29 @@ const AutoAcceptSettings = () => {
                         min="0"
                         max="1440"
                       />
-                      <span className="text-sm text-gray-500 dark:text-gray-400">minutter</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {t('minutes', 'minutter')}
+                      </span>
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Vent denne tiden før avtalen godkjennes automatisk
+                      {t(
+                        'waitBeforeAutoApproval',
+                        'Vent denne tiden før avtalen godkjennes automatisk'
+                      )}
                     </p>
                   </div>
 
                   {/* Business Hours Only */}
                   <div className="flex items-center justify-between">
                     <div>
-                      <label className="text-sm font-medium text-gray-700">Kun i kontortid</label>
+                      <label className="text-sm font-medium text-gray-700">
+                        {t('businessHoursOnly', 'Kun i kontortid')}
+                      </label>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Godkjenn kun avtaler innenfor 08:00-18:00 på hverdager
+                        {t(
+                          'businessHoursOnlyDesc',
+                          'Godkjenn kun avtaler innenfor 08:00-18:00 på hverdager'
+                        )}
                       </p>
                     </div>
                     <button
@@ -299,7 +313,7 @@ const AutoAcceptSettings = () => {
                   {/* Daily Limit */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Maks antall per dag (valgfritt)
+                      {t('maxPerDayOptional', 'Maks antall per dag (valgfritt)')}
                     </label>
                     <input
                       type="number"
@@ -314,14 +328,14 @@ const AutoAcceptSettings = () => {
                       }
                       className="w-24 px-3 py-2 border border-gray-200 rounded-lg"
                       min="1"
-                      placeholder="Ingen grense"
+                      placeholder={t('noLimit', 'Ingen grense')}
                     />
                   </div>
 
                   {/* Appointment Types */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Ekskluder disse avtaletypene
+                      {t('excludeAppointmentTypes', 'Ekskluder disse avtaletypene')}
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {appointmentTypes.map((type) => (
@@ -339,7 +353,10 @@ const AutoAcceptSettings = () => {
                       ))}
                     </div>
                     <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                      Disse avtaletypene vil kreve manuell godkjenning
+                      {t(
+                        'excludedRequireManual',
+                        'Disse avtaletypene vil kreve manuell godkjenning'
+                      )}
                     </p>
                   </div>
                 </>
@@ -359,9 +376,9 @@ const AutoAcceptSettings = () => {
                 <Users className="w-5 h-5 text-purple-600" />
               </div>
               <div className="text-left">
-                <h2 className="font-medium text-gray-900">Henvisninger</h2>
+                <h2 className="font-medium text-gray-900">{t('referrals', 'Henvisninger')}</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Automatisk godta innkommende henvisninger
+                  {t('autoAcceptReferrals', 'Automatisk godta innkommende henvisninger')}
                 </p>
               </div>
             </div>
@@ -373,7 +390,7 @@ const AutoAcceptSettings = () => {
                     : 'bg-gray-100 text-gray-600 dark:text-gray-300'
                 }`}
               >
-                {settings.autoAcceptReferrals ? 'Aktiv' : 'Inaktiv'}
+                {settings.autoAcceptReferrals ? t('active', 'Aktiv') : t('inactive', 'Inaktiv')}
               </span>
               {expandedSection === 'referrals' ? (
                 <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
@@ -388,7 +405,7 @@ const AutoAcceptSettings = () => {
               {/* Enable Toggle */}
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-gray-700">
-                  Aktiver auto-godkjenning av henvisninger
+                  {t('enableAutoApprovalReferrals', 'Aktiver auto-godkjenning av henvisninger')}
                 </label>
                 <button
                   onClick={() =>
@@ -414,7 +431,7 @@ const AutoAcceptSettings = () => {
                   {/* Delay */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Forsinkelse før auto-godkjenning
+                      {t('delayBeforeAutoApproval', 'Forsinkelse før auto-godkjenning')}
                     </label>
                     <div className="flex items-center gap-2">
                       <input
@@ -430,7 +447,9 @@ const AutoAcceptSettings = () => {
                         min="0"
                         max="1440"
                       />
-                      <span className="text-sm text-gray-500 dark:text-gray-400">minutter</span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">
+                        {t('minutes', 'minutter')}
+                      </span>
                     </div>
                   </div>
 
@@ -438,10 +457,13 @@ const AutoAcceptSettings = () => {
                   <div className="flex items-center justify-between">
                     <div>
                       <label className="text-sm font-medium text-gray-700">
-                        Krev fullstendig informasjon
+                        {t('requireCompleteInfo', 'Krev fullstendig informasjon')}
                       </label>
                       <p className="text-xs text-gray-500 dark:text-gray-400">
-                        Godkjenn kun henvisninger med pasientnavn, henvisende lege og årsak
+                        {t(
+                          'requireCompleteInfoDesc',
+                          'Godkjenn kun henvisninger med pasientnavn, henvisende lege og årsak'
+                        )}
                       </p>
                     </div>
                     <button
@@ -466,7 +488,7 @@ const AutoAcceptSettings = () => {
                   {/* Referral Sources */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Godta kun fra disse kildene (la tom for alle)
+                      {t('acceptOnlyFromSources', 'Godta kun fra disse kildene (la tom for alle)')}
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {referralSources.map((source) => (
@@ -503,9 +525,11 @@ const AutoAcceptSettings = () => {
                 <Bell className="w-5 h-5 text-orange-600" />
               </div>
               <div className="text-left">
-                <h2 className="font-medium text-gray-900">Varsler</h2>
+                <h2 className="font-medium text-gray-900">
+                  {t('notificationsSection', 'Varsler')}
+                </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Få beskjed når noe blir automatisk godkjent
+                  {t('notifyOnAutoApproval', 'Få beskjed når noe blir automatisk godkjent')}
                 </p>
               </div>
             </div>
@@ -521,7 +545,7 @@ const AutoAcceptSettings = () => {
               {/* Enable Toggle */}
               <div className="flex items-center justify-between">
                 <label className="text-sm font-medium text-gray-700">
-                  Send varsel ved auto-godkjenning
+                  {t('sendNotificationOnAutoApproval', 'Send varsel ved auto-godkjenning')}
                 </label>
                 <button
                   onClick={() =>
@@ -546,7 +570,7 @@ const AutoAcceptSettings = () => {
                 <>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      E-post for varsler
+                      {t('emailForNotifications', 'E-post for varsler')}
                     </label>
                     <input
                       type="email"
@@ -564,7 +588,7 @@ const AutoAcceptSettings = () => {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      SMS for varsler (valgfritt)
+                      {t('smsForNotificationsOptional', 'SMS for varsler (valgfritt)')}
                     </label>
                     <input
                       type="tel"
@@ -601,9 +625,9 @@ const AutoAcceptSettings = () => {
                 <History className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               </div>
               <div className="text-left">
-                <h2 className="font-medium text-gray-900">Aktivitetslogg</h2>
+                <h2 className="font-medium text-gray-900">{t('activityLog', 'Aktivitetslogg')}</h2>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Se historikk over automatiske godkjenninger
+                  {t('viewAutoApprovalHistory', 'Se historikk over automatiske godkjenninger')}
                 </p>
               </div>
             </div>
@@ -618,7 +642,7 @@ const AutoAcceptSettings = () => {
             <div className="border-t border-gray-100 max-h-64 overflow-y-auto">
               {log.length === 0 ? (
                 <div className="p-4 text-center text-gray-500 dark:text-gray-400 text-sm">
-                  Ingen aktivitet ennå
+                  {t('noActivityYet', 'Ingen aktivitet ennå')}
                 </div>
               ) : (
                 <div className="divide-y divide-gray-100">
@@ -636,7 +660,9 @@ const AutoAcceptSettings = () => {
                             entry.action === 'accepted' ? 'text-green-700' : 'text-red-700'
                           }
                         >
-                          {entry.action === 'accepted' ? 'godkjent' : 'avvist'}
+                          {entry.action === 'accepted'
+                            ? t('approved', 'godkjent')
+                            : t('rejected', 'avvist')}
                         </span>
                         {entry.reason && (
                           <span className="text-gray-500 dark:text-gray-400">
@@ -667,12 +693,12 @@ const AutoAcceptSettings = () => {
           {saving ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-              Lagrer...
+              {t('saving', 'Lagrer...')}
             </>
           ) : (
             <>
               <Save className="w-4 h-4" />
-              Lagre innstillinger
+              {t('saveSettings', 'Lagre innstillinger')}
             </>
           )}
         </button>

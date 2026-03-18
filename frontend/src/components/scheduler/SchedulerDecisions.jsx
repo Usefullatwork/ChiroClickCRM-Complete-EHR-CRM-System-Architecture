@@ -21,13 +21,39 @@ import {
 } from 'lucide-react';
 import { schedulerAPI } from '../../services/api';
 import { formatRelativeTime } from '../../lib/utils';
+import { useTranslation } from '../../i18n';
 
 const DECISION_TYPE_CONFIG = {
-  conflict: { icon: AlertTriangle, color: 'red', label: 'Konflikt' },
-  suggestion: { icon: Clock, color: 'blue', label: 'Forslag' },
-  auto_accept: { icon: Zap, color: 'green', label: 'Auto-godkjent' },
-  recall: { icon: Calendar, color: 'orange', label: 'Tilbakekalling' },
-  followup: { icon: MessageSquare, color: 'purple', label: 'Oppfolging' },
+  conflict: {
+    icon: AlertTriangle,
+    color: 'red',
+    labelKey: 'schedulerConflictLabel',
+    labelFallback: 'Konflikt',
+  },
+  suggestion: {
+    icon: Clock,
+    color: 'blue',
+    labelKey: 'schedulerSuggestion',
+    labelFallback: 'Forslag',
+  },
+  auto_accept: {
+    icon: Zap,
+    color: 'green',
+    labelKey: 'schedulerAutoAcceptLabel',
+    labelFallback: 'Auto-godkjent',
+  },
+  recall: {
+    icon: Calendar,
+    color: 'orange',
+    labelKey: 'schedulerRecall',
+    labelFallback: 'Tilbakekalling',
+  },
+  followup: {
+    icon: MessageSquare,
+    color: 'purple',
+    labelKey: 'schedulerFollowup',
+    labelFallback: 'Oppfølging',
+  },
 };
 
 const CHANNEL_ICONS = {
@@ -36,6 +62,7 @@ const CHANNEL_ICONS = {
 };
 
 const SchedulerDecisions = () => {
+  const { t } = useTranslation('common');
   const queryClient = useQueryClient();
   const [filter, setFilter] = useState('pending');
   const [expandedId, setExpandedId] = useState(null);
@@ -150,16 +177,18 @@ const SchedulerDecisions = () => {
       {/* Decisions Panel */}
       <div className="border rounded-lg bg-white shadow-sm">
         <div className="px-4 py-3 border-b border-slate-100 flex items-center justify-between">
-          <h3 className="text-lg font-medium text-slate-800">Planleggingsbeslutninger</h3>
+          <h3 className="text-lg font-medium text-slate-800">
+            {t('schedulerDecisions', 'Planleggingsbeslutninger')}
+          </h3>
           <div className="flex items-center gap-2">
             <select
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
               className="text-sm border border-slate-200 rounded px-2 py-1"
             >
-              <option value="pending">Ventende</option>
-              <option value="approved">Godkjent</option>
-              <option value="dismissed">Avvist</option>
+              <option value="pending">{t('schedulerPendingFilter', 'Ventende')}</option>
+              <option value="approved">{t('schedulerApprovedFilter', 'Godkjent')}</option>
+              <option value="dismissed">{t('schedulerDismissedFilter', 'Avvist')}</option>
             </select>
             {filter === 'pending' && decisions.length > 0 && (
               <button
@@ -167,7 +196,7 @@ const SchedulerDecisions = () => {
                 disabled={resolveMutation.isPending}
                 className="text-xs px-3 py-1 bg-teal-600 text-white rounded hover:bg-teal-700 transition-colors disabled:opacity-50"
               >
-                Godkjenn alle
+                {t('schedulerApproveAll', 'Godkjenn alle')}
               </button>
             )}
           </div>
@@ -176,8 +205,8 @@ const SchedulerDecisions = () => {
         {decisions.length === 0 ? (
           <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">
             {filter === 'pending'
-              ? 'Ingen ventende beslutninger.'
-              : `Ingen ${filter === 'approved' ? 'godkjente' : 'avviste'} beslutninger.`}
+              ? t('schedulerNoPending', 'Ingen ventende beslutninger.')
+              : `Ingen ${filter === 'approved' ? t('schedulerApprovedFilter', 'godkjente') : t('schedulerDismissedFilter', 'avviste')} beslutninger.`}
           </div>
         ) : (
           <ul className="divide-y divide-slate-100">
@@ -202,12 +231,14 @@ const SchedulerDecisions = () => {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2">
                             <p className="text-sm font-medium text-slate-800">
-                              {decision.title || decision.type || 'Anbefaling'}
+                              {decision.title ||
+                                decision.type ||
+                                t('schedulerRecommendation', 'Anbefaling')}
                             </p>
                             <span
                               className={`text-xs px-1.5 py-0.5 rounded bg-${typeConfig.color}-100 text-${typeConfig.color}-700`}
                             >
-                              {typeConfig.label}
+                              {t(typeConfig.labelKey, typeConfig.labelFallback)}
                             </span>
                             {decision.auto_accepted && (
                               <span className="text-xs px-1.5 py-0.5 rounded bg-green-100 text-green-700 flex items-center gap-1">
@@ -217,15 +248,21 @@ const SchedulerDecisions = () => {
                             )}
                           </div>
                           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                            {decision.description || decision.reason || 'Ingen beskrivelse'}
+                            {decision.description ||
+                              decision.reason ||
+                              t('schedulerNoDescription', 'Ingen beskrivelse')}
                           </p>
 
                           {/* Patient and time info */}
                           <div className="flex items-center gap-4 mt-2 text-xs text-slate-400 dark:text-slate-300">
-                            {decision.patient_name && <span>Pasient: {decision.patient_name}</span>}
+                            {decision.patient_name && (
+                              <span>
+                                {t('schedulerPatient', 'Pasient')}: {decision.patient_name}
+                              </span>
+                            )}
                             {decision.suggested_time && (
                               <span className="text-teal-600">
-                                Foreslatt:{' '}
+                                {t('schedulerSuggested', 'Foreslått')}:{' '}
                                 {new Date(decision.suggested_time).toLocaleString('no-NO')}
                               </span>
                             )}
@@ -259,14 +296,14 @@ const SchedulerDecisions = () => {
                             disabled={resolveMutation.isPending}
                             className="px-3 py-1.5 text-xs bg-green-100 text-green-700 rounded hover:bg-green-200 transition-colors disabled:opacity-50"
                           >
-                            Godkjenn
+                            {t('schedulerApprove', 'Godkjenn')}
                           </button>
                           <button
                             onClick={() => handleDismiss(decision.id)}
                             disabled={resolveMutation.isPending}
                             className="px-3 py-1.5 text-xs bg-slate-100 text-slate-600 dark:text-slate-300 rounded hover:bg-slate-200 transition-colors disabled:opacity-50"
                           >
-                            Avvis
+                            {t('schedulerDismiss', 'Avvis')}
                           </button>
                         </div>
                       )}
@@ -278,7 +315,9 @@ const SchedulerDecisions = () => {
                               : 'bg-slate-100 text-slate-500 dark:text-slate-400'
                           }`}
                         >
-                          {filter === 'approved' ? 'Godkjent' : 'Avvist'}
+                          {filter === 'approved'
+                            ? t('schedulerApprovedFilter', 'Godkjent')
+                            : t('schedulerDismissedFilter', 'Avvist')}
                         </span>
                       )}
                     </div>
@@ -323,7 +362,9 @@ const SchedulerDecisions = () => {
         >
           <div className="flex items-center gap-2">
             <Send className="w-4 h-4 text-teal-600" />
-            <h3 className="text-base font-medium text-slate-800">Dagens meldinger</h3>
+            <h3 className="text-base font-medium text-slate-800">
+              {t('schedulerTodaysMessages', 'Dagens meldinger')}
+            </h3>
             {todaysMessages.length > 0 && (
               <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full">
                 {todaysMessages.length}
@@ -341,11 +382,11 @@ const SchedulerDecisions = () => {
           <div>
             {todaysLoading ? (
               <div className="p-4 text-center text-sm text-slate-400 dark:text-slate-300">
-                Laster meldinger...
+                {t('schedulerLoadingMessages', 'Laster meldinger...')}
               </div>
             ) : todaysMessages.length === 0 ? (
               <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">
-                Ingen planlagte meldinger i dag.
+                {t('schedulerNoMessagesPlanned', 'Ingen planlagte meldinger i dag.')}
               </div>
             ) : (
               <>
@@ -362,7 +403,7 @@ const SchedulerDecisions = () => {
                       className="text-xs px-3 py-1 bg-teal-600 text-white rounded hover:bg-teal-700 transition-colors disabled:opacity-50 flex items-center gap-1"
                     >
                       <Send className="w-3 h-3" />
-                      Send alle
+                      {t('schedulerSendAll', 'Send alle')}
                     </button>
                   </div>
                 )}
@@ -377,10 +418,10 @@ const SchedulerDecisions = () => {
                             <ChannelIcon className="w-4 h-4 text-slate-400 dark:text-slate-300 flex-shrink-0" />
                             <div className="min-w-0 flex-1">
                               <p className="text-sm text-slate-700 truncate">
-                                {msg.patient_name || 'Ukjent pasient'}
+                                {msg.patient_name || t('schedulerUnknownPatient', 'Ukjent pasient')}
                               </p>
                               <p className="text-xs text-slate-400 dark:text-slate-300 truncate">
-                                {msg.message || msg.subject || 'Melding'}
+                                {msg.message || msg.subject || t('schedulerMessage', 'Melding')}
                               </p>
                             </div>
                           </div>
@@ -405,12 +446,12 @@ const SchedulerDecisions = () => {
                               }`}
                             >
                               {msg.status === 'approved'
-                                ? 'Klar'
+                                ? t('schedulerReady', 'Klar')
                                 : msg.status === 'sent'
-                                  ? 'Sendt'
+                                  ? t('schedulerSent', 'Sendt')
                                   : msg.status === 'failed'
-                                    ? 'Feilet'
-                                    : 'Venter'}
+                                    ? t('schedulerFailed', 'Feilet')
+                                    : t('schedulerWaiting', 'Venter')}
                             </span>
                             {msg.status !== 'sent' && msg.status !== 'cancelled' && (
                               <button

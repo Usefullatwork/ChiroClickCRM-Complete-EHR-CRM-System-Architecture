@@ -12,113 +12,7 @@
 
 import { useState } from 'react';
 import { useConfirm } from '../ui/ConfirmDialog';
-
-// =============================================================================
-// TRANSLATIONS
-// =============================================================================
-
-const TRANSLATIONS = {
-  en: {
-    providers: 'Providers',
-    addProvider: 'Add Provider',
-    editProvider: 'Edit Provider',
-    providerDetails: 'Provider Details',
-    personalInfo: 'Personal Information',
-    firstName: 'First Name',
-    lastName: 'Last Name',
-    email: 'Email',
-    phone: 'Phone',
-    title: 'Title',
-    credentials: 'Credentials',
-    specialty: 'Specialty',
-    bio: 'Bio',
-    color: 'Calendar Color',
-    workingHours: 'Working Hours',
-    availability: 'Availability',
-    monday: 'Monday',
-    tuesday: 'Tuesday',
-    wednesday: 'Wednesday',
-    thursday: 'Thursday',
-    friday: 'Friday',
-    saturday: 'Saturday',
-    sunday: 'Sunday',
-    startTime: 'Start Time',
-    endTime: 'End Time',
-    closed: 'Closed',
-    role: 'Role',
-    permissions: 'Permissions',
-    admin: 'Admin',
-    practitioner: 'Practitioner',
-    staff: 'Staff',
-    active: 'Active',
-    inactive: 'Inactive',
-    status: 'Status',
-    save: 'Save',
-    cancel: 'Cancel',
-    delete: 'Delete',
-    confirmDelete: 'Are you sure you want to delete this provider?',
-    noProviders: 'No providers added yet',
-    appointmentsToday: 'Appointments Today',
-    patientsTotal: 'Total Patients',
-    viewSchedule: 'View Schedule',
-    viewPatients: 'View Patients',
-    selectProvider: 'Select Provider',
-    allProviders: 'All Providers',
-    hprnumber: 'HPR Number',
-    defaultDuration: 'Default Appointment Duration',
-    minutes: 'minutes',
-  },
-  no: {
-    providers: 'Behandlere',
-    addProvider: 'Legg til behandler',
-    editProvider: 'Rediger behandler',
-    providerDetails: 'Behandlerdetaljer',
-    personalInfo: 'Personlig informasjon',
-    firstName: 'Fornavn',
-    lastName: 'Etternavn',
-    email: 'E-post',
-    phone: 'Telefon',
-    title: 'Tittel',
-    credentials: 'Legitimasjon',
-    specialty: 'Spesialitet',
-    bio: 'Bio',
-    color: 'Kalenderfarge',
-    workingHours: 'Arbeidstider',
-    availability: 'Tilgjengelighet',
-    monday: 'Mandag',
-    tuesday: 'Tirsdag',
-    wednesday: 'Onsdag',
-    thursday: 'Torsdag',
-    friday: 'Fredag',
-    saturday: 'Lørdag',
-    sunday: 'Søndag',
-    startTime: 'Starttid',
-    endTime: 'Sluttid',
-    closed: 'Stengt',
-    role: 'Rolle',
-    permissions: 'Tillatelser',
-    admin: 'Administrator',
-    practitioner: 'Behandler',
-    staff: 'Ansatt',
-    active: 'Aktiv',
-    inactive: 'Inaktiv',
-    status: 'Status',
-    save: 'Lagre',
-    cancel: 'Avbryt',
-    delete: 'Slett',
-    confirmDelete: 'Er du sikker på at du vil slette denne behandleren?',
-    noProviders: 'Ingen behandlere lagt til ennå',
-    appointmentsToday: 'Avtaler i dag',
-    patientsTotal: 'Totale pasienter',
-    viewSchedule: 'Se timeplan',
-    viewPatients: 'Se pasienter',
-    selectProvider: 'Velg behandler',
-    allProviders: 'Alle behandlere',
-    hprnumber: 'HPR-nummer',
-    defaultDuration: 'Standard avtaletid',
-    minutes: 'minutter',
-  },
-};
+import { useTranslation } from '../../i18n';
 
 // =============================================================================
 // CONSTANTS
@@ -282,8 +176,8 @@ const MOCK_PROVIDERS = [
 /**
  * Provider Card
  */
-function ProviderCard({ provider, onEdit, onSelect, isSelected, lang }) {
-  const t = TRANSLATIONS[lang];
+function ProviderCard({ provider, onEdit, onSelect, isSelected }) {
+  const { t, lang } = useTranslation('common');
   const color = CALENDAR_COLORS.find((c) => c.id === provider.color);
 
   return (
@@ -318,7 +212,7 @@ function ProviderCard({ provider, onEdit, onSelect, isSelected, lang }) {
                   : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400'
               }`}
             >
-              {provider.status === 'active' ? t.active : t.inactive}
+              {provider.status === 'active' ? t('active', 'Aktiv') : t('inactive', 'Inaktiv')}
             </span>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -347,13 +241,17 @@ function ProviderCard({ provider, onEdit, onSelect, isSelected, lang }) {
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
             {provider.stats?.appointmentsToday || 0}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">{t.appointmentsToday}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {t('appointmentsToday', 'Avtaler i dag')}
+          </div>
         </div>
         <div>
           <div className="text-2xl font-bold text-gray-900 dark:text-white">
             {provider.stats?.totalPatients || 0}
           </div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">{t.patientsTotal}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {t('patientsTotal', 'Totale pasienter')}
+          </div>
         </div>
       </div>
     </div>
@@ -363,8 +261,8 @@ function ProviderCard({ provider, onEdit, onSelect, isSelected, lang }) {
 /**
  * Working Hours Editor
  */
-function WorkingHoursEditor({ hours, onChange, lang }) {
-  const t = TRANSLATIONS[lang];
+function WorkingHoursEditor({ hours, onChange }) {
+  const { t } = useTranslation('common');
 
   const handleDayChange = (day, field, value) => {
     onChange({
@@ -387,7 +285,7 @@ function WorkingHoursEditor({ hours, onChange, lang }) {
               onChange={(e) => handleDayChange(day, 'enabled', e.target.checked)}
               className="h-4 w-4 text-blue-600 rounded"
             />
-            <span className="text-sm text-gray-700 dark:text-gray-300">{t[day]}</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t(day, day)}</span>
           </label>
 
           {hours[day]?.enabled ? (
@@ -407,7 +305,9 @@ function WorkingHoursEditor({ hours, onChange, lang }) {
               />
             </div>
           ) : (
-            <span className="text-sm text-gray-400 dark:text-gray-300">{t.closed}</span>
+            <span className="text-sm text-gray-400 dark:text-gray-300">
+              {t('closed', 'Stengt')}
+            </span>
           )}
         </div>
       ))}
@@ -418,9 +318,9 @@ function WorkingHoursEditor({ hours, onChange, lang }) {
 /**
  * Provider Form
  */
-function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
+function ProviderForm({ provider, onSave, onCancel, onDelete }) {
   const confirm = useConfirm();
-  const t = TRANSLATIONS[lang];
+  const { t, lang } = useTranslation('common');
   const isNew = !provider?.id;
 
   const [formData, setFormData] = useState(
@@ -452,12 +352,12 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
       {/* Personal Info */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {t.personalInfo}
+          {t('personalInfo', 'Personlig informasjon')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.firstName} *
+              {t('firstName', 'Fornavn')} *
             </label>
             <input
               type="text"
@@ -469,7 +369,7 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.lastName} *
+              {t('lastName', 'Etternavn')} *
             </label>
             <input
               type="text"
@@ -481,7 +381,7 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.email} *
+              {t('email', 'E-post')} *
             </label>
             <input
               type="email"
@@ -493,7 +393,7 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.phone}
+              {t('phone', 'Telefon')}
             </label>
             <input
               type="tel"
@@ -508,12 +408,12 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
       {/* Professional Info */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {t.credentials}
+          {t('credentials', 'Legitimasjon')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.title}
+              {t('title', 'Tittel')}
             </label>
             <input
               type="text"
@@ -525,7 +425,7 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.credentials}
+              {t('credentials', 'Legitimasjon')}
             </label>
             <input
               type="text"
@@ -537,7 +437,7 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.hprnumber}
+              {t('hprNumber', 'HPR-nummer')}
             </label>
             <input
               type="text"
@@ -548,7 +448,7 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.specialty}
+              {t('specialty', 'Spesialitet')}
             </label>
             <select
               value={formData.specialty}
@@ -568,12 +468,12 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
       {/* Role & Settings */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {t.role} & {t.status}
+          {t('role', 'Rolle')} & {t('status', 'Status')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.role}
+              {t('role', 'Rolle')}
             </label>
             <select
               value={formData.role}
@@ -589,20 +489,20 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.status}
+              {t('status', 'Status')}
             </label>
             <select
               value={formData.status}
               onChange={(e) => setFormData({ ...formData, status: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
-              <option value="active">{t.active}</option>
-              <option value="inactive">{t.inactive}</option>
+              <option value="active">{t('active', 'Aktiv')}</option>
+              <option value="inactive">{t('inactive', 'Inaktiv')}</option>
             </select>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-              {t.defaultDuration}
+              {t('defaultDuration', 'Standard avtaletid')}
             </label>
             <select
               value={formData.defaultDuration}
@@ -611,10 +511,10 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
               }
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
-              <option value={15}>15 {t.minutes}</option>
-              <option value={30}>30 {t.minutes}</option>
-              <option value={45}>45 {t.minutes}</option>
-              <option value={60}>60 {t.minutes}</option>
+              <option value={15}>15 {t('minutes', 'minutter')}</option>
+              <option value={30}>30 {t('minutes', 'minutter')}</option>
+              <option value={45}>45 {t('minutes', 'minutter')}</option>
+              <option value={60}>60 {t('minutes', 'minutter')}</option>
             </select>
           </div>
         </div>
@@ -623,7 +523,7 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
       {/* Calendar Color */}
       <div>
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-          {t.color}
+          {t('calendarColor', 'Kalenderfarge')}
         </label>
         <div className="flex gap-2">
           {CALENDAR_COLORS.map((color) => (
@@ -644,7 +544,7 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
       {/* Working Hours */}
       <div>
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          {t.workingHours}
+          {t('workingHours', 'Arbeidstider')}
         </h3>
         <WorkingHoursEditor
           hours={formData.workingHours}
@@ -660,14 +560,20 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
             <button
               type="button"
               onClick={async () => {
-                const ok = await confirm({ title: t.confirmDelete, variant: 'destructive' });
+                const ok = await confirm({
+                  title: t(
+                    'confirmDeleteProvider',
+                    'Er du sikker på at du vil slette denne behandleren?'
+                  ),
+                  variant: 'destructive',
+                });
                 if (ok) {
                   onDelete(provider.id);
                 }
               }}
               className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
             >
-              {t.delete}
+              {t('delete', 'Slett')}
             </button>
           )}
         </div>
@@ -677,13 +583,13 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
             onClick={onCancel}
             className="px-4 py-2 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
           >
-            {t.cancel}
+            {t('cancel', 'Avbryt')}
           </button>
           <button
             type="submit"
             className="px-4 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            {t.save}
+            {t('save', 'Lagre')}
           </button>
         </div>
       </div>
@@ -694,8 +600,8 @@ function ProviderForm({ provider, onSave, onCancel, onDelete, lang }) {
 /**
  * Provider Selector (for filtering)
  */
-export function ProviderSelector({ providers, selected, onChange, lang, showAll = true }) {
-  const t = TRANSLATIONS[lang];
+export function ProviderSelector({ providers, selected, onChange, showAll = true }) {
+  const { t } = useTranslation('common');
 
   return (
     <select
@@ -703,7 +609,7 @@ export function ProviderSelector({ providers, selected, onChange, lang, showAll 
       onChange={(e) => onChange(e.target.value || null)}
       className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
     >
-      {showAll && <option value="">{t.allProviders}</option>}
+      {showAll && <option value="">{t('allProviders', 'Alle behandlere')}</option>}
       {providers.map((provider) => (
         <option key={provider.id} value={provider.id}>
           {provider.firstName} {provider.lastName}
@@ -717,13 +623,8 @@ export function ProviderSelector({ providers, selected, onChange, lang, showAll 
 // MAIN COMPONENT
 // =============================================================================
 
-export default function ProviderManagement({
-  providers = MOCK_PROVIDERS,
-  onSave,
-  onDelete,
-  lang = 'en',
-}) {
-  const t = TRANSLATIONS[lang];
+export default function ProviderManagement({ providers = MOCK_PROVIDERS, onSave, onDelete }) {
+  const { t, lang } = useTranslation('common');
   const [selectedProvider, setSelectedProvider] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editingProvider, setEditingProvider] = useState(null);
@@ -755,7 +656,9 @@ export default function ProviderManagement({
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
-          {editingProvider ? t.editProvider : t.addProvider}
+          {editingProvider
+            ? t('editProvider', 'Rediger behandler')
+            : t('addProvider', 'Legg til behandler')}
         </h2>
         <ProviderForm
           provider={editingProvider}
@@ -772,12 +675,14 @@ export default function ProviderManagement({
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">{t.providers}</h2>
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+          {t('providers', 'Behandlere')}
+        </h2>
         <button
           onClick={handleAdd}
           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
         >
-          + {t.addProvider}
+          + {t('addProvider', 'Legg til behandler')}
         </button>
       </div>
 
@@ -785,12 +690,14 @@ export default function ProviderManagement({
       {providers.length === 0 ? (
         <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-xl">
           <div className="text-4xl mb-4">👥</div>
-          <p className="text-gray-600 dark:text-gray-400">{t.noProviders}</p>
+          <p className="text-gray-600 dark:text-gray-400">
+            {t('noProviders', 'Ingen behandlere lagt til ennå')}
+          </p>
           <button
             onClick={handleAdd}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
-            {t.addProvider}
+            {t('addProvider', 'Legg til behandler')}
           </button>
         </div>
       ) : (

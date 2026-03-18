@@ -30,6 +30,7 @@ import {
   Phone,
 } from 'lucide-react';
 import useMediaQuery from '../../hooks/useMediaQuery';
+import { useTranslation } from '../../i18n';
 
 /**
  * MobileNav Component
@@ -54,25 +55,26 @@ export default function MobileNav({
   const navigate = useNavigate();
   const location = useLocation();
   const { isMobile, prefersReducedMotion } = useMediaQuery();
+  const { t } = useTranslation('common');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const [touchStart, setTouchStart] = useState(null);
 
   // Default navigation items for clinic staff
   const defaultClinicNav = [
-    { icon: Home, label: 'Hjem', path: '/dashboard' },
-    { icon: Calendar, label: 'Kalender', path: '/calendar' },
-    { icon: Users, label: 'Pasienter', path: '/patients' },
-    { icon: FileText, label: 'Notater', path: '/notes' },
-    { icon: Menu, label: 'Meny', action: 'menu' },
+    { icon: Home, label: t('navHome', 'Hjem'), path: '/dashboard' },
+    { icon: Calendar, label: t('navCalendar', 'Kalender'), path: '/calendar' },
+    { icon: Users, label: t('navPatients', 'Pasienter'), path: '/patients' },
+    { icon: FileText, label: t('navNotes', 'Notater'), path: '/notes' },
+    { icon: Menu, label: t('navMenu', 'Meny'), action: 'menu' },
   ];
 
   // Default navigation items for patient portal
   const defaultPortalNav = [
-    { icon: Dumbbell, label: 'Ovelser', path: '/portal/ovelser' },
-    { icon: Calendar, label: 'Timer', path: '/portal/timer' },
-    { icon: User, label: 'Profil', path: '/portal/profil' },
-    { icon: Phone, label: 'Kontakt', action: 'contact' },
+    { icon: Dumbbell, label: t('navExercises', 'Øvelser'), path: '/portal/ovelser' },
+    { icon: Calendar, label: t('navAppointments', 'Timer'), path: '/portal/timer' },
+    { icon: User, label: t('navProfile', 'Profil'), path: '/portal/profil' },
+    { icon: Phone, label: t('navContact', 'Kontakt'), action: 'contact' },
   ];
 
   // Use provided items or defaults
@@ -81,10 +83,10 @@ export default function MobileNav({
 
   // Default menu items
   const defaultMenuItems = [
-    { icon: BarChart3, label: 'Statistikk', path: '/statistics' },
-    { icon: Dumbbell, label: 'Ovelsesbibliotek', path: '/exercises' },
-    { icon: Settings, label: 'Innstillinger', path: '/settings' },
-    { icon: HelpCircle, label: 'Hjelp', path: '/help' },
+    { icon: BarChart3, label: t('navStatistics', 'Statistikk'), path: '/statistics' },
+    { icon: Dumbbell, label: t('navExerciseLibrary', 'Øvelsesbibliotek'), path: '/exercises' },
+    { icon: Settings, label: t('navSettings', 'Innstillinger'), path: '/settings' },
+    { icon: HelpCircle, label: t('navHelp', 'Hjelp'), path: '/help' },
   ];
 
   const drawerMenuItems = menuItems.length > 0 ? menuItems : defaultMenuItems;
@@ -231,7 +233,7 @@ export default function MobileNav({
         onTouchEnd={handleTouchEnd}
         role="dialog"
         aria-modal="true"
-        aria-label="Navigasjonsmeny"
+        aria-label={t('navMenu2', 'Navigasjonsmeny')}
       >
         {/* Menu Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
@@ -244,7 +246,7 @@ export default function MobileNav({
           <button
             onClick={() => setIsMenuOpen(false)}
             className="p-2 -mr-2 text-gray-500 dark:text-gray-400 hover:bg-gray-200 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-            aria-label="Lukk meny"
+            aria-label={t('navCloseMenu', 'Lukk meny')}
           >
             <X className="w-6 h-6" />
           </button>
@@ -258,7 +260,7 @@ export default function MobileNav({
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300" />
               <input
                 type="search"
-                placeholder="Sok..."
+                placeholder={t('navSearch', 'Søk...')}
                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -311,7 +313,7 @@ export default function MobileNav({
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-red-600 hover:bg-red-50 active:bg-red-100 transition-colors min-h-[48px]"
               >
                 <LogOut className="w-5 h-5 flex-shrink-0" />
-                <span className="font-medium">Logg ut</span>
+                <span className="font-medium">{t('navLogout', 'Logg ut')}</span>
               </button>
             </div>
           )}
@@ -379,7 +381,7 @@ export function MobileHeader({
             <button
               onClick={handleBack}
               className="p-2 -ml-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-              aria-label="Tilbake"
+              aria-label={t('navBack', 'Tilbake')}
             >
               <ChevronRight className="w-6 h-6 rotate-180" />
             </button>

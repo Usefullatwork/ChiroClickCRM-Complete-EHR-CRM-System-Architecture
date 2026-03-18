@@ -29,6 +29,7 @@ import {
 import { format, addDays, addWeeks } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { followUpsAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 
 // Note types
 const NOTE_TYPES = {
@@ -89,6 +90,7 @@ export default function QuickNotePanel({
   className = '',
 }) {
   const queryClient = useQueryClient();
+  const { t } = useTranslation('exercises');
 
   // State
   const [isExpanded, setIsExpanded] = useState(!compact);
@@ -214,7 +216,7 @@ export default function QuickNotePanel({
       >
         <div className="flex items-center gap-2">
           <MessageSquare className="w-4 h-4 text-blue-600" />
-          <span className="font-medium text-gray-900">Hurtignotater</span>
+          <span className="font-medium text-gray-900">{t('quickNotes', 'Hurtignotater')}</span>
         </div>
         {isExpanded ? (
           <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
@@ -276,7 +278,7 @@ export default function QuickNotePanel({
             {/* Priority */}
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                Prioritet
+                {t('priorityLabel', 'Prioritet')}
               </label>
               <select
                 value={priority}
@@ -294,7 +296,7 @@ export default function QuickNotePanel({
             {/* Due date */}
             <div>
               <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
-                Forfallsdato
+                {t('dueDateLabel', 'Forfallsdato')}
               </label>
               <input
                 type="date"
@@ -322,7 +324,7 @@ export default function QuickNotePanel({
           {(patientPhone || patientEmail) && (
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
               <p className="text-xs font-medium text-amber-800 mb-2">
-                Send melding til pasient (krever godkjenning)
+                {t('sendMessageToPatient', 'Send melding til pasient (krever godkjenning)')}
               </p>
               <div className="flex gap-4">
                 {patientPhone && (
@@ -363,7 +365,10 @@ export default function QuickNotePanel({
               {(sendSms || sendEmail) && (
                 <p className="text-[10px] text-amber-600 mt-2 flex items-center gap-1">
                   <AlertCircle className="w-3 h-3" />
-                  Meldingen sendes til godkjenningskø før den sendes
+                  {t(
+                    'messageQueuedForApproval',
+                    'Meldingen sendes til godkjenningskø før den sendes'
+                  )}
                 </p>
               )}
             </div>
@@ -379,12 +384,14 @@ export default function QuickNotePanel({
               {createNoteMutation.isPending ? (
                 <>
                   <span className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
-                  Lagrer...
+                  {t('savingBtn', 'Lagrer...')}
                 </>
               ) : (
                 <>
                   <Plus className="w-4 h-4" />
-                  {sendSms || sendEmail ? 'Lagre & kø melding' : 'Lagre'}
+                  {sendSms || sendEmail
+                    ? t('saveAndQueue', 'Lagre & kø melding')
+                    : t('saveLabel', 'Lagre')}
                 </>
               )}
             </button>
@@ -404,7 +411,9 @@ export default function QuickNotePanel({
             onClick={() => setShowHistory(!showHistory)}
             className="w-full text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 py-2"
           >
-            {showHistory ? 'Skjul historikk' : 'Vis tidligere notater'}
+            {showHistory
+              ? t('hideHistory', 'Skjul historikk')
+              : t('showPreviousNotes', 'Vis tidligere notater')}
           </button>
 
           {/* Notes history */}
@@ -416,7 +425,7 @@ export default function QuickNotePanel({
                 </div>
               ) : notes.length === 0 ? (
                 <p className="text-sm text-gray-400 dark:text-gray-300 text-center py-4">
-                  Ingen notater ennå
+                  {t('noNotesYet', 'Ingen notater ennå')}
                 </p>
               ) : (
                 notes.map((note) => {
@@ -454,7 +463,7 @@ export default function QuickNotePanel({
                             {note.message_status === 'sent' && (
                               <span className="flex items-center gap-1 text-green-500">
                                 <Send className="w-3 h-3" />
-                                Sendt
+                                {t('sent', 'Sendt')}
                               </span>
                             )}
                           </div>
@@ -482,9 +491,12 @@ export default function QuickNotePanel({
 
 // Compact inline version for SOAP note footer
 export function QuickNoteInline({ _patientId, _encounterId, onAction }) {
+  const { t: tEx } = useTranslation('exercises');
   return (
     <div className="flex items-center gap-2 text-sm">
-      <span className="text-gray-500 dark:text-gray-400">Hurtighandlinger:</span>
+      <span className="text-gray-500 dark:text-gray-400">
+        {tEx('quickActions', 'Hurtighandlinger:')}
+      </span>
       <button
         onClick={() => onAction?.('sms')}
         className="flex items-center gap-1 px-2 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100"
@@ -504,7 +516,7 @@ export function QuickNoteInline({ _patientId, _encounterId, onAction }) {
         className="flex items-center gap-1 px-2 py-1 bg-green-50 text-green-600 rounded hover:bg-green-100"
       >
         <Calendar className="w-3.5 h-3.5" />
-        Neste time
+        {tEx('nextAppointment', 'Neste time')}
       </button>
       <button
         onClick={() => onAction?.('note')}

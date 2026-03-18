@@ -21,8 +21,10 @@ import {
 import { crmAPI } from '../../services/api';
 import toast from '../../utils/toast';
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 
 const ReferralProgram = () => {
+  const { t } = useTranslation('crm');
   const [activeTab, setActiveTab] = useState('overview');
   const [showNewReferralForm, setShowNewReferralForm] = useState(false);
   const [copiedCode, setCopiedCode] = useState(null);
@@ -140,7 +142,9 @@ const ReferralProgram = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        <span className="ml-2 text-gray-600 dark:text-gray-300">Laster henvisninger...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">
+          {t('loadingReferrals', 'Laster henvisninger...')}
+        </span>
       </div>
     );
   }
@@ -155,7 +159,7 @@ const ReferralProgram = () => {
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
         >
-          Prøv igjen
+          {t('tryAgain', 'Prøv igjen')}
         </button>
       </div>
     );
@@ -166,9 +170,11 @@ const ReferralProgram = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Henvisningsprogram</h2>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {t('referralProgramTitle', 'Henvisningsprogram')}
+          </h2>
           <p className="text-gray-600 dark:text-gray-300">
-            Belønn pasienter som henviser nye kunder
+            {t('referralProgramSubtitle', 'Belønn pasienter som henviser nye kunder')}
           </p>
         </div>
         <button
@@ -176,7 +182,7 @@ const ReferralProgram = () => {
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          Ny Henvisning
+          {t('newReferral', 'Ny Henvisning')}
         </button>
       </div>
 
@@ -189,7 +195,9 @@ const ReferralProgram = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">Totalt Henvisninger</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {t('totalReferrals', 'Totalt Henvisninger')}
+          </p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -199,7 +207,9 @@ const ReferralProgram = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.converted}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">Konvertert</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {t('metricConverted', 'Konvertert')}
+          </p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -209,7 +219,7 @@ const ReferralProgram = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">Ventende</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{t('pending', 'Ventende')}</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -219,7 +229,9 @@ const ReferralProgram = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.conversionRate}%</p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">Konverteringsrate</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {t('conversionRate', 'Konverteringsrate')}
+          </p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -231,17 +243,19 @@ const ReferralProgram = () => {
           <p className="text-2xl font-bold text-gray-900">
             {stats.totalRewards.toLocaleString('nb-NO')} kr
           </p>
-          <p className="text-sm text-gray-600 dark:text-gray-300">Utbetalt Belønning</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {t('paidRewards', 'Utbetalt Belønning')}
+          </p>
         </div>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-4 border-b border-gray-200">
         {[
-          { id: 'overview', label: 'Oversikt' },
-          { id: 'referrals', label: 'Alle Henvisninger' },
-          { id: 'leaderboard', label: 'Toppliste' },
-          { id: 'settings', label: 'Innstillinger' },
+          { id: 'overview', label: t('tabOverview', 'Oversikt') },
+          { id: 'referrals', label: t('tabAllReferrals', 'Alle Henvisninger') },
+          { id: 'leaderboard', label: t('tabLeaderboard', 'Toppliste') },
+          { id: 'settings', label: t('tabSettings', 'Innstillinger') },
         ].map((tab) => (
           <button
             key={tab.id}

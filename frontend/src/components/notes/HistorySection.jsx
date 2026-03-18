@@ -3,6 +3,7 @@
  * Extracted from InitialConsultTemplate.jsx
  */
 import { User, FileText, Heart, AlertTriangle } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 export default function HistorySection({
   consultData,
@@ -15,19 +16,26 @@ export default function HistorySection({
   InputField,
   Checkbox,
 }) {
+  const { t } = useTranslation('clinical');
+
   return (
     <>
       {/* Demographics Section / Demografiseksjon */}
-      <Section id="demographics" title="Pasientinformasjon" icon={User} color="gray">
+      <Section
+        id="demographics"
+        title={t('historyPatientInfo', 'Pasientinformasjon')}
+        icon={User}
+        color="gray"
+      >
         <div className="grid grid-cols-2 gap-4">
           <InputField
-            label="Yrke"
+            label={t('historyOccupation', 'Yrke')}
             value={consultData.demographics.occupation}
             onChange={(v) => updateField('demographics', 'occupation', v)}
             placeholder="F.eks. kontorarbeider, haandverker"
           />
           <InputField
-            label="Aktivitetsniva"
+            label={t('historyActivityLevel', 'Aktivitetsnivå')}
             value={consultData.demographics.activityLevel}
             onChange={(v) => updateField('demographics', 'activityLevel', v)}
             placeholder="F.eks. stillesittende, moderat aktiv, svaert aktiv"
@@ -35,13 +43,13 @@ export default function HistorySection({
         </div>
         <div className="grid grid-cols-2 gap-4">
           <InputField
-            label="Livsstil"
+            label={t('historyLifestyle', 'Livsstil')}
             value={consultData.demographics.lifestyle}
             onChange={(v) => updateField('demographics', 'lifestyle', v)}
             placeholder="Relevante livsstilsfaktorer"
           />
           <InputField
-            label="Sovnkvalitet"
+            label={t('historySleepQuality', 'Søvnkvalitet')}
             value={consultData.demographics.sleepQuality}
             onChange={(v) => updateField('demographics', 'sleepQuality', v)}
             placeholder="F.eks. god, moderat, darlig"
@@ -52,7 +60,7 @@ export default function HistorySection({
       {/* Subjective Section / Subjektiv seksjon */}
       <Section
         id="subjective"
-        title="Subjektiv - Hovedklage og anamnese"
+        title={t('historySubjectiveTitle', 'Subjektiv - Hovedklage og anamnese')}
         icon={FileText}
         color="blue"
       >
@@ -188,7 +196,12 @@ export default function HistorySection({
       </Section>
 
       {/* Medical History Section / Sykehistorieseksjon */}
-      <Section id="medicalHistory" title="Sykehistorie" icon={Heart} color="pink">
+      <Section
+        id="medicalHistory"
+        title={t('historyMedicalHistory', 'Sykehistorie')}
+        icon={Heart}
+        color="pink"
+      >
         <TextField
           label="Tidligere sykdommer"
           value={consultData.medicalHistory.pastMedicalHistory}
@@ -221,7 +234,7 @@ export default function HistorySection({
         <div className="mt-4">
           <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-red-500" />
-            Rodt flagg screening
+            {t('historyRedFlagScreening', 'Rødt flagg screening')}
           </h4>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             <Checkbox

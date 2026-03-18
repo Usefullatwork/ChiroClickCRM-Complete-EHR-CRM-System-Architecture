@@ -621,7 +621,11 @@ export default function CRM() {
         {/* Main Content */}
         <div className="flex-1 p-6">
           <Suspense
-            fallback={<div className="p-6 text-gray-500 dark:text-gray-400">Laster modul...</div>}
+            fallback={
+              <div className="p-6 text-gray-500 dark:text-gray-400">
+                {t({ no: 'Laster modul...', en: 'Loading module...' })}
+              </div>
+            }
           >
             {renderModuleContent()}
           </Suspense>

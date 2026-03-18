@@ -34,6 +34,7 @@ import { Card, CardBody } from '../ui/Card';
 import { Alert } from '../ui/Alert';
 import { Modal } from '../ui/Modal';
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 
 const log = logger.scope('VCardImport');
 
@@ -303,6 +304,7 @@ export default function VCardImport({
   const [error, setError] = useState(null);
   const [previewContact, setPreviewContact] = useState(null);
 
+  useTranslation('common'); // Register hook for i18n context
   const t = TRANSLATIONS[language] || TRANSLATIONS.no;
 
   // Validate all contacts

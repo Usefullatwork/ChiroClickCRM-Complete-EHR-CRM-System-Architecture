@@ -9,51 +9,18 @@
 
 import { useState } from 'react';
 import { Loader2, ShieldCheck, AlertCircle, ArrowLeft } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 import logger from '../../utils/logger';
-const TRANSLATIONS = {
-  en: {
-    title: 'Verify Your Identity',
-    subtitle: 'Please enter your date of birth',
-    day: 'Day',
-    month: 'Month',
-    year: 'Year',
-    verifyButton: 'Verify',
-    verifying: 'Verifying...',
-    success: 'Identity verified!',
-    failed: 'Date of birth does not match our records',
-    tryAgain: 'Please check and try again, or ask reception for help',
-    back: 'Back',
-  },
-  no: {
-    title: 'Bekreft din identitet',
-    subtitle: 'Vennligst oppgi din fødselsdato',
-    day: 'Dag',
-    month: 'Måned',
-    year: 'År',
-    verifyButton: 'Bekreft',
-    verifying: 'Bekrefter...',
-    success: 'Identitet bekreftet!',
-    failed: 'Fødselsdato stemmer ikke med våre registre',
-    tryAgain: 'Vennligst sjekk og prøv igjen, eller spør resepsjonen',
-    back: 'Tilbake',
-  },
-};
 
 const MONTHS = {
   en: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
   no: ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des'],
 };
 
-export default function IdentityVerify({
-  appointment,
-  onVerified,
-  onBack,
-  lang = 'no',
-  apiBase = '/api/v1',
-}) {
-  const t = TRANSLATIONS[lang];
-  const months = MONTHS[lang];
+export default function IdentityVerify({ appointment, onVerified, onBack, apiBase = '/api/v1' }) {
+  const { t, lang } = useTranslation('kiosk');
+  const months = MONTHS[lang] || MONTHS.no;
 
   const [day, setDay] = useState('');
   const [month, setMonth] = useState('');
@@ -101,11 +68,11 @@ export default function IdentityVerify({
           });
         }, 1000);
       } else {
-        setError(t.failed);
+        setError(t('verifyFailed', 'Fødselsdato stemmer ikke med våre registre'));
       }
     } catch (err) {
       logger.error('Verify error:', err);
-      setError(lang === 'no' ? 'Bekreftelse mislyktes' : 'Verification failed');
+      setError(t('verifyError', 'Bekreftelse mislyktes'));
     } finally {
       setLoading(false);
     }
@@ -120,9 +87,11 @@ export default function IdentityVerify({
         >
           <ShieldCheck className="w-12 h-12 text-green-600" />
         </div>
-        <h2 className="text-3xl font-bold text-green-700 mb-2">{t.success}</h2>
+        <h2 className="text-3xl font-bold text-green-700 mb-2">
+          {t('verifySuccess', 'Identitet bekreftet!')}
+        </h2>
         <p className="text-xl text-slate-600 dark:text-slate-300">
-          {lang === 'no' ? 'Velkommen,' : 'Welcome,'} {appointment.firstName}!
+          {t('welcomeGreeting', 'Velkommen,')} {appointment.firstName}!
         </p>
       </div>
     );
@@ -137,13 +106,17 @@ export default function IdentityVerify({
                    transition-colors mb-4"
       >
         <ArrowLeft className="w-5 h-5" />
-        {t.back}
+        {t('verifyBack', 'Tilbake')}
       </button>
 
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-3">{t.title}</h1>
-        <p className="text-xl text-slate-500 dark:text-slate-400">{t.subtitle}</p>
+        <h1 className="text-3xl md:text-4xl font-bold text-slate-800 mb-3">
+          {t('verifyTitle', 'Bekreft din identitet')}
+        </h1>
+        <p className="text-xl text-slate-500 dark:text-slate-400">
+          {t('verifySubtitle', 'Vennligst oppgi din fødselsdato')}
+        </p>
         <p className="text-lg text-teal-600 font-medium mt-2">
           {appointment.firstName} {appointment.lastName}
         </p>
@@ -154,7 +127,7 @@ export default function IdentityVerify({
         {/* Day */}
         <div>
           <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2 text-center">
-            {t.day}
+            {t('dayLabel', 'Dag')}
           </label>
           <select
             value={day}
@@ -175,7 +148,7 @@ export default function IdentityVerify({
         {/* Month */}
         <div>
           <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2 text-center">
-            {t.month}
+            {t('monthLabel', 'Måned')}
           </label>
           <select
             value={month}
@@ -196,7 +169,7 @@ export default function IdentityVerify({
         {/* Year */}
         <div>
           <label className="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-2 text-center">
-            {t.year}
+            {t('yearLabel', 'År')}
           </label>
           <select
             value={year}
@@ -222,7 +195,9 @@ export default function IdentityVerify({
             <AlertCircle className="w-6 h-6 flex-shrink-0" />
             <div>
               <p className="font-medium">{error}</p>
-              <p className="text-sm text-red-600 mt-1">{t.tryAgain}</p>
+              <p className="text-sm text-red-600 mt-1">
+                {t('verifyTryAgain', 'Vennligst sjekk og prøv igjen, eller spør resepsjonen')}
+              </p>
             </div>
           </div>
         </div>
@@ -242,12 +217,12 @@ export default function IdentityVerify({
         {loading ? (
           <>
             <Loader2 className="w-6 h-6 animate-spin" />
-            {t.verifying}
+            {t('verifying', 'Bekrefter...')}
           </>
         ) : (
           <>
             <ShieldCheck className="w-6 h-6" />
-            {t.verifyButton}
+            {t('verifyButton', 'Bekreft')}
           </>
         )}
       </button>

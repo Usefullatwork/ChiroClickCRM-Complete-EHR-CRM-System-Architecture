@@ -3,6 +3,7 @@
  * Extracted from InitialConsultTemplate.jsx
  */
 import { ClipboardCheck, Target, Activity, AlertTriangle, Plus, Trash2 } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 export default function PlanSection({
   consultData,
@@ -21,10 +22,17 @@ export default function PlanSection({
   showCodePicker: _showCodePicker,
   setShowCodePicker,
 }) {
+  const { t } = useTranslation('clinical');
+
   return (
     <>
       {/* Assessment Section / Vurderingsseksjon */}
-      <Section id="assessment" title="Vurdering" icon={ClipboardCheck} color="purple">
+      <Section
+        id="assessment"
+        title={t('assessment', 'Vurdering')}
+        icon={ClipboardCheck}
+        color="purple"
+      >
         <TextField
           label="Primaerdiagnose"
           value={consultData.assessment.primaryDiagnosis}
@@ -48,7 +56,9 @@ export default function PlanSection({
 
         {/* Red Flags / Rode flagg */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Rode flagg</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {t('soapRedFlags', 'Røde flagg')}
+          </label>
           <div className="space-y-2">
             {(consultData.assessment.redFlags || []).map((flag, index) => (
               <div
@@ -79,7 +89,7 @@ export default function PlanSection({
                 className="flex items-center gap-2 text-sm text-red-600 hover:text-red-700"
               >
                 <Plus className="w-4 h-4" />
-                Legg til rodt flagg
+                {t('soapAddRedFlag', 'Legg til rødt flagg')}
               </button>
             )}
           </div>
@@ -117,7 +127,7 @@ export default function PlanSection({
       </Section>
 
       {/* Diagnosis Codes Section / Diagnosekoder-seksjon */}
-      <Section id="codes" title="Diagnosekoder" icon={Activity} color="teal">
+      <Section id="codes" title={t('diagnosisCodes', 'Diagnosekoder')} icon={Activity} color="teal">
         <div className="space-y-4">
           {/* ICD-10 Codes */}
           <div>
@@ -162,7 +172,7 @@ export default function PlanSection({
       </Section>
 
       {/* Plan Section / Planseksjon */}
-      <Section id="plan" title="Behandlingsplan" icon={Target} color="orange">
+      <Section id="plan" title={t('treatmentPlan', 'Behandlingsplan')} icon={Target} color="orange">
         <div className="grid grid-cols-2 gap-4">
           <TextField
             label="Kortsiktige mal"

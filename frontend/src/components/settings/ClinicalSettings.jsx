@@ -134,11 +134,11 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
       queryClient.invalidateQueries(['spine-templates-grouped']);
       setEditingTemplate(null);
       setTemplateEditText('');
-      toast.success(lang === 'no' ? 'Mal oppdatert' : 'Template updated');
+      toast.success(t('templateUpdated', 'Mal oppdatert'));
     },
     onError: (error) => {
       toast.error(
-        `${lang === 'no' ? 'Kunne ikke oppdatere mal' : 'Failed to update template'}: ${error.response?.data?.message || error.message}`
+        `${t('failedToUpdateTemplate', 'Kunne ikke oppdatere mal')}: ${error.response?.data?.message || error.message}`
       );
     },
   });
@@ -148,13 +148,11 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
     mutationFn: () => spineTemplatesAPI.resetToDefaults(),
     onSuccess: () => {
       queryClient.invalidateQueries(['spine-templates-grouped']);
-      toast.success(
-        lang === 'no' ? 'Maler tilbakestilt til standard' : 'Templates reset to defaults'
-      );
+      toast.success(t('templatesResetToDefaults', 'Maler tilbakestilt til standard'));
     },
     onError: (error) => {
       toast.error(
-        `${lang === 'no' ? 'Kunne ikke tilbakestille maler' : 'Failed to reset templates'}: ${error.response?.data?.message || error.message}`
+        `${t('failedToResetTemplates', 'Kunne ikke tilbakestille maler')}: ${error.response?.data?.message || error.message}`
       );
     },
   });
@@ -184,11 +182,11 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
 
   const handleResetTemplates = async () => {
     const ok = await confirm({
-      title: lang === 'no' ? 'Tilbakestill maler' : 'Reset templates',
-      description:
-        lang === 'no'
-          ? 'Er du sikker på at du vil tilbakestille alle palpasjonsmaler til standard? Dette kan ikke angres.'
-          : 'Are you sure you want to reset all palpation templates to defaults? This cannot be undone.',
+      title: t('resetTemplates', 'Tilbakestill maler'),
+      description: t(
+        'resetTemplatesConfirm',
+        'Er du sikker på at du vil tilbakestille alle palpasjonsmaler til standard? Dette kan ikke angres.'
+      ),
       variant: 'destructive',
     });
     if (ok) {
@@ -409,14 +407,13 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {lang === 'no'
-                    ? 'Palpasjonsmaler (Rask-klikk)'
-                    : 'Palpation Templates (Quick-Click)'}
+                  {t('palpationTemplates', 'Palpasjonsmaler (Rask-klikk)')}
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-200">
-                  {lang === 'no'
-                    ? 'Tilpass tekstmaler for rask palpasjonsdokumentasjon'
-                    : 'Customize text templates for rapid palpation documentation'}
+                  {t(
+                    'palpationTemplatesDesc',
+                    'Tilpass tekstmaler for rask palpasjonsdokumentasjon'
+                  )}
                 </p>
               </div>
             </div>
@@ -426,7 +423,7 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
               className="px-3 py-1.5 text-sm text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg flex items-center gap-1.5 transition-colors"
             >
               <RotateCcw className="w-4 h-4" />
-              {lang === 'no' ? 'Tilbakestill' : 'Reset'}
+              {t('reset', 'Tilbakestill')}
             </button>
           </div>
         </div>
@@ -436,7 +433,7 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
             <div className="px-6 py-8 text-center">
               <Loader2 className="w-6 h-6 animate-spin text-orange-600 mx-auto" />
               <p className="text-sm text-gray-500 dark:text-gray-200 mt-2">
-                {lang === 'no' ? 'Laster maler...' : 'Loading templates...'}
+                {t('loadingTemplates', 'Laster maler...')}
               </p>
             </div>
           ) : (
@@ -452,7 +449,7 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
                   </span>
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-gray-500 dark:text-gray-200">
-                      {regionConfig.segments.length} {lang === 'no' ? 'segmenter' : 'segments'}
+                      {regionConfig.segments.length} {t('segments', 'segmenter')}
                     </span>
                     {expandedSpineRegions[regionKey] ? (
                       <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
@@ -484,10 +481,8 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
                                 className="flex items-center gap-2 text-xs group"
                               >
                                 <span className="w-16 text-gray-500 dark:text-gray-200 uppercase">
-                                  {template.direction === 'left' &&
-                                    (lang === 'no' ? 'Venstre' : 'Left')}
-                                  {template.direction === 'right' &&
-                                    (lang === 'no' ? 'Høyre' : 'Right')}
+                                  {template.direction === 'left' && t('left', 'Venstre')}
+                                  {template.direction === 'right' && t('right', 'Høyre')}
                                   {template.direction === 'bilateral' && 'Bilateral'}
                                   {template.direction === 'posterior' && 'Posterior'}
                                   {template.direction === 'anterior' && 'Anterior'}
@@ -527,7 +522,7 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
                                     <button
                                       onClick={() => handleEditTemplate(template)}
                                       className="p-1 text-gray-400 dark:text-gray-300 hover:text-orange-600 hover:bg-orange-50 rounded opacity-0 group-hover:opacity-100 transition-opacity"
-                                      title={lang === 'no' ? 'Rediger' : 'Edit'}
+                                      title={t('edit', 'Rediger')}
                                     >
                                       <Edit3 className="w-3.5 h-3.5" />
                                     </button>
@@ -537,7 +532,7 @@ export default function ClinicalSettings({ t, clinicalPrefs, onClinicalPrefChang
                             ))}
                             {segmentTemplates.length === 0 && (
                               <p className="text-xs text-gray-400 dark:text-gray-300 italic">
-                                {lang === 'no' ? 'Ingen maler funnet' : 'No templates found'}
+                                {t('noTemplatesFound', 'Ingen maler funnet')}
                               </p>
                             )}
                           </div>

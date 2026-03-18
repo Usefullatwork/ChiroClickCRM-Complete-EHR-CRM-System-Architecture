@@ -35,6 +35,7 @@ import { Input } from '../ui/Input';
 import { Modal } from '../ui/Modal';
 
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 // Patient field definitions with Norwegian labels
 export const PATIENT_FIELDS = [
   { field: 'first_name', label: 'First Name', labelNo: 'Fornavn', required: true, group: 'basic' },
@@ -460,7 +461,6 @@ export default function CSVColumnMapper({
   onMappingComplete,
   onCancel,
   initialMappings = {},
-  language = 'no',
   className = '',
 }) {
   const [file, setFile] = useState(null);
@@ -475,7 +475,7 @@ export default function CSVColumnMapper({
   const [errors, setErrors] = useState([]);
   const fileInputRef = useRef(null);
 
-  const t = TRANSLATIONS[language] || TRANSLATIONS.no;
+  const { t, lang: language } = useTranslation('common');
 
   // Load saved templates from localStorage
   useEffect(() => {
@@ -579,7 +579,7 @@ export default function CSVColumnMapper({
   const handleFile = useCallback(
     (selectedFile) => {
       if (!selectedFile.name.match(/\.csv$/i)) {
-        setErrors([t.invalidFile]);
+        setErrors([t('invalidFile', 'Ugyldig filformat')]);
         return;
       }
 
@@ -597,7 +597,7 @@ export default function CSVColumnMapper({
           const detectedMappings = autoDetectMappings(parsed.headers);
           setMappings((prev) => ({ ...detectedMappings, ...prev }));
         } catch (error) {
-          setErrors([`${t.parseError}: ${error.message}`]);
+          setErrors([`${t('parseError', 'Feil ved behandling av CSV-fil')}: ${error.message}`]);
         }
       };
       reader.readAsText(selectedFile);
@@ -764,16 +764,20 @@ export default function CSVColumnMapper({
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">{t.title}</h2>
-          <p className="text-slate-500 dark:text-slate-400">{t.subtitle}</p>
+          <h2 className="text-2xl font-bold text-slate-900">
+            {t('csvTitle', 'CSV Kolonnekartlegger')}
+          </h2>
+          <p className="text-slate-500 dark:text-slate-400">
+            {t('csvSubtitle', 'Koble CSV-kolonner til pasientfelt')}
+          </p>
         </div>
         <div className="flex gap-2">
           <Button variant="secondary" icon={FolderOpen} onClick={() => setShowTemplateModal(true)}>
-            {t.loadTemplate}
+            {t('loadTemplate', 'Last Mal')}
           </Button>
           {Object.keys(mappings).length > 0 && (
             <Button variant="secondary" icon={Save} onClick={() => setShowTemplateModal(true)}>
-              {t.saveTemplate}
+              {t('saveTemplate', 'Lagre Mal')}
             </Button>
           )}
         </div>
@@ -781,7 +785,7 @@ export default function CSVColumnMapper({
 
       {/* Error display */}
       {errors.length > 0 && (
-        <Alert variant="danger" title={t.errors}>
+        <Alert variant="danger" title={t('errors', 'Feil')}>
           <ul className="list-disc list-inside">
             {errors.map((error, idx) => (
               <li key={idx}>{error}</li>
@@ -808,9 +812,14 @@ export default function CSVColumnMapper({
               onClick={() => fileInputRef.current?.click()}
             >
               <Upload className="w-12 h-12 text-slate-400 dark:text-slate-300 mx-auto mb-4" />
-              <p className="text-lg font-medium text-slate-700 mb-2">{t.dropHere}</p>
+              <p className="text-lg font-medium text-slate-700 mb-2">
+                {t('dropHere', 'Slipp CSV-fil her eller klikk for å bla')}
+              </p>
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                {t.supportedFormats}
+                {t(
+                  'supportedCsvFormats',
+                  'Støtter .csv-filer med komma, semikolon eller tab-separatorer'
+                )}
               </p>
               <input
                 ref={fileInputRef}
@@ -820,7 +829,7 @@ export default function CSVColumnMapper({
                 onChange={handleFileChange}
               />
               <Button variant="secondary" icon={FileSpreadsheet}>
-                {t.uploadFile}
+                {t('uploadFile', 'Last opp CSV-fil')}
               </Button>
             </div>
           </CardBody>
@@ -839,17 +848,17 @@ export default function CSVColumnMapper({
                   <div>
                     <p className="font-medium text-slate-900">{file?.name}</p>
                     <p className="text-sm text-slate-500 dark:text-slate-400">
-                      {parsedData.rowCount} {t.rows} | {parsedData.headers.length}{' '}
-                      {t.csvColumn.toLowerCase()}s
+                      {parsedData.rowCount} {t('rows', 'rader')} | {parsedData.headers.length}{' '}
+                      {t('csvColumn', 'CSV-kolonne').toLowerCase()}s
                     </p>
                   </div>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="ghost" size="sm" icon={RefreshCw} onClick={handleAutoDetect}>
-                    {t.autoDetect}
+                    {t('autoDetect', 'Auto-Oppdag')}
                   </Button>
                   <Button variant="ghost" size="sm" icon={Trash2} onClick={handleClearMappings}>
-                    {t.clearMappings}
+                    {t('clearMappings', 'Fjern Alle')}
                   </Button>
                   <Button
                     variant="ghost"
@@ -861,7 +870,7 @@ export default function CSVColumnMapper({
                       setMappings({});
                     }}
                   >
-                    {t.cancel}
+                    {t('cancel', 'Avbryt')}
                   </Button>
                 </div>
               </div>
@@ -872,9 +881,10 @@ export default function CSVColumnMapper({
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-slate-900">{t.preview}</h3>
+                <h3 className="font-semibold text-slate-900">{t('preview', 'Forhåndsvisning')}</h3>
                 <span className="text-sm text-slate-500 dark:text-slate-400">
-                  {t.showing} 5 {t.of} {parsedData.rowCount} {t.rows}
+                  {t('showing', 'Viser')} 5 {t('of', 'av')} {parsedData.rowCount}{' '}
+                  {t('rows', 'rader')}
                 </span>
               </div>
             </CardHeader>
@@ -924,8 +934,10 @@ export default function CSVColumnMapper({
             {/* CSV Columns */}
             <Card>
               <CardHeader>
-                <h3 className="font-semibold text-slate-900">{t.csvColumn}s</h3>
-                <p className="text-sm text-slate-500 dark:text-slate-400">{t.dragDrop}</p>
+                <h3 className="font-semibold text-slate-900">{t('csvColumn', 'CSV-kolonne')}s</h3>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  {t('dragDrop', 'Dra og slipp for å omorganisere')}
+                </p>
               </CardHeader>
               <CardBody className="space-y-2">
                 {parsedData.headers.map((header) => (
@@ -967,7 +979,7 @@ export default function CSVColumnMapper({
                             onChange={(e) => handleMappingChange(header, e.target.value)}
                             className="text-sm border-slate-200 rounded focus:ring-teal-500 focus:border-teal-500"
                           >
-                            <option value="">{t.selectField}</option>
+                            <option value="">{t('selectField', 'Velg felt...')}</option>
                             {Object.entries(groupedFields).map(([group, fields]) => (
                               <optgroup key={group} label={getGroupLabel(group)}>
                                 {fields.map((field) => (
@@ -988,7 +1000,7 @@ export default function CSVColumnMapper({
                     </div>
                     {/* Sample data */}
                     <div className="mt-2 text-xs text-slate-500 dark:text-slate-400 truncate">
-                      {t.sampleData}: {parsedData.rows[0]?.[header] || '-'}
+                      {t('sampleData', 'Eksempeldata')}: {parsedData.rows[0]?.[header] || '-'}
                     </div>
                   </div>
                 ))}
@@ -998,7 +1010,9 @@ export default function CSVColumnMapper({
             {/* Patient Fields */}
             <Card>
               <CardHeader>
-                <h3 className="font-semibold text-slate-900">{t.patientField}s</h3>
+                <h3 className="font-semibold text-slate-900">
+                  {t('patientField', 'Pasientfelt')}s
+                </h3>
               </CardHeader>
               <CardBody className="space-y-4">
                 {Object.entries(groupedFields).map(([group, fields]) => (
@@ -1061,12 +1075,15 @@ export default function CSVColumnMapper({
           {/* Validation Status */}
           <Card>
             <CardHeader>
-              <h3 className="font-semibold text-slate-900">{t.validation}</h3>
+              <h3 className="font-semibold text-slate-900">{t('validationTitle', 'Validering')}</h3>
             </CardHeader>
             <CardBody>
               {/* Required fields status */}
               {missingRequiredFields.length > 0 ? (
-                <Alert variant="warning" title={t.missingRequired}>
+                <Alert
+                  variant="warning"
+                  title={t('missingRequired', 'Følgende påkrevde felt er ikke koblet:')}
+                >
                   <ul className="list-disc list-inside">
                     {missingRequiredFields.map((field) => (
                       <li key={field}>{getFieldLabel(field)}</li>
@@ -1077,7 +1094,7 @@ export default function CSVColumnMapper({
                 <Alert variant="success">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4" />
-                    {t.allRequiredMapped}
+                    {t('allRequiredMapped', 'Alle påkrevde felt er koblet')}
                   </div>
                 </Alert>
               )}
@@ -1086,13 +1103,15 @@ export default function CSVColumnMapper({
               <div className="mt-4 grid grid-cols-2 gap-4">
                 <div className="p-4 bg-teal-50 rounded-lg">
                   <p className="text-2xl font-bold text-teal-600">{Object.keys(mappings).length}</p>
-                  <p className="text-sm text-teal-700">{t.mappedFields}</p>
+                  <p className="text-sm text-teal-700">{t('mappedFields', 'Koblede Felt')}</p>
                 </div>
                 <div className="p-4 bg-slate-50 rounded-lg">
                   <p className="text-2xl font-bold text-slate-600 dark:text-slate-300">
                     {unmappedColumns.length}
                   </p>
-                  <p className="text-sm text-slate-700">{t.unmappedColumns}</p>
+                  <p className="text-sm text-slate-700">
+                    {t('unmappedColumns', 'Ukoblede Kolonner')}
+                  </p>
                 </div>
               </div>
             </CardBody>
@@ -1101,11 +1120,11 @@ export default function CSVColumnMapper({
           {/* Action buttons */}
           <div className="flex justify-between">
             <Button variant="secondary" onClick={onCancel}>
-              {t.cancel}
+              {t('cancel', 'Avbryt')}
             </Button>
             <div className="flex gap-2">
               <Button variant="secondary" icon={Eye} onClick={() => setShowPreviewModal(true)}>
-                {t.previewMapped}
+                {t('previewMapped', 'Forhåndsvis Kartlagt Data')}
               </Button>
               <Button
                 variant="primary"
@@ -1113,7 +1132,7 @@ export default function CSVColumnMapper({
                 onClick={handleApply}
                 disabled={missingRequiredFields.length > 0}
               >
-                {t.apply}
+                {t('applyMapping', 'Bruk Kobling')}
               </Button>
             </div>
           </div>
@@ -1124,19 +1143,19 @@ export default function CSVColumnMapper({
       <Modal
         isOpen={showTemplateModal}
         onClose={() => setShowTemplateModal(false)}
-        title={t.savedTemplates}
+        title={t('savedTemplates', 'Lagrede Maler')}
         size="md"
       >
         <div className="space-y-4">
           {/* Save new template */}
           {Object.keys(mappings).length > 0 && (
             <div className="p-4 bg-slate-50 rounded-lg">
-              <h4 className="font-medium text-slate-900 mb-2">{t.saveTemplate}</h4>
+              <h4 className="font-medium text-slate-900 mb-2">{t('saveTemplate', 'Lagre Mal')}</h4>
               <div className="flex gap-2">
                 <Input
                   value={templateName}
                   onChange={(e) => setTemplateName(e.target.value)}
-                  placeholder={t.templateName}
+                  placeholder={t('templateName', 'Malnavn')}
                   className="flex-1"
                 />
                 <Button
@@ -1145,7 +1164,7 @@ export default function CSVColumnMapper({
                   onClick={handleSaveTemplate}
                   disabled={!templateName.trim()}
                 >
-                  {t.save}
+                  {t('save', 'Lagre')}
                 </Button>
               </div>
             </div>
@@ -1155,7 +1174,7 @@ export default function CSVColumnMapper({
           {savedTemplates.length === 0 ? (
             <div className="text-center py-8 text-slate-500 dark:text-slate-400">
               <FolderOpen className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              <p>{t.noTemplates}</p>
+              <p>{t('noTemplates', 'Ingen lagrede maler')}</p>
             </div>
           ) : (
             <div className="space-y-2">
@@ -1177,7 +1196,7 @@ export default function CSVColumnMapper({
                       size="sm"
                       onClick={() => handleLoadTemplate(template)}
                     >
-                      {t.load}
+                      {t('load', 'Last')}
                     </Button>
                     <Button
                       variant="ghost"
@@ -1197,7 +1216,7 @@ export default function CSVColumnMapper({
       <Modal
         isOpen={showPreviewModal}
         onClose={() => setShowPreviewModal(false)}
-        title={t.previewMapped}
+        title={t('previewMapped', 'Forhåndsvis Kartlagt Data')}
         size="xl"
       >
         <div className="space-y-4">
@@ -1209,23 +1228,23 @@ export default function CSVColumnMapper({
                 <div className="grid grid-cols-3 gap-4">
                   <div className="p-4 bg-teal-50 rounded-lg text-center">
                     <p className="text-2xl font-bold text-teal-600">{validation.valid.length}</p>
-                    <p className="text-sm text-teal-700">{t.parsedRows}</p>
+                    <p className="text-sm text-teal-700">{t('parsedRows', 'Behandlede Rader')}</p>
                   </div>
                   <div className="p-4 bg-red-50 rounded-lg text-center">
                     <p className="text-2xl font-bold text-red-600">{validation.invalid.length}</p>
-                    <p className="text-sm text-red-700">{t.errors}</p>
+                    <p className="text-sm text-red-700">{t('errors', 'Feil')}</p>
                   </div>
                   <div className="p-4 bg-amber-50 rounded-lg text-center">
                     <p className="text-2xl font-bold text-amber-600">
                       {validation.warnings.length}
                     </p>
-                    <p className="text-sm text-amber-700">{t.warnings}</p>
+                    <p className="text-sm text-amber-700">{t('warnings', 'Advarsler')}</p>
                   </div>
                 </div>
 
                 {/* Error list */}
                 {validation.invalid.length > 0 && (
-                  <Alert variant="danger" title={t.errors}>
+                  <Alert variant="danger" title={t('errors', 'Feil')}>
                     <ul className="list-disc list-inside max-h-32 overflow-y-auto">
                       {validation.invalid.slice(0, 10).map((item, idx) => (
                         <li key={idx}>{item.errors.join(', ')}</li>
@@ -1282,7 +1301,7 @@ export default function CSVColumnMapper({
         </div>
         <div className="mt-4 flex justify-end">
           <Button variant="secondary" onClick={() => setShowPreviewModal(false)}>
-            {t.close}
+            {t('close', 'Lukk')}
           </Button>
         </div>
       </Modal>
