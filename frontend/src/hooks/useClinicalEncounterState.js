@@ -4,14 +4,11 @@ import { useExamData } from './useExamData.js';
 import { useAIState } from './useAIState.js';
 
 /**
- * Composite hook that preserves the original API of useClinicalEncounterState.
- * Internally delegates to focused sub-hooks for better separation of concerns.
+ * Composite hook for ClinicalEncounter state.
  *
- * Sub-hooks can also be imported directly by components that only need a subset:
- *   import { useSOAPForm } from './useSOAPForm';
- *   import { usePanelVisibility } from './usePanelVisibility';
- *   import { useExamData } from './useExamData';
- *   import { useAIState } from './useAIState';
+ * Returns `panels` and `examData` as nested objects so they can be passed
+ * directly to ExamPanelProvider. AI and SOAP state remain flat-spread
+ * because ClinicalEncounter consumes them directly.
  */
 export function useClinicalEncounterState(patientId) {
   const soapForm = useSOAPForm(patientId);
@@ -20,9 +17,9 @@ export function useClinicalEncounterState(patientId) {
   const aiState = useAIState();
 
   return {
-    ...panels,
+    panels,
+    examData,
     ...aiState,
-    ...examData,
     ...soapForm,
   };
 }
