@@ -1,128 +1,104 @@
-# ChiroClickEHR -- Development Reference
+# ChiroClickEHR
 
-## Quick Reference
+Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electron + PGlite), with patient portal and mobile app.
 
-- **Path**: Desktop SSD (not HDD -- npm is too slow on HDD)
+## Identity
+
+- **Brand**: ChiroClickEHR (DB name stays `chiroclickcrm`)
+- **Version**: v2.0.1 released (2026-03-19). Next: v2.1 (patient connectivity)
+- **Mode**: Desktop — `DB_ENGINE=pglite`, `CACHE_ENGINE=memory`, `DEV_SKIP_AUTH=true`
 - **Ports**: Backend=3000, Frontend=5173, Ollama=11434
-- **Test credentials**: admin@chiroclickehr.no / admin123
-- **DB name**: chiroclickcrm (legacy, not renamed)
-- **Brand**: ChiroClickEHR (was ChiroClickCRM)
-- **Mode**: Desktop -- DB_ENGINE=pglite, CACHE_ENGINE=memory, DEV_SKIP_AUTH=true
-
-## Test Commands
-
-```bash
-# Backend (2,045 tests, 85 suites)
-cd backend && npm test
-
-# Frontend (974 tests, 44 suites)
-cd frontend && npx vitest --run
-
-# E2E (88 tests, 11 Playwright specs)
-cd frontend && npx playwright test
-
-# Single backend file
-cd backend && npm test -- --testPathPattern=crm.test.js
-
-# Claude API provider tests only
-cd backend && npm test -- --testPathPattern="providers|aiCost|clinicalEvals|extendedThinking|structuredExtraction|clinicalVision|batchProcessor|clinicalOrchestrator|complianceValidator|rag.contextual" --no-coverage
-```
-
-## Architecture Overview
-
-**Backend**: Node.js + Express, PGlite for desktop mode (PostgreSQL for Docker). 85 test suites covering auth, patients, encounters, CRM, AI, exercises, billing, GDPR, and security. Swagger API docs at `/api-docs` with 109 annotated endpoints. Multi-tenant via `organization_id` with RLS. Winston logging (no console.log -- pre-commit hook enforces this).
-
-**Frontend**: React 18 + Vite, lazy-loaded chunks (ClinicalEncounter -50.7% after splitting). 44 test suites. Tailwind CSS + design tokens. Norwegian (nb-NO) primary language via i18n. Key pages: Dashboard, ClinicalEncounter, EasyAssessment, PatientDetail, CRM, Training, Settings. Service worker for offline exercise caching.
-
-**AI**: Multi-model Ollama routing (`chiro-no-sft-dpo-v6` production at 96% eval, `chiro-fast` for autocomplete, `chiro-medical` for clinical reasoning). Claude API fallback via provider abstraction (disabled/fallback/preferred/claude_only modes). Budget-tracked with daily/monthly caps. RAG with pgvector + HNSW index.
-
-## File Organization (Canonical Locations)
-
-```
-frontend/src/components/
-  anatomy/       -- AnatomyViewer, AnatomicalSpine, MuscleMap, EnhancedSpineDiagram, Spine3DViewer
-  assessment/    -- EasyAssessment sub-components (BodyChart, SpineDiagram, MacroMatrix)
-  examination/   -- AnatomicalBodyChart, BodyChartPanel, ExamPanelManager (clinical exam)
-  clinical/      -- QuickPalpationSpine, EnhancedClinicalTextarea, AITextarea, TextExpansionPopup
-  patient/       -- Patient self-service/portal components
-  patients/      -- Clinician-facing patient views
-  exercises/     -- ExercisePanel (670 lines), offline sync
-  scheduler/     -- SchedulerDecisions, AppointmentImporter, TodaysMessages
-
-backend/src/
-  services/ai.js            -- Multi-model routing with guardrails/RAG (42KB)
-  services/providers/       -- claudeProvider, ollamaProvider, aiProviderFactory, budgetTracker
-  services/crm.js           -- CRM business logic (~1300 lines)
-  services/exercises.js     -- Exercise prescription service (1100+ lines)
-  services/reportService.js -- Weekly AI digest (Monday 07:00 Europe/Oslo)
-```
-
-## Critical Lessons
-
-1. **NEVER run npm on HDD** (D: drive) from Claude Code -- causes timeouts
-2. **Run backend tests** with `cd backend && npm test` (NOT `npx jest` from root)
-3. **Pre-commit hook** greps for literal `console.log` -- use `process.stdout.write`
-4. **PGlite WASM** crashes under parallel test suites -- known limitation
-5. **`useCallback({obj})`** silently crashes in prod builds -- use `useMemo(() => ({obj}))`
-6. **Dev mode (Vite HMR)** is lenient with React hook misuse; prod builds crash at runtime
-7. **Download Playwright artifacts**: `gh run download --name playwright-report`
-8. **Vitest v1 hangs in CI** (jsdom unresolved handles) -- use `timeout -k 10 300 npx vitest --run`
-9. **Git commits**: use `-m` flag, not HEREDOC (hangs on Windows MSYS)
-10. **`git add .`** / `git add -A` on this large repo can timeout -- stage files by name
-11. **Barrel `index.js`** re-exports prevent Vite from tree-shaking (components stay in shared chunk)
-12. **Zustand test mocks** need `Object.assign()` pattern for selector/no-selector calls
-13. **Don't add duplicate DB columns** -- fix controller to use existing column names + SQL aliases
-14. **ESM test import errors**: must use `npm test` (configures ESM loader via jest.config)
-15. **`node -e`** with complex JSON on Windows sometimes produces no output -- use `node -p`
-
-## Claude API Integration
-
-### Environment Variables
-
-| Variable                    | Default             | Description                                           |
-| --------------------------- | ------------------- | ----------------------------------------------------- |
-| `CLAUDE_FALLBACK_MODE`      | `disabled`          | `disabled` / `fallback` / `preferred` / `claude_only` |
-| `CLAUDE_API_KEY`            | (none)              | Anthropic SDK key; required for any non-disabled mode |
-| `CLAUDE_MODEL`              | `claude-sonnet-4-6` | Override default model mapping                        |
-| `CLAUDE_DAILY_BUDGET_USD`   | `10`                | Hard daily spend cap (USD)                            |
-| `CLAUDE_MONTHLY_BUDGET_USD` | `200`               | Hard monthly spend cap (USD)                          |
-
-Without `CLAUDE_API_KEY`, the factory falls back to `disabled` regardless of mode.
-
-### Model Mapping (Ollama -> Claude)
-
-| Task                | Ollama Model Pattern | Claude Model        |
-| ------------------- | -------------------- | ------------------- |
-| SOAP / letters      | `chiro-no*`          | `claude-sonnet-4-6` |
-| Norwegian           | `chiro-norwegian*`   | `claude-sonnet-4-6` |
-| Red flags / medical | `chiro-medical*`     | `claude-sonnet-4-6` |
-| Autocomplete        | `chiro-fast*`        | `claude-haiku-4-5`  |
-| Default             | --                   | `claude-sonnet-4-6` |
-
-### Cost Model
-
-| Model               | Input/MTok | Output/MTok | Cache Read (90% off) | Cache Create (+25%) |
-| ------------------- | ---------- | ----------- | -------------------- | ------------------- |
-| `claude-sonnet-4-6` | $3.00      | $15.00      | $0.30                | $3.75               |
-| `claude-haiku-4-5`  | $0.80      | $4.00       | $0.08                | $1.00               |
-
-Budget enforcement: pre-flight `canSpend()` before every Claude call; auto-resets daily/monthly.
-Full endpoint docs at `/api-docs` (Swagger).
-
-## Known Tech Debt
-
-- `pdf.js` + `pdfGenerator.js` are split by domain (letters/invoices vs summaries/referrals) — both consumed via controllers/pdf.js
-- `assessment/` BodyChart + SpineDiagram used by EasyAssessment (not consolidated with `anatomy/`)
-- `mobile-app/` exists (routes/mobile.js now registered in server.js)
-- `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (kept for future)
-- `services/ai.js` is now a shim re-exporting from `services/ai/` (5 modules)
-- i18n: ~50 remaining hardcoded strings in files using bilingual `{en,no}` object patterns (skip by design); 18 namespaces, ~70 components wired to useTranslation
+- **Credentials**: admin@chiroclickehr.no / admin123
 
 ## Current State
 
-- **Backend**: 2,059 tests (87 suites), 0 lint errors
-- **Frontend**: 974 tests (45 suites), 0 lint errors, 0 failures
+- **Backend**: 2,533 tests (112 suites), 0 lint errors
+- **Frontend**: 993 tests (48 suites), 0 lint errors
 - **E2E**: 88 tests (11 Playwright specs)
-- **CI**: All 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
-- **GDPR**: 55 tests pass (erasure, access, portability, consent audit trail)
-- **Sprint history**: see `docs/sprint-history.md`
+- **CI**: 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
+- **Electron**: Portable exe verified (96MB), PGlite WASM loads correctly
+- **Latest migration**: 073 (`finding_diagnosis_map`)
+
+## Commands
+
+```bash
+cd backend && npm test                          # All backend tests
+cd backend && npm test -- --testPathPattern=X   # Single test file
+cd frontend && npx vitest --run                 # All frontend tests
+cd frontend && npm run build                    # Verify prod build
+cd frontend && npx playwright test              # E2E tests
+```
+
+## Architecture
+
+| Layer    | Stack                                  | Notes                                                           |
+| -------- | -------------------------------------- | --------------------------------------------------------------- |
+| Backend  | Node.js + Express + PGlite             | Multi-tenant via `organization_id`. Winston logging.            |
+| Frontend | React 18 + Vite + Tailwind             | i18n (18 namespaces, ~70 components). Lazy-loaded chunks.       |
+| AI       | Ollama (chiro-no-sft-dpo-v6, 96% eval) | Claude API fallback via provider abstraction. Budget-tracked.   |
+| Desktop  | Electron (portable exe)                | `ELECTRON_RUN_AS_NODE=1` for backend fork. PGlite `asarUnpack`. |
+| Portal   | React pages under `/portal/`           | Auth via portal token. View-only (v2.1 adds booking/messaging). |
+| Mobile   | React Native + Expo                    | Exercise-only now. v2.1 adds messaging, docs, booking, push.    |
+
+**Key directories:**
+
+- `frontend/src/components/` — 39 subdirs, ~300 components
+- `backend/src/services/` — 97 service files (ai/, providers/, crm, exercises, pdf, etc.)
+- `backend/src/routes/` — 52 route files. Swagger at `/api-docs` (109 endpoints)
+- `database/migrations/` — 073 migrations (PGlite auto-applies on startup via `db-init.js`)
+
+## v2.1 Sprint: Patient Connectivity
+
+**Goal**: Patients reachable via SMS/email. Documents sendable. Self-service booking + messaging.
+
+**Critical service paths for v2.1:**
+
+| Service                   | Path                    | Status                                                             |
+| ------------------------- | ----------------------- | ------------------------------------------------------------------ |
+| `communications.js`       | `backend/src/services/` | Core SMS/email abstraction                                         |
+| `emailService.js`         | `backend/src/services/` | Nodemailer + templates                                             |
+| `smsService.js`           | `backend/src/services/` | Twilio client + rate limiting                                      |
+| `exerciseDelivery.js`     | `backend/src/services/` | BROKEN import line 11 (`./email.js` should be `./emailService.js`) |
+| `appointmentReminders.js` | `backend/src/services/` | Logic exists, DB table missing                                     |
+| `pdfGenerator.js`         | `backend/src/services/` | 7 document types                                                   |
+| `patientPortal.js`        | `backend/src/routes/`   | Extend with booking, messaging, docs                               |
+| `mobile.js`               | `backend/src/routes/`   | 2,200 lines — extend for v2.1                                      |
+| `scheduler.js`            | `backend/src/jobs/`     | 12 cron jobs — wire reminders                                      |
+| `automations/actions.js`  | `backend/src/services/` | Add `SEND_BOOKING_LINK` action                                     |
+
+**Branch**: `feature/ai-tooling-ui-sprint` ready to merge (feature gating + encounter→CRM triggers).
+**Provider strategy**: Mock SMS/email only. Real Twilio/SMTP via `.env` later — no code changes needed.
+
+## Gotchas
+
+1. **Git**: `-m` flag only (HEREDOC hangs on Windows). Stage files by name (never `git add .`).
+2. **Backend tests**: `cd backend && npm test` (NOT `npx jest` from root — ESM loader issue).
+3. **Pre-commit hook**: greps for `console.log` — use `process.stdout.write`.
+4. **PGlite WASM**: crashes under parallel test suites — known, not a regression.
+5. **Prod builds**: `useCallback({obj})` crashes silently — use `useMemo(() => ({obj}))`.
+6. **Vite dev vs prod**: dev mode tolerates React hook misuse; prod crashes at runtime.
+7. **Vitest CI**: hangs on completion — use `timeout -k 10 300 npx vitest --run`.
+8. **i18n**: CUSTOM `useTranslation` from `./i18n` (NOT react-i18next). Same API, local module.
+9. **Barrel exports**: `index.js` re-exports prevent Vite tree-shaking.
+10. **Electron**: `process.resourcesPath` replaces `__dirname/..` in packaged app.
+11. **`node -e`** on Windows: sometimes no output — use `node -p` instead.
+
+## Claude API
+
+| Variable                    | Default    | Description                                           |
+| --------------------------- | ---------- | ----------------------------------------------------- |
+| `CLAUDE_FALLBACK_MODE`      | `disabled` | `disabled` / `fallback` / `preferred` / `claude_only` |
+| `CLAUDE_API_KEY`            | (none)     | Required for any non-disabled mode                    |
+| `CLAUDE_DAILY_BUDGET_USD`   | `10`       | Hard daily cap                                        |
+| `CLAUDE_MONTHLY_BUDGET_USD` | `200`      | Hard monthly cap                                      |
+
+Budget enforcement: `canSpend()` pre-flight. Auto-resets daily/monthly.
+
+## Tech Debt
+
+- `pdf.js` + `pdfGenerator.js` split by domain — both via `controllers/pdf.js`
+- `assessment/` BodyChart + SpineDiagram not consolidated with `anatomy/`
+- `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (future)
+- `services/ai.js` is a shim re-exporting from `services/ai/` (5 modules)
+- i18n: ~50 bilingual `{en,no}` strings remain by design
+- `exerciseDelivery.js` line 11: broken import (fix in v2.1 Session 0)
