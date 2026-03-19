@@ -5,20 +5,20 @@ Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electro
 ## Identity
 
 - **Brand**: ChiroClickEHR (DB name stays `chiroclickcrm`)
-- **Version**: v2.0.1 released (2026-03-19). Next: v2.1 (patient connectivity)
+- **Version**: v2.1.0 (2026-03-20). Patient connectivity sprint complete.
 - **Mode**: Desktop — `DB_ENGINE=pglite`, `CACHE_ENGINE=memory`, `DEV_SKIP_AUTH=true`
 - **Ports**: Backend=3000, Frontend=5173, Ollama=11434
 - **Credentials**: admin@chiroclickehr.no / admin123
 
 ## Current State
 
-- **Backend**: 2,644 tests (127 suites), 0 lint errors
-- **Frontend**: 1,050 tests (55 suites), 0 lint errors
+- **Backend**: 2,657 tests (130 suites), 0 lint errors
+- **Frontend**: ~1,050 tests (55 suites), 0 lint errors
 - **E2E**: 88 tests (11 Playwright specs)
 - **CI**: 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
 - **Electron**: Portable exe verified (96MB), PGlite WASM loads correctly
-- **Latest migration**: 077 (`reminder_wiring`)
-- **Branch**: `feature/v2.1-patient-connectivity` (Sessions 0-3 complete)
+- **Latest migration**: 078 (`mobile_push_connectivity`)
+- **Branch**: main (v2.1 merged)
 
 ## Commands
 
@@ -38,42 +38,29 @@ cd frontend && npx playwright test              # E2E tests
 | Frontend | React 18 + Vite + Tailwind             | i18n (18 namespaces, ~70 components). Lazy-loaded chunks.       |
 | AI       | Ollama (chiro-no-sft-dpo-v6, 96% eval) | Claude API fallback via provider abstraction. Budget-tracked.   |
 | Desktop  | Electron (portable exe)                | `ELECTRON_RUN_AS_NODE=1` for backend fork. PGlite `asarUnpack`. |
-| Portal   | React pages under `/portal/`           | Auth via portal token. View-only (v2.1 adds booking/messaging). |
-| Mobile   | React Native + Expo                    | Exercise-only now. v2.1 adds messaging, docs, booking, push.    |
+| Portal   | React pages under `/portal/`           | Booking, messaging, documents, communication preferences.       |
+| Mobile   | React Native + Expo                    | Exercises, messaging, documents, booking, push notifications.   |
 
 **Key directories:**
 
 - `frontend/src/components/` — 39 subdirs, ~300 components
 - `backend/src/services/` — 97 service files (ai/, providers/, crm, exercises, pdf, etc.)
 - `backend/src/routes/` — 52 route files. Swagger at `/api-docs` (109 endpoints)
-- `database/migrations/` — 073 migrations (PGlite auto-applies on startup via `db-init.js`)
+- `database/migrations/` — 078 migrations (PGlite auto-applies on startup via `db-init.js`)
 
-## v2.1 Sprint: Patient Connectivity
+## Patient Connectivity (v2.1 — COMPLETE)
 
-**Goal**: Patients reachable via SMS/email. Documents sendable. Self-service booking + messaging.
+| Service                    | Role                                                          |
+| -------------------------- | ------------------------------------------------------------- |
+| `documentDelivery.js`      | PDF generate → portal doc → email/SMS/push pipeline           |
+| `pushNotification.js`      | Expo Push API wrapper (mock in desktop)                       |
+| `appointmentReminders.js`  | Schedule on create, cancel on cancel, \*/15 cron              |
+| `communications.js`        | Core SMS/email abstraction — all delivery routes through here |
+| `patientPortal.js` (route) | Booking, messaging, documents, preferences                    |
+| `mobile.js` (route)        | +8 endpoints: messages, documents, booking                    |
+| `automations/actions.js`   | 9 action types incl. SEND_BOOKING_LINK                        |
 
-**Critical service paths for v2.1:**
-
-| Service                   | Path                    | Status                                                        |
-| ------------------------- | ----------------------- | ------------------------------------------------------------- |
-| `communications.js`       | `backend/src/services/` | Core SMS/email abstraction                                    |
-| `emailService.js`         | `backend/src/services/` | Nodemailer + templates                                        |
-| `smsService.js`           | `backend/src/services/` | Twilio client + rate limiting                                 |
-| `exerciseDelivery.js`     | `backend/src/services/` | Fixed — imports from `./emailService.js` now                  |
-| `appointmentReminders.js` | `backend/src/services/` | Wired to controller + cron. Org/patient pref checks.          |
-| `documentDelivery.js`     | `backend/src/services/` | NEW — PDF generate + portal doc + email/SMS delivery pipeline |
-| `pdfGenerator.js`         | `backend/src/services/` | 7 document types                                              |
-| `patientPortal.js`        | `backend/src/routes/`   | Booking, messaging, docs, communication preferences           |
-| `mobile.js`               | `backend/src/routes/`   | 2,200 lines — extend for v2.1                                 |
-| `scheduler.js`            | `backend/src/jobs/`     | 13 cron jobs (incl. processAppointmentRemindersQueue \*/15)   |
-| `automations/actions.js`  | `backend/src/services/` | 9 action types incl. SEND_BOOKING_LINK                        |
-| `recallEngine.js`         | `backend/src/services/` | processRecalls sends booking links (org+patient opt-out)      |
-| `automatedComms.js`       | `backend/src/services/` | Exercise inactivity respects patient/org preferences          |
-
-**Session 0 complete**: AI tooling merged, exerciseDelivery fixed, migration 076 (4 tables), documentDelivery pipeline + tests.
-**Session 2 complete**: Patient self-service booking (request/reschedule/cancel + available slots) + messaging (patient inbox/compose/thread + staff chat). Staff booking request management (approve/reject). 28 new tests.
-**Session 3 complete**: Automated reminders wired (schedule on create, cancel on cancel, \*/15 cron). Recall booking links. Exercise preference checks. Admin settings UI (4 toggles). Portal comm prefs (5 toggles + backend endpoints). Migration 077. 18 new tests.
-**Provider strategy**: Mock SMS/email only. Real Twilio/SMTP via `.env` later — no code changes needed.
+**Provider strategy**: Mock in desktop mode. Set `EMAIL_PROVIDER=smtp` + `SMS_PROVIDER=twilio` + Firebase creds for real delivery.
 
 ## Gotchas
 
@@ -107,4 +94,4 @@ Budget enforcement: `canSpend()` pre-flight. Auto-resets daily/monthly.
 - `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (future)
 - `services/ai.js` is a shim re-exporting from `services/ai/` (5 modules)
 - i18n: ~50 bilingual `{en,no}` strings remain by design
-- `exerciseDelivery.js` line 11: FIXED (now imports from `./emailService.js`)
+- Dead routes: several unregistered route files in `backend/src/routes/` (oldNotes, examinations, notes)
