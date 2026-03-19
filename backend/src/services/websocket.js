@@ -10,6 +10,20 @@ let io = null;
 const connectedUsers = new Map(); // userId -> Set<socketId>
 const patientViewers = new Map(); // patientId -> Map<userId, { name, socketId }>
 
+/** Check if dev auth bypass is allowed (non-production + DEV_SKIP_AUTH) */
+function isDevBypassAllowed() {
+  return process.env.DEV_SKIP_AUTH === 'true' && process.env.NODE_ENV !== 'production';
+}
+
+/** Create a dev-mode user object for unauthenticated connections */
+function createDevUser() {
+  return {
+    id: 'dev-user',
+    organizationId: 'a0000000-0000-0000-0000-000000000001',
+    role: 'ADMIN',
+  };
+}
+
 /**
  * Initialize WebSocket server
  * @param {import('http').Server} httpServer
@@ -32,31 +46,14 @@ export function initializeWebSocket(httpServer) {
   io.use(async (socket, next) => {
     try {
       const cookies = socket.handshake.headers.cookie;
-      if (!cookies) {
-        // Allow connection in dev mode without auth
-        if (process.env.DEV_SKIP_AUTH === 'true' && process.env.NODE_ENV !== 'production') {
-          socket.user = {
-            id: 'dev-user',
-            organizationId: 'a0000000-0000-0000-0000-000000000001',
-            role: 'ADMIN',
-          };
-          return next();
-        }
-        return next(new Error('Authentication required'));
-      }
+      const sessionMatch = cookies?.match(/session=([^;]+)/);
 
-      // Parse session cookie
-      const sessionMatch = cookies.match(/session=([^;]+)/);
       if (!sessionMatch) {
-        if (process.env.DEV_SKIP_AUTH === 'true' && process.env.NODE_ENV !== 'production') {
-          socket.user = {
-            id: 'dev-user',
-            organizationId: 'a0000000-0000-0000-0000-000000000001',
-            role: 'ADMIN',
-          };
+        if (isDevBypassAllowed()) {
+          socket.user = createDevUser();
           return next();
         }
-        return next(new Error('Session required'));
+        return next(new Error(cookies ? 'Session required' : 'Authentication required'));
       }
 
       const result = await validateSession(sessionMatch[1]);

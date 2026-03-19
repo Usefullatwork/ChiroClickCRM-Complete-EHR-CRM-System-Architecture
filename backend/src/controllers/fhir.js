@@ -8,6 +8,12 @@ import { query } from '../config/database.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
+// Explicit column lists to prevent PHI leakage (no SELECT *)
+const PATIENT_FHIR_COLUMNS =
+  'id, first_name, last_name, date_of_birth, gender, phone, email, address, status, solvit_id, preferred_language, updated_at';
+const ENCOUNTER_FHIR_COLUMNS =
+  'ce.id, ce.patient_id, ce.practitioner_id, ce.encounter_date, ce.encounter_type, ce.duration_minutes, ce.subjective, ce.objective, ce.assessment, ce.plan, ce.icpc_codes, ce.signed_at, ce.updated_at';
+
 // ============================================================================
 // CAPABILITY STATEMENT
 // ============================================================================
@@ -117,7 +123,7 @@ export const getPatient = async (req, res) => {
     const { organizationId } = req.user;
 
     const result = await query(
-      `SELECT * FROM patients
+      `SELECT ${PATIENT_FHIR_COLUMNS} FROM patients
        WHERE id = $1 AND organization_id = $2`,
       [id, organizationId]
     );
@@ -170,7 +176,7 @@ export const searchPatients = async (req, res) => {
     const { organizationId } = req.user;
     const { name, birthdate, _identifier, _count = 50 } = req.query;
 
-    let sql = `SELECT * FROM patients WHERE organization_id = $1`;
+    let sql = `SELECT ${PATIENT_FHIR_COLUMNS} FROM patients WHERE organization_id = $1`;
     const params = [organizationId];
     let paramIndex = 2;
 
@@ -231,7 +237,7 @@ export const getEncounter = async (req, res) => {
     const { organizationId } = req.user;
 
     const result = await query(
-      `SELECT ce.*, p.first_name as patient_first_name, p.last_name as patient_last_name
+      `SELECT ${ENCOUNTER_FHIR_COLUMNS}, p.first_name as patient_first_name, p.last_name as patient_last_name
        FROM clinical_encounters ce
        JOIN patients p ON ce.patient_id = p.id
        WHERE ce.id = $1 AND ce.organization_id = $2`,
@@ -291,7 +297,7 @@ export const searchEncounters = async (req, res) => {
     const { patient, date, _status, _count = 50 } = req.query;
 
     let sql = `
-      SELECT ce.*, p.first_name as patient_first_name, p.last_name as patient_last_name
+      SELECT ${ENCOUNTER_FHIR_COLUMNS}, p.first_name as patient_first_name, p.last_name as patient_last_name
       FROM clinical_encounters ce
       JOIN patients p ON ce.patient_id = p.id
       WHERE ce.organization_id = $1

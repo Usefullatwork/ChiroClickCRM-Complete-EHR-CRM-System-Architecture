@@ -19,7 +19,12 @@ import { healthCheck, query as dbQuery } from './config/database.js';
 import logger from './utils/logger.js';
 import { requireAuth, requireRole } from './middleware/auth.js';
 import circuitBreakerRegistry from './infrastructure/resilience/CircuitBreakerRegistry.js';
-import { securityHeaders, csrfProtection, sendCsrfToken } from './middleware/security.js';
+import {
+  securityHeaders,
+  csrfProtection,
+  sendCsrfToken,
+  sanitizeInput,
+} from './middleware/security.js';
 import { scheduleKeyRotation, createKeyRotationTable } from './utils/keyRotation.js';
 import { initializeScheduler, shutdownScheduler } from './jobs/scheduler.js';
 import { initializeWebSocket, getIO } from './services/websocket.js';
@@ -76,6 +81,9 @@ if (process.env.DESKTOP_MODE !== 'true' && !['test', 'e2e'].includes(process.env
   app.use(csrfProtection);
   app.use(sendCsrfToken);
 }
+
+// Input sanitization (XSS/injection prevention — preserves SOAP fields)
+app.use(sanitizeInput);
 
 // Compression
 app.use(compression());
