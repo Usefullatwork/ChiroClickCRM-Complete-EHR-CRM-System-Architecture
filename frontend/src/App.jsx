@@ -43,6 +43,8 @@ const PortalAppointments = lazy(() => import('./pages/portal/PortalAppointments'
 const PortalOutcomes = lazy(() => import('./pages/portal/PortalOutcomes'));
 const PortalProfile = lazy(() => import('./pages/portal/PortalProfile'));
 const PatientLogin = lazy(() => import('./pages/portal/PatientLogin'));
+const PortalDocuments = lazy(() => import('./pages/portal/PortalDocuments'));
+const PortalMessages = lazy(() => import('./pages/portal/PortalMessages'));
 
 // Kiosk (full-screen, no auth)
 const Kiosk = lazy(() => import('./pages/Kiosk'));
@@ -502,6 +504,26 @@ function App() {
             <Suspense fallback={<PageLoader />}>
               <PageErrorBoundary pageName={t('exercises')}>
                 <PatientExercises />
+              </PageErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/portal/documents"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Portal Documents">
+                <PortalDocuments />
+              </PageErrorBoundary>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/portal/messages"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <PageErrorBoundary pageName="Portal Messages">
+                <PortalMessages />
               </PageErrorBoundary>
             </Suspense>
           }

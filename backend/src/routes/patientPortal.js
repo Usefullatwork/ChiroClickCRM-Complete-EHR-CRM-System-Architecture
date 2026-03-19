@@ -7,9 +7,19 @@
 import express from 'express';
 import { query } from '../config/database.js';
 import validate from '../middleware/validation.js';
-import { pinAuthSchema, logComplianceSchema } from '../validators/patientPortal.validators.js';
+import {
+  pinAuthSchema,
+  logComplianceSchema,
+  bookingRequestSchema,
+  rescheduleSchema,
+  cancelAppointmentSchema,
+  messageSchema,
+} from '../validators/patientPortal.validators.js';
 import logger from '../utils/logger.js';
 import crypto from 'crypto';
+import { generatePdf } from '../services/documentDelivery.js';
+import { broadcastToOrg } from '../services/websocket.js';
+import { notifyByRole, NOTIFICATION_TYPES } from '../services/notifications.js';
 
 const router = express.Router();
 
@@ -380,6 +390,426 @@ router.post(
     }
   }
 );
+
+// =============================================================================
+// BOOKING ENDPOINTS (patient-facing)
+// =============================================================================
+
+/**
+ * GET /patient-portal/available-slots
+ * Returns available 30-min slots for a given date
+ */
+router.get('/available-slots', requirePortalAuth, async (req, res) => {
+  try {
+    const { date, practitioner_id } = req.query;
+    const { organization_id } = req.portalPatient;
+
+    if (!date) {
+      return res.status(400).json({ error: 'date query parameter is required' });
+    }
+
+    // Get existing appointments for the date
+    let existingQuery = `
+      SELECT appointment_time, duration
+      FROM appointments
+      WHERE organization_id = $1
+        AND appointment_date = $2
+        AND status NOT IN ('cancelled', 'no_show')
+    `;
+    const params = [organization_id, date];
+
+    if (practitioner_id) {
+      existingQuery += ' AND practitioner_id = $3';
+      params.push(practitioner_id);
+    }
+
+    const existing = await query(existingQuery, params);
+
+    // Generate 30-min slots from 08:00 to 17:00
+    const bookedTimes = new Set(existing.rows.map((r) => r.appointment_time?.substring(0, 5)));
+    const slots = [];
+    for (let hour = 8; hour < 17; hour++) {
+      for (let min = 0; min < 60; min += 30) {
+        const time = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+        slots.push({ time, available: !bookedTimes.has(time) });
+      }
+    }
+
+    res.json({ slots });
+  } catch (error) {
+    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+      return res.status(503).json({ error: 'Booking system not yet configured' });
+    }
+    logger.error('Error getting available slots:', error);
+    res.status(500).json({ error: 'Failed to get available slots' });
+  }
+});
+
+/**
+ * POST /patient-portal/appointments/request
+ * Patient requests a new appointment
+ */
+router.post(
+  '/appointments/request',
+  requirePortalAuth,
+  validate(bookingRequestSchema),
+  async (req, res) => {
+    try {
+      const { preferredDate, preferredTime, reason } = req.body;
+      const { patient_id, organization_id, first_name, last_name } = req.portalPatient;
+
+      const result = await query(
+        `INSERT INTO portal_booking_requests
+          (patient_id, organization_id, preferred_date, preferred_time_slot, reason, status)
+         VALUES ($1, $2, $3, $4, $5, 'PENDING')
+         RETURNING *`,
+        [patient_id, organization_id, preferredDate, preferredTime || null, reason || null]
+      );
+
+      const request = result.rows[0];
+
+      // Notify staff via WebSocket
+      try {
+        broadcastToOrg(organization_id, 'booking:new-request', {
+          id: request.id,
+          patientName: `${first_name} ${last_name}`,
+          preferredDate,
+          preferredTime,
+        });
+      } catch (wsErr) {
+        logger.debug('WebSocket broadcast failed:', wsErr.message);
+      }
+
+      // Create in-app notifications for staff
+      try {
+        await notifyByRole(organization_id, ['ADMIN', 'PRACTITIONER'], {
+          type: NOTIFICATION_TYPES.BOOKING_REQUEST,
+          title: 'Ny timeforespørsel',
+          message: `${first_name} ${last_name} ønsker time ${preferredDate}`,
+        });
+      } catch (notifErr) {
+        logger.debug('Staff notification failed:', notifErr.message);
+      }
+
+      res.status(201).json({ id: request.id, status: 'PENDING' });
+    } catch (error) {
+      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        return res.status(503).json({ error: 'Booking system not yet configured' });
+      }
+      logger.error('Error creating booking request:', error);
+      res.status(500).json({ error: 'Failed to create booking request' });
+    }
+  }
+);
+
+/**
+ * PATCH /patient-portal/appointments/:id/reschedule
+ * Patient requests to reschedule an existing appointment
+ */
+router.patch(
+  '/appointments/:id/reschedule',
+  requirePortalAuth,
+  validate(rescheduleSchema),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { preferredDate, preferredTime, reason } = req.body;
+      const { patient_id, organization_id, first_name, last_name } = req.portalPatient;
+
+      // Verify appointment belongs to this patient's org
+      const apptResult = await query(
+        `SELECT id FROM appointments
+         WHERE id = $1 AND patient_id = $2 AND organization_id = $3`,
+        [id, patient_id, organization_id]
+      );
+
+      if (apptResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Appointment not found' });
+      }
+
+      // Create a new booking request referencing the original appointment
+      const result = await query(
+        `INSERT INTO portal_booking_requests
+          (patient_id, organization_id, preferred_date, preferred_time_slot, reason, status, original_appointment_id)
+         VALUES ($1, $2, $3, $4, $5, 'PENDING', $6)
+         RETURNING *`,
+        [patient_id, organization_id, preferredDate, preferredTime || null, reason || null, id]
+      );
+
+      const request = result.rows[0];
+
+      try {
+        broadcastToOrg(organization_id, 'booking:reschedule-request', {
+          id: request.id,
+          originalAppointmentId: id,
+          patientName: `${first_name} ${last_name}`,
+          preferredDate,
+        });
+      } catch (wsErr) {
+        logger.debug('WebSocket broadcast failed:', wsErr.message);
+      }
+
+      res.json({ id: request.id, status: 'PENDING' });
+    } catch (error) {
+      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        return res.status(503).json({ error: 'Booking system not yet configured' });
+      }
+      logger.error('Error creating reschedule request:', error);
+      res.status(500).json({ error: 'Failed to create reschedule request' });
+    }
+  }
+);
+
+/**
+ * POST /patient-portal/appointments/:id/cancel
+ * Patient cancels an appointment
+ */
+router.post(
+  '/appointments/:id/cancel',
+  requirePortalAuth,
+  validate(cancelAppointmentSchema),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { reason } = req.body;
+      const { patient_id, organization_id, first_name, last_name } = req.portalPatient;
+
+      // Verify appointment belongs to this patient
+      const apptResult = await query(
+        `SELECT id, status FROM appointments
+         WHERE id = $1 AND patient_id = $2 AND organization_id = $3`,
+        [id, patient_id, organization_id]
+      );
+
+      if (apptResult.rows.length === 0) {
+        return res.status(404).json({ error: 'Appointment not found' });
+      }
+
+      if (apptResult.rows[0].status === 'cancelled') {
+        return res.status(400).json({ error: 'Appointment is already cancelled' });
+      }
+
+      await query(
+        `UPDATE appointments
+         SET status = 'cancelled', cancelled_at = NOW(), cancellation_reason = $1
+         WHERE id = $2`,
+        [reason || null, id]
+      );
+
+      try {
+        broadcastToOrg(organization_id, 'appointment:cancelled', {
+          appointmentId: id,
+          patientName: `${first_name} ${last_name}`,
+          reason,
+        });
+      } catch (wsErr) {
+        logger.debug('WebSocket broadcast failed:', wsErr.message);
+      }
+
+      res.json({ success: true });
+    } catch (error) {
+      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        return res.status(503).json({ error: 'Appointment system not yet configured' });
+      }
+      logger.error('Error cancelling appointment:', error);
+      res.status(500).json({ error: 'Failed to cancel appointment' });
+    }
+  }
+);
+
+// =============================================================================
+// MESSAGING ENDPOINTS (patient-facing)
+// =============================================================================
+
+/**
+ * GET /patient-portal/messages
+ * Patient retrieves their messages
+ */
+router.get('/messages', requirePortalAuth, async (req, res) => {
+  try {
+    const { patient_id, organization_id } = req.portalPatient;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = (page - 1) * limit;
+
+    const [messagesResult, countResult, unreadResult] = await Promise.all([
+      query(
+        `SELECT id, sender_type, sender_id, subject, body, is_read, read_at, parent_message_id, created_at
+         FROM patient_messages
+         WHERE patient_id = $1 AND organization_id = $2
+         ORDER BY created_at DESC
+         LIMIT $3 OFFSET $4`,
+        [patient_id, organization_id, limit, offset]
+      ),
+      query(
+        `SELECT COUNT(*) as total FROM patient_messages WHERE patient_id = $1 AND organization_id = $2`,
+        [patient_id, organization_id]
+      ),
+      query(
+        `SELECT COUNT(*) as count FROM patient_messages
+         WHERE patient_id = $1 AND organization_id = $2 AND sender_type != 'PATIENT' AND is_read = false`,
+        [patient_id, organization_id]
+      ),
+    ]);
+
+    res.json({
+      messages: messagesResult.rows,
+      unread_count: parseInt(unreadResult.rows[0].count, 10),
+      pagination: { page, limit, total: parseInt(countResult.rows[0].total, 10) },
+    });
+  } catch (error) {
+    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+      return res.json({
+        messages: [],
+        unread_count: 0,
+        pagination: { page: 1, limit: 20, total: 0 },
+      });
+    }
+    logger.error('Error getting portal messages:', error);
+    res.status(500).json({ error: 'Failed to get messages' });
+  }
+});
+
+/**
+ * POST /patient-portal/messages
+ * Patient sends a new message
+ */
+router.post('/messages', requirePortalAuth, validate(messageSchema), async (req, res) => {
+  try {
+    const { patient_id, organization_id, first_name, last_name } = req.portalPatient;
+    const { subject, body: msgBody, parent_message_id } = req.body;
+
+    const result = await query(
+      `INSERT INTO patient_messages (patient_id, organization_id, sender_type, sender_id, subject, body, parent_message_id)
+       VALUES ($1, $2, 'PATIENT', NULL, $3, $4, $5)
+       RETURNING *`,
+      [patient_id, organization_id, subject || null, msgBody, parent_message_id || null]
+    );
+
+    broadcastToOrg(organization_id, 'message:new-patient-message', {
+      patientId: patient_id,
+      patientName: `${first_name} ${last_name}`,
+      subject: subject || '(Ingen emne)',
+    });
+
+    notifyByRole(organization_id, ['ADMIN', 'PRACTITIONER'], {
+      type: NOTIFICATION_TYPES.NEW_PATIENT_MESSAGE,
+      title: 'Ny melding fra pasient',
+      message: `${first_name} ${last_name}: ${subject || msgBody.substring(0, 100)}`,
+    });
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+      return res.status(503).json({ error: 'Messaging not yet configured' });
+    }
+    logger.error('Error sending portal message:', error);
+    res.status(500).json({ error: 'Failed to send message' });
+  }
+});
+
+/**
+ * PATCH /patient-portal/messages/:id/read
+ * Patient marks a message as read
+ */
+router.patch('/messages/:id/read', requirePortalAuth, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { patient_id, organization_id } = req.portalPatient;
+
+    await query(
+      `UPDATE patient_messages SET is_read = true, read_at = NOW()
+       WHERE id = $1 AND patient_id = $2 AND organization_id = $3`,
+      [id, patient_id, organization_id]
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+      return res.json({ success: true });
+    }
+    logger.error('Error marking message read:', error);
+    res.status(500).json({ error: 'Failed to mark message as read' });
+  }
+});
+
+// =============================================================================
+// DOCUMENTS
+// =============================================================================
+
+router.get('/documents', requirePortalAuth, async (req, res) => {
+  try {
+    const { patient_id, organization_id } = req.portalPatient;
+
+    const result = await query(
+      `SELECT id, title, document_type, created_at, token_expires_at, downloaded_at, download_token
+       FROM portal_documents
+       WHERE patient_id = $1 AND organization_id = $2
+       ORDER BY created_at DESC`,
+      [patient_id, organization_id]
+    );
+
+    const documents = result.rows.map((doc) => ({
+      id: doc.id,
+      title: doc.title,
+      documentType: doc.document_type,
+      createdAt: doc.created_at,
+      expired: doc.token_expires_at < new Date(),
+      downloadedAt: doc.downloaded_at,
+      downloadToken: doc.token_expires_at > new Date() ? doc.download_token : null,
+    }));
+
+    res.json({ documents });
+  } catch (error) {
+    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+      return res.json({ documents: [] });
+    }
+    logger.error('Error getting portal documents:', error);
+    res.status(500).json({ error: 'Failed to get documents' });
+  }
+});
+
+router.get('/documents/:token/download', async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    const result = await query(
+      `SELECT id, document_type, document_id, organization_id, token_expires_at
+       FROM portal_documents
+       WHERE download_token = $1`,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Document not found' });
+    }
+
+    const doc = result.rows[0];
+
+    if (doc.token_expires_at < new Date()) {
+      return res.status(410).json({ error: 'Download link has expired' });
+    }
+
+    const { buffer, filename } = await generatePdf(
+      doc.document_type,
+      doc.document_id,
+      doc.organization_id
+    );
+
+    // Mark as downloaded
+    await query(
+      `UPDATE portal_documents SET downloaded_at = NOW() WHERE id = $1 AND downloaded_at IS NULL`,
+      [doc.id]
+    );
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(buffer);
+  } catch (error) {
+    logger.error('Error downloading portal document:', error);
+    res.status(500).json({ error: 'Failed to download document' });
+  }
+});
 
 /**
  * @swagger

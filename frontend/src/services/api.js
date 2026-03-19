@@ -431,6 +431,7 @@ export const pdfAPI = {
   generateInvoice: (financialMetricId) => apiClient.post(`/pdf/invoice/${financialMetricId}`),
   generatePatientLetter: (encounterId, letterType) =>
     apiClient.post(`/pdf/letter/${encounterId}`, { letterType }),
+  deliverDocument: (type, id, data) => apiClient.post(`/pdf/${type}/${id}/deliver`, data),
 };
 
 // GDPR
@@ -918,6 +919,7 @@ export const exercisesAPI = {
     apiClient.get(`/patients/${patientId}/exercises/pdf`, {
       responseType: 'blob',
     }),
+  deliverPrescription: (id, data) => apiClient.post(`/exercises/prescriptions/${id}/deliver`, data),
 };
 
 // Vestibular / VNG Assessments API
@@ -965,6 +967,18 @@ export const patientPortalAPI = {
   getOutcomes: () => apiClient.get('/patient-portal/outcomes'),
   submitOutcome: (data) => apiClient.post('/patient-portal/outcomes', data),
   logout: () => apiClient.post('/patient-portal/logout'),
+  getDocuments: () => apiClient.get('/patient-portal/documents'),
+  downloadDocument: (token) =>
+    apiClient.get(`/patient-portal/documents/${token}/download`, { responseType: 'blob' }),
+  getAvailableSlots: (date, practitionerId) =>
+    apiClient.get('/patient-portal/available-slots', {
+      params: { date, practitioner_id: practitionerId },
+    }),
+  rescheduleAppointment: (id, data) =>
+    apiClient.patch(`/patient-portal/appointments/${id}/reschedule`, data),
+  getMessages: (params) => apiClient.get('/patient-portal/messages', { params }),
+  sendMessage: (data) => apiClient.post('/patient-portal/messages', data),
+  markMessageRead: (id) => apiClient.patch(`/patient-portal/messages/${id}/read`),
 };
 
 // Encounter Validation API
@@ -1047,6 +1061,13 @@ export const portalAPI = {
   generateMagicLink: (patientId) => apiClient.post('/portal/auth/magic-link', { patientId }),
   setPortalAccess: (patientId, pin) =>
     apiClient.post(`/portal/patient/${patientId}/portal-access`, { pin }),
+  getBookingRequests: (params) => apiClient.get('/portal/booking-requests', { params }),
+  handleBookingRequest: (id, data) => apiClient.patch(`/portal/booking-requests/${id}`, data),
+  getBookingRequestCount: () => apiClient.get('/portal/booking-requests/count'),
+  getPatientMessages: (patientId, params) =>
+    apiClient.get(`/portal/patient/${patientId}/messages`, { params }),
+  sendPatientMessage: (patientId, data) =>
+    apiClient.post(`/portal/patient/${patientId}/messages`, data),
 };
 
 // Audit Logs (admin only)

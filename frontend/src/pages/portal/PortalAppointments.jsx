@@ -15,6 +15,7 @@ import {
   AlertCircle,
   CheckCircle,
   History,
+  RefreshCw,
 } from 'lucide-react';
 import { patientPortalAPI } from '../../services/api';
 import { useTranslation } from '../../i18n';
@@ -35,6 +36,15 @@ export default function PortalAppointments() {
     reason: '',
   });
   const [requestStatus, setRequestStatus] = useState(null);
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [reschedulingId, setReschedulingId] = useState(null);
+  const [rescheduleForm, setRescheduleForm] = useState({
+    preferredDate: '',
+    preferredTime: '',
+    reason: '',
+  });
+  const [rescheduleStatus, setRescheduleStatus] = useState(null);
 
   const VISIT_TYPE_LABELS = useMemo(
     () => ({
@@ -61,6 +71,23 @@ export default function PortalAppointments() {
     }),
     [t]
   );
+
+  const loadAvailableSlots = async (date) => {
+    if (!date) {
+      setAvailableSlots([]);
+      return;
+    }
+    try {
+      setLoadingSlots(true);
+      const res = await patientPortalAPI.getAvailableSlots(date);
+      setAvailableSlots(res.data?.slots || []);
+    } catch (err) {
+      logger.error('Failed to load slots:', err);
+      setAvailableSlots([]);
+    } finally {
+      setLoadingSlots(false);
+    }
+  };
 
   useEffect(() => {
     loadAppointments();
@@ -108,6 +135,22 @@ export default function PortalAppointments() {
     } catch (err) {
       logger.error('Failed to request appointment:', err);
       setRequestStatus('error');
+    }
+  };
+
+  const handleReschedule = async (e) => {
+    e.preventDefault();
+    try {
+      setRescheduleStatus('sending');
+      await patientPortalAPI.rescheduleAppointment(reschedulingId, rescheduleForm);
+      setRescheduleStatus('sent');
+      setTimeout(() => {
+        setReschedulingId(null);
+        setRescheduleStatus(null);
+      }, 2000);
+    } catch (err) {
+      logger.error('Failed to reschedule:', err);
+      setRescheduleStatus('error');
     }
   };
 
@@ -196,9 +239,11 @@ export default function PortalAppointments() {
                   <input
                     type="date"
                     value={requestForm.preferredDate}
-                    onChange={(e) =>
-                      setRequestForm((f) => ({ ...f, preferredDate: e.target.value }))
-                    }
+                    onChange={(e) => {
+                      const date = e.target.value;
+                      setRequestForm((f) => ({ ...f, preferredDate: date, preferredTime: '' }));
+                      loadAvailableSlots(date);
+                    }}
                     min={new Date().toISOString().split('T')[0]}
                     className="w-full px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
                     required
@@ -206,20 +251,43 @@ export default function PortalAppointments() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('portalPreferredTime')}
+                    {t('portalPreferredTime', 'Velg tid')}
                   </label>
-                  <select
-                    value={requestForm.preferredTime}
-                    onChange={(e) =>
-                      setRequestForm((f) => ({ ...f, preferredTime: e.target.value }))
-                    }
-                    className="w-full px-3 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
-                  >
-                    <option value="">{t('portalFlexible')}</option>
-                    <option value="morning">{t('portalMorning')}</option>
-                    <option value="afternoon">{t('portalAfternoon')}</option>
-                    <option value="evening">{t('portalEvening')}</option>
-                  </select>
+                  {loadingSlots ? (
+                    <div className="flex items-center gap-2 py-3 text-gray-500 text-sm">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      {t('portalLoadingSlots', 'Laster ledige tider...')}
+                    </div>
+                  ) : availableSlots.length > 0 ? (
+                    <div className="grid grid-cols-4 gap-2">
+                      {availableSlots
+                        .filter((s) => s.available)
+                        .map((slot) => (
+                          <button
+                            key={slot.time}
+                            type="button"
+                            onClick={() =>
+                              setRequestForm((f) => ({ ...f, preferredTime: slot.time }))
+                            }
+                            className={`px-2 py-2 text-sm rounded-lg border transition-colors ${
+                              requestForm.preferredTime === slot.time
+                                ? 'bg-blue-600 text-white border-blue-600'
+                                : 'border-gray-300 hover:border-blue-400 text-gray-700'
+                            }`}
+                          >
+                            {slot.time}
+                          </button>
+                        ))}
+                    </div>
+                  ) : requestForm.preferredDate ? (
+                    <p className="text-sm text-gray-500 py-2">
+                      {t('portalNoSlots', 'Ingen ledige tider denne dagen')}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-gray-400 py-2">
+                      {t('portalSelectDate', 'Velg dato først')}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -300,19 +368,156 @@ export default function PortalAppointments() {
                         </span>
                       </div>
                       {appt.status !== 'cancelled' && appt.status !== 'checked_in' && (
-                        <button
-                          onClick={() => handleCancelAppointment(appt.id)}
-                          disabled={cancelingId === appt.id}
-                          className="text-sm text-red-500 hover:text-red-700 px-2 py-1 hover:bg-red-50 rounded transition-colors"
-                        >
-                          {cancelingId === appt.id ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                          ) : (
-                            t('portalCancel')
-                          )}
-                        </button>
+                        <div className="flex items-center gap-2">
+                          <button
+                            onClick={() => {
+                              setReschedulingId(appt.id);
+                              setRescheduleForm({
+                                preferredDate: '',
+                                preferredTime: '',
+                                reason: '',
+                              });
+                              setRescheduleStatus(null);
+                            }}
+                            className="text-sm text-blue-500 hover:text-blue-700 px-2 py-1 hover:bg-blue-50 rounded transition-colors"
+                          >
+                            {t('portalReschedule', 'Endre time')}
+                          </button>
+                          <button
+                            onClick={() => handleCancelAppointment(appt.id)}
+                            disabled={cancelingId === appt.id}
+                            className="text-sm text-red-500 hover:text-red-700 px-2 py-1 hover:bg-red-50 rounded transition-colors"
+                          >
+                            {cancelingId === appt.id ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              t('portalCancel')
+                            )}
+                          </button>
+                        </div>
                       )}
                     </div>
+                    {reschedulingId === appt.id && (
+                      <div className="mt-3 pt-3 border-t border-gray-100">
+                        {rescheduleStatus === 'sent' ? (
+                          <div className="text-center py-2">
+                            <CheckCircle className="w-8 h-8 text-green-500 mx-auto mb-1" />
+                            <p className="text-sm font-medium text-gray-900">
+                              {t('portalRescheduleSent', 'Forespørsel sendt')}
+                            </p>
+                          </div>
+                        ) : (
+                          <form onSubmit={handleReschedule} className="space-y-3">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                {t('portalNewDate', 'Ny dato')}
+                              </label>
+                              <input
+                                type="date"
+                                value={rescheduleForm.preferredDate}
+                                onChange={(e) => {
+                                  const date = e.target.value;
+                                  setRescheduleForm((f) => ({
+                                    ...f,
+                                    preferredDate: date,
+                                    preferredTime: '',
+                                  }));
+                                  loadAvailableSlots(date);
+                                }}
+                                min={new Date().toISOString().split('T')[0]}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                required
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                {t('portalPreferredTime', 'Velg tid')}
+                              </label>
+                              {loadingSlots ? (
+                                <div className="flex items-center gap-2 py-2 text-gray-500 text-sm">
+                                  <Loader2 className="w-4 h-4 animate-spin" />
+                                  {t('portalLoadingSlots', 'Laster ledige tider...')}
+                                </div>
+                              ) : availableSlots.length > 0 ? (
+                                <div className="grid grid-cols-4 gap-2">
+                                  {availableSlots
+                                    .filter((s) => s.available)
+                                    .map((slot) => (
+                                      <button
+                                        key={slot.time}
+                                        type="button"
+                                        onClick={() =>
+                                          setRescheduleForm((f) => ({
+                                            ...f,
+                                            preferredTime: slot.time,
+                                          }))
+                                        }
+                                        className={`px-2 py-2 text-sm rounded-lg border transition-colors ${
+                                          rescheduleForm.preferredTime === slot.time
+                                            ? 'bg-blue-600 text-white border-blue-600'
+                                            : 'border-gray-300 hover:border-blue-400 text-gray-700'
+                                        }`}
+                                      >
+                                        {slot.time}
+                                      </button>
+                                    ))}
+                                </div>
+                              ) : rescheduleForm.preferredDate ? (
+                                <p className="text-sm text-gray-500 py-2">
+                                  {t('portalNoSlots', 'Ingen ledige tider denne dagen')}
+                                </p>
+                              ) : (
+                                <p className="text-sm text-gray-400 py-2">
+                                  {t('portalSelectDate', 'Velg dato først')}
+                                </p>
+                              )}
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">
+                                {t('portalRescheduleReason', 'Grunn til endring')}
+                              </label>
+                              <textarea
+                                value={rescheduleForm.reason}
+                                onChange={(e) =>
+                                  setRescheduleForm((f) => ({ ...f, reason: e.target.value }))
+                                }
+                                placeholder={t('portalRescheduleReasonPlaceholder', 'Valgfritt')}
+                                rows={2}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm resize-none"
+                              />
+                            </div>
+                            <div className="flex gap-2">
+                              <button
+                                type="submit"
+                                disabled={rescheduleStatus === 'sending'}
+                                className="flex-1 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                              >
+                                {rescheduleStatus === 'sending' ? (
+                                  <>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    {t('portalSending')}
+                                  </>
+                                ) : (
+                                  t('portalSendReschedule', 'Send endringsforespørsel')
+                                )}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setReschedulingId(null)}
+                                className="px-3 py-2 text-gray-500 text-sm hover:bg-gray-100 rounded-lg transition-colors"
+                              >
+                                {t('portalCancelAction', 'Avbryt')}
+                              </button>
+                            </div>
+                            {rescheduleStatus === 'error' && (
+                              <p className="text-sm text-red-600 text-center">
+                                {t('portalRescheduleFailed', 'Kunne ikke sende forespørsel')}
+                              </p>
+                            )}
+                          </form>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}

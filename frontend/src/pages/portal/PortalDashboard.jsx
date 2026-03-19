@@ -9,12 +9,14 @@ import {
   Calendar,
   Dumbbell,
   ClipboardList,
+  FileText,
   User,
   ChevronRight,
   Loader2,
   AlertCircle,
   Clock,
   LogOut,
+  MessageSquare,
 } from 'lucide-react';
 import { patientPortalAPI } from '../../services/api';
 import { useTranslation } from '../../i18n';
@@ -190,6 +192,22 @@ export default function PortalDashboard() {
               path: '/portal/exercises',
               color: 'text-green-600',
               bg: 'bg-green-100',
+            },
+            {
+              icon: FileText,
+              label: t('myDocuments', 'Mine dokumenter'),
+              desc: t('viewDocuments', 'Se dokumenter fra klinikken'),
+              path: '/portal/documents',
+              color: 'text-indigo-600',
+              bg: 'bg-indigo-100',
+            },
+            {
+              icon: MessageSquare,
+              label: t('portalMyMessages', 'Mine meldinger'),
+              desc: t('portalMessagesDesc', 'Send og motta meldinger'),
+              path: '/portal/messages',
+              color: 'text-teal-600',
+              bg: 'bg-teal-100',
             },
             {
               icon: ClipboardList,

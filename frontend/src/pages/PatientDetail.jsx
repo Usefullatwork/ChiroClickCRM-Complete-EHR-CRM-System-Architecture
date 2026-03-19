@@ -33,12 +33,14 @@ import Breadcrumbs from '../components/common/Breadcrumbs';
 import { useTranslation } from '../i18n';
 import usePatientPresence from '../hooks/usePatientPresence';
 import { useAuth } from '../hooks/useAuth';
+import PatientMessages from '../components/portal/PatientMessages';
 
 const TABS = [
   { key: 'overview', labelEn: 'Overview', labelNo: 'Oversikt' },
   { key: 'journals', labelEn: 'Journals', labelNo: 'Journaler' },
   { key: 'timeline', labelEn: 'Timeline', labelNo: 'Tidslinje' },
   { key: 'results', labelEn: 'Results', labelNo: 'Resultater' },
+  { key: 'messages', labelEn: 'Messages', labelNo: 'Meldinger' },
 ];
 
 export default function PatientDetail() {
@@ -713,6 +715,13 @@ export default function PatientDetail() {
                     </div>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Messages Tab */}
+            {activeTab === 'messages' && (
+              <div className="p-6">
+                <PatientMessages patientId={id} />
               </div>
             )}
           </div>
