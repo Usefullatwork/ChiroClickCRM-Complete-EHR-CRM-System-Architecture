@@ -12,12 +12,13 @@ Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electro
 
 ## Current State
 
-- **Backend**: 2,533 tests (112 suites), 0 lint errors
-- **Frontend**: 993 tests (48 suites), 0 lint errors
+- **Backend**: 2,601 tests (119 suites), 0 lint errors
+- **Frontend**: 1,034 tests (52 suites), 0 lint errors
 - **E2E**: 88 tests (11 Playwright specs)
 - **CI**: 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
 - **Electron**: Portable exe verified (96MB), PGlite WASM loads correctly
-- **Latest migration**: 073 (`finding_diagnosis_map`)
+- **Latest migration**: 076 (`patient_connectivity`)
+- **Branch**: `feature/v2.1-patient-connectivity` (Session 0 complete)
 
 ## Commands
 
@@ -53,20 +54,21 @@ cd frontend && npx playwright test              # E2E tests
 
 **Critical service paths for v2.1:**
 
-| Service                   | Path                    | Status                                                             |
-| ------------------------- | ----------------------- | ------------------------------------------------------------------ |
-| `communications.js`       | `backend/src/services/` | Core SMS/email abstraction                                         |
-| `emailService.js`         | `backend/src/services/` | Nodemailer + templates                                             |
-| `smsService.js`           | `backend/src/services/` | Twilio client + rate limiting                                      |
-| `exerciseDelivery.js`     | `backend/src/services/` | BROKEN import line 11 (`./email.js` should be `./emailService.js`) |
-| `appointmentReminders.js` | `backend/src/services/` | Logic exists, DB table missing                                     |
-| `pdfGenerator.js`         | `backend/src/services/` | 7 document types                                                   |
-| `patientPortal.js`        | `backend/src/routes/`   | Extend with booking, messaging, docs                               |
-| `mobile.js`               | `backend/src/routes/`   | 2,200 lines — extend for v2.1                                      |
-| `scheduler.js`            | `backend/src/jobs/`     | 12 cron jobs — wire reminders                                      |
-| `automations/actions.js`  | `backend/src/services/` | Add `SEND_BOOKING_LINK` action                                     |
+| Service                   | Path                    | Status                                                        |
+| ------------------------- | ----------------------- | ------------------------------------------------------------- |
+| `communications.js`       | `backend/src/services/` | Core SMS/email abstraction                                    |
+| `emailService.js`         | `backend/src/services/` | Nodemailer + templates                                        |
+| `smsService.js`           | `backend/src/services/` | Twilio client + rate limiting                                 |
+| `exerciseDelivery.js`     | `backend/src/services/` | Fixed — imports from `./emailService.js` now                  |
+| `appointmentReminders.js` | `backend/src/services/` | Logic exists, DB table created (migration 076)                |
+| `documentDelivery.js`     | `backend/src/services/` | NEW — PDF generate + portal doc + email/SMS delivery pipeline |
+| `pdfGenerator.js`         | `backend/src/services/` | 7 document types                                              |
+| `patientPortal.js`        | `backend/src/routes/`   | Extend with booking, messaging, docs                          |
+| `mobile.js`               | `backend/src/routes/`   | 2,200 lines — extend for v2.1                                 |
+| `scheduler.js`            | `backend/src/jobs/`     | 12 cron jobs — wire reminders                                 |
+| `automations/actions.js`  | `backend/src/services/` | Has `SEND_BOOKING_LINK` (merged from AI tooling branch)       |
 
-**Branch**: `feature/ai-tooling-ui-sprint` ready to merge (feature gating + encounter→CRM triggers).
+**Session 0 complete**: AI tooling merged, exerciseDelivery fixed, migration 076 (4 tables), documentDelivery pipeline + tests.
 **Provider strategy**: Mock SMS/email only. Real Twilio/SMTP via `.env` later — no code changes needed.
 
 ## Gotchas
@@ -101,4 +103,4 @@ Budget enforcement: `canSpend()` pre-flight. Auto-resets daily/monthly.
 - `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (future)
 - `services/ai.js` is a shim re-exporting from `services/ai/` (5 modules)
 - i18n: ~50 bilingual `{en,no}` strings remain by design
-- `exerciseDelivery.js` line 11: broken import (fix in v2.1 Session 0)
+- `exerciseDelivery.js` line 11: FIXED (now imports from `./emailService.js`)
