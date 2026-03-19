@@ -15,6 +15,7 @@ import { validation } from './validation';
 import { analytics } from './analytics';
 import { ai } from './ai';
 import { assessment } from './assessment';
+import { portal } from './portal';
 
 export const translations = {
   common,
@@ -34,4 +35,5 @@ export const translations = {
   analytics,
   ai,
   assessment,
+  portal,
 };
