@@ -27,9 +27,9 @@ import {
   ArrowDownRight,
 } from 'lucide-react';
 import { progressAPI } from '../services/api';
-import ProgressChart from '../components/patient/ProgressChart';
-import ComplianceCalendar from '../components/patient/ComplianceCalendar';
-import PainTracker from '../components/patient/PainTracker';
+import ProgressChart from '../components/patients/ProgressChart';
+import ComplianceCalendar from '../components/patients/ComplianceCalendar';
+import PainTracker from '../components/patients/PainTracker';
 
 /**
  * PatientProgress Component

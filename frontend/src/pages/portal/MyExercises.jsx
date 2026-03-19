@@ -28,7 +28,7 @@ import {
   ArrowUp,
 } from 'lucide-react';
 import { patientApi, getStoredToken, clearStoredToken } from '../../api/patientApi';
-import ExerciseCard from '../../components/patient/ExerciseCard';
+import ExerciseCard from '../../components/patients/ExerciseCard';
 import useMediaQuery from '../../hooks/useMediaQuery';
 
 import logger from '../../utils/logger';

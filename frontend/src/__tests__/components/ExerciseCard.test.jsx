@@ -5,7 +5,7 @@
 
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import ExerciseCard from '../../components/patient/ExerciseCard';
+import ExerciseCard from '../../components/patients/ExerciseCard';
 import { createMockExercise } from '../setup';
 
 describe('ExerciseCard Component', () => {

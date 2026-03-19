@@ -37,7 +37,7 @@ vi.mock('../../services/api', () => ({
   },
 }));
 
-vi.mock('../../components/patient/ProgressChart', () => ({
+vi.mock('../../components/patients/ProgressChart', () => ({
   default: ({ data, metric, period }) => (
     <div data-testid="progress-chart" data-metric={metric} data-period={period}>
       ProgressChart ({data?.length || 0} items)
@@ -45,13 +45,13 @@ vi.mock('../../components/patient/ProgressChart', () => ({
   ),
 }));
 
-vi.mock('../../components/patient/ComplianceCalendar', () => ({
+vi.mock('../../components/patients/ComplianceCalendar', () => ({
   default: ({ data }) => (
     <div data-testid="compliance-calendar">ComplianceCalendar ({data?.length || 0} days)</div>
   ),
 }));
 
-vi.mock('../../components/patient/PainTracker', () => ({
+vi.mock('../../components/patients/PainTracker', () => ({
   default: ({ data, trend, currentAvg }) => (
     <div data-testid="pain-tracker" data-trend={trend} data-avg={currentAvg}>
       PainTracker ({data?.length || 0} entries)

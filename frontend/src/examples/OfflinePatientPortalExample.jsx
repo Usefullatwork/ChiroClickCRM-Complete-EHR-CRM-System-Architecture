@@ -29,13 +29,13 @@ import {
 // Import offline utilities
 import { useOffline } from '../hooks/useOffline';
 import { OfflineIndicator } from '../components/ui/OfflineIndicator';
-import { VideoOfflineManager, VideoOfflineToggle } from '../components/patient/VideoOfflineToggle';
+import { VideoOfflineManager, VideoOfflineToggle } from '../components/patients/VideoOfflineToggle';
 
 // Import your existing patient API
 import { patientApi, getStoredToken } from '../api/patientApi';
 
 // Import your existing components
-import ExerciseCard from '../components/patient/ExerciseCard';
+import ExerciseCard from '../components/patients/ExerciseCard';
 
 import logger from '../utils/logger';
 /**
