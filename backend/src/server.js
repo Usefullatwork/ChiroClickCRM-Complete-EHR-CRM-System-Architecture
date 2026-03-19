@@ -420,9 +420,13 @@ if (process.env.DESKTOP_MODE === 'true') {
         res.sendFile(path.default.join(frontendDist, 'index.html'));
       });
       logger.info(`Desktop mode: Serving frontend from ${frontendDist}`);
+    } else {
+      logger.warn(`Desktop mode: Frontend dist NOT found at: ${frontendDist}`);
+      logger.warn('Running in API-only mode');
     }
   } catch (e) {
-    logger.warn('Desktop mode: Frontend dist not found, API-only mode');
+    logger.warn(`Desktop mode: Frontend dist NOT found at: ${frontendDist}`);
+    logger.warn('Running in API-only mode');
   }
 }
 

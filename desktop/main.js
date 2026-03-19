@@ -95,6 +95,13 @@ function startBackend() {
   const backendDir = getResourcePath('backend');
   const serverPath = path.join(backendDir, 'src', 'server.js');
 
+  // Diagnostic logging for packaged-mode path debugging
+  console.log('[desktop] Packaged:', app.isPackaged);
+  console.log('[desktop] resourcesPath:', process.resourcesPath);
+  console.log('[desktop] backendDir:', backendDir);
+  console.log('[desktop] serverPath:', serverPath);
+  console.log('[desktop] serverPath exists:', fs.existsSync(serverPath));
+
   // Data directory: writable location for PGlite, uploads, etc.
   const dataDir = app.isPackaged
     ? path.join(app.getPath('userData'), 'data')
@@ -112,6 +119,7 @@ function startBackend() {
 
   const env = {
     ...process.env,
+    ELECTRON_RUN_AS_NODE: '1',
     DESKTOP_MODE: 'true',
     NODE_ENV: 'production',
     PORT: String(BACKEND_PORT),
@@ -123,6 +131,8 @@ function startBackend() {
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || defaultKey,
   };
 
+  console.log('[desktop] FRONTEND_DIST:', env.FRONTEND_DIST);
+  console.log('[desktop] DATA_DIR:', env.DATA_DIR);
   console.log(`[desktop] Starting backend server on port ${BACKEND_PORT}...`);
 
   backendProcess = fork(serverPath, [], {
