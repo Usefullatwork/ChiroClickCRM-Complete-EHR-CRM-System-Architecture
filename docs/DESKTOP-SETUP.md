@@ -86,6 +86,7 @@ ChiroClickEHR can use local AI models via Ollama for:
 
 - Check if another application is using port 3000
 - Try closing all Node.js processes in Task Manager, then restart
+- On Windows: `taskkill /F /IM node.exe` then relaunch
 
 ### Database errors on startup
 
@@ -97,11 +98,62 @@ ChiroClickEHR can use local AI models via Ollama for:
 
 - Close other heavy applications (browser tabs, IDEs)
 - PGlite runs entirely in-memory — more RAM helps
+- If the app becomes sluggish with many patients (>5000), consider exporting old data
 
 ### GPU cache warnings in console
 
 - "Unable to create cache" messages are harmless Chromium warnings
 - They do not affect functionality
+
+### White screen on startup
+
+- The backend takes 5-15 seconds to initialize on first launch
+- Wait for the splash screen to finish — do not force-close
+- If white screen persists after 30 seconds: close and relaunch
+- Check if antivirus software is blocking Node.js
+
+### Ollama AI not connecting
+
+- Verify Ollama is running: open a terminal and run `ollama list`
+- Ollama must be on port 11434 (default)
+- If you changed the Ollama port, set `OLLAMA_HOST` environment variable
+- Firewall may block localhost connections — allow Node.js through Windows Firewall
+- The app works normally without Ollama; AI features are optional
+
+### Data folder permission errors
+
+- The data folder requires write access: `%APPDATA%\chiroclickehr-desktop\data\`
+- Run the app as your normal user (not as Administrator)
+- If using a managed PC: ask IT to grant write access to the AppData folder
+- Corporate group policies may restrict AppData writes — contact your IT department
+
+### Export/import not working
+
+- Ensure you have write access to the destination folder
+- Export creates a `.sql` file — do not rename the extension
+- Import only accepts `.sql` files created by ChiroClickEHR export
+- Large databases (>100MB) may take a few minutes to export
+
+### Crash recovery
+
+- If the app crashes, your data is safe — PGlite uses WAL (write-ahead log)
+- Simply relaunch the app; it will recover automatically
+- If data appears corrupted after a crash: restore from your latest backup
+- Crash logs are saved to `%APPDATA%\chiroclickehr-desktop\data\logs\`
+
+### Multiple instances
+
+- Only one instance of ChiroClickEHR can run at a time
+- If you see "port 3000 already in use": close the other instance first
+- Check Task Manager for orphan `ChiroClickEHR` or `node.exe` processes
+
+### High memory usage
+
+- ChiroClickEHR typically uses 300-500 MB of RAM
+- PGlite keeps the database in memory for performance
+- Memory usage grows with the number of open tabs/patients
+- Close unused patient tabs to free memory
+- If usage exceeds 1 GB: restart the app
 
 ## Updating
 

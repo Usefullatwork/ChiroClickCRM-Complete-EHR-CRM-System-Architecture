@@ -77,9 +77,11 @@ export function initializeWebSocket(httpServer) {
 
     logger.info(`WebSocket connected: ${userId} (org: ${orgId})`);
 
-    // Join org room
-    if (orgId) {
+    // Join org room — verify user belongs to this org
+    if (orgId && socket.user?.organizationId === orgId) {
       socket.join(`org:${orgId}`);
+    } else if (orgId) {
+      logger.warn(`WebSocket org mismatch: user ${userId} tried to join org:${orgId}`);
     }
 
     // Track connected users

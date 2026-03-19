@@ -98,6 +98,39 @@ export const getOrganizationById = async (organizationId) => {
  * Create new organization
  */
 export const createOrganization = async (orgData) => {
+  const DEFAULT_MODULES = {
+    BASIC: {
+      core_ehr: true,
+      clinical_ai: false,
+      exercise_rx: false,
+      patient_portal: false,
+      crm_marketing: false,
+      advanced_clinical: false,
+      analytics_reporting: false,
+      multi_location: false,
+    },
+    PRO: {
+      core_ehr: true,
+      clinical_ai: true,
+      exercise_rx: true,
+      patient_portal: true,
+      crm_marketing: false,
+      advanced_clinical: false,
+      analytics_reporting: true,
+      multi_location: false,
+    },
+    ENTERPRISE: {
+      core_ehr: true,
+      clinical_ai: true,
+      exercise_rx: true,
+      patient_portal: true,
+      crm_marketing: true,
+      advanced_clinical: true,
+      analytics_reporting: true,
+      multi_location: true,
+    },
+  };
+
   const {
     name,
     org_number,
@@ -112,6 +145,9 @@ export const createOrganization = async (orgData) => {
     max_patients = 500,
     settings = {},
   } = orgData;
+
+  settings.enabled_modules =
+    settings.enabled_modules || DEFAULT_MODULES[subscription_tier] || DEFAULT_MODULES.PRO;
 
   return await transaction(async (client) => {
     // Create organization

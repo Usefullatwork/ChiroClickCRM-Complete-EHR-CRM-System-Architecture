@@ -57,6 +57,18 @@ export const getAllPatients = async (organizationId, options = {}) => {
     const countResult = await query(`SELECT COUNT(*) FROM patients p ${whereClause}`, params);
     const total = parseInt(countResult.rows[0].count);
 
+    // Validate sort column to prevent SQL injection
+    const validSortColumns = {
+      last_name: 'p.last_name',
+      first_name: 'p.first_name',
+      date_of_birth: 'p.date_of_birth',
+      created_at: 'p.created_at',
+      status: 'p.status',
+      category: 'p.category',
+    };
+    const sortColumn = validSortColumns[sortBy] || 'p.last_name';
+    const sortDirection = sortOrder.toUpperCase() === 'DESC' ? 'DESC' : 'ASC';
+
     // Get patients with pagination
     params.push(limit, offset);
     const result = await query(
@@ -70,7 +82,7 @@ export const getAllPatients = async (organizationId, options = {}) => {
       LEFT JOIN appointments a ON a.patient_id = p.id
       ${whereClause}
       GROUP BY p.id
-      ORDER BY p.${sortBy} ${sortOrder.toUpperCase()}
+      ORDER BY ${sortColumn} ${sortDirection}
       LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`,
       params
     );

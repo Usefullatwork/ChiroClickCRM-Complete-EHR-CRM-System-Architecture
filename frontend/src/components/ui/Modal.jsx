@@ -1,7 +1,7 @@
 import { useEffect, useRef, useId } from 'react';
 import { X } from 'lucide-react';
 
-export const Modal = ({ isOpen, onClose, title, children, size = 'md', footer }) => {
+export const Modal = ({ isOpen, onClose, title, description, children, size = 'md', footer }) => {
   const sizes = {
     sm: 'max-w-md',
     md: 'max-w-2xl',
@@ -11,6 +11,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md', footer })
   };
 
   const titleId = useId();
+  const descId = useId();
   const modalRef = useRef(null);
 
   // Focus trap
@@ -69,7 +70,10 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md', footer })
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-slate-900/50 dark:bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
       {/* Modal */}
       <div
@@ -77,6 +81,7 @@ export const Modal = ({ isOpen, onClose, title, children, size = 'md', footer })
         role="dialog"
         aria-modal="true"
         aria-labelledby={title ? titleId : undefined}
+        aria-describedby={description ? descId : undefined}
         className={`relative bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full ${sizes[size]} max-h-[90vh] flex flex-col animate-in zoom-in-95 duration-200`}
       >
         {/* Header */}

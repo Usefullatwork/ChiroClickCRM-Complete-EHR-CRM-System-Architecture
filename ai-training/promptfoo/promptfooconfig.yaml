@@ -1,0 +1,48 @@
+# promptfoo configuration — ChiroClickEHR AI Evaluation
+# Replaces the custom Python evaluate.py with a battle-tested framework
+#
+# Usage:
+#   npx promptfoo eval                    # Run regression suite against v6
+#   npx promptfoo eval --no-cache         # Force fresh evaluation
+#   npx promptfoo view                    # Open web UI
+#   npx promptfoo eval -c suites/clinical-safety.yaml  # Run safety suite
+
+description: ChiroClickEHR Clinical AI Evaluation
+
+# Default provider — production model
+providers:
+  - id: ollama:chiro-no-sft-dpo-v6
+    label: "v6-production"
+    config:
+      temperature: 0.3
+
+# Prompt template — maps vars from test cases
+prompts:
+  - "{{system_prompt_text}}\n\n{{prompt_text}}"
+
+# Default test suite
+tests: suites/regression.yaml
+
+# Output settings
+outputPath: results/eval-latest.json
+
+# Evaluation settings
+defaultTest:
+  options:
+    # Custom assertion module
+    provider:
+      id: ollama:chiro-no-sft-dpo-v6
+      config:
+        temperature: 0.3
+
+# Comparison mode — add more providers to compare
+# Uncomment to compare v5 vs v6:
+# providers:
+#   - id: ollama:chiro-no-sft-dpo-v6
+#     label: "v6-production"
+#     config:
+#       temperature: 0.3
+#   - id: ollama:chiro-no-sft-dpo-v5
+#     label: "v5-previous"
+#     config:
+#       temperature: 0.3

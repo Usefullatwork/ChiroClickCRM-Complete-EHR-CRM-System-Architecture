@@ -13,6 +13,7 @@ import {
   setAdjustmentStyleSchema,
   updateTestSettingsSchema,
   updateLetterSettingsSchema,
+  updatePanelConfigSchema,
 } from '../validators/clinicalSettings.validators.js';
 
 const router = Router();
@@ -212,6 +213,66 @@ router.patch(
   requireRole(['ADMIN', 'PRACTITIONER']),
   validate(updateLetterSettingsSchema),
   clinicalSettingsController.updateLetterSettings
+);
+
+// ============================================
+// PANEL CONFIGURATION ROUTES
+// ============================================
+
+/**
+ * @swagger
+ * /clinical-settings/panels:
+ *   get:
+ *     summary: Get panel configuration for current user
+ *     tags: [Clinical Settings]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User's panel configuration
+ */
+router.get('/panels', clinicalSettingsController.getPanelConfig);
+
+/**
+ * @swagger
+ * /clinical-settings/panels:
+ *   put:
+ *     summary: Save panel configuration for current user
+ *     tags: [Clinical Settings]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [panels]
+ *             properties:
+ *               panels:
+ *                 type: array
+ *                 items:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     visible:
+ *                       type: boolean
+ *                     order:
+ *                       type: integer
+ *                     pinned:
+ *                       type: boolean
+ *               presetName:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Panel configuration saved
+ */
+router.put(
+  '/panels',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(updatePanelConfigSchema),
+  clinicalSettingsController.updatePanelConfig
 );
 
 // ============================================

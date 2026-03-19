@@ -157,15 +157,15 @@ export default function Patients() {
     }
     const headers = [
       'ID',
-      'First Name',
-      'Last Name',
-      'Email',
-      'Phone',
-      'Date of Birth',
+      t('firstName'),
+      t('lastName'),
+      t('email'),
+      t('phone'),
+      t('dateOfBirth'),
       'Status',
-      'Category',
-      'Total Visits',
-      'Last Visit',
+      t('category'),
+      t('totalVisits'),
+      t('lastVisit'),
     ];
     const csvRows = [headers.join(',')];
     patients.forEach((p) => {

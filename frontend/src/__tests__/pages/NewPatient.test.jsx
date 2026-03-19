@@ -55,6 +55,38 @@ vi.mock('../../i18n', () => ({
         notes: 'Notater',
         consentGiven: 'Samtykke',
         createPatient: 'Opprett pasient',
+        // NewPatient form keys
+        newPatientDesc: 'Opprett en ny pasientjournal',
+        selectGender: 'Select gender',
+        category: 'Kategori',
+        notSet: 'Not set',
+        outsideOslo: 'Outside Oslo',
+        traveling: 'Traveling',
+        referred: 'Referred',
+        noContact: 'Do not contact',
+        language: 'Sprak',
+        streetAddress: 'Gateadresse',
+        treatmentType: 'Behandlingstype',
+        preferredTherapist: 'Foretrukket behandler',
+        referralSource: 'Henvisningskilde',
+        consentSms: 'Consent to SMS notifications',
+        consentEmail: 'Consent to email notifications',
+        consentDataStorage: 'Consent to data storage (GDPR required)',
+        consentMarketing: 'Consent to marketing communications',
+        consentVideo: 'Consent to video marketing',
+        cancel: 'Cancel',
+        creating: 'Creating...',
+        backToPatients: 'Back to patients',
+        // Validation keys
+        'validation.solvitIdRequired': 'SolvIt ID is required',
+        'validation.firstNameRequired': 'First name is required',
+        'validation.lastNameRequired': 'Last name is required',
+        'validation.dobRequired': 'Date of birth is required',
+        'validation.genderRequired': 'Gender is required',
+        'validation.dobFuture': 'Date of birth cannot be in the future',
+        'validation.phoneInvalid': 'Phone must be a valid Norwegian phone number (8 digits)',
+        'validation.emailInvalid': 'Email must be valid',
+        'validation.error': 'Error',
       };
       return map[key] || key;
     },
@@ -203,7 +235,8 @@ describe('NewPatient Page', () => {
     expect(screen.getByDisplayValue('Select gender')).toBeInTheDocument();
     expect(screen.getByText('Mann')).toBeInTheDocument();
     expect(screen.getByText('Kvinne')).toBeInTheDocument();
-    expect(screen.getByText('Annet')).toBeInTheDocument();
+    // 'Annet' appears in both gender and treatment type selects
+    expect(screen.getAllByText('Annet').length).toBeGreaterThanOrEqual(1);
   });
 
   it('should render phone and email inputs', () => {
@@ -695,6 +728,6 @@ describe('NewPatient Page', () => {
 
   it('should render subtitle text', () => {
     renderPage();
-    expect(screen.getByText('Create a new patient record')).toBeInTheDocument();
+    expect(screen.getByText('Opprett en ny pasientjournal')).toBeInTheDocument();
   });
 });

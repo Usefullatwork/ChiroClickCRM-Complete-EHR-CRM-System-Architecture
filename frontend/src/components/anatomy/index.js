@@ -23,6 +23,9 @@ export { EnhancedBodyDiagram, CompactBodyDiagram } from './body';
 export { default as AnatomyViewer, VIEW_MODES } from './AnatomyViewer';
 export { default as AnatomyProvider } from './AnatomyProvider';
 
+// Unified body chart facade (lazy-loads simple or detailed mode)
+export { default as UnifiedBodyChart } from './UnifiedBodyChart';
+
 // NOTE: Spine3DViewer and CompactSpine3D are NOT re-exported here to avoid
 // eagerly loading Three.js (~300KB). Import directly with React.lazy():
 //   const Spine3DViewer = lazy(() => import('./anatomy/spine/Spine3DViewer'));

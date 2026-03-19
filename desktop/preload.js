@@ -30,6 +30,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('backend-error', (_, message) => callback(message));
   },
 
+  // Listen for File menu export/import events
+  onExportData: (callback) => {
+    ipcRenderer.on('menu:export-data', (_, filePath) => callback(filePath));
+  },
+  onImportData: (callback) => {
+    ipcRenderer.on('menu:import-data', (_, filePath) => callback(filePath));
+  },
+
   // Platform identifier
   platform: process.platform,
 });

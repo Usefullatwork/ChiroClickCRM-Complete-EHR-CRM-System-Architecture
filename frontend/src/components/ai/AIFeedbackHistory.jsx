@@ -403,7 +403,7 @@ export const AIFeedbackHistory = ({
 
           {onRefresh && (
             <Button
-              variant="ghost"
+              variant="subtle"
               size="sm"
               onClick={onRefresh}
               disabled={isLoading}
@@ -479,7 +479,7 @@ export const AIFeedbackHistory = ({
               {hasMore && (
                 <div className="flex justify-center pt-4">
                   <Button
-                    variant="ghost"
+                    variant="subtle"
                     size="sm"
                     onClick={() => setDisplayCount((prev) => prev + pageSize)}
                     icon={ChevronDown}

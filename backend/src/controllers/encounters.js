@@ -9,6 +9,7 @@ import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 import { NotFoundError } from '../utils/errors.js';
 import { broadcastToOrg } from '../services/websocket.js';
+import { eventBus, DOMAIN_EVENTS } from '../domain/events/index.js';
 
 /**
  * Build a plain-text SOAP note from encounter JSON fields for RAG indexing
@@ -195,6 +196,18 @@ export const createEncounter = async (req, res) => {
       userAgent: req.get('user-agent'),
     });
 
+    // Emit domain event for CRM automation triggers
+    eventBus.emit(
+      DOMAIN_EVENTS.ENCOUNTER_CREATED,
+      {
+        encounter_id: encounter.id,
+        patient_id: encounter.patient_id,
+        encounter_type: encounterData.encounter_type,
+        practitioner_id: user.id,
+      },
+      { userId: user.id, organizationId }
+    );
+
     // Index encounter for RAG retrieval
     if (process.env.RAG_ENABLED === 'true') {
       try {
@@ -330,6 +343,17 @@ export const signEncounter = async (req, res) => {
     });
 
     broadcastToOrg(organizationId, 'encounter:locked', { encounterId: id, lockedBy: user.id });
+
+    // Emit domain event for CRM automation triggers
+    eventBus.emit(
+      DOMAIN_EVENTS.ENCOUNTER_SIGNED,
+      {
+        encounter_id: id,
+        patient_id: signedEncounter.patient_id,
+        signed_by: user.id,
+      },
+      { userId: user.id, organizationId }
+    );
 
     // Final RAG indexing on sign (ensures signed encounters are indexed)
     if (process.env.RAG_ENABLED === 'true') {

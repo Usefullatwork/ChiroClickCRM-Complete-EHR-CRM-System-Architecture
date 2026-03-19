@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useNavigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import DashboardLayout from './components/layouts/DashboardLayout';
 import { ErrorBoundary } from './components/ErrorBoundary';
@@ -8,6 +8,7 @@ import { setOrganizationId, getApiBaseUrl } from './services/api';
 import useGlobalKeyboardShortcuts from './hooks/useGlobalKeyboardShortcuts';
 import KeyboardShortcutsModal from './components/common/KeyboardShortcutsModal';
 import { useTranslation } from './i18n';
+import { FeatureModuleProvider, useFeatureModule } from './context/FeatureModuleContext';
 
 // Lazy load all pages for code splitting
 const Dashboard = lazy(() => import('./pages/Dashboard'));
@@ -32,6 +33,7 @@ const PatientFlow = lazy(() => import('./pages/PatientFlow'));
 const CRM = lazy(() => import('./pages/CRM'));
 const Macros = lazy(() => import('./pages/Macros'));
 const AIPerformance = lazy(() => import('./pages/AIPerformance'));
+const Help = lazy(() => import('./pages/Help'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Patient Portal (public, no auth required)
@@ -68,11 +70,63 @@ function PageLoader() {
   );
 }
 
+function ModuleRoute({ module, children }) {
+  const { isModuleEnabled } = useFeatureModule();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isModuleEnabled(module)) {
+      navigate('/', { replace: true });
+    }
+  }, [module, isModuleEnabled, navigate]);
+
+  if (!isModuleEnabled(module)) return null;
+  return children;
+}
+
 function App() {
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [needsSetup, setNeedsSetup] = useState(false);
   const { showHelp, setShowHelp } = useGlobalKeyboardShortcuts();
   const { t } = useTranslation('navigation');
+
+  // Listen for Electron File menu export/import events
+  useEffect(() => {
+    if (!window.electronAPI) return;
+    window.electronAPI.onExportData?.((filePath) => {
+      fetch(`${getApiBaseUrl()}/api/v1/system/export`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ filePath }),
+      })
+        .then((res) => (res.ok ? res.json() : Promise.reject(new Error('Export failed'))))
+        .then(() => {
+          import('sonner').then(({ toast }) => toast.success(`Data eksportert til ${filePath}`));
+        })
+        .catch(() => {
+          import('sonner').then(({ toast }) => toast.error('Eksport feilet. Proev igjen.'));
+        });
+    });
+    window.electronAPI.onImportData?.((filePath) => {
+      fetch(`${getApiBaseUrl()}/api/v1/system/import`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ filePath }),
+      })
+        .then((res) => (res.ok ? res.json() : Promise.reject(new Error('Import failed'))))
+        .then(() => {
+          import('sonner').then(({ toast }) => {
+            toast.success('Data importert. Starter paa nytt...');
+            setTimeout(() => window.location.reload(), 1500);
+          });
+        })
+        .catch(() => {
+          import('sonner').then(({ toast }) => toast.error('Import feilet. Proev igjen.'));
+        });
+    });
+  }, []);
 
   // Auto-login on startup (checks setup status first)
   useEffect(() => {
@@ -151,7 +205,9 @@ function App() {
           path="/"
           element={
             <Suspense fallback={<PageLoader />}>
-              <DashboardLayout />
+              <FeatureModuleProvider>
+                <DashboardLayout />
+              </FeatureModuleProvider>
             </Suspense>
           }
         >
@@ -255,7 +311,9 @@ function App() {
             path="communications"
             element={
               <PageErrorBoundary pageName={t('communications')}>
-                <Communications />
+                <ModuleRoute module="crm_marketing">
+                  <Communications />
+                </ModuleRoute>
               </PageErrorBoundary>
             }
           />
@@ -279,7 +337,9 @@ function App() {
             path="kpi"
             element={
               <PageErrorBoundary pageName={t('kpi')}>
-                <KPI />
+                <ModuleRoute module="analytics_reporting">
+                  <KPI />
+                </ModuleRoute>
               </PageErrorBoundary>
             }
           />
@@ -295,7 +355,9 @@ function App() {
             path="training"
             element={
               <PageErrorBoundary pageName={t('aiTraining')}>
-                <Training />
+                <ModuleRoute module="clinical_ai">
+                  <Training />
+                </ModuleRoute>
               </PageErrorBoundary>
             }
           />
@@ -311,7 +373,9 @@ function App() {
             path="templates"
             element={
               <PageErrorBoundary pageName={t('templates')}>
-                <Templates />
+                <ModuleRoute module="advanced_clinical">
+                  <Templates />
+                </ModuleRoute>
               </PageErrorBoundary>
             }
           />
@@ -327,7 +391,9 @@ function App() {
             path="crm"
             element={
               <PageErrorBoundary pageName={t('crm')}>
-                <CRM />
+                <ModuleRoute module="crm_marketing">
+                  <CRM />
+                </ModuleRoute>
               </PageErrorBoundary>
             }
           />
@@ -335,7 +401,9 @@ function App() {
             path="macros"
             element={
               <PageErrorBoundary pageName={t('macros')}>
-                <Macros />
+                <ModuleRoute module="advanced_clinical">
+                  <Macros />
+                </ModuleRoute>
               </PageErrorBoundary>
             }
           />
@@ -344,6 +412,14 @@ function App() {
             element={
               <PageErrorBoundary pageName={t('aiPerformance')}>
                 <AIPerformance />
+              </PageErrorBoundary>
+            }
+          />
+          <Route
+            path="help"
+            element={
+              <PageErrorBoundary pageName={t('help')}>
+                <Help />
               </PageErrorBoundary>
             }
           />

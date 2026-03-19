@@ -5,7 +5,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import StatCard from '../../components/ui/StatCard';
-import { Calendar } from 'lucide-react';
+import { Calendar, AlertTriangle } from 'lucide-react';
 
 describe('StatCard Component', () => {
   const defaultProps = {
@@ -151,6 +151,53 @@ describe('StatCard Component', () => {
     it('should use default teal styling when no bgClass provided', () => {
       render(<StatCard {...defaultProps} icon={Calendar} />);
       const iconContainer = document.querySelector('.bg-teal-50');
+      expect(iconContainer).toBeInTheDocument();
+    });
+  });
+
+  // ============================================================================
+  // URGENT STATE
+  // ============================================================================
+
+  describe('Urgent State', () => {
+    it('should render pulse badge when urgent and value > 0', () => {
+      const { container } = render(
+        <StatCard label="Red Flags" value={3} icon={AlertTriangle} urgent />
+      );
+      expect(container.querySelector('.animate-ping')).toBeInTheDocument();
+    });
+
+    it('should not render pulse badge when urgent but value is 0', () => {
+      const { container } = render(
+        <StatCard label="Red Flags" value={0} icon={AlertTriangle} urgent />
+      );
+      expect(container.querySelector('.animate-ping')).not.toBeInTheDocument();
+    });
+
+    it('should apply red border class when urgent with value > 0', () => {
+      render(<StatCard label="Red Flags" value={3} icon={AlertTriangle} urgent />);
+      const card = screen.getByTestId('dashboard-stat-card');
+      expect(card).toHaveClass('border-red-300');
+    });
+
+    it('should apply default styling when not urgent', () => {
+      render(<StatCard label="Normal" value={5} />);
+      const card = screen.getByTestId('dashboard-stat-card');
+      expect(card).toHaveClass('border-gray-200');
+      expect(card).not.toHaveClass('border-red-300');
+    });
+
+    it('should show red value text when urgent and value > 0', () => {
+      render(<StatCard label="Red Flags" value={3} icon={AlertTriangle} urgent />);
+      const valueEl = screen.getByText('3');
+      expect(valueEl).toHaveClass('text-red-700');
+    });
+
+    it('should use red icon container background when urgent and value > 0', () => {
+      const { container } = render(
+        <StatCard label="Red Flags" value={3} icon={AlertTriangle} urgent />
+      );
+      const iconContainer = container.querySelector('.bg-red-100');
       expect(iconContainer).toBeInTheDocument();
     });
   });

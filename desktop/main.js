@@ -125,7 +125,6 @@ function startBackend() {
     PORT: String(BACKEND_PORT),
     DB_ENGINE: 'pglite',
     CACHE_ENGINE: 'memory',
-    DEV_SKIP_AUTH: 'true',
     DATA_DIR: dataDir,
     FRONTEND_DIST: getResourcePath('frontend/dist'),
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || defaultKey,
@@ -323,7 +322,9 @@ function createMenu() {
         {
           label: 'Documentation',
           click: () => {
-            shell.openExternal('https://github.com/ChiroClick/chiroclickehr/wiki');
+            if (mainWindow) {
+              mainWindow.loadURL(`http://localhost:${BACKEND_PORT}/help`);
+            }
           },
         },
         { type: 'separator' },

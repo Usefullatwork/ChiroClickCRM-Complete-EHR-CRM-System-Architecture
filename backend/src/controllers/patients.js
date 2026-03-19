@@ -436,6 +436,20 @@ export const exportSingleVcf = async (req, res) => {
     const vcfContent = vcfLines.join('\r\n');
     const filename = `${firstName}_${lastName}`.replace(/\s+/g, '_') || 'kontakt';
 
+    // Audit log for single VCF export (Normen compliance)
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'EXPORT',
+      resourceType: 'PATIENT',
+      resourceId: id,
+      details: `Single contact export (VCF) — ${firstName} ${lastName}`,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.setHeader('Content-Type', 'text/vcard; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}.vcf"`);
     res.send(vcfContent);

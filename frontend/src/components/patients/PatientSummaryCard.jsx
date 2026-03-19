@@ -5,7 +5,7 @@ import { useTranslation } from '../../i18n';
 
 export default function PatientSummaryCard({ patient, patientId }) {
   const navigate = useNavigate();
-  const { _t } = useTranslation('patients');
+  const { t } = useTranslation('patients');
 
   if (!patient) {
     return null;
@@ -29,7 +29,7 @@ export default function PatientSummaryCard({ patient, patientId }) {
               {patient.first_name} {patient.last_name}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              {age ? `${age} years` : ''}
+              {age ? `${age} ${t('sidebar.years') || 'år'}` : ''}
               {patient.gender ? ` - ${patient.gender}` : ''}
               {patient.solvit_id ? ` - ID: ${patient.solvit_id}` : ''}
             </p>
@@ -46,18 +46,18 @@ export default function PatientSummaryCard({ patient, patientId }) {
           <button
             onClick={() => navigate(`/appointments/new?patient=${patientId}`)}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400 dark:hover:bg-blue-900/50 rounded-lg transition-colors"
-            aria-label="New appointment"
+            aria-label={t('nextAppointment')}
           >
             <Calendar className="w-4 h-4" />
-            <span className="hidden sm:inline">Appointment</span>
+            <span className="hidden sm:inline">{t('appointments')}</span>
           </button>
           <button
             onClick={() => navigate(`/patients/${patientId}/encounter`)}
             className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-green-50 text-green-700 hover:bg-green-100 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50 rounded-lg transition-colors"
-            aria-label="New clinical encounter"
+            aria-label={t('newVisit')}
           >
             <FileText className="w-4 h-4" />
-            <span className="hidden sm:inline">Encounter</span>
+            <span className="hidden sm:inline">{t('journal')}</span>
           </button>
         </div>
       </div>
@@ -68,20 +68,19 @@ export default function PatientSummaryCard({ patient, patientId }) {
           {hasRedFlags && (
             <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 rounded-full">
               <AlertTriangle className="w-3.5 h-3.5" />
-              {patient.red_flags.length} Red Flag{patient.red_flags.length > 1 ? 's' : ''}
+              {patient.red_flags.length} {t('sidebar.redFlags') || 'Røde flagg'}
             </span>
           )}
           {hasAllergies && (
             <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400 rounded-full">
               <AlertTriangle className="w-3.5 h-3.5" />
-              Allergies: {patient.allergies.join(', ')}
+              {t('allergies')}: {patient.allergies.join(', ')}
             </span>
           )}
           {hasMeds && (
             <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400 rounded-full">
               <Pill className="w-3.5 h-3.5" />
-              {patient.current_medications.length} Medication
-              {patient.current_medications.length > 1 ? 's' : ''}
+              {patient.current_medications.length} {t('medications')}
             </span>
           )}
           {patient.main_problem && (

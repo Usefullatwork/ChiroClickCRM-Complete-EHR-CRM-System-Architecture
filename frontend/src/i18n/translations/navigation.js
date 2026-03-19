@@ -34,6 +34,7 @@ export const navigation = {
     referralLetters: 'Referral Letters',
     sickNotes: 'Sick Notes',
     vngAssessment: 'VNG Assessment',
+    help: 'Help',
     // CommandPalette sections
     patientsSection: 'Patients',
     navigationSection: 'Navigation',
@@ -82,6 +83,7 @@ export const navigation = {
     referralLetters: 'Henvisningsbrev',
     sickNotes: 'Sykmeldinger',
     vngAssessment: 'VNG-vurdering',
+    help: 'Hjelp',
     // CommandPalette sections
     patientsSection: 'Pasienter',
     navigationSection: 'Navigasjon',

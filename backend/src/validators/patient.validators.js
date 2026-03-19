@@ -230,16 +230,31 @@ export const listPatientsSchema = {
     page: Joi.number().integer().min(1).default(1),
     limit: Joi.number().integer().min(1).max(100).default(20),
     status: Joi.string().valid('ACTIVE', 'INACTIVE', 'FINISHED', 'DECEASED'),
+    category: Joi.string().valid('OSLO', 'OUTSIDE_OSLO', 'TRAVELING', 'REFERRED'),
     search: Joi.string().max(200),
+    // Accept both camelCase (from frontend) and snake_case
     sort_by: Joi.string().valid(
       'name',
       'date_of_birth',
       'last_visit',
       'created_at',
       'first_name',
-      'last_name'
+      'last_name',
+      'status',
+      'category'
+    ),
+    sortBy: Joi.string().valid(
+      'name',
+      'date_of_birth',
+      'last_visit',
+      'created_at',
+      'first_name',
+      'last_name',
+      'status',
+      'category'
     ),
     sort_order: Joi.string().valid('asc', 'desc'),
+    sortOrder: Joi.string().valid('asc', 'desc'),
   }),
 };
 
