@@ -12,13 +12,13 @@ Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electro
 
 ## Current State
 
-- **Backend**: 2,630 tests (124 suites), 0 lint errors
-- **Frontend**: 1,046 tests (54 suites), 0 lint errors
+- **Backend**: 2,644 tests (127 suites), 0 lint errors
+- **Frontend**: 1,050 tests (55 suites), 0 lint errors
 - **E2E**: 88 tests (11 Playwright specs)
 - **CI**: 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
 - **Electron**: Portable exe verified (96MB), PGlite WASM loads correctly
-- **Latest migration**: 076 (`patient_connectivity`)
-- **Branch**: `feature/v2.1-patient-connectivity` (Sessions 0-2 complete)
+- **Latest migration**: 077 (`reminder_wiring`)
+- **Branch**: `feature/v2.1-patient-connectivity` (Sessions 0-3 complete)
 
 ## Commands
 
@@ -60,16 +60,19 @@ cd frontend && npx playwright test              # E2E tests
 | `emailService.js`         | `backend/src/services/` | Nodemailer + templates                                        |
 | `smsService.js`           | `backend/src/services/` | Twilio client + rate limiting                                 |
 | `exerciseDelivery.js`     | `backend/src/services/` | Fixed — imports from `./emailService.js` now                  |
-| `appointmentReminders.js` | `backend/src/services/` | Logic exists, DB table created (migration 076)                |
+| `appointmentReminders.js` | `backend/src/services/` | Wired to controller + cron. Org/patient pref checks.          |
 | `documentDelivery.js`     | `backend/src/services/` | NEW — PDF generate + portal doc + email/SMS delivery pipeline |
 | `pdfGenerator.js`         | `backend/src/services/` | 7 document types                                              |
-| `patientPortal.js`        | `backend/src/routes/`   | Extend with booking, messaging, docs                          |
+| `patientPortal.js`        | `backend/src/routes/`   | Booking, messaging, docs, communication preferences           |
 | `mobile.js`               | `backend/src/routes/`   | 2,200 lines — extend for v2.1                                 |
-| `scheduler.js`            | `backend/src/jobs/`     | 12 cron jobs — wire reminders                                 |
-| `automations/actions.js`  | `backend/src/services/` | Has `SEND_BOOKING_LINK` (merged from AI tooling branch)       |
+| `scheduler.js`            | `backend/src/jobs/`     | 13 cron jobs (incl. processAppointmentRemindersQueue \*/15)   |
+| `automations/actions.js`  | `backend/src/services/` | 9 action types incl. SEND_BOOKING_LINK                        |
+| `recallEngine.js`         | `backend/src/services/` | processRecalls sends booking links (org+patient opt-out)      |
+| `automatedComms.js`       | `backend/src/services/` | Exercise inactivity respects patient/org preferences          |
 
 **Session 0 complete**: AI tooling merged, exerciseDelivery fixed, migration 076 (4 tables), documentDelivery pipeline + tests.
 **Session 2 complete**: Patient self-service booking (request/reschedule/cancel + available slots) + messaging (patient inbox/compose/thread + staff chat). Staff booking request management (approve/reject). 28 new tests.
+**Session 3 complete**: Automated reminders wired (schedule on create, cancel on cancel, \*/15 cron). Recall booking links. Exercise preference checks. Admin settings UI (4 toggles). Portal comm prefs (5 toggles + backend endpoints). Migration 077. 18 new tests.
 **Provider strategy**: Mock SMS/email only. Real Twilio/SMTP via `.env` later — no code changes needed.
 
 ## Gotchas
