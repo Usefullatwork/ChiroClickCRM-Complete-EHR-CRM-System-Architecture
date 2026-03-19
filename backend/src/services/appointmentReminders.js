@@ -19,6 +19,17 @@ const REMINDER_HOURS_BEFORE = (process.env.REMINDER_HOURS_BEFORE || '24,48')
 export const scheduleReminder = async (appointment, hoursBeforeArray = null) => {
   const hours = hoursBeforeArray || REMINDER_HOURS_BEFORE;
 
+  // Check org-level toggle
+  try {
+    const orgResult = await query(
+      `SELECT settings->>'reminder_appointment_enabled' as enabled FROM organizations WHERE id = $1`,
+      [appointment.organization_id]
+    );
+    if (orgResult.rows[0]?.enabled === 'false') return [];
+  } catch (_orgErr) {
+    // Org setting not available — proceed with defaults
+  }
+
   try {
     const results = [];
 
@@ -114,6 +125,23 @@ export const processReminders = async () => {
 
     for (const reminder of dueReminders.rows) {
       try {
+        // Check patient opted in
+        try {
+          const prefs = await query(
+            `SELECT reminder_enabled, sms_enabled, email_enabled FROM patient_communication_preferences WHERE patient_id = $1`,
+            [reminder.patient_id]
+          );
+          if (prefs.rows[0]?.reminder_enabled === false) {
+            await query(
+              `UPDATE appointment_reminders SET status = 'CANCELLED', failure_reason = 'Patient opted out' WHERE id = $1`,
+              [reminder.id]
+            );
+            continue;
+          }
+        } catch (_prefErr) {
+          // Table may not exist — proceed with sending
+        }
+
         const appointmentDate = new Date(reminder.appointment_time);
         const dateStr = appointmentDate.toLocaleDateString('nb-NO', {
           weekday: 'long',

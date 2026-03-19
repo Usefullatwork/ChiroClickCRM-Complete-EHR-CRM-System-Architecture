@@ -21,6 +21,7 @@ export const ACTION_TYPES = {
   NOTIFY_STAFF: 'NOTIFY_STAFF',
   ADD_TAG: 'ADD_TAG',
   CREATE_TASK: 'CREATE_TASK',
+  SEND_BOOKING_LINK: 'SEND_BOOKING_LINK',
 };
 
 /**
@@ -67,6 +68,9 @@ export const executeAction = async (organizationId, action, patient, _executionI
 
       case ACTION_TYPES.CREATE_TASK:
         return await executeCreateTask(organizationId, action, patient);
+
+      case ACTION_TYPES.SEND_BOOKING_LINK:
+        return await executeSendBookingLink(organizationId, action, patient);
 
       default:
         logger.warn('Unknown action type:', action.type);
@@ -313,6 +317,54 @@ const executeCreateTask = async (organizationId, action, patient) => {
   return { success: true };
 };
 
+/**
+ * Send booking link action
+ */
+const executeSendBookingLink = async (organizationId, action, patient) => {
+  const crypto = await import('crypto');
+  const token = crypto.randomBytes(16).toString('hex');
+  const portalUrl = process.env.PORTAL_URL || 'http://localhost:5173';
+  const bookingLink = `${portalUrl}/portal/book?patient_id=${patient.id}&token=${token}`;
+
+  const message = replaceVariables(action.message || action.template, {
+    ...patient,
+    bookingLink,
+  });
+
+  try {
+    if (patient?.phone) {
+      await communicationService.sendSMS(
+        organizationId,
+        {
+          patient_id: patient.id,
+          recipient_phone: patient.phone,
+          content: message,
+        },
+        null
+      );
+    } else if (patient?.email) {
+      await communicationService.sendEmail(
+        organizationId,
+        {
+          patient_id: patient.id,
+          recipient_email: patient.email,
+          subject: 'Bestill ny time',
+          content: message,
+        },
+        null
+      );
+    } else {
+      logger.warn('Cannot send booking link — patient has no phone or email');
+      return { success: false, error: 'No contact method' };
+    }
+
+    return { success: true, bookingLink };
+  } catch (error) {
+    logger.error('Error sending booking link:', error);
+    return { success: false, error: error.message };
+  }
+};
+
 // =============================================================================
 // HELPER FUNCTIONS
 // =============================================================================
@@ -339,6 +391,8 @@ export const replaceVariables = (template, patient) => {
     '{fulltNavn}': `${patient?.first_name || ''} ${patient?.last_name || ''}`.trim(),
     '{epost}': patient?.email || '',
     '{telefon}': patient?.phone || '',
+    '{bookingLink}': patient?.bookingLink || '',
+    '{bestillingslenke}': patient?.bookingLink || '',
   };
 
   let result = template;

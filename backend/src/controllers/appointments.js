@@ -6,6 +6,7 @@ import * as appointmentService from '../services/appointments.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 import { broadcastToOrg } from '../services/websocket.js';
+import { scheduleReminder, cancelReminders } from '../services/appointmentReminders.js';
 
 export const getAppointmentById = async (req, res) => {
   try {
@@ -50,6 +51,18 @@ export const createAppointment = async (req, res) => {
   try {
     const { organizationId, user } = req;
     const appointment = await appointmentService.createAppointment(organizationId, req.body);
+
+    // Schedule reminders (non-blocking)
+    try {
+      if (appointment.start_time) {
+        await scheduleReminder(appointment);
+      }
+    } catch (reminderErr) {
+      logger.warn('Failed to schedule reminders:', {
+        appointmentId: appointment.id,
+        error: reminderErr.message,
+      });
+    }
 
     await logAudit({
       organizationId,
@@ -230,6 +243,13 @@ export const cancelAppointment = async (req, res) => {
         success: false,
         error: 'Appointment not found',
       });
+    }
+
+    // Cancel pending reminders
+    try {
+      await cancelReminders(id);
+    } catch (cancelErr) {
+      logger.warn('Failed to cancel reminders:', { appointmentId: id, error: cancelErr.message });
     }
 
     broadcastToOrg(organizationId, 'appointment:cancelled', { appointmentId: id });

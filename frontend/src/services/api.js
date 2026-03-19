@@ -979,6 +979,9 @@ export const patientPortalAPI = {
   getMessages: (params) => apiClient.get('/patient-portal/messages', { params }),
   sendMessage: (data) => apiClient.post('/patient-portal/messages', data),
   markMessageRead: (id) => apiClient.patch(`/patient-portal/messages/${id}/read`),
+  getCommunicationPreferences: () => apiClient.get('/patient-portal/communication-preferences'),
+  updateCommunicationPreferences: (data) =>
+    apiClient.put('/patient-portal/communication-preferences', data),
 };
 
 // Encounter Validation API

@@ -6,6 +6,7 @@
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 import { createNotification } from './notifications.js';
+import { executeAction, ACTION_TYPES } from './automations/actions.js';
 
 // Default recall intervals by diagnosis category (in days)
 const DEFAULT_RECALL_RULES = {
@@ -305,7 +306,7 @@ export const processRecalls = async () => {
     const dueResult = await query(
       `SELECT
         f.id, f.organization_id, f.patient_id, f.reason, f.due_date,
-        p.first_name, p.last_name,
+        p.first_name, p.last_name, p.phone, p.email,
         p.preferred_therapist_id
        FROM follow_ups f
        JOIN patients p ON p.id = f.patient_id
@@ -316,7 +317,7 @@ export const processRecalls = async () => {
        LIMIT 500`
     );
 
-    const processed = { total: dueResult.rows.length, notified: 0, errors: 0 };
+    const processed = { total: dueResult.rows.length, notified: 0, bookingSent: 0, errors: 0 };
 
     for (const recall of dueResult.rows) {
       try {
@@ -337,6 +338,52 @@ export const processRecalls = async () => {
       } catch (notifyError) {
         logger.error(`Error notifying for recall ${recall.id}:`, notifyError);
         processed.errors++;
+      }
+
+      // Send booking link to patient if enabled
+      try {
+        const orgResult = await query(
+          `SELECT settings->>'recall_booking_link_enabled' as enabled FROM organizations WHERE id = $1`,
+          [recall.organization_id]
+        );
+        if (orgResult.rows[0]?.enabled !== 'false') {
+          // Check patient preference
+          let patientOptedOut = false;
+          try {
+            const prefs = await query(
+              `SELECT recall_enabled FROM patient_communication_preferences WHERE patient_id = $1`,
+              [recall.patient_id]
+            );
+            if (prefs.rows[0]?.recall_enabled === false) {
+              patientOptedOut = true;
+            }
+          } catch (_prefErr) {
+            // Table may not exist — proceed
+          }
+
+          if (!patientOptedOut && (recall.phone || recall.email)) {
+            await executeAction(
+              recall.organization_id,
+              {
+                type: ACTION_TYPES.SEND_BOOKING_LINK,
+                message: `Hei {firstName}! Det er tid for en oppfølgingstime. Bestill her: {bookingLink}`,
+              },
+              {
+                id: recall.patient_id,
+                first_name: recall.first_name,
+                last_name: recall.last_name,
+                phone: recall.phone,
+                email: recall.email,
+              }
+            );
+            processed.bookingSent++;
+          }
+        }
+      } catch (bookingErr) {
+        logger.warn('Failed to send booking link for recall:', {
+          recallId: recall.id,
+          error: bookingErr.message,
+        });
       }
     }
 

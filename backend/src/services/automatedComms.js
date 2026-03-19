@@ -413,6 +413,28 @@ export const checkExerciseInactivity = async (daysThreshold = 7) => {
 
     const queued = [];
     for (const patient of patients) {
+      // Check patient exercise reminder preference
+      try {
+        const prefsResult = await query(
+          `SELECT exercise_reminder_enabled FROM patient_communication_preferences WHERE patient_id = $1`,
+          [patient.patient_id]
+        );
+        if (prefsResult.rows[0]?.exercise_reminder_enabled === false) continue;
+      } catch (_prefErr) {
+        // Table may not exist — proceed
+      }
+
+      // Check org-level toggle
+      try {
+        const orgSettings = await query(
+          `SELECT settings->>'reminder_exercise_enabled' as enabled FROM organizations WHERE id = $1`,
+          [patient.organization_id]
+        );
+        if (orgSettings.rows[0]?.enabled === 'false') continue;
+      } catch (_orgErr) {
+        // Org setting not available — proceed
+      }
+
       const template = await getTemplate(patient.organization_id, 'EXERCISE_INACTIVE');
 
       const variables = {

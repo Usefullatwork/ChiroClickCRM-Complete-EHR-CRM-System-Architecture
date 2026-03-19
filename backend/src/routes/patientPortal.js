@@ -811,6 +811,104 @@ router.get('/documents/:token/download', async (req, res) => {
   }
 });
 
+// =============================================================================
+// COMMUNICATION PREFERENCES
+// =============================================================================
+
+/**
+ * GET /patient-portal/communication-preferences
+ * Returns patient's communication preferences or defaults
+ */
+router.get('/communication-preferences', requirePortalAuth, async (req, res) => {
+  try {
+    const { patient_id } = req.portalPatient;
+
+    const result = await query(
+      `SELECT sms_enabled, email_enabled, reminder_enabled, exercise_reminder_enabled, recall_enabled, marketing_enabled
+       FROM patient_communication_preferences WHERE patient_id = $1`,
+      [patient_id]
+    );
+
+    if (result.rows.length > 0) {
+      return res.json(result.rows[0]);
+    }
+
+    // Return defaults
+    res.json({
+      sms_enabled: true,
+      email_enabled: true,
+      reminder_enabled: true,
+      exercise_reminder_enabled: true,
+      recall_enabled: true,
+      marketing_enabled: false,
+    });
+  } catch (error) {
+    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+      return res.json({
+        sms_enabled: true,
+        email_enabled: true,
+        reminder_enabled: true,
+        exercise_reminder_enabled: true,
+        recall_enabled: true,
+        marketing_enabled: false,
+      });
+    }
+    logger.error('Error getting communication preferences:', error);
+    res.status(500).json({ error: 'Failed to get communication preferences' });
+  }
+});
+
+/**
+ * PUT /patient-portal/communication-preferences
+ * Creates or updates patient's communication preferences
+ */
+router.put('/communication-preferences', requirePortalAuth, async (req, res) => {
+  try {
+    const { patient_id, organization_id } = req.portalPatient;
+    const {
+      sms_enabled,
+      email_enabled,
+      reminder_enabled,
+      exercise_reminder_enabled,
+      recall_enabled,
+      marketing_enabled,
+    } = req.body;
+
+    const result = await query(
+      `INSERT INTO patient_communication_preferences
+        (patient_id, organization_id, sms_enabled, email_enabled, reminder_enabled, exercise_reminder_enabled, recall_enabled, marketing_enabled, updated_at)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, NOW())
+       ON CONFLICT (patient_id) DO UPDATE SET
+        sms_enabled = EXCLUDED.sms_enabled,
+        email_enabled = EXCLUDED.email_enabled,
+        reminder_enabled = EXCLUDED.reminder_enabled,
+        exercise_reminder_enabled = EXCLUDED.exercise_reminder_enabled,
+        recall_enabled = EXCLUDED.recall_enabled,
+        marketing_enabled = EXCLUDED.marketing_enabled,
+        updated_at = NOW()
+       RETURNING *`,
+      [
+        patient_id,
+        organization_id,
+        sms_enabled !== false,
+        email_enabled !== false,
+        reminder_enabled !== false,
+        exercise_reminder_enabled !== false,
+        recall_enabled !== false,
+        marketing_enabled === true,
+      ]
+    );
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+      return res.status(503).json({ error: 'Communication preferences not yet configured' });
+    }
+    logger.error('Error updating communication preferences:', error);
+    res.status(500).json({ error: 'Failed to update communication preferences' });
+  }
+});
+
 /**
  * @swagger
  * /patient-portal/logout:

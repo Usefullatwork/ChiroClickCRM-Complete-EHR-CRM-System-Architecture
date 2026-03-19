@@ -12,6 +12,7 @@ import {
   Loader2,
   ToggleLeft,
   Package,
+  Timer,
 } from 'lucide-react';
 import { organizationAPI, usersAPI, clinicalSettingsAPI } from '../services/api';
 import { useTranslation } from '../i18n';
@@ -31,6 +32,9 @@ const ClinicalSettings = lazy(() => import('../components/settings/ClinicalSetti
 const ExerciseSettings = lazy(() => import('../components/settings/ExerciseSettings'));
 const AutoAcceptSettings = lazy(() => import('../components/settings/AutoAcceptSettings'));
 const ModuleManager = lazy(() => import('../components/settings/ModuleManager'));
+const AutomatedRemindersSettings = lazy(
+  () => import('../components/settings/AutomatedRemindersSettings')
+);
 
 // Default clinical preferences
 const DEFAULT_CLINICAL_PREFS = {
@@ -249,6 +253,12 @@ export default function Settings() {
       activeClass: 'border-teal-600 text-teal-600',
     },
     {
+      id: 'reminders',
+      icon: Timer,
+      label: t('automatedReminders', 'Automatiske påminnelser'),
+      activeClass: 'border-orange-600 text-orange-600',
+    },
+    {
       id: 'modules',
       icon: Package,
       label: t('moduleManagement', 'Modules'),
@@ -361,6 +371,8 @@ export default function Settings() {
         {activeTab === 'exercises' && <ExerciseSettings lang={lang} />}
 
         {activeTab === 'autoaccept' && <AutoAcceptSettings />}
+
+        {activeTab === 'reminders' && <AutomatedRemindersSettings />}
 
         {activeTab === 'modules' && <ModuleManager />}
       </Suspense>

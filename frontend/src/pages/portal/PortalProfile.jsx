@@ -4,8 +4,20 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, ChevronLeft, Loader2, AlertCircle, CheckCircle, Edit3, Save, X } from 'lucide-react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import {
+  User,
+  ChevronLeft,
+  Loader2,
+  AlertCircle,
+  CheckCircle,
+  Edit3,
+  Save,
+  X,
+  Bell,
+} from 'lucide-react';
 import { patientPortalAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 import logger from '../../utils/logger';
 
 export default function PortalProfile() {
@@ -17,6 +29,38 @@ export default function PortalProfile() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [editForm, setEditForm] = useState({ phone: '', email: '' });
+
+  const { t } = useTranslation('settings');
+
+  const { data: prefsResponse } = useQuery({
+    queryKey: ['comm-prefs'],
+    queryFn: () => patientPortalAPI.getCommunicationPreferences(),
+    retry: false,
+  });
+
+  const [commPrefs, setCommPrefs] = useState({
+    sms_enabled: true,
+    email_enabled: true,
+    reminder_enabled: true,
+    exercise_reminder_enabled: true,
+    marketing_enabled: false,
+  });
+
+  useEffect(() => {
+    if (prefsResponse?.data) {
+      setCommPrefs((prev) => ({ ...prev, ...prefsResponse.data }));
+    }
+  }, [prefsResponse]);
+
+  const updatePrefsMutation = useMutation({
+    mutationFn: (data) => patientPortalAPI.updateCommunicationPreferences(data),
+  });
+
+  const handlePrefToggle = (key) => {
+    const updated = { ...commPrefs, [key]: !commPrefs[key] };
+    setCommPrefs(updated);
+    updatePrefsMutation.mutate(updated);
+  };
 
   useEffect(() => {
     loadProfile();
@@ -196,6 +240,66 @@ export default function PortalProfile() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* Communication Preferences */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Bell className="w-5 h-5 text-orange-600" />
+            <h3 className="font-semibold text-gray-900">
+              {t('communicationPreferences', 'Kommunikasjonspreferanser')}
+            </h3>
+          </div>
+          <p className="text-xs text-gray-500 mb-4">
+            {t('communicationPreferencesDesc', 'Velg hvordan vi kan kontakte deg')}
+          </p>
+
+          <div className="space-y-3">
+            {[
+              {
+                key: 'sms_enabled',
+                label: t('smsNotifications', 'SMS-varsler'),
+                desc: t('smsNotificationsDesc', 'Motta meldinger via SMS'),
+              },
+              {
+                key: 'email_enabled',
+                label: t('emailNotificationsPortal', 'E-postvarsler'),
+                desc: t('emailNotificationsPortalDesc', 'Motta meldinger via e-post'),
+              },
+              {
+                key: 'reminder_enabled',
+                label: t('reminderNotifications', 'Timepåminnelser'),
+                desc: t('reminderNotificationsDesc', 'Få påminnelser før timer'),
+              },
+              {
+                key: 'exercise_reminder_enabled',
+                label: t('exerciseReminderNotifications', 'Øvelsespåminnelser'),
+                desc: t('exerciseReminderNotificationsDesc', 'Få påminnelser om øvelsesprogrammer'),
+              },
+              {
+                key: 'marketing_enabled',
+                label: t('marketingMessages', 'Markedsføringsmeldinger'),
+                desc: t('marketingMessagesDesc', 'Motta tilbud og nyheter'),
+              },
+            ].map(({ key, label, desc }) => (
+              <div key={key} className="flex items-center justify-between py-2">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{label}</p>
+                  <p className="text-xs text-gray-500">{desc}</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={commPrefs[key]}
+                    onChange={() => handlePrefToggle(key)}
+                    disabled={updatePrefsMutation.isPending}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                </label>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Privacy note */}

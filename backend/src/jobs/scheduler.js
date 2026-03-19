@@ -21,6 +21,7 @@ let communicationsService = null;
 let smartSchedulerService = null;
 let recallEngine = null;
 let reportService = null;
+let appointmentRemindersService = null;
 
 // Track running jobs to prevent overlap
 const runningJobs = new Map();
@@ -79,6 +80,13 @@ const loadServices = async () => {
     logger.info('Recall Engine service loaded');
   } catch (e) {
     logger.warn('Recall Engine service not available:', e.message);
+  }
+
+  try {
+    appointmentRemindersService = await import('../services/appointmentReminders.js');
+    logger.info('Appointment Reminders service loaded');
+  } catch (e) {
+    logger.warn('Appointment Reminders service not available:', e.message);
   }
 
   try {
@@ -669,6 +677,27 @@ const healthCheck = async () => {
   }
 };
 
+/**
+ * Process due appointment reminders (SMS/Email)
+ * EVERY 15 MINUTES
+ */
+const processAppointmentRemindersQueue = async () => {
+  if (!appointmentRemindersService) {
+    logger.debug('Appointment Reminders service not available');
+    return { skipped: true, reason: 'service_not_available' };
+  }
+
+  try {
+    logger.info('Processing appointment reminders queue...');
+    const result = await appointmentRemindersService.processReminders();
+    logger.info('Appointment reminders processed:', result);
+    return result;
+  } catch (error) {
+    logger.error('Error processing appointment reminders:', error);
+    throw error;
+  }
+};
+
 // ============================================================
 // SCHEDULER INITIALIZATION
 // ============================================================
@@ -894,6 +923,22 @@ export const initializeScheduler = async () => {
     lastStatus: null,
   });
 
+  // Process appointment reminders queue - Every 15 minutes
+  const reminderQueueJob = cron.schedule(
+    '*/15 * * * *',
+    () => {
+      executeJob('processAppointmentRemindersQueue', processAppointmentRemindersQueue, 120000);
+    },
+    { timezone: TIMEZONE }
+  );
+  scheduledJobs.set('processAppointmentRemindersQueue', {
+    job: reminderQueueJob,
+    description: 'Process due appointment reminders (SMS/Email)',
+    schedule: '*/15 * * * *',
+    lastRun: null,
+    lastStatus: null,
+  });
+
   logger.info(`Scheduled jobs initialized successfully (${scheduledJobs.size} jobs)`);
 
   return {
@@ -951,6 +996,7 @@ export const runJob = async (jobName) => {
     cleanupOldLogs,
     backupTrainingData,
     healthCheck,
+    processAppointmentRemindersQueue,
   };
 
   if (!jobs[jobName]) {
