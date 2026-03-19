@@ -8,7 +8,7 @@
 import PDFDocument from 'pdfkit';
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
-import { sendEmail } from './email.js';
+import { sendEmail } from './emailService.js';
 import exerciseLibraryService from './exerciseLibrary.js';
 
 // ============================================================================
