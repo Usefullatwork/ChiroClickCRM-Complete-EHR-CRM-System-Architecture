@@ -311,4 +311,55 @@ router.post(
   pdfController.generateInvoiceFromItems
 );
 
+// ── Document delivery route ──────────────────────────────────────────
+
+/**
+ * @swagger
+ * /pdf/{type}/{id}/deliver:
+ *   post:
+ *     summary: Deliver document to patient via email/SMS
+ *     tags: [PDF]
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: type
+ *         required: true
+ *         schema:
+ *           type: string
+ *           enum: [treatment_summary, referral_letter, sick_note, invoice, exercise_prescription]
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [patientId, method]
+ *             properties:
+ *               patientId:
+ *                 type: string
+ *                 format: uuid
+ *               method:
+ *                 type: string
+ *                 enum: [email, sms, both]
+ *     responses:
+ *       200:
+ *         description: Document delivered
+ *       400:
+ *         description: Invalid request
+ *       404:
+ *         description: Patient not found
+ */
+router.post(
+  '/:type/:id/deliver',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  pdfController.deliverDocument
+);
+
 export default router;

@@ -334,6 +334,47 @@ export const generateInvoiceFromItems = async (req, res) => {
   }
 };
 
+/**
+ * Deliver a document to a patient via email/SMS
+ * POST /api/v1/pdf/:type/:id/deliver
+ */
+export const deliverDocument = async (req, res) => {
+  try {
+    const { organizationId, user } = req;
+    const { type, id } = req.params;
+    const { patientId, method } = req.body;
+
+    if (!patientId) {
+      return res.status(400).json({ error: 'patientId is required' });
+    }
+    if (!['email', 'sms', 'both'].includes(method)) {
+      return res.status(400).json({ error: 'method must be email, sms, or both' });
+    }
+
+    const { deliverDocument: deliver } = await import('../services/documentDelivery.js');
+    const result = await deliver(organizationId, type, id, patientId, method, {
+      userId: user.id,
+    });
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      action: 'DOCUMENT_DELIVERED',
+      resource: 'pdf',
+      resourceId: id,
+      details: { documentType: type, method, patientId: patientId.slice(0, 8) + '...' },
+    });
+
+    return res.json(result);
+  } catch (error) {
+    logger.error('Document delivery failed:', { error: error.message });
+    return res
+      .status(error.message.includes('not found') ? 404 : 500)
+      .json({ error: error.message });
+  }
+};
+
 export default {
   generatePatientLetter,
   generateInvoice,
@@ -342,4 +383,5 @@ export default {
   generateReferralLetter,
   generateSickNote,
   generateInvoiceFromItems,
+  deliverDocument,
 };
