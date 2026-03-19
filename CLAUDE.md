@@ -45,7 +45,7 @@ cd frontend && npx playwright test              # E2E tests
 
 - `frontend/src/components/` — 39 subdirs, ~300 components
 - `backend/src/services/` — 97 service files (ai/, providers/, crm, exercises, pdf, etc.)
-- `backend/src/routes/` — 52 route files. Swagger at `/api-docs` (109 endpoints)
+- `backend/src/routes/` — 49 route files (47 registered + 2 regulatory stubs). Swagger at `/api-docs` (109 endpoints)
 - `database/migrations/` — 078 migrations (PGlite auto-applies on startup via `db-init.js`)
 
 ## Patient Connectivity (v2.1 — COMPLETE)
@@ -94,4 +94,3 @@ Budget enforcement: `canSpend()` pre-flight. Auto-resets daily/monthly.
 - `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (future)
 - `services/ai.js` is a shim re-exporting from `services/ai/` (5 modules)
 - i18n: ~50 bilingual `{en,no}` strings remain by design
-- Dead routes: several unregistered route files in `backend/src/routes/` (oldNotes, examinations, notes)
