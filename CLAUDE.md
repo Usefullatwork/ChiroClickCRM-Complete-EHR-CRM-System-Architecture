@@ -12,13 +12,13 @@ Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electro
 
 ## Current State
 
-- **Backend**: 2,601 tests (119 suites), 0 lint errors
-- **Frontend**: 1,034 tests (52 suites), 0 lint errors
+- **Backend**: 2,630 tests (124 suites), 0 lint errors
+- **Frontend**: 1,046 tests (54 suites), 0 lint errors
 - **E2E**: 88 tests (11 Playwright specs)
 - **CI**: 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
 - **Electron**: Portable exe verified (96MB), PGlite WASM loads correctly
 - **Latest migration**: 076 (`patient_connectivity`)
-- **Branch**: `feature/v2.1-patient-connectivity` (Session 0 complete)
+- **Branch**: `feature/v2.1-patient-connectivity` (Sessions 0-2 complete)
 
 ## Commands
 
@@ -69,6 +69,7 @@ cd frontend && npx playwright test              # E2E tests
 | `automations/actions.js`  | `backend/src/services/` | Has `SEND_BOOKING_LINK` (merged from AI tooling branch)       |
 
 **Session 0 complete**: AI tooling merged, exerciseDelivery fixed, migration 076 (4 tables), documentDelivery pipeline + tests.
+**Session 2 complete**: Patient self-service booking (request/reschedule/cancel + available slots) + messaging (patient inbox/compose/thread + staff chat). Staff booking request management (approve/reject). 28 new tests.
 **Provider strategy**: Mock SMS/email only. Real Twilio/SMTP via `.env` later — no code changes needed.
 
 ## Gotchas
