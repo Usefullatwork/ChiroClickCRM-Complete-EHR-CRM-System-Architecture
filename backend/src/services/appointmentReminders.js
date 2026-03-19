@@ -194,6 +194,22 @@ export const processReminders = async () => {
           continue;
         }
 
+        // Also send push notification
+        try {
+          const { sendPushToPatient } = await import('./pushNotification.js');
+          await sendPushToPatient(reminder.patient_id, {
+            title: 'Påminnelse om time',
+            body: message,
+            data: {
+              type: 'appointment_reminder',
+              id: reminder.appointment_id,
+              route: '/clinic/booking',
+            },
+          });
+        } catch (_pushErr) {
+          logger.debug('Push notification skipped:', _pushErr.message);
+        }
+
         // Mark as sent
         await query(
           `UPDATE appointment_reminders SET status = 'SENT', sent_at = NOW() WHERE id = $1`,

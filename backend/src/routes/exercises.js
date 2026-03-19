@@ -571,6 +571,12 @@ router.post(
   exerciseController.sendSMS
 );
 
+router.post(
+  '/prescriptions/:id/deliver',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  exerciseController.deliverPrescription
+);
+
 // ============================================================================
 // EXERCISE CRUD (Admin-only for create/update/delete)
 // ============================================================================

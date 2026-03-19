@@ -26,11 +26,13 @@ jest.unstable_mockModule('../../src/utils/logger.js', () => ({
 const mockGenerateTreatmentSummary = jest.fn();
 const mockGenerateReferralLetter = jest.fn();
 const mockGenerateSickNote = jest.fn();
+const mockGenerateInvoice = jest.fn();
 
 jest.unstable_mockModule('../../src/services/pdfGenerator.js', () => ({
   generateTreatmentSummary: mockGenerateTreatmentSummary,
   generateReferralLetter: mockGenerateReferralLetter,
   generateSickNote: mockGenerateSickNote,
+  generateInvoice: mockGenerateInvoice,
 }));
 
 const mockSendEmail = jest.fn();
@@ -92,6 +94,8 @@ function setupEmailDeliveryMocks() {
   mockQuery.mockResolvedValueOnce({ rows: [mockPortalDoc] });
   // 4. Communications INSERT (email)
   mockQuery.mockResolvedValueOnce({ rows: [{ id: 'comm-1' }] });
+  // 5. Push notification device_tokens lookup (sendPushToPatient)
+  mockQuery.mockResolvedValueOnce({ rows: [] });
 
   mockGenerateTreatmentSummary.mockResolvedValue(Buffer.from('fake-pdf-content'));
   mockSendEmail.mockResolvedValue({ messageId: 'msg-1' });
@@ -105,6 +109,8 @@ function setupSmsDeliveryMocks() {
   mockQuery.mockResolvedValueOnce({ rows: [{ patient_id: PATIENT_ID }] });
   mockQuery.mockResolvedValueOnce({ rows: [mockPortalDoc] });
   mockQuery.mockResolvedValueOnce({ rows: [{ id: 'comm-2' }] });
+  // Push notification device_tokens lookup (sendPushToPatient)
+  mockQuery.mockResolvedValueOnce({ rows: [] });
 
   mockGenerateTreatmentSummary.mockResolvedValue(Buffer.from('fake-pdf-content'));
   mockSendSMS.mockResolvedValue({ sid: 'sms-1' });
@@ -140,8 +146,8 @@ describe('DocumentDelivery Service', () => {
       expect(emailArgs.attachments).toHaveLength(1);
       expect(emailArgs.attachments[0].contentType).toBe('application/pdf');
 
-      // Verify communications log (4th query call)
-      expect(mockQuery).toHaveBeenCalledTimes(4);
+      // Verify communications log (4th query call; 5th is push token lookup)
+      expect(mockQuery).toHaveBeenCalledTimes(5);
       const commCall = mockQuery.mock.calls[3];
       expect(commCall[0]).toContain('INSERT INTO communications');
       expect(commCall[1]).toContain('EMAIL');
@@ -184,6 +190,8 @@ describe('DocumentDelivery Service', () => {
       mockQuery.mockResolvedValueOnce({ rows: [{ id: 'comm-1' }] });
       // Communications INSERT (sms)
       mockQuery.mockResolvedValueOnce({ rows: [{ id: 'comm-2' }] });
+      // Push notification device_tokens lookup
+      mockQuery.mockResolvedValueOnce({ rows: [] });
 
       mockGenerateTreatmentSummary.mockResolvedValue(Buffer.from('fake-pdf'));
       mockSendEmail.mockResolvedValue({ messageId: 'msg-1' });

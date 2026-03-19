@@ -13,6 +13,7 @@ import {
   generateTreatmentSummary,
   generateReferralLetter,
   generateSickNote,
+  generateInvoice,
 } from './pdfGenerator.js';
 import { sendEmail } from './emailService.js';
 import { sendSMS } from './smsService.js';
@@ -45,7 +46,7 @@ function generateDownloadToken() {
  * @param {string} organizationId
  * @returns {Promise<{buffer: Buffer, filename: string}>}
  */
-async function generatePdf(documentType, documentId, organizationId) {
+export async function generatePdf(documentType, documentId, organizationId) {
   let buffer;
 
   switch (documentType) {
@@ -90,6 +91,23 @@ async function generatePdf(documentType, documentId, organizationId) {
         orgId: organizationId,
         encounterId: documentId,
       });
+      break;
+    }
+    case 'invoice': {
+      const invRes = await query(`SELECT * FROM invoices WHERE id = $1 AND organization_id = $2`, [
+        documentId,
+        organizationId,
+      ]);
+      if (invRes.rows.length === 0) {
+        throw new Error('Invoice not found');
+      }
+      const result = await generateInvoice(invRes.rows[0]);
+      buffer = result;
+      break;
+    }
+    case 'exercise_prescription': {
+      const { generatePrescriptionPDF } = await import('./exerciseDelivery.js');
+      buffer = await generatePrescriptionPDF(organizationId, documentId);
       break;
     }
     default:
@@ -276,6 +294,18 @@ export async function deliverDocument(
       documentType,
       patientId: patientId.slice(0, 8) + '...',
     });
+  }
+
+  // Best-effort push notification to patient's mobile app
+  try {
+    const { sendPushToPatient } = await import('./pushNotification.js');
+    await sendPushToPatient(patientId, {
+      title: 'Nytt dokument tilgjengelig',
+      body: `${docTitle} er klar for nedlasting`,
+      data: { type: 'document', route: '/clinic/documents' },
+    });
+  } catch (_pushErr) {
+    logger.debug('Push for document delivery skipped:', _pushErr.message);
   }
 
   return {

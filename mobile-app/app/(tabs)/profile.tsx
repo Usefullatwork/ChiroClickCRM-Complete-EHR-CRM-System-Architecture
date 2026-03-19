@@ -3,7 +3,7 @@
  * User settings and account management
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { Card, Button } from '../../components';
-import { useAuthStore, useOfflineStore } from '../../stores';
+import { useAuthStore, useOfflineStore, useClinicStore } from '../../stores';
 import { formatBytes } from '../../stores/offlineStore';
 
 export default function ProfileScreen() {
@@ -26,6 +26,9 @@ export default function ProfileScreen() {
 
   const { user, logout } = useAuthStore();
   const { autoSync, syncOnWifiOnly, totalDownloadSize, setAutoSync, setSyncOnWifiOnly, clearDownloadedVideos } = useOfflineStore();
+  const { unreadCount, fetchMessages } = useClinicStore();
+
+  useEffect(() => { fetchMessages(); }, []);
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
@@ -203,6 +206,31 @@ export default function ProfileScreen() {
             icon="▶️"
             title="YouTube"
             onPress={() => openLink('https://youtube.com/@chiroclick')}
+          />
+        </Card>
+      </View>
+
+      {/* Klinikk */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Klinikk</Text>
+        <Card padding="none">
+          <SettingRow
+            icon="💬"
+            title={`Meldinger${unreadCount > 0 ? ` (${unreadCount})` : ''}`}
+            subtitle="Send og motta meldinger"
+            onPress={() => router.push('/clinic/messages')}
+          />
+          <SettingRow
+            icon="📋"
+            title="Dokumenter"
+            subtitle="Last ned dokumenter"
+            onPress={() => router.push('/clinic/documents')}
+          />
+          <SettingRow
+            icon="📅"
+            title="Timebestilling"
+            subtitle="Bestill time online"
+            onPress={() => router.push('/clinic/booking')}
           />
         </Card>
       </View>

@@ -127,6 +127,8 @@ describe('Appointment Reminders Service', () => {
     mockQuery.mockResolvedValueOnce({ rows: [] });
     // sendSMS resolves
     mockSendSMS.mockResolvedValueOnce({ id: 'sms-1' });
+    // Push notification device_tokens lookup (from sendPushToPatient)
+    mockQuery.mockResolvedValueOnce({ rows: [] });
     // UPDATE to SENT
     mockQuery.mockResolvedValueOnce({ rows: [{ id: 'rem-1' }] });
 
@@ -136,8 +138,8 @@ describe('Appointment Reminders Service', () => {
     expect(result.failed).toBe(0);
     expect(mockSendSMS).toHaveBeenCalledTimes(1);
     expect(mockSendSMS.mock.calls[0][1].recipient_phone).toBe('+4712345678');
-    // Verify UPDATE to SENT was called
-    const updateCall = mockQuery.mock.calls[2];
+    // Verify UPDATE to SENT was called (index 3: select reminders, prefs, push tokens, then update)
+    const updateCall = mockQuery.mock.calls[3];
     expect(updateCall[0]).toContain("status = 'SENT'");
   });
 

@@ -602,6 +602,59 @@ export const sendSMS = async (req, res) => {
   });
 };
 
+/**
+ * Deliver prescription via email, SMS, or both
+ * @route POST /api/v1/exercises/prescriptions/:id/deliver
+ */
+export const deliverPrescription = async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
+  const { method } = req.body;
+
+  if (!method || !['email', 'sms', 'both'].includes(method)) {
+    return res.status(400).json({ error: 'Invalid delivery method. Must be email, sms, or both' });
+  }
+
+  // Get prescription to verify it exists
+  const prescription = await exerciseLibraryService.getPrescriptionById(organizationId, id);
+  if (!prescription) {
+    return res.status(404).json({ error: 'Prescription not found' });
+  }
+
+  const results = {};
+
+  if (method === 'email' || method === 'both') {
+    results.email = await exerciseDeliveryService.sendPrescriptionEmail(organizationId, id);
+  }
+
+  if (method === 'sms' || method === 'both') {
+    results.sms = await exerciseDeliveryService.sendPortalSMS(organizationId, id);
+  }
+
+  // Update delivered_at
+  await exerciseLibraryService.updatePrescription(organizationId, id, {
+    delivered_at: new Date().toISOString(),
+    delivery_method: method,
+  });
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'DELIVER',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: id,
+    details: { method },
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
+
+  res.json({
+    success: true,
+    message: 'Prescription delivered successfully',
+    data: results,
+  });
+};
+
 export default {
   // Library
   getExercises,
@@ -632,4 +685,5 @@ export default {
   sendEmail,
   sendReminder,
   sendSMS,
+  deliverPrescription,
 };

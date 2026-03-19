@@ -190,7 +190,7 @@ export default function SickNoteGenerator({
   patientData = null,
   practitionerData = null,
   onSave,
-  _onSubmitToNav,
+  onSend,
 }) {
   const { t, lang } = useTranslation('assessment');
 

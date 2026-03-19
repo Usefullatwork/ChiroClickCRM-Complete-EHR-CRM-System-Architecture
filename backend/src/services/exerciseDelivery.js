@@ -464,7 +464,7 @@ export const sendPortalSMS = async (organizationId, prescriptionId) => {
     const portalUrl = `${process.env.FRONTEND_URL || 'https://app.chiroclick.no'}/portal/exercises/${prescription.portal_access_token}`;
 
     // Use SMS service (assumes sendSMS is available from another service)
-    const { sendSMS } = await import('./sms.js');
+    const { sendSMS } = await import('./smsService.js');
 
     const message = `Hei! Øvelsesprogrammet ditt er klart. Se øvelsene med video her: ${portalUrl}`;
 

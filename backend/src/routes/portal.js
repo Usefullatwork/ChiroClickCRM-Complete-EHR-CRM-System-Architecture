@@ -723,6 +723,18 @@ router.post('/patient/:patientId/messages', async (req, res) => {
       }
     }
 
+    // Best-effort push notification to patient's mobile app
+    try {
+      const { sendPushToPatient } = await import('../services/pushNotification.js');
+      await sendPushToPatient(patientId, {
+        title: 'Ny melding fra klinikken',
+        body: (subject || msgBody).substring(0, 100),
+        data: { type: 'message', id: result.rows[0].id, route: '/clinic/messages' },
+      });
+    } catch (_pushErr) {
+      logger.debug('Push to patient mobile app skipped:', _pushErr.message);
+    }
+
     res.status(201).json(result.rows[0]);
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {

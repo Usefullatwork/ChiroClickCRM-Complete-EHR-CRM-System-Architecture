@@ -193,7 +193,7 @@ export default function ReferralLetterGenerator({
   patientData = null,
   senderData = null,
   onSave,
-  _onSend,
+  onSend,
 }) {
   const { t, lang } = useTranslation('assessment');
 

@@ -24,6 +24,7 @@ import {
 import { exercisesApi } from '../api/exercises';
 import ExerciseLibrary from '../components/exercises/ExerciseLibrary';
 import ExercisePrescription from '../components/exercises/ExercisePrescription';
+import SendDocumentModal from '../components/ui/SendDocumentModal';
 
 import logger from '../utils/logger';
 export default function Exercises() {
@@ -48,6 +49,9 @@ export default function Exercises() {
   const [success, setSuccess] = useState(null);
   const [_showCreateModal, _setShowCreateModal] = useState(false);
   const [selectedPrescription, setSelectedPrescription] = useState(null);
+  const [sendModalOpen, setSendModalOpen] = useState(false);
+  const [sendPrescriptionId, setSendPrescriptionId] = useState(null);
+  const [sendPatientName, setSendPatientName] = useState('');
 
   // Mock patient data (would come from context in real app)
   const patient = patientId
@@ -546,8 +550,16 @@ export default function Exercises() {
                 selectedExercises={selectedExercises}
                 onExercisesChange={setSelectedExercises}
                 onSave={handleSavePrescription}
-                onSendEmail={() => {}}
-                onSendSMS={() => {}}
+                onSendEmail={(prescriptionId) => {
+                  setSendPrescriptionId(prescriptionId);
+                  setSendPatientName(patient ? `${patient.first_name} ${patient.last_name}` : '');
+                  setSendModalOpen(true);
+                }}
+                onSendSMS={(prescriptionId) => {
+                  setSendPrescriptionId(prescriptionId);
+                  setSendPatientName(patient ? `${patient.first_name} ${patient.last_name}` : '');
+                  setSendModalOpen(true);
+                }}
                 onGeneratePDF={() => {}}
                 saving={saving}
                 sending={sending}
@@ -651,6 +663,16 @@ export default function Exercises() {
           </div>
         </div>
       )}
+
+      <SendDocumentModal
+        isOpen={sendModalOpen}
+        onClose={() => setSendModalOpen(false)}
+        documentType="exercise_prescription"
+        documentId={sendPrescriptionId}
+        patientId={patientId}
+        patientName={sendPatientName}
+        onSuccess={() => {}}
+      />
     </div>
   );
 }

@@ -5,6 +5,7 @@
 
 import express from 'express';
 import * as mobileAuth from '../services/mobileAuth.js';
+import { generatePdf } from '../services/documentDelivery.js';
 
 const router = express.Router();
 
@@ -40,6 +41,28 @@ const authenticateMobile = async (req, res, next) => {
     next();
   } catch (error) {
     return res.status(401).json({ error: 'Invalid or expired token' });
+  }
+};
+
+/**
+ * Middleware to resolve patient context from mobile user
+ * Links mobile auth (phone-based) to patient records (UUID-based)
+ */
+const resolvePatientContext = async (req, res, next) => {
+  try {
+    const result = await req.db.query(
+      'SELECT patient_id, organization_id FROM mobile_users WHERE id = $1',
+      [req.mobileUser.id]
+    );
+    if (!result.rows[0]?.patient_id) {
+      return res.status(403).json({ error: 'Ingen koblet pasientkonto. Kontakt klinikken din.' });
+    }
+    req.mobileUser.patientId = result.rows[0].patient_id;
+    req.mobileUser.organizationId = result.rows[0].organization_id;
+    next();
+  } catch (error) {
+    logger.error('Patient context error:', error);
+    res.status(500).json({ error: 'Feil ved oppslag av pasientkontekst' });
   }
 };
 
@@ -2288,5 +2311,316 @@ async function checkStreakAchievements(db, userId, streak) {
     }
   }
 }
+
+// ============================================
+// CLINIC CONNECTIVITY (v2.1)
+// ============================================
+
+/**
+ * GET /mobile/messages — Patient's message inbox
+ */
+router.get('/messages', authenticateMobile, resolvePatientContext, async (req, res) => {
+  try {
+    const patientId = req.mobileUser.patientId;
+    const orgId = req.mobileUser.organizationId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = (page - 1) * limit;
+
+    const [messagesResult, countResult, unreadResult] = await Promise.all([
+      req.db.query(
+        `SELECT id, sender_type, sender_id, subject, body, is_read, read_at, parent_message_id, created_at
+         FROM patient_messages
+         WHERE patient_id = $1 AND organization_id = $2
+         ORDER BY created_at DESC
+         LIMIT $3 OFFSET $4`,
+        [patientId, orgId, limit, offset]
+      ),
+      req.db.query(
+        `SELECT COUNT(*) as total FROM patient_messages WHERE patient_id = $1 AND organization_id = $2`,
+        [patientId, orgId]
+      ),
+      req.db.query(
+        `SELECT COUNT(*) as count FROM patient_messages
+         WHERE patient_id = $1 AND organization_id = $2 AND sender_type != 'PATIENT' AND is_read = false`,
+        [patientId, orgId]
+      ),
+    ]);
+
+    res.json({
+      messages: messagesResult.rows,
+      unread_count: parseInt(unreadResult.rows[0].count, 10),
+      pagination: { page, limit, total: parseInt(countResult.rows[0].total, 10) },
+    });
+  } catch (error) {
+    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+      return res.json({
+        messages: [],
+        unread_count: 0,
+        pagination: { page: 1, limit: 20, total: 0 },
+      });
+    }
+    logger.error('Error getting mobile messages:', error);
+    res.status(500).json({ error: 'Failed to get messages' });
+  }
+});
+
+/**
+ * POST /mobile/messages — Patient sends a message
+ */
+router.post('/messages', authenticateMobile, resolvePatientContext, async (req, res) => {
+  try {
+    const patientId = req.mobileUser.patientId;
+    const orgId = req.mobileUser.organizationId;
+    const { subject, body: msgBody, parent_message_id } = req.body;
+
+    if (!msgBody) {
+      return res.status(400).json({ error: 'Meldingstekst er påkrevd' });
+    }
+
+    const result = await req.db.query(
+      `INSERT INTO patient_messages (patient_id, organization_id, sender_type, sender_id, subject, body, parent_message_id)
+       VALUES ($1, $2, 'PATIENT', NULL, $3, $4, $5)
+       RETURNING *`,
+      [patientId, orgId, subject || null, msgBody, parent_message_id || null]
+    );
+
+    res.status(201).json(result.rows[0]);
+  } catch (error) {
+    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+      return res.status(503).json({ error: 'Meldingssystemet er ikke konfigurert ennå' });
+    }
+    logger.error('Error sending mobile message:', error);
+    res.status(500).json({ error: 'Failed to send message' });
+  }
+});
+
+/**
+ * PATCH /mobile/messages/:id/read — Mark message as read
+ */
+router.patch('/messages/:id/read', authenticateMobile, resolvePatientContext, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const patientId = req.mobileUser.patientId;
+    const orgId = req.mobileUser.organizationId;
+
+    await req.db.query(
+      `UPDATE patient_messages SET is_read = true, read_at = NOW()
+       WHERE id = $1 AND patient_id = $2 AND organization_id = $3`,
+      [id, patientId, orgId]
+    );
+
+    res.json({ success: true });
+  } catch (error) {
+    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+      return res.json({ success: true });
+    }
+    logger.error('Error marking mobile message read:', error);
+    res.status(500).json({ error: 'Failed to mark message as read' });
+  }
+});
+
+/**
+ * GET /mobile/documents — List portal documents for patient
+ */
+router.get('/documents', authenticateMobile, resolvePatientContext, async (req, res) => {
+  try {
+    const patientId = req.mobileUser.patientId;
+    const orgId = req.mobileUser.organizationId;
+
+    const result = await req.db.query(
+      `SELECT id, title, document_type, created_at, token_expires_at, downloaded_at, download_token
+       FROM portal_documents
+       WHERE patient_id = $1 AND organization_id = $2
+       ORDER BY created_at DESC`,
+      [patientId, orgId]
+    );
+
+    const documents = result.rows.map((doc) => ({
+      id: doc.id,
+      title: doc.title,
+      documentType: doc.document_type,
+      createdAt: doc.created_at,
+      expired: doc.token_expires_at < new Date(),
+      downloadedAt: doc.downloaded_at,
+      downloadToken: doc.token_expires_at > new Date() ? doc.download_token : null,
+    }));
+
+    res.json({ documents });
+  } catch (error) {
+    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+      return res.json({ documents: [] });
+    }
+    logger.error('Error getting mobile documents:', error);
+    res.status(500).json({ error: 'Failed to get documents' });
+  }
+});
+
+/**
+ * GET /mobile/documents/:token/download — Token-based document download
+ */
+router.get('/documents/:token/download', authenticateMobile, async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    const result = await req.db.query(
+      `SELECT id, document_type, document_id, organization_id, token_expires_at
+       FROM portal_documents
+       WHERE download_token = $1`,
+      [token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Document not found' });
+    }
+
+    const doc = result.rows[0];
+
+    if (doc.token_expires_at < new Date()) {
+      return res.status(410).json({ error: 'Download link has expired' });
+    }
+
+    const { buffer, filename } = await generatePdf(
+      doc.document_type,
+      doc.document_id,
+      doc.organization_id
+    );
+
+    // Mark as downloaded
+    await req.db.query(
+      `UPDATE portal_documents SET downloaded_at = NOW() WHERE id = $1 AND downloaded_at IS NULL`,
+      [doc.id]
+    );
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    res.send(buffer);
+  } catch (error) {
+    logger.error('Error downloading mobile document:', error);
+    res.status(500).json({ error: 'Failed to download document' });
+  }
+});
+
+/**
+ * GET /mobile/appointments/available-slots — Available time slots
+ */
+router.get(
+  '/appointments/available-slots',
+  authenticateMobile,
+  resolvePatientContext,
+  async (req, res) => {
+    try {
+      const { date, practitioner_id } = req.query;
+      const orgId = req.mobileUser.organizationId;
+
+      if (!date) {
+        return res.status(400).json({ error: 'date query parameter is required' });
+      }
+
+      let existingQuery = `
+      SELECT appointment_time, duration
+      FROM appointments
+      WHERE organization_id = $1
+        AND appointment_date = $2
+        AND status NOT IN ('cancelled', 'no_show')
+    `;
+      const params = [orgId, date];
+
+      if (practitioner_id) {
+        existingQuery += ' AND practitioner_id = $3';
+        params.push(practitioner_id);
+      }
+
+      const existing = await req.db.query(existingQuery, params);
+
+      // Generate 30-min slots from 08:00 to 17:00
+      const bookedTimes = new Set(existing.rows.map((r) => r.appointment_time?.substring(0, 5)));
+      const slots = [];
+      for (let hour = 8; hour < 17; hour++) {
+        for (let min = 0; min < 60; min += 30) {
+          const time = `${String(hour).padStart(2, '0')}:${String(min).padStart(2, '0')}`;
+          slots.push({ time, available: !bookedTimes.has(time) });
+        }
+      }
+
+      res.json({ slots });
+    } catch (error) {
+      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        return res.status(503).json({ error: 'Booking system not yet configured' });
+      }
+      logger.error('Error getting mobile available slots:', error);
+      res.status(500).json({ error: 'Failed to get available slots' });
+    }
+  }
+);
+
+/**
+ * POST /mobile/appointments/request — Patient requests a new appointment
+ */
+router.post(
+  '/appointments/request',
+  authenticateMobile,
+  resolvePatientContext,
+  async (req, res) => {
+    try {
+      const { preferredDate, preferredTime, reason } = req.body;
+      const patientId = req.mobileUser.patientId;
+      const orgId = req.mobileUser.organizationId;
+
+      if (!preferredDate) {
+        return res.status(400).json({ error: 'preferredDate is required' });
+      }
+
+      const result = await req.db.query(
+        `INSERT INTO portal_booking_requests
+        (patient_id, organization_id, preferred_date, preferred_time_slot, reason, status)
+       VALUES ($1, $2, $3, $4, $5, 'PENDING')
+       RETURNING *`,
+        [patientId, orgId, preferredDate, preferredTime || null, reason || null]
+      );
+
+      const bookingRequest = result.rows[0];
+
+      res.status(201).json({ id: bookingRequest.id, status: 'PENDING' });
+    } catch (error) {
+      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        return res.status(503).json({ error: 'Booking system not yet configured' });
+      }
+      logger.error('Error creating mobile booking request:', error);
+      res.status(500).json({ error: 'Failed to create booking request' });
+    }
+  }
+);
+
+/**
+ * GET /mobile/appointments/requests — List patient's booking requests
+ */
+router.get(
+  '/appointments/requests',
+  authenticateMobile,
+  resolvePatientContext,
+  async (req, res) => {
+    try {
+      const patientId = req.mobileUser.patientId;
+      const orgId = req.mobileUser.organizationId;
+
+      const result = await req.db.query(
+        `SELECT id, preferred_date, preferred_time_slot, reason, status, created_at
+       FROM portal_booking_requests
+       WHERE patient_id = $1 AND organization_id = $2
+       ORDER BY created_at DESC`,
+        [patientId, orgId]
+      );
+
+      res.json({ requests: result.rows });
+    } catch (error) {
+      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
+        return res.json({ requests: [] });
+      }
+      logger.error('Error getting mobile booking requests:', error);
+      res.status(500).json({ error: 'Failed to get booking requests' });
+    }
+  }
+);
 
 export default router;

@@ -7,3 +7,4 @@ export { useAuthStore } from './authStore';
 export { useExerciseStore } from './exerciseStore';
 export { useProgramStore } from './programStore';
 export { useOfflineStore, initNetworkListener, formatBytes } from './offlineStore';
+export { useClinicStore } from './clinicStore';
