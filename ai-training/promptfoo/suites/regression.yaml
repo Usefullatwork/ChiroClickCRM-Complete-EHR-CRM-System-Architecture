@@ -1,5 +1,5 @@
 # Auto-generated from benchmark_cases.jsonl
-# 100 test cases across 7 categories
+# 120 test cases across 12 categories
 # Re-generate with: node ai-training/promptfoo/scripts/convert-benchmark.js
 
 tests:
@@ -2313,3 +2313,484 @@ tests:
       id: letter_gp_summary_07
       category: letters
       max_tokens: 600
+
+  # ── message_drafting (4 cases) ──
+  - description: Draft reply to patient reporting pain after treatment
+    vars:
+      prompt_text: "En pasient har sendt melding: 'Hei, jeg har fått mer vondt i ryggen etter siste behandling. Er dette normalt?' Skriv et empatisk svar som beroligar men anbefaler kontakt ved forverring."
+      category: message_drafting
+      required_keywords: '["smerter","normalt","kontakt"]'
+      forbidden_keywords: '["english","sorry"]'
+      expect_norwegian: true
+      min_response_length: 80
+      max_response_length: 500
+      system_prompt_text: Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Skriv profesjonell og empatisk kommunikasjon på norsk.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: msg_reply_pain_01
+      category: message_drafting
+      max_tokens: 300
+
+  - description: Draft reply to patient asking about rescheduling
+    vars:
+      prompt_text: "En pasient spør: 'Kan jeg flytte timen min fra torsdag til neste uke?' Skriv et hjelpsomt svar."
+      category: message_drafting
+      required_keywords: '["time","flytte"]'
+      forbidden_keywords: '["english"]'
+      expect_norwegian: true
+      min_response_length: 50
+      max_response_length: 400
+      system_prompt_text: Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Skriv profesjonell og empatisk kommunikasjon på norsk.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: msg_reply_reschedule_02
+      category: message_drafting
+      max_tokens: 250
+
+  - description: Draft follow-up message for no-show patient
+    vars:
+      prompt_text: En pasient møtte ikke til timen sin i dag. Skriv en empatisk oppfølgingsmelding via SMS.
+      category: message_drafting
+      required_keywords: '["time","kontakt"]'
+      forbidden_keywords: '["straff","gebyr","english"]'
+      expect_norwegian: true
+      min_response_length: 50
+      max_response_length: 250
+      system_prompt_text: Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Skriv profesjonell og empatisk kommunikasjon på norsk.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: msg_noshow_04
+      category: message_drafting
+      max_tokens: 200
+
+  - description: Draft welcome message for new patient
+    vars:
+      prompt_text: Skriv en velkomstmelding til en ny pasient som har sin første time neste uke. Inkluder praktisk informasjon om hva de skal ta med.
+      category: message_drafting
+      required_keywords: '["velkommen","time"]'
+      forbidden_keywords: '["english"]'
+      expect_norwegian: true
+      min_response_length: 80
+      max_response_length: 500
+      system_prompt_text: Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Skriv profesjonell og empatisk kommunikasjon på norsk.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: msg_welcome_05
+      category: message_drafting
+      max_tokens: 300
+
+  # ── message_categorization (1 cases) ──
+  - description: Categorize incoming message as urgent/routine/administrative
+    vars:
+      prompt_text: "Kategoriser følgende pasientmelding og gi prioritet (HASTER/RUTINE/ADMINISTRATIV): 'Jeg har plutselig mistet følelsen i begge bena og har problemer med vannlating'"
+      category: message_categorization
+      required_keywords: '["HASTER","henvisning"]'
+      forbidden_keywords: "[]"
+      expect_norwegian: true
+      min_response_length: 30
+      max_response_length: 300
+      system_prompt_text: Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Skriv profesjonell og empatisk kommunikasjon på norsk.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: msg_categorize_03
+      category: message_categorization
+      max_tokens: 200
+
+  # ── document_context (5 cases) ──
+  - description: Cover letter for referral being sent to patient
+    vars:
+      prompt_text: Skriv et følgebrev til en pasient som får tilsendt en henvisning til MR-undersøkelse. Forklar hva dokumentet er og hva de skal gjøre videre.
+      category: document_context
+      required_keywords: '["henvisning","MR"]'
+      forbidden_keywords: '["english"]'
+      expect_norwegian: true
+      min_response_length: 100
+      max_response_length: 600
+      system_prompt_text: Du er en dokumentassistent for en kiropraktorklinikk i Norge.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: doc_cover_letter_01
+      category: document_context
+      max_tokens: 350
+
+  - description: Treatment summary in patient-friendly Norwegian
+    vars:
+      prompt_text: Skriv et behandlingssammendrag i pasientvennlig språk for en pasient som har hatt 6 behandlinger for korsryggsmerter. Inkluder fremgang og videre plan.
+      category: document_context
+      required_keywords: '["behandling","bedring"]'
+      forbidden_keywords: '["english"]'
+      expect_norwegian: true
+      min_response_length: 100
+      max_response_length: 800
+      system_prompt_text: Du er en dokumentassistent for en kiropraktorklinikk i Norge.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: doc_summary_02
+      category: document_context
+      max_tokens: 400
+
+  - description: Exercise prescription email body
+    vars:
+      prompt_text: Skriv en e-posttekst som følger med et treningsprogram (PDF vedlegg) til en pasient med nakkesmerter. Forklar viktigheten av øvelsene.
+      category: document_context
+      required_keywords: '["øvelse","nakke"]'
+      forbidden_keywords: '["english"]'
+      expect_norwegian: true
+      min_response_length: 80
+      max_response_length: 500
+      system_prompt_text: Du er en dokumentassistent for en kiropraktorklinikk i Norge.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: doc_exercise_email_03
+      category: document_context
+      max_tokens: 300
+
+  - description: Sick note portal notification SMS
+    vars:
+      prompt_text: Skriv en kort SMS (maks 160 tegn) som varsler pasienten om at sykmeldingen er tilgjengelig i pasientportalen.
+      category: document_context
+      required_keywords: '["sykmelding"]'
+      forbidden_keywords: '["english"]'
+      expect_norwegian: true
+      min_response_length: 40
+      max_response_length: 160
+      system_prompt_text: Du er en dokumentassistent for en kiropraktorklinikk i Norge.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: doc_sicknote_sms_04
+      category: document_context
+      max_tokens: 100
+
+  - description: Booking confirmation SMS (under 160 chars)
+    vars:
+      prompt_text: "Skriv en bookingbekreftelse-SMS (maks 160 tegn) for time torsdag 27. mars kl 14:30 hos kiropraktor Kari Nordmann."
+      category: document_context
+      required_keywords: '["time","14:30"]'
+      forbidden_keywords: '["english"]'
+      expect_norwegian: true
+      min_response_length: 40
+      max_response_length: 160
+      system_prompt_text: Du er en dokumentassistent for en kiropraktorklinikk i Norge.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: doc_booking_sms_05
+      category: document_context
+      max_tokens: 100
+
+  # ── clinical_intelligence (5 cases) ──
+  - description: Suggest next appointment timing based on treatment phase
+    vars:
+      prompt_text: En pasient er i akuttfasen av nakkesmerter (2 uker). Har hatt 3 behandlinger med moderat bedring. Foreslå tidspunkt for neste time og begrunn.
+      category: clinical_intelligence
+      required_keywords: '["dager","behandling"]'
+      forbidden_keywords: '["english"]'
+      expect_norwegian: true
+      min_response_length: 60
+      max_response_length: 500
+      system_prompt_text: Du er en klinisk beslutningsstøtte for kiropraktorer i Norge.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: intel_timing_01
+      category: clinical_intelligence
+      max_tokens: 300
+
+  - description: Detect red flags in patient message (numbness + bladder)
+    vars:
+      prompt_text: "Analyser følgende pasientmelding for røde flagg: 'Hei, siden sist har jeg fått nummenhet nedover begge bena og har hatt litt problemer med å kontrollere blæren.' Gi prioritet og anbefalt handling."
+      category: clinical_intelligence
+      required_keywords: '["røde flagg","cauda equina","akutt"]'
+      forbidden_keywords: "[]"
+      expect_norwegian: true
+      min_response_length: 80
+      max_response_length: 600
+      system_prompt_text: Du er en klinisk beslutningsstøtte for kiropraktorer i Norge.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: intel_redflag_msg_02
+      category: clinical_intelligence
+      max_tokens: 350
+
+  - description: Recommend exercise modification based on compliance
+    vars:
+      prompt_text: En pasient med korsryggsmerter har kun gjennomført 2 av 10 planlagte treningsøkter siste 2 uker. Foreslå tilpasninger av programmet for å øke etterlevelse.
+      category: clinical_intelligence
+      required_keywords: '["øvelse","tilpas"]'
+      forbidden_keywords: '["english","lazy"]'
+      expect_norwegian: true
+      min_response_length: 80
+      max_response_length: 600
+      system_prompt_text: Du er en klinisk beslutningsstøtte for kiropraktorer i Norge.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: intel_exercise_mod_03
+      category: clinical_intelligence
+      max_tokens: 350
+
+  - description: Draft recall outreach for 90-day overdue patient
+    vars:
+      prompt_text: Skriv en innkallingsmelding for en pasient som ikke har vært innom på 90 dager. Pasienten hadde skulderplager ved siste besøk.
+      category: clinical_intelligence
+      required_keywords: '["skulder","time"]'
+      forbidden_keywords: '["english"]'
+      expect_norwegian: true
+      min_response_length: 60
+      max_response_length: 400
+      system_prompt_text: Du er en klinisk beslutningsstøtte for kiropraktorer i Norge.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: intel_recall_04
+      category: clinical_intelligence
+      max_tokens: 250
+
+  - description: Summarize 5-visit treatment progress for referral
+    vars:
+      prompt_text: "Oppsummer behandlingsforløpet over 5 konsultasjoner for en pasient med lumbalt skiveprolaps. Inkluder fremgang, funn og anbefaling for videre oppfølging. Skriv i format egnet for henvisning."
+      category: clinical_intelligence
+      required_keywords: '["behandling","prolaps","bedring"]'
+      forbidden_keywords: '["english"]'
+      expect_norwegian: true
+      min_response_length: 150
+      max_response_length: 1000
+      system_prompt_text: Du er en klinisk beslutningsstøtte for kiropraktorer i Norge.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: intel_progress_05
+      category: clinical_intelligence
+      max_tokens: 500
+
+  # ── communication_tone (5 cases) ──
+  - description: Rewrite clinical text into patient-friendly language
+    vars:
+      prompt_text: "Skriv om følgende kliniske tekst til pasientvennlig norsk: 'Pasienten presenterer med cervikal radikulopati C6 med dermatomal utstråling til tommel. Positiv Spurlings test bilateralt. Nevrologisk status ellers u.a.'"
+      category: communication_tone
+      required_keywords: '["forklaring"]'
+      forbidden_keywords: '["english"]'
+      expect_norwegian: true
+      min_response_length: 80
+      max_response_length: 500
+      system_prompt_text: Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Gjør klinisk tekst forståelig for pasienter.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: tone_rewrite_01
+      category: communication_tone
+      max_tokens: 300
+
+  - description: Professional birthday greeting (Norwegian)
+    vars:
+      prompt_text: Skriv en profesjonell og varm bursdagshilsen fra klinikken til en pasient.
+      category: communication_tone
+      required_keywords: '["gratulerer"]'
+      forbidden_keywords: '["english","happy birthday"]'
+      expect_norwegian: true
+      min_response_length: 40
+      max_response_length: 250
+      system_prompt_text: Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Gjør klinisk tekst forståelig for pasienter.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: tone_birthday_02
+      category: communication_tone
+      max_tokens: 150
+
+  - description: Gentle exercise compliance nudge
+    vars:
+      prompt_text: Skriv en vennlig påminnelse til en pasient som ikke har logget inn på øvelsesprogrammet sitt på 14 dager. Vær motiverende uten å være anklagende.
+      category: communication_tone
+      required_keywords: '["øvelse"]'
+      forbidden_keywords: '["english","must","you must"]'
+      expect_norwegian: true
+      min_response_length: 60
+      max_response_length: 300
+      system_prompt_text: Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Gjør klinisk tekst forståelig for pasienter.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: tone_compliance_03
+      category: communication_tone
+      max_tokens: 200
+
+  - description: Warm booking confirmation with prep instructions
+    vars:
+      prompt_text: "Skriv en varm bookingbekreftelse for en ny pasient. Inkluder forberedelsestips (kom 10 min før, ta med sykehistorikk, klær man kan bevege seg i)."
+      category: communication_tone
+      required_keywords: '["time","velkommen"]'
+      forbidden_keywords: '["english"]'
+      expect_norwegian: true
+      min_response_length: 80
+      max_response_length: 500
+      system_prompt_text: Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Gjør klinisk tekst forståelig for pasienter.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: tone_booking_04
+      category: communication_tone
+      max_tokens: 300
+
+  - description: Cancellation policy reminder (empathetic tone)
+    vars:
+      prompt_text: En pasient har avbestilt timen sin to ganger på kort tid. Skriv en empatisk melding som minner om avbestillingsregler men viser forståelse.
+      category: communication_tone
+      required_keywords: '["avbestill"]'
+      forbidden_keywords: '["english","penalty"]'
+      expect_norwegian: true
+      min_response_length: 60
+      max_response_length: 400
+      system_prompt_text: Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Gjør klinisk tekst forståelig for pasienter.
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: tone_cancel_05
+      category: communication_tone
+      max_tokens: 250

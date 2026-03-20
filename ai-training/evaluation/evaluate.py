@@ -172,6 +172,12 @@ SYNONYMS = {
 
     # Neck pain terms — model sometimes uses Latin "cervikalgi" instead of Norwegian "nakke"
     "nakke": ["nakke", "cervikalgi", "cervikalt", "cervikale"],
+
+    # v2.1 communication terms
+    "velkommen": ["velkommen", "velkomst", "ny pasient", "første gang"],
+    "kategori": ["kategori", "prioritet", "klassifisering", "triage"],
+    "bedring": ["bedring", "forbedring", "fremgang", "positiv utvikling"],
+    "forklaring": ["forklaring", "forståelig", "pasientvennlig", "lettfattelig"],
 }
 
 # Negation words — if a forbidden keyword is preceded (within 5 tokens) by
