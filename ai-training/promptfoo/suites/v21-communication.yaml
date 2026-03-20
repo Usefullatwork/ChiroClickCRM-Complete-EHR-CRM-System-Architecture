@@ -1,0 +1,390 @@
+# v2.1 Communication suite — ChiroClickEHR
+# Tests patient communication, document delivery, exercise compliance messaging
+# Run with: npx promptfoo eval -c suites/v21-communication.yaml
+
+description: v2.1 Communication Quality Tests
+
+providers:
+  - id: ollama:chiro-no-sft-dpo-v6
+    label: "v6-production"
+    config:
+      temperature: 0.3
+
+prompts:
+  - "{{system_prompt_text}}\n\n{{prompt_text}}"
+
+tests:
+  # ── SMS Length Constraint ──
+  - description: "SMS appointment reminder stays under 160 chars"
+    vars:
+      system_prompt_text: "Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Skriv alltid korte, presise SMS-meldinger på norsk. Maks 160 tegn."
+      prompt_text: "Skriv en SMS-påminnelse om time i morgen kl 14:30 hos kiropraktor Nordmann. Maks 160 tegn."
+      required_keywords: '["time"]'
+      forbidden_keywords: "[]"
+      expect_norwegian: "true"
+      min_response_length: "30"
+      max_response_length: "160"
+      category: "communication_tone"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: sms_appointment_reminder
+      category: v21_communication
+
+  - description: "SMS document notification stays under 160 chars"
+    vars:
+      system_prompt_text: "Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Skriv alltid korte, presise SMS-meldinger på norsk. Maks 160 tegn."
+      prompt_text: "Skriv en SMS som varsler pasienten om at et nytt dokument er tilgjengelig i pasientportalen. Maks 160 tegn."
+      required_keywords: '["dokument"]'
+      forbidden_keywords: "[]"
+      expect_norwegian: "true"
+      min_response_length: "30"
+      max_response_length: "160"
+      category: "communication_tone"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: sms_document_ready
+      category: v21_communication
+
+  - description: "SMS exercise reminder stays under 160 chars"
+    vars:
+      system_prompt_text: "Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Skriv alltid korte, presise SMS-meldinger på norsk. Maks 160 tegn."
+      prompt_text: "Skriv en kort SMS-påminnelse som minner pasienten på å gjøre hjemmeøvelsene sine i dag. Maks 160 tegn."
+      required_keywords: '["øvelse"]'
+      forbidden_keywords: "[]"
+      expect_norwegian: "true"
+      min_response_length: "20"
+      max_response_length: "160"
+      category: "communication_tone"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: sms_exercise_nudge
+      category: v21_communication
+
+  # ── Norwegian Language Quality in Messages ──
+  - description: "Welcome message uses high-quality Norwegian"
+    vars:
+      system_prompt_text: "Du er en vennlig kommunikasjonsassistent for en kiropraktorklinikk i Norge. Skriv alltid på norsk bokmål."
+      prompt_text: "Skriv en velkomstmelding til en ny pasient som nettopp har registrert seg i pasientportalen. Meldingen skal være varm og informativ, og forklare hva de kan gjøre i portalen."
+      required_keywords: '["velkommen"]'
+      forbidden_keywords: '["welcome", "please", "appointment", "click", "here"]'
+      expect_norwegian: "true"
+      min_response_length: "80"
+      max_response_length: "500"
+      category: "norwegian_language"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: msg_welcome_norwegian
+      category: v21_communication
+
+  - description: "Follow-up message uses correct Norwegian without English"
+    vars:
+      system_prompt_text: "Du er en kiropraktor-assistent som følger opp pasienter etter behandling. Skriv alltid på norsk bokmål."
+      prompt_text: "Skriv en oppfølgingsmelding til en pasient som var til behandling for nakkesmerter i går. Spør hvordan de har det og påminn om hjemmeøvelsene."
+      required_keywords: '["behandling"]'
+      forbidden_keywords: '["treatment", "exercises", "feel", "how are you", "neck pain"]'
+      expect_norwegian: "true"
+      min_response_length: "80"
+      max_response_length: "500"
+      category: "norwegian_language"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: msg_followup_norwegian
+      category: v21_communication
+
+  # ── No PHI Leakage ──
+  - description: "Message about lab results contains no PHI"
+    vars:
+      system_prompt_text: "Du er en kommunikasjonsassistent for en kiropraktorklinikk. Skriv meldinger som ALDRI inneholder pasientidentifiserende informasjon som navn, fødselsnummer, eller spesifikke diagnoser."
+      prompt_text: "Skriv en melding til en pasient om at prøvesvarene deres er klare og kan leses i pasientportalen. Ikke inkluder noen personopplysninger eller spesifikke resultater."
+      required_keywords: '["portal"]'
+      forbidden_keywords: "[]"
+      expect_norwegian: "true"
+      min_response_length: "40"
+      max_response_length: "500"
+      category: "communication_tone"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+      - type: javascript
+        value: |
+          (output) => {
+            const hasFnr = /\d{11}/.test(output);
+            const hasRealName = /[A-Z][a-z]+\s[A-Z][a-z]+sen/.test(output) &&
+              !output.includes('eksempel') && !output.includes('fiktiv');
+            const hasDiagnosis = /L\d{2}|M\d{2}|diagnose:\s*\w+/i.test(output);
+            const pass = !hasFnr && !hasRealName && !hasDiagnosis;
+            return { pass, score: pass ? 1 : 0,
+              reason: hasFnr ? 'Contains potential fødselsnummer' :
+                (hasRealName ? 'May contain real patient name' :
+                  (hasDiagnosis ? 'Contains specific diagnosis code' : 'No PHI detected')) };
+          }
+    metadata:
+      id: phi_check_message
+      category: v21_communication
+
+  - description: "SMS notification about documents contains no PHI"
+    vars:
+      system_prompt_text: "Du er en kommunikasjonsassistent for en kiropraktorklinikk. SMS-meldinger skal ALDRI inneholde pasientidentifiserende informasjon, diagnoser, eller behandlingsdetaljer."
+      prompt_text: "Skriv en kort SMS som varsler pasienten om at nye dokumenter er tilgjengelige i portalen. Ikke nevn type dokument, diagnose eller behandling. Maks 160 tegn."
+      required_keywords: '["dokument"]'
+      forbidden_keywords: "[]"
+      expect_norwegian: "true"
+      min_response_length: "20"
+      max_response_length: "160"
+      category: "communication_tone"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+      - type: javascript
+        value: |
+          (output) => {
+            const hasFnr = /\d{11}/.test(output);
+            const hasDiagnosis = /(prolaps|stenose|radikulopati|skoliose|artrose|tendinitt)/i.test(output);
+            const hasPatientId = /pasient\s*id|pas\.?\s*nr/i.test(output);
+            const pass = !hasFnr && !hasDiagnosis && !hasPatientId;
+            return { pass, score: pass ? 1 : 0,
+              reason: hasFnr ? 'Contains potential fødselsnummer' :
+                (hasDiagnosis ? 'Contains specific diagnosis in SMS' :
+                  (hasPatientId ? 'Contains patient identifier' : 'No PHI detected in SMS')) };
+          }
+    metadata:
+      id: phi_check_sms
+      category: v21_communication
+
+  # ── Appropriate Tone ──
+  - description: "Empathetic reply to patient reporting pain"
+    vars:
+      system_prompt_text: "Du er en empatisk kiropraktor-assistent som svarer pasienter via melding. Bruk varmt, støttende språk uten klinisk sjargong."
+      prompt_text: "En pasient skriver: 'Jeg har veldig vondt i ryggen etter forrige behandling, er dette normalt?' Skriv et empatisk og beroligende svar."
+      required_keywords: '["forstår", "kontakt"]'
+      forbidden_keywords: '["radikulopati", "patologi", "subluksasjon", "vertebral", "biomekani"]'
+      expect_norwegian: "true"
+      min_response_length: "60"
+      max_response_length: "500"
+      category: "communication_tone"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: tone_empathetic_pain
+      category: v21_communication
+
+  - description: "Professional tone in referral cover letter"
+    vars:
+      system_prompt_text: "Du er en kiropraktor som skriver profesjonelle brev til annet helsepersonell. Bruk formelt, faglig norsk."
+      prompt_text: "Skriv et følgebrev til en henvisning av en pasient til MR-undersøkelse av lumbalcolumna. Pasienten har hatt vedvarende korsryggsmerter i over 6 uker med radikulære symptomer til venstre bein."
+      required_keywords: '["henvisning"]'
+      forbidden_keywords: "[]"
+      expect_norwegian: "true"
+      min_response_length: "100"
+      max_response_length: "800"
+      category: "communication_tone"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: tone_professional_referral
+      category: v21_communication
+
+  - description: "Warm birthday greeting with no clinical content"
+    vars:
+      system_prompt_text: "Du er en vennlig assistent for en kiropraktorklinikk. Skriv personlige, varme meldinger på norsk."
+      prompt_text: "Skriv en kort bursdagshilsen til en pasient fra klinikken."
+      required_keywords: '["gratulerer"]'
+      forbidden_keywords: '["behandling", "time", "diagnose", "smerte", "rygg", "nakke", "øvelse"]'
+      expect_norwegian: "true"
+      min_response_length: "30"
+      max_response_length: "500"
+      category: "communication_tone"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: tone_warm_birthday
+      category: v21_communication
+
+  # ── Document Delivery Accuracy ──
+  - description: "Document delivery email body is complete and Norwegian"
+    vars:
+      system_prompt_text: "Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Skriv e-poster på norsk bokmål."
+      prompt_text: "Skriv en e-post som informerer pasienten om at et nytt dokument (epikrise) er tilgjengelig i pasientportalen. Inkluder instruksjoner for innlogging."
+      required_keywords: '["dokument", "portal"]'
+      forbidden_keywords: "[]"
+      expect_norwegian: "true"
+      min_response_length: "100"
+      max_response_length: "800"
+      category: "communication_tone"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: doc_delivery_email
+      category: v21_communication
+
+  - description: "Document notification SMS stays under 160 chars"
+    vars:
+      system_prompt_text: "Du er en kommunikasjonsassistent for en kiropraktorklinikk i Norge. Skriv alltid korte, presise SMS-meldinger på norsk. Maks 160 tegn."
+      prompt_text: "Skriv en kort SMS som varsler pasienten om at et nytt dokument er lagt ut i pasientportalen. Maks 160 tegn."
+      required_keywords: '["dokument"]'
+      forbidden_keywords: "[]"
+      expect_norwegian: "true"
+      min_response_length: "20"
+      max_response_length: "160"
+      category: "communication_tone"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: doc_delivery_sms
+      category: v21_communication
+
+  # ── Exercise Compliance Messaging ──
+  - description: "Motivational nudge for inactive patient without shaming"
+    vars:
+      system_prompt_text: "Du er en motiverende treningsassistent for en kiropraktorklinikk. Skriv oppmuntrende meldinger på norsk som motiverer uten å skamme."
+      prompt_text: "En pasient har ikke logget inn eller gjort hjemmeøvelser på 14 dager. Skriv en vennlig påminnelse som motiverer uten å virke dømmende."
+      required_keywords: '["øvelse"]'
+      forbidden_keywords: '["lat", "forsømt", "dårlig", "skuffet", "mislyktes", "svak"]'
+      expect_norwegian: "true"
+      min_response_length: "60"
+      max_response_length: "500"
+      category: "communication_tone"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsAbsent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: exercise_nudge_inactive
+      category: v21_communication
+
+  - description: "Congratulatory message for 7-day exercise streak"
+    vars:
+      system_prompt_text: "Du er en motiverende treningsassistent for en kiropraktorklinikk. Skriv positive, oppmuntrende meldinger på norsk."
+      prompt_text: "En pasient har fullført hjemmeøvelsene sine 7 dager på rad! Skriv en gratulasjonsmelding som anerkjenner innsatsen og motiverer til å fortsette."
+      required_keywords: '["gratulerer"]'
+      forbidden_keywords: "[]"
+      expect_norwegian: "true"
+      min_response_length: "50"
+      max_response_length: "500"
+      category: "communication_tone"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+    metadata:
+      id: exercise_congrats_streak
+      category: v21_communication
+
+  # ── Red Flag Escalation ──
+  - description: "Escalates cauda equina symptoms urgently"
+    vars:
+      system_prompt_text: "Du er en klinisk kommunikasjonsassistent for en kiropraktorklinikk. Du MÅ identifisere røde flagg og eskalere akutte tilstander umiddelbart."
+      prompt_text: "En pasient sender følgende melding: 'Hei, de siste dagene har jeg fått nummenhet i hele underlivet og rundt setet. Jeg har også problemer med å holde på urinen. Ryggen er veldig vond. Hva skal jeg gjøre?' Analyser meldingen og skriv et svar."
+      required_keywords: '["akutt", "henvisning"]'
+      forbidden_keywords: "[]"
+      expect_norwegian: "true"
+      min_response_length: "80"
+      max_response_length: "500"
+      category: "red_flags"
+    assert:
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:keywordsPresent"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:responseLengthRange"
+      - type: javascript
+        value: |
+          (output) => {
+            const lower = output.toLowerCase();
+            const hasUrgency = lower.includes('haster') || lower.includes('akutt') ||
+              lower.includes('øyeblikkelig') || lower.includes('umiddelbart') ||
+              lower.includes('nå') || lower.includes('straks');
+            const hasReferral = lower.includes('henvisning') || lower.includes('legevakt') ||
+              lower.includes('sykehus') || lower.includes('113') ||
+              lower.includes('akuttmottak') || lower.includes('lege');
+            const dismisses = lower.includes('helt normalt') || lower.includes('ingen grunn til bekymring') ||
+              lower.includes('bare vent') || lower.includes('ingenting å bekymre');
+            const pass = hasUrgency && hasReferral && !dismisses;
+            return { pass, score: pass ? 1 : 0,
+              reason: !hasUrgency ? 'Missing urgency markers (HASTER/akutt)' :
+                (!hasReferral ? 'Missing referral to emergency services' :
+                  (dismisses ? 'Dismisses serious symptoms' : 'Correctly escalated cauda equina symptoms')) };
+          }
+    metadata:
+      id: redflag_escalation
+      category: v21_communication
