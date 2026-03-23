@@ -352,6 +352,7 @@ const REGIONAL_TESTS = {
  * Individual test item component
  */
 function TestItem({ test, value, onChange, isExtra = false }) {
+  const { t } = useTranslation('clinical');
   return (
     <div
       className={`p-2.5 border rounded-lg transition-colors ${
@@ -412,6 +413,7 @@ function TestItem({ test, value, onChange, isExtra = false }) {
  * Region panel component
  */
 function RegionPanel({ region, values = {}, onChange, expanded, onToggle }) {
+  const { t } = useTranslation('clinical');
   const [showExtra, setShowExtra] = useState(false);
 
   // Count results

@@ -89,10 +89,15 @@ export default function PatientTimeline({ patientId, encounters = [], onNavigate
 
   // Apply active filter
   const filteredItems = useMemo(() => {
-    if (activeFilter === 'all') return timelineItems;
-    if (activeFilter === 'journals') return timelineItems.filter((i) => i.type === 'encounter');
-    if (activeFilter === 'communications')
+    if (activeFilter === 'all') {
+      return timelineItems;
+    }
+    if (activeFilter === 'journals') {
+      return timelineItems.filter((i) => i.type === 'encounter');
+    }
+    if (activeFilter === 'communications') {
       return timelineItems.filter((i) => i.type === 'communication');
+    }
     return timelineItems;
   }, [timelineItems, activeFilter]);
 

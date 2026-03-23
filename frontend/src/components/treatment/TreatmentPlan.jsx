@@ -268,7 +268,7 @@ function GoalTracker({ goals, onToggle, lang }) {
 /**
  * Visit Progress Bar
  */
-function VisitProgress({ completed, total, lang }) {
+function VisitProgress({ completed, total, _lang }) {
   const { t } = useTranslation('exercises');
   const percentage = (completed / total) * 100;
 

@@ -188,12 +188,12 @@ function InputField({
 
 // Main Component
 export default function ReferralLetterGenerator({
-  language = 'no',
+  _language = 'no',
   initialData = null,
   patientData = null,
   senderData = null,
   onSave,
-  onSend,
+  _onSend,
 }) {
   const { t, lang } = useTranslation('assessment');
 

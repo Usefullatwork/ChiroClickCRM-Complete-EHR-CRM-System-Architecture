@@ -18,8 +18,12 @@ const PREF_ICONS = {
 };
 
 function getPref(value) {
-  if (value === true) return PREF_ICONS.ok;
-  if (value === false) return PREF_ICONS.no;
+  if (value === true) {
+    return PREF_ICONS.ok;
+  }
+  if (value === false) {
+    return PREF_ICONS.no;
+  }
   return PREF_ICONS.unknown;
 }
 
@@ -32,20 +36,24 @@ function getInitials(patient) {
 export default function PatientChartSidebar({
   patient,
   encounters = [],
-  isEditing,
+  _isEditing,
   onNavigate,
   t: tProp,
-  lang: langProp,
+  lang: _langProp,
 }) {
   const { t: tHook } = useTranslation('patients');
   const t = (key, fallback) => {
     if (tProp) {
       const result = tProp(key);
-      if (result && result !== key) return result;
+      if (result && result !== key) {
+        return result;
+      }
     }
     return tHook(key, fallback);
   };
-  if (!patient) return null;
+  if (!patient) {
+    return null;
+  }
 
   const age = calculateAge(patient.date_of_birth);
   const hasRedFlags = patient.red_flags && patient.red_flags.length > 0;
@@ -77,7 +85,7 @@ export default function PatientChartSidebar({
           {patient.first_name} {patient.last_name}
         </h2>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          {age != null && `${age} ${t('sidebarYears', 'år')}`}
+          {age !== null && `${age} ${t('sidebarYears', 'år')}`}
           {patient.solvit_id && ` \u00b7 ID: ${patient.solvit_id}`}
         </p>
         <div className="mt-1.5">

@@ -35,7 +35,9 @@ const EXACT_RENAMES = {
 const PREFIX_RENAMES = [{ from: 'chiroclickcrm_autosave_', to: 'chiroclickehr_autosave_' }];
 
 export function migrateLocalStorage() {
-  if (localStorage.getItem(MIGRATION_FLAG)) return;
+  if (localStorage.getItem(MIGRATION_FLAG)) {
+    return;
+  }
 
   // 1. Exact key renames
   for (const [oldKey, newKey] of Object.entries(EXACT_RENAMES)) {

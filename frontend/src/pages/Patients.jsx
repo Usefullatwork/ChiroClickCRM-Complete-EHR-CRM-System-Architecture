@@ -92,8 +92,12 @@ export default function Patients() {
   const sortedPatients = [...patients].sort((a, b) => {
     const aHasFlags = a.red_flags && a.red_flags.length > 0;
     const bHasFlags = b.red_flags && b.red_flags.length > 0;
-    if (aHasFlags && !bHasFlags) return -1;
-    if (!aHasFlags && bHasFlags) return 1;
+    if (aHasFlags && !bHasFlags) {
+      return -1;
+    }
+    if (!aHasFlags && bHasFlags) {
+      return 1;
+    }
     return 0;
   });
 
@@ -101,7 +105,9 @@ export default function Patients() {
   const handleTableKeyDown = useCallback(
     (e) => {
       // Skip if focus is inside the search input
-      if (searchInputRef.current && searchInputRef.current.contains(document.activeElement)) return;
+      if (searchInputRef.current && searchInputRef.current.contains(document.activeElement)) {
+        return;
+      }
 
       if (e.key === 'ArrowDown') {
         e.preventDefault();
@@ -119,9 +125,13 @@ export default function Patients() {
 
   useEffect(() => {
     const tbody = tableBodyRef.current;
-    if (!tbody) return;
+    if (!tbody) {
+      return;
+    }
     const table = tbody.closest('table');
-    if (!table) return;
+    if (!table) {
+      return;
+    }
 
     table.addEventListener('keydown', handleTableKeyDown);
     return () => table.removeEventListener('keydown', handleTableKeyDown);

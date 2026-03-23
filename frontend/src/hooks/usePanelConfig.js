@@ -35,7 +35,9 @@ export function usePanelConfig() {
     apiClient
       .get('/clinical-settings/panels')
       .then((res) => {
-        if (cancelled) return;
+        if (cancelled) {
+          return;
+        }
         const data = res.data?.data || res.data;
         if (data?.panels?.length) {
           setPanels(data.panels);
@@ -46,7 +48,9 @@ export function usePanelConfig() {
         // Use defaults on error
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       });
     return () => {
       cancelled = true;

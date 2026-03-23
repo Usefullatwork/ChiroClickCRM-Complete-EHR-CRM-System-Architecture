@@ -569,7 +569,9 @@ export const saveAnatomyFindings = async (encounterId, findings) => {
   try {
     await query('DELETE FROM encounter_anatomy_findings WHERE encounter_id = $1', [encounterId]);
 
-    if (!findings || findings.length === 0) return { saved: 0 };
+    if (!findings || findings.length === 0) {
+      return { saved: 0 };
+    }
 
     const values = [];
     const placeholders = [];
@@ -670,7 +672,9 @@ const getDiagnosisFindings = async (diagnosisCode) => {
 // Reverse lookup: given body regions, suggest diagnosis codes
 const getCodesFromFindings = async (bodyRegions) => {
   try {
-    if (!bodyRegions || bodyRegions.length === 0) return [];
+    if (!bodyRegions || bodyRegions.length === 0) {
+      return [];
+    }
     const result = await query(
       `SELECT diagnosis_code, diagnosis_name,
               COUNT(*) as matching_regions,

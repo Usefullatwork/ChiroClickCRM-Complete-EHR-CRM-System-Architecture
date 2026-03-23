@@ -419,7 +419,9 @@ export const checkExerciseInactivity = async (daysThreshold = 7) => {
           `SELECT exercise_reminder_enabled FROM patient_communication_preferences WHERE patient_id = $1`,
           [patient.patient_id]
         );
-        if (prefsResult.rows[0]?.exercise_reminder_enabled === false) continue;
+        if (prefsResult.rows[0]?.exercise_reminder_enabled === false) {
+          continue;
+        }
       } catch (_prefErr) {
         // Table may not exist — proceed
       }
@@ -430,7 +432,9 @@ export const checkExerciseInactivity = async (daysThreshold = 7) => {
           `SELECT settings->>'reminder_exercise_enabled' as enabled FROM organizations WHERE id = $1`,
           [patient.organization_id]
         );
-        if (orgSettings.rows[0]?.enabled === 'false') continue;
+        if (orgSettings.rows[0]?.enabled === 'false') {
+          continue;
+        }
       } catch (_orgErr) {
         // Org setting not available — proceed
       }

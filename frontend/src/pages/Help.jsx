@@ -10,7 +10,7 @@ import {
   Calendar,
   Users,
   FileText,
-  BarChart3,
+  BarChart3 as _BarChart3,
 } from 'lucide-react';
 
 function ShortcutKey({ children }) {
@@ -22,7 +22,7 @@ function ShortcutKey({ children }) {
 }
 
 export default function Help() {
-  const { t } = useTranslation('common');
+  const { t: _t } = useTranslation('common');
 
   const sections = [
     {

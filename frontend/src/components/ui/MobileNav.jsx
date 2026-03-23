@@ -356,6 +356,7 @@ export function MobileHeader({
   onBack,
   className = '',
 }) {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { _prefersReducedMotion } = useMediaQuery();
 

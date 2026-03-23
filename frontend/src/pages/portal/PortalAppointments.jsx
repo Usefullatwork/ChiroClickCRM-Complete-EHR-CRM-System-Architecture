@@ -15,7 +15,7 @@ import {
   AlertCircle,
   CheckCircle,
   History,
-  RefreshCw,
+  RefreshCw as _RefreshCw,
 } from 'lucide-react';
 import { patientPortalAPI } from '../../services/api';
 import { useTranslation } from '../../i18n';

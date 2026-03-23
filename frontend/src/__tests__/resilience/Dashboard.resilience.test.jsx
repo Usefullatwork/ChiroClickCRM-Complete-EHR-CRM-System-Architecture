@@ -2,7 +2,7 @@
  * Dashboard Resilience Tests
  * Verify Dashboard renders gracefully with null, empty, and extreme data
  */
-import { render, screen } from '@testing-library/react';
+import { render, screen as _screen } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';

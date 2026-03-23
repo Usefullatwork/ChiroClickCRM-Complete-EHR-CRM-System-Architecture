@@ -223,7 +223,7 @@ const SuggestionTypeCard = ({ type, data, t, maxTotal }) => {
 };
 
 // Main Dashboard Component
-export default function AIPerformanceDashboard({ language = 'NO' }) {
+export default function AIPerformanceDashboard({ language: _language = 'NO' }) {
   const { t: translate } = useTranslation('analytics');
   const t = useMemo(() => buildTexts(translate), [translate]);
   const queryClient = useQueryClient();

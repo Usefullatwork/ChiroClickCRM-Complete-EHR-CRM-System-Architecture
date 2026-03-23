@@ -29,7 +29,7 @@ import PatientTimeline from '../components/patients/PatientTimeline';
 import TreatmentPlanProgress from '../components/treatment/TreatmentPlanProgress';
 import OutcomeChart from '../components/clinical/OutcomeChart';
 import ComplianceDashboard from '../components/clinical/ComplianceDashboard';
-import Breadcrumbs from '../components/common/Breadcrumbs';
+import _Breadcrumbs from '../components/common/Breadcrumbs';
 import { useTranslation } from '../i18n';
 import usePatientPresence from '../hooks/usePatientPresence';
 import { useAuth } from '../hooks/useAuth';

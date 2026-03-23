@@ -24,7 +24,7 @@ export default function PortalMessages() {
   const { t } = useTranslation('portal');
   const [loading, setLoading] = useState(true);
   const [messages, setMessages] = useState([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [_unreadCount, setUnreadCount] = useState(0);
   const [error, setError] = useState(null);
   const [view, setView] = useState('inbox'); // inbox | compose | thread
   const [selectedMessage, setSelectedMessage] = useState(null);
@@ -52,7 +52,9 @@ export default function PortalMessages() {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!composeForm.body.trim()) return;
+    if (!composeForm.body.trim()) {
+      return;
+    }
     try {
       setSendStatus('sending');
       await patientPortalAPI.sendMessage(composeForm);
@@ -71,7 +73,9 @@ export default function PortalMessages() {
 
   const handleReply = async (e) => {
     e.preventDefault();
-    if (!replyBody.trim() || !selectedMessage) return;
+    if (!replyBody.trim() || !selectedMessage) {
+      return;
+    }
     try {
       setSendStatus('sending');
       await patientPortalAPI.sendMessage({

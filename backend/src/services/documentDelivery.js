@@ -263,7 +263,7 @@ export async function deliverDocument(
     deliveryStatus.email = true;
     logger.info('Document delivered via email', {
       documentType,
-      patientId: patientId.slice(0, 8) + '...',
+      patientId: `${patientId.slice(0, 8)}...`,
     });
   }
 
@@ -292,7 +292,7 @@ export async function deliverDocument(
     deliveryStatus.sms = true;
     logger.info('Document delivered via SMS', {
       documentType,
-      patientId: patientId.slice(0, 8) + '...',
+      patientId: `${patientId.slice(0, 8)}...`,
     });
   }
 

@@ -66,6 +66,4 @@ export const TOTAL_CONTEXT_BUDGET = 3000;
  * @param {string} taskType
  * @returns {string[]} Array of tier IDs ['L0', 'L1', 'L2']
  */
-export const getTiersForTask = (taskType) => {
-  return TASK_TIER_MAP[taskType] || ['L0'];
-};
+export const getTiersForTask = (taskType) => TASK_TIER_MAP[taskType] || ['L0'];

@@ -126,7 +126,9 @@ export default function DashboardLayout() {
 
   const isActive = useCallback(
     (href) => {
-      if (href === '/') return location.pathname === '/';
+      if (href === '/') {
+        return location.pathname === '/';
+      }
       return location.pathname.startsWith(href);
     },
     [location.pathname]

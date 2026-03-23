@@ -185,12 +185,12 @@ function InputField({
 
 // Main SickNoteGenerator Component
 export default function SickNoteGenerator({
-  language = 'no', // Kept for backwards compat
+  _language = 'no', // Kept for backwards compat
   initialData = null,
   patientData = null,
   practitionerData = null,
   onSave,
-  onSend,
+  _onSend,
 }) {
   const { t, lang } = useTranslation('assessment');
 

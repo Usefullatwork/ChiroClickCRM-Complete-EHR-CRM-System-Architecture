@@ -61,7 +61,9 @@ export default function PortalDocuments() {
   };
 
   const handleDownload = async (doc) => {
-    if (!doc.downloadToken) return;
+    if (!doc.downloadToken) {
+      return;
+    }
     try {
       setDownloading(doc.id);
       const res = await patientPortalAPI.downloadDocument(doc.downloadToken);
@@ -87,7 +89,9 @@ export default function PortalDocuments() {
   };
 
   const formatDate = (dateStr) => {
-    if (!dateStr) return '';
+    if (!dateStr) {
+      return '';
+    }
     return new Date(dateStr).toLocaleDateString('nb-NO', {
       day: '2-digit',
       month: '2-digit',

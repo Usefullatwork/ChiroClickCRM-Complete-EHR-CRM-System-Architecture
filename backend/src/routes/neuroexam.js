@@ -22,7 +22,7 @@ import {
   logBPPVTreatmentSchema,
   getPatientHistorySchema,
 } from '../validators/neuroexam.validators.js';
-import { query as dbQuery, getClient, pool } from '../config/database.js';
+import { query as dbQuery, getClient } from '../config/database.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 

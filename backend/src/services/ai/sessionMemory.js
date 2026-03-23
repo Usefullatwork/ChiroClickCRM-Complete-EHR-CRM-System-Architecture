@@ -95,7 +95,9 @@ const extractLearnings = (taskType, output, metadata = {}) => {
  * Store learnings from an AI generation into session memory
  */
 export const recordLearning = (organizationId, patientId, taskType, output, metadata = {}) => {
-  if (!TIERED_ENABLED) return;
+  if (!TIERED_ENABLED) {
+    return;
+  }
 
   const key = sessionKey(organizationId, patientId);
   if (!sessionStore.has(key)) {
@@ -125,11 +127,15 @@ export const recordLearning = (organizationId, patientId, taskType, output, meta
  * Get session learnings formatted as context text
  */
 export const getSessionContext = (organizationId, patientId) => {
-  if (!TIERED_ENABLED) return '';
+  if (!TIERED_ENABLED) {
+    return '';
+  }
 
   const key = sessionKey(organizationId, patientId);
   const session = sessionStore.get(key);
-  if (!session || session.learnings.length === 0) return '';
+  if (!session || session.learnings.length === 0) {
+    return '';
+  }
 
   const parts = [];
 

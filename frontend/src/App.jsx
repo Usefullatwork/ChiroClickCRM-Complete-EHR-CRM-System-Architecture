@@ -82,7 +82,9 @@ function ModuleRoute({ module, children }) {
     }
   }, [module, isModuleEnabled, navigate]);
 
-  if (!isModuleEnabled(module)) return null;
+  if (!isModuleEnabled(module)) {
+    return null;
+  }
   return children;
 }
 
@@ -94,7 +96,9 @@ function App() {
 
   // Listen for Electron File menu export/import events
   useEffect(() => {
-    if (!window.electronAPI) return;
+    if (!window.electronAPI) {
+      return;
+    }
     window.electronAPI.onExportData?.((filePath) => {
       fetch(`${getApiBaseUrl()}/api/v1/system/export`, {
         method: 'POST',

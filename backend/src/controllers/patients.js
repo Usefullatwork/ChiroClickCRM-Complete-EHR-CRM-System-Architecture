@@ -368,8 +368,12 @@ export const exportVcf = async (req, res) => {
       const firstName = (contact.first_name || '').trim();
       const lastName = (contact.last_name || '').trim();
       const phone = (contact.phone || '').trim();
-      if (!firstName && !lastName) continue;
-      if (!phone) continue;
+      if (!firstName && !lastName) {
+        continue;
+      }
+      if (!phone) {
+        continue;
+      }
 
       vcfLines.push('BEGIN:VCARD');
       vcfLines.push('VERSION:3.0');
@@ -430,7 +434,9 @@ export const exportSingleVcf = async (req, res) => {
       `N:${lastName};${firstName};;;`,
       `FN:${firstName} ${lastName}`.trim(),
     ];
-    if (phone) vcfLines.push(`TEL;TYPE=CELL:${phone}`);
+    if (phone) {
+      vcfLines.push(`TEL;TYPE=CELL:${phone}`);
+    }
     vcfLines.push('END:VCARD');
 
     const vcfContent = vcfLines.join('\r\n');

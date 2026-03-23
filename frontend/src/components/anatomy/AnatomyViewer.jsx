@@ -362,7 +362,7 @@ export default function AnatomyViewer({
             {Object.entries(spineFindings).map(([region, finding]) => {
               const isConfirmed = finding.confirmed !== false;
               const isSuggested = finding.source === 'ai_suggested';
-              const isCarriedForward = finding.source === 'carried_forward';
+              const _isCarriedForward = finding.source === 'carried_forward';
               // Three states: blue=confirmed, yellow=AI suggested, gray=carried forward
               const chipClass = isConfirmed
                 ? 'bg-blue-50 border-blue-200 text-blue-800'

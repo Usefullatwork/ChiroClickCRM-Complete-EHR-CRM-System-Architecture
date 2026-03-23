@@ -26,7 +26,7 @@ export const augmentWithRAG = async (sanitizedPrompt, clinicalContext, options =
   const { organizationId, patientId, taskType } = options;
 
   let prompt = sanitizedPrompt;
-  let ragContext = null;
+  const ragContext = null;
 
   // Step 1: Add tiered patient context if enabled
   if (TIERED_ENABLED && patientId && organizationId) {

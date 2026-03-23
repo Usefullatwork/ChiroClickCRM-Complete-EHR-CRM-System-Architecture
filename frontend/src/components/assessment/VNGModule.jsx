@@ -262,14 +262,14 @@ function Section({ title, icon: Icon, children, defaultOpen = true }) {
 
 // Main VNG Module Component
 export default function VNGModule({
-  language = 'en',
+  _language = 'en',
   initialData = null,
   onSave,
   _onGenerateReport,
   patientName = '',
   examDate = new Date().toISOString().split('T')[0],
 }) {
-  const { t, lang } = useTranslation('assessment');
+  const { t, lang: _lang } = useTranslation('assessment');
   const [data, setData] = useState(initialData || getDefaultVNGData());
   const [activeTab, setActiveTab] = useState('assessment');
 

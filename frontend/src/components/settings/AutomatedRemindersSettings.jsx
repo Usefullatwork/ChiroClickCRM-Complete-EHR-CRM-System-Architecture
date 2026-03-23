@@ -1,3 +1,4 @@
+/* global process */
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Loader2, MessageSquare, Mail } from 'lucide-react';
@@ -26,7 +27,7 @@ export default function AutomatedRemindersSettings() {
   useEffect(() => {
     if (orgResponse?.data?.organization?.settings) {
       const s = orgResponse.data.organization.settings;
-      setSettings((prev) => ({
+      setSettings((_prev) => ({
         reminder_appointment_enabled: s.reminder_appointment_enabled !== false,
         reminder_exercise_enabled: s.reminder_exercise_enabled !== false,
         recall_booking_link_enabled: s.recall_booking_link_enabled !== false,
