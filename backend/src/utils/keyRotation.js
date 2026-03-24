@@ -163,6 +163,7 @@ export const scheduleKeyRotation = () => {
  * Create encryption_keys table migration
  */
 export const createKeyRotationTable = async () => {
+  // Split into individual statements (PGlite rejects multi-statement prepared queries)
   await query(`
     CREATE TABLE IF NOT EXISTS encryption_keys (
       id SERIAL PRIMARY KEY,
@@ -170,18 +171,18 @@ export const createKeyRotationTable = async () => {
       encrypted_key TEXT NOT NULL,
       is_active BOOLEAN DEFAULT false,
       created_at TIMESTAMP DEFAULT NOW(),
-      rotated_at TIMESTAMP,
-      CONSTRAINT one_active_key CHECK (
-        (is_active = false) OR
-        (SELECT COUNT(*) FROM encryption_keys WHERE is_active = true) <= 1
-      )
-    );
+      rotated_at TIMESTAMP
+    )
+  `);
 
+  await query(`
     CREATE INDEX IF NOT EXISTS idx_encryption_keys_active
-    ON encryption_keys(is_active) WHERE is_active = true;
+    ON encryption_keys(is_active) WHERE is_active = true
+  `);
 
+  await query(`
     CREATE INDEX IF NOT EXISTS idx_encryption_keys_version
-    ON encryption_keys(key_version);
+    ON encryption_keys(key_version)
   `);
 
   logger.info('Encryption keys table created/verified');

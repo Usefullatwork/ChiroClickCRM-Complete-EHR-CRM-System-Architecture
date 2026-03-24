@@ -178,8 +178,13 @@ export async function initializeDatabase(db) {
     `ALTER TABLE clinical_encounter_versions ADD COLUMN IF NOT EXISTS changed_by UUID`,
     `ALTER TABLE clinical_encounter_versions ADD COLUMN IF NOT EXISTS changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`,
     // =========================================================================
-    // CRM columns on patients table (from migration 010_crm_full_features)
-    // Must be here (not in applySchemaPatches) so they run AFTER schema.sql
+    // Scheduled job logs columns (scheduler.js writes duration_ms, result, executed_at)
+    // =========================================================================
+    `ALTER TABLE scheduled_job_logs ADD COLUMN IF NOT EXISTS duration_ms INTEGER`,
+    `ALTER TABLE scheduled_job_logs ADD COLUMN IF NOT EXISTS result JSONB`,
+    `ALTER TABLE scheduled_job_logs ADD COLUMN IF NOT EXISTS executed_at TIMESTAMP DEFAULT NOW()`,
+    // =========================================================================
+    // CRM / lifecycle columns on patients table
     // =========================================================================
     `ALTER TABLE patients ADD COLUMN IF NOT EXISTS lifecycle_stage VARCHAR(30) DEFAULT 'NEW'`,
     `ALTER TABLE patients ADD COLUMN IF NOT EXISTS engagement_score INTEGER DEFAULT 50`,
@@ -190,6 +195,12 @@ export async function initializeDatabase(db) {
     `ALTER TABLE patients ADD COLUMN IF NOT EXISTS acquisition_campaign VARCHAR(100)`,
     `ALTER TABLE patients ADD COLUMN IF NOT EXISTS visit_frequency_days NUMERIC`,
     `ALTER TABLE patients ADD COLUMN IF NOT EXISTS first_visit_date DATE`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS total_visits INTEGER DEFAULT 0`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS total_revenue DECIMAL(12,2) DEFAULT 0`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS avg_visit_value DECIMAL(10,2) DEFAULT 0`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS lifetime_value DECIMAL(12,2) DEFAULT 0`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS last_visit_date DATE`,
+    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS treatment_completion_rate DECIMAL(5,2)`,
   ];
 
   for (const sql of missingColumns) {
@@ -521,18 +532,7 @@ async function applySchemaPatches(db) {
       fresh BOOLEAN DEFAULT true,
       created_at TIMESTAMP DEFAULT NOW()
     )`,
-    // =========================================================================
-    // CRM columns on patients table (from migration 010_crm_full_features)
-    // =========================================================================
-    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS lifecycle_stage VARCHAR(30) DEFAULT 'NEW'`,
-    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS engagement_score INTEGER DEFAULT 50`,
-    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS is_vip BOOLEAN DEFAULT false`,
-    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS tags JSONB DEFAULT '[]'::jsonb`,
-    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS last_contact_date TIMESTAMP`,
-    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS acquisition_source VARCHAR(50)`,
-    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS acquisition_campaign VARCHAR(100)`,
-    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS visit_frequency_days NUMERIC`,
-    `ALTER TABLE patients ADD COLUMN IF NOT EXISTS first_visit_date DATE`,
+    // CRM patient columns are in initializeDatabase missingColumns (avoid duplication)
     // =========================================================================
     // CRM Leads table (from migration 010_crm_full_features)
     // Uses organization_id (not clinic_id) to match the service layer
@@ -1066,6 +1066,206 @@ async function applySchemaPatches(db) {
       display_order INTEGER DEFAULT 0,
       created_at TIMESTAMP DEFAULT NOW()
     )`,
+    // =========================================================================
+    // Appointment reminders (appointmentReminders.js + cron every 15min)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS appointment_reminders (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID NOT NULL,
+      appointment_id UUID NOT NULL,
+      patient_id UUID NOT NULL,
+      reminder_type VARCHAR(20) NOT NULL DEFAULT 'SMS',
+      channel VARCHAR(10),
+      hours_before INTEGER,
+      scheduled_send_at TIMESTAMP,
+      scheduled_at TIMESTAMP,
+      sent_at TIMESTAMP,
+      status VARCHAR(20) DEFAULT 'PENDING',
+      failure_reason TEXT,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`,
+    // =========================================================================
+    // AI suggestions (promptBuilder.js INSERT, aiAnalytics.js SELECT/UPDATE)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS ai_suggestions (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID NOT NULL,
+      encounter_id UUID,
+      patient_id UUID,
+      provider_id UUID,
+      suggestion_type VARCHAR(50) NOT NULL,
+      soap_section VARCHAR(20),
+      input_text TEXT,
+      suggested_text TEXT NOT NULL,
+      model_name VARCHAR(100),
+      model_version VARCHAR(50),
+      confidence_score DECIMAL(3,2),
+      confidence_level VARCHAR(20),
+      has_red_flags BOOLEAN DEFAULT false,
+      red_flags JSONB,
+      requires_review BOOLEAN DEFAULT true,
+      feedback_status VARCHAR(30) DEFAULT 'PENDING',
+      feedback_text TEXT,
+      modified_text TEXT,
+      feedback_at TIMESTAMP,
+      feedback_by UUID,
+      was_helpful BOOLEAN,
+      helpfulness_rating INTEGER,
+      time_saved_seconds INTEGER,
+      accuracy_rating INTEGER,
+      request_duration_ms INTEGER,
+      tokens_used INTEGER,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`,
+    // =========================================================================
+    // AI performance metrics (aiAnalytics.js aggregation endpoint)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS ai_performance_metrics (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID NOT NULL,
+      period_start DATE NOT NULL,
+      period_end DATE NOT NULL,
+      period_type VARCHAR(20) NOT NULL,
+      model_name VARCHAR(100),
+      total_suggestions INTEGER DEFAULT 0,
+      approved_count INTEGER DEFAULT 0,
+      modified_count INTEGER DEFAULT 0,
+      rejected_count INTEGER DEFAULT 0,
+      pending_count INTEGER DEFAULT 0,
+      avg_confidence_score DECIMAL(3,2),
+      avg_helpfulness_rating DECIMAL(3,2),
+      avg_accuracy_rating DECIMAL(3,2),
+      avg_latency_ms NUMERIC,
+      total_time_saved_minutes INTEGER DEFAULT 0,
+      red_flags_detected INTEGER DEFAULT 0,
+      red_flags_confirmed INTEGER DEFAULT 0,
+      red_flags_false_positive INTEGER DEFAULT 0,
+      metrics_by_model JSONB,
+      metrics_by_type JSONB,
+      metrics_by_provider JSONB,
+      approval_rate DECIMAL(5,2),
+      accuracy_rate DECIMAL(5,2),
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`,
+    // =========================================================================
+    // AI API usage tracking (budgetTracker.js INSERT, aiAnalytics.js SELECT)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS ai_api_usage (
+      id SERIAL PRIMARY KEY,
+      provider VARCHAR(20) NOT NULL DEFAULT 'claude',
+      model VARCHAR(100) NOT NULL,
+      input_tokens INTEGER NOT NULL DEFAULT 0,
+      output_tokens INTEGER NOT NULL DEFAULT 0,
+      cache_read_tokens INTEGER NOT NULL DEFAULT 0,
+      cache_creation_tokens INTEGER NOT NULL DEFAULT 0,
+      cost_usd NUMERIC(10,6) NOT NULL DEFAULT 0,
+      task_type VARCHAR(50),
+      duration_ms INTEGER,
+      organization_id UUID,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`,
+    // =========================================================================
+    // Communication queue (automatedComms.js + cron every 30min)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS communication_queue (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID,
+      patient_id UUID,
+      type VARCHAR(20) NOT NULL DEFAULT 'SMS',
+      content TEXT NOT NULL,
+      subject TEXT,
+      template_id UUID,
+      trigger_type VARCHAR(50),
+      scheduled_at TIMESTAMP DEFAULT NOW(),
+      priority VARCHAR(20) DEFAULT 'normal',
+      status VARCHAR(20) DEFAULT 'pending',
+      retry_count INTEGER DEFAULT 0,
+      last_error TEXT,
+      processed_at TIMESTAMP,
+      notes TEXT,
+      sent_at TIMESTAMP,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )`,
+    // =========================================================================
+    // Scheduled communications (smartScheduler.js + cron every 30min)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS scheduled_communications (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID NOT NULL,
+      patient_id UUID NOT NULL,
+      communication_type VARCHAR(20) NOT NULL DEFAULT 'sms',
+      template_id UUID,
+      custom_message TEXT,
+      scheduled_date DATE NOT NULL,
+      scheduled_time TIME DEFAULT '10:00:00',
+      trigger_type VARCHAR(50),
+      trigger_appointment_id UUID,
+      trigger_days_after INTEGER,
+      status VARCHAR(20) DEFAULT 'pending',
+      conflict_detected_at TIMESTAMP,
+      conflict_appointment_id UUID,
+      conflict_resolution VARCHAR(30),
+      resolved_by UUID,
+      resolved_at TIMESTAMP,
+      sent_at TIMESTAMP,
+      created_by UUID,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )`,
+    // =========================================================================
+    // Workflow scheduled actions (automations/engine.js + actionExecutor.js)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS workflow_scheduled_actions (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      execution_id UUID NOT NULL,
+      action_type VARCHAR(50) NOT NULL,
+      action_config JSONB NOT NULL,
+      scheduled_for TIMESTAMP NOT NULL,
+      status VARCHAR(20) DEFAULT 'PENDING',
+      completed_at TIMESTAMP,
+      error_message TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`,
+    // =========================================================================
+    // Scheduler decisions (smartScheduler.js conflict resolution)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS scheduler_decisions (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID NOT NULL,
+      scheduled_communication_id UUID NOT NULL,
+      patient_id UUID NOT NULL,
+      decision_type VARCHAR(30) NOT NULL,
+      original_date DATE NOT NULL,
+      suggested_new_date DATE,
+      conflict_reason TEXT,
+      new_appointment_date DATE,
+      status VARCHAR(20) NOT NULL DEFAULT 'pending',
+      decision VARCHAR(30),
+      decided_by UUID,
+      decided_at TIMESTAMP,
+      decision_note TEXT,
+      notified_at TIMESTAMP,
+      created_at TIMESTAMP DEFAULT NOW(),
+      priority INTEGER DEFAULT 5
+    )`,
+    // =========================================================================
+    // Patient communication preferences (reminder + comms processing)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS patient_communication_preferences (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      patient_id UUID NOT NULL UNIQUE,
+      organization_id UUID,
+      sms_enabled BOOLEAN DEFAULT true,
+      email_enabled BOOLEAN DEFAULT true,
+      reminder_enabled BOOLEAN DEFAULT true,
+      exercise_reminder_enabled BOOLEAN DEFAULT true,
+      recall_enabled BOOLEAN DEFAULT true,
+      marketing_enabled BOOLEAN DEFAULT false,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )`,
   ];
 
   let applied = 0;
@@ -1120,6 +1320,23 @@ async function applyPerformanceIndexes(db) {
     // Follow-ups
     `CREATE INDEX IF NOT EXISTS idx_followups_patient ON follow_ups (patient_id)`,
     `CREATE INDEX IF NOT EXISTS idx_followups_org_status ON follow_ups (organization_id, status)`,
+    // Appointment reminders
+    `CREATE INDEX IF NOT EXISTS idx_reminders_org ON appointment_reminders (organization_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_reminders_status_scheduled ON appointment_reminders (status, scheduled_send_at)`,
+    `CREATE UNIQUE INDEX IF NOT EXISTS idx_reminders_apt_hours ON appointment_reminders (appointment_id, hours_before)`,
+    // AI suggestions
+    `CREATE INDEX IF NOT EXISTS idx_ai_suggestions_org_type ON ai_suggestions (organization_id, suggestion_type)`,
+    `CREATE INDEX IF NOT EXISTS idx_ai_suggestions_model ON ai_suggestions (model_name, feedback_status)`,
+    // AI API usage
+    `CREATE INDEX IF NOT EXISTS idx_ai_api_usage_provider ON ai_api_usage (provider)`,
+    `CREATE INDEX IF NOT EXISTS idx_ai_api_usage_org ON ai_api_usage (organization_id)`,
+    // Communication queue
+    `CREATE INDEX IF NOT EXISTS idx_comm_queue_status ON communication_queue (status, scheduled_at)`,
+    // Scheduled communications
+    `CREATE INDEX IF NOT EXISTS idx_sched_comms_org_status ON scheduled_communications (organization_id, status)`,
+    `CREATE INDEX IF NOT EXISTS idx_sched_comms_date ON scheduled_communications (scheduled_date)`,
+    // Workflow scheduled actions
+    `CREATE INDEX IF NOT EXISTS idx_sched_actions_time ON workflow_scheduled_actions (scheduled_for)`,
   ];
 
   let applied = 0;
