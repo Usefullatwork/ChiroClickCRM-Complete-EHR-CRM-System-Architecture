@@ -4,7 +4,7 @@
  * All methods take organizationId as first parameter and return data objects.
  */
 
-import { query } from '../config/database.js';
+import { query, transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 import crypto from 'crypto';
 
@@ -319,30 +319,34 @@ export const handleBookingRequest = async (organizationId, requestId, action, da
   const bookingReq = reqResult.rows[0];
 
   if (action === 'approve') {
-    const apptResult = await query(
-      `INSERT INTO appointments
-        (patient_id, organization_id, appointment_date, appointment_time, duration, visit_type, status, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, 'confirmed', $7)
-       RETURNING *`,
-      [
-        bookingReq.patient_id,
-        organizationId,
-        appointment_date,
-        appointment_time,
-        duration || 30,
-        visit_type || 'consultation',
-        userId,
-      ]
-    );
+    const appointmentId = await transaction(async (client) => {
+      const apptResult = await client.query(
+        `INSERT INTO appointments
+          (patient_id, organization_id, appointment_date, appointment_time, duration, visit_type, status, created_by)
+         VALUES ($1, $2, $3, $4, $5, $6, 'confirmed', $7)
+         RETURNING *`,
+        [
+          bookingReq.patient_id,
+          organizationId,
+          appointment_date,
+          appointment_time,
+          duration || 30,
+          visit_type || 'consultation',
+          userId,
+        ]
+      );
 
-    await query(
-      `UPDATE portal_booking_requests
-       SET status = 'CONFIRMED', handled_by = $1, handled_at = NOW(), appointment_id = $2
-       WHERE id = $3`,
-      [userId, apptResult.rows[0].id, requestId]
-    );
+      await client.query(
+        `UPDATE portal_booking_requests
+         SET status = 'CONFIRMED', handled_by = $1, handled_at = NOW(), appointment_id = $2
+         WHERE id = $3`,
+        [userId, apptResult.rows[0].id, requestId]
+      );
 
-    return { ...bookingReq, status: 'CONFIRMED', appointment_id: apptResult.rows[0].id };
+      return apptResult.rows[0].id;
+    });
+
+    return { ...bookingReq, status: 'CONFIRMED', appointment_id: appointmentId };
   }
 
   // Reject

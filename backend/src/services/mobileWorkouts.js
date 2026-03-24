@@ -3,7 +3,7 @@
  * Business logic for daily workouts, logging, progress, streaks, and achievements
  */
 
-import { query } from '../config/database.js';
+import { query, transaction } from '../config/database.js';
 
 /**
  * Get today's workout across all active enrollments
@@ -115,35 +115,37 @@ export async function logWorkout(mobileUserId, workoutData) {
     notes,
   } = workoutData;
 
-  const result = await query(
-    `INSERT INTO workout_logs (
-      mobile_user_id, enrollment_id, program_exercise_id, exercise_id,
-      sets_completed, reps_completed, weight_kg, hold_seconds_completed,
-      rir_actual, pain_rating, difficulty_rating, soreness_rating, notes
-    )
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-    RETURNING *`,
-    [
-      mobileUserId,
-      enrollmentId,
-      programExerciseId,
-      exerciseId,
-      setsCompleted,
-      repsCompleted,
-      weightKg,
-      holdSecondsCompleted,
-      rirActual,
-      painRating,
-      difficultyRating,
-      sorenessRating,
-      notes,
-    ]
-  );
+  return await transaction(async (client) => {
+    const result = await client.query(
+      `INSERT INTO workout_logs (
+        mobile_user_id, enrollment_id, program_exercise_id, exercise_id,
+        sets_completed, reps_completed, weight_kg, hold_seconds_completed,
+        rir_actual, pain_rating, difficulty_rating, soreness_rating, notes
+      )
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+      RETURNING *`,
+      [
+        mobileUserId,
+        enrollmentId,
+        programExerciseId,
+        exerciseId,
+        setsCompleted,
+        repsCompleted,
+        weightKg,
+        holdSecondsCompleted,
+        rirActual,
+        painRating,
+        difficultyRating,
+        sorenessRating,
+        notes,
+      ]
+    );
 
-  // Update streak
-  await updateStreak(mobileUserId);
+    // Update streak and check achievements within the same transaction
+    await updateStreak(client, mobileUserId);
 
-  return result.rows[0];
+    return result.rows[0];
+  });
 }
 
 /**
@@ -205,16 +207,18 @@ export async function getAchievements(mobileUserId) {
 
 /**
  * Update user streak after logging workout
+ * @param {object} client - Transaction client for atomic operations
+ * @param {string} userId - Mobile user UUID
  */
-async function updateStreak(userId) {
+async function updateStreak(client, userId) {
   const today = new Date().toISOString().split('T')[0];
 
-  const streakResult = await query(`SELECT * FROM user_streaks WHERE mobile_user_id = $1`, [
+  const streakResult = await client.query(`SELECT * FROM user_streaks WHERE mobile_user_id = $1`, [
     userId,
   ]);
 
   if (streakResult.rows.length === 0) {
-    await query(
+    await client.query(
       `INSERT INTO user_streaks (mobile_user_id, current_streak, longest_streak, last_workout_date, streak_start_date)
        VALUES ($1, 1, 1, $2, $2)`,
       [userId, today]
@@ -247,20 +251,23 @@ async function updateStreak(userId) {
     streakStart = today;
   }
 
-  await query(
+  await client.query(
     `UPDATE user_streaks
      SET current_streak = $1, longest_streak = $2, last_workout_date = $3, streak_start_date = $4, updated_at = NOW()
      WHERE mobile_user_id = $5`,
     [newStreak, newLongest, today, streakStart, userId]
   );
 
-  await checkStreakAchievements(userId, newStreak);
+  await checkStreakAchievements(client, userId, newStreak);
 }
 
 /**
  * Check and award streak achievements
+ * @param {object} client - Transaction client for atomic operations
+ * @param {string} userId - Mobile user UUID
+ * @param {number} streak - Current streak count
  */
-async function checkStreakAchievements(userId, streak) {
+async function checkStreakAchievements(client, userId, streak) {
   const milestones = [
     { days: 7, type: 'streak_7', name: '7-Day Streak' },
     { days: 14, type: 'streak_14', name: '2-Week Streak' },
@@ -271,7 +278,7 @@ async function checkStreakAchievements(userId, streak) {
 
   for (const milestone of milestones) {
     if (streak >= milestone.days) {
-      await query(
+      await client.query(
         `INSERT INTO user_achievements (mobile_user_id, achievement_type, achievement_name, description)
          VALUES ($1, $2, $3, $4)
          ON CONFLICT (mobile_user_id, achievement_type, achievement_name) DO NOTHING`,
