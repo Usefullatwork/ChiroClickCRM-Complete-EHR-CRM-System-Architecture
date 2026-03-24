@@ -215,6 +215,15 @@ router.post('/patient/:patientId/appointments', async (req, res) => {
       return res.status(400).json({ error: 'appointment_date and appointment_time are required' });
     }
 
+    // Verify patient belongs to this organization before creating appointment
+    const patientCheck = await query(
+      'SELECT id FROM patients WHERE id = $1 AND organization_id = $2',
+      [patientId, orgId]
+    );
+    if (patientCheck.rows.length === 0) {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+
     const result = await query(
       `INSERT INTO appointments (patient_id, organization_id, appointment_date, appointment_time, duration, visit_type, status, notes, created_by)
        VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8)
@@ -269,9 +278,9 @@ router.get('/patient/:patientId/exercises', async (req, res) => {
         el.category, el.body_region, el.difficulty, el.video_url, el.image_url
       FROM patient_exercise_prescriptions pep
       JOIN exercise_library el ON el.id = pep.exercise_id
-      WHERE pep.patient_id = $1 AND pep.status = 'active'
+      WHERE pep.patient_id = $1 AND pep.organization_id = $2 AND pep.status = 'active'
       ORDER BY pep.created_at DESC`,
-      [patientId]
+      [patientId, req.organizationId]
     );
 
     res.json({ exercises: result.rows });
@@ -312,10 +321,11 @@ router.get('/patient/:patientId/outcomes', async (req, res) => {
               oq.name, oq.name_no, oq.category
        FROM outcome_submissions os
        LEFT JOIN outcome_questionnaires oq ON oq.id = os.questionnaire_id
-       WHERE os.patient_id = $1
+       JOIN patients p ON p.id = os.patient_id
+       WHERE os.patient_id = $1 AND p.organization_id = $2
        ORDER BY os.submitted_at DESC
        LIMIT 50`,
-      [patientId]
+      [patientId, req.organizationId]
     );
 
     res.json({ outcomes: result.rows });
