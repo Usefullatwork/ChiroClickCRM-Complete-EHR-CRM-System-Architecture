@@ -459,17 +459,13 @@ const generateFollowUpReminders = async () => {
 
     const result = { recalls: 0, birthdays: 0 };
 
-    // Check for patients needing 3-month recall
-    const recall3m = await automationsService.checkDaysSinceVisitTriggers(90, 'RECALL_3M');
-    result.recalls += recall3m?.count || 0;
-
-    // Check for patients needing 6-month recall
-    const recall6m = await automationsService.checkDaysSinceVisitTriggers(180, 'RECALL_6M');
-    result.recalls += recall6m?.count || 0;
+    // Check for patients needing recall (thresholds come from workflow trigger_config.days)
+    const recalls = await automationsService.checkDaysSinceVisitTriggers();
+    result.recalls = recalls?.processed || 0;
 
     // Check for upcoming birthdays
     const birthdays = await automationsService.checkBirthdayTriggers();
-    result.birthdays = birthdays?.count || 0;
+    result.birthdays = birthdays?.processed || 0;
 
     logger.info('Follow-up reminders generated:', result);
     return result;
