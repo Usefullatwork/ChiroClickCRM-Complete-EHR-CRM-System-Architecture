@@ -7,7 +7,6 @@
 import * as encounterService from './encounters.js';
 import * as examinationService from './examinations.js';
 import * as treatmentService from './treatments.js';
-import * as clinicalNotes from './clinicalNotes.js';
 import { query, transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 import { BusinessLogicError, NotFoundError } from '../utils/errors.js';

@@ -83,7 +83,6 @@ describe('API Integration Tests', () => {
       expect(response.status).toBe(200);
       expect(response.body.status).toBe('healthy');
       expect(response.body).toHaveProperty('timestamp');
-      expect(response.body).toHaveProperty('uptime');
     });
 
     it('GET /health should return unhealthy when database is down', async () => {

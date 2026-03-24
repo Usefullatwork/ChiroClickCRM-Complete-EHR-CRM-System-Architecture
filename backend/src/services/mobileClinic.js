@@ -10,10 +10,10 @@ import { generatePdf } from './documentDelivery.js';
 // Logger - noop fallback avoids raw console usage
 const noop = () => {};
 const fallbackLogger = { info: noop, error: noop, warn: noop, debug: noop };
-let logger = fallbackLogger;
+let _logger = fallbackLogger;
 try {
   const mod = await import('../utils/logger.js');
-  logger = mod.default || mod;
+  _logger = mod.default || mod;
 } catch {
   // Logger not available; structured logging disabled
 }

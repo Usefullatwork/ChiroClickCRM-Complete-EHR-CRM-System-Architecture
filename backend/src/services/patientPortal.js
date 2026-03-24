@@ -89,16 +89,14 @@ export const authenticateWithPIN = async (pin, patientId, dateOfBirth, ipAddress
 };
 
 /** Get patient profile data (already loaded by middleware). */
-export const getProfile = (portalPatient) => {
-  return {
-    id: portalPatient.patient_id,
-    firstName: portalPatient.first_name,
-    lastName: portalPatient.last_name,
-    email: portalPatient.email,
-    phone: portalPatient.phone,
-    dateOfBirth: portalPatient.date_of_birth,
-  };
-};
+export const getProfile = (portalPatient) => ({
+  id: portalPatient.patient_id,
+  firstName: portalPatient.first_name,
+  lastName: portalPatient.last_name,
+  email: portalPatient.email,
+  phone: portalPatient.phone,
+  dateOfBirth: portalPatient.date_of_birth,
+});
 
 /** Get upcoming appointments for a patient. */
 export const getAppointments = async (patientId, organizationId) => {

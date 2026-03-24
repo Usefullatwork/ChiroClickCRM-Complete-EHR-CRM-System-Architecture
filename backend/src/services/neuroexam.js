@@ -61,7 +61,9 @@ function determineClusterId(testId) {
 
 /** Determine referral urgency based on red flags and scores */
 function determineReferralUrgency(redFlags, _clusterScores) {
-  if (!redFlags || redFlags.length === 0) return null;
+  if (!redFlags || redFlags.length === 0) {
+    return null;
+  }
 
   const hasMyelopathy = redFlags.some(
     (f) =>
@@ -70,7 +72,9 @@ function determineReferralUrgency(redFlags, _clusterScores) {
       f.testId?.includes('babinski') ||
       f.testId?.includes('lhermitte')
   );
-  if (hasMyelopathy) return 'EMERGENT';
+  if (hasMyelopathy) {
+    return 'EMERGENT';
+  }
 
   const hasInstability = redFlags.some(
     (f) =>
@@ -79,12 +83,16 @@ function determineReferralUrgency(redFlags, _clusterScores) {
       f.testId?.includes('alar') ||
       f.testId?.includes('transverse')
   );
-  if (hasInstability) return 'EMERGENT';
+  if (hasInstability) {
+    return 'EMERGENT';
+  }
 
   const hasCentralSigns = redFlags.some(
     (f) => f.testId?.includes('skew') || f.label?.toLowerCase().includes('central')
   );
-  if (hasCentralSigns) return 'URGENT';
+  if (hasCentralSigns) {
+    return 'URGENT';
+  }
 
   return 'ROUTINE';
 }
