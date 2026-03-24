@@ -1266,6 +1266,77 @@ async function applySchemaPatches(db) {
       created_at TIMESTAMP DEFAULT NOW(),
       updated_at TIMESTAMP DEFAULT NOW()
     )`,
+    // =========================================================================
+    // AI feedback (aiLearning.js, aiRetraining.js, dataCuration.js — cron jobs)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS ai_feedback (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID,
+      encounter_id UUID,
+      user_id UUID,
+      suggestion_type VARCHAR(50) NOT NULL,
+      soap_section VARCHAR(20),
+      original_suggestion TEXT NOT NULL,
+      user_correction TEXT,
+      accepted BOOLEAN NOT NULL DEFAULT false,
+      correction_type VARCHAR(20),
+      confidence_score DECIMAL(4,3),
+      user_rating INTEGER,
+      feedback_notes TEXT,
+      template_id UUID,
+      context_data JSONB,
+      time_to_decision INTEGER,
+      was_helpful BOOLEAN,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`,
+    // =========================================================================
+    // Portal documents (documentDelivery.js, patientPortal.js — v2.1)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS portal_documents (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID NOT NULL,
+      patient_id UUID NOT NULL,
+      document_type VARCHAR(50) NOT NULL,
+      document_id UUID,
+      title VARCHAR(255) NOT NULL,
+      download_token VARCHAR(64) UNIQUE NOT NULL,
+      token_expires_at TIMESTAMP NOT NULL,
+      downloaded_at TIMESTAMP,
+      created_by UUID,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`,
+    // =========================================================================
+    // Patient messages (patientPortal.js, portal.js — v2.1)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS patient_messages (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID NOT NULL,
+      patient_id UUID NOT NULL,
+      sender_type VARCHAR(20) NOT NULL,
+      sender_id UUID,
+      subject VARCHAR(255),
+      body TEXT NOT NULL,
+      is_read BOOLEAN DEFAULT false,
+      read_at TIMESTAMP,
+      parent_message_id UUID,
+      created_at TIMESTAMP DEFAULT NOW()
+    )`,
+    // =========================================================================
+    // Portal booking requests (patientPortal.js — v2.1)
+    // =========================================================================
+    `CREATE TABLE IF NOT EXISTS portal_booking_requests (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      organization_id UUID NOT NULL,
+      patient_id UUID NOT NULL,
+      preferred_date DATE,
+      preferred_time_slot VARCHAR(20),
+      reason TEXT,
+      status VARCHAR(20) DEFAULT 'PENDING',
+      handled_by UUID,
+      appointment_id UUID,
+      created_at TIMESTAMP DEFAULT NOW(),
+      updated_at TIMESTAMP DEFAULT NOW()
+    )`,
   ];
 
   let applied = 0;
@@ -1337,6 +1408,20 @@ async function applyPerformanceIndexes(db) {
     `CREATE INDEX IF NOT EXISTS idx_sched_comms_date ON scheduled_communications (scheduled_date)`,
     // Workflow scheduled actions
     `CREATE INDEX IF NOT EXISTS idx_sched_actions_time ON workflow_scheduled_actions (scheduled_for)`,
+    // AI feedback
+    `CREATE INDEX IF NOT EXISTS idx_ai_feedback_encounter ON ai_feedback (encounter_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_ai_feedback_user ON ai_feedback (user_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_ai_feedback_type ON ai_feedback (suggestion_type)`,
+    // Portal documents
+    `CREATE INDEX IF NOT EXISTS idx_portal_docs_org ON portal_documents (organization_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_portal_docs_patient ON portal_documents (patient_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_portal_docs_token ON portal_documents (download_token)`,
+    // Patient messages
+    `CREATE INDEX IF NOT EXISTS idx_messages_org ON patient_messages (organization_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_messages_patient ON patient_messages (patient_id)`,
+    // Portal booking requests
+    `CREATE INDEX IF NOT EXISTS idx_booking_req_org ON portal_booking_requests (organization_id)`,
+    `CREATE INDEX IF NOT EXISTS idx_booking_req_patient ON portal_booking_requests (patient_id)`,
   ];
 
   let applied = 0;
