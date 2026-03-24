@@ -39,6 +39,12 @@ if (process.env.NODE_ENV === 'production' && process.env.DEV_SKIP_AUTH === 'true
   process.exit(1);
 }
 
+// CRITICAL: Refuse to start if DESKTOP_MODE is enabled in production
+if (process.env.NODE_ENV === 'production' && process.env.DESKTOP_MODE === 'true') {
+  logger.error('FATAL: DESKTOP_MODE=true is not allowed in production. Aborting.');
+  process.exit(1);
+}
+
 // Initialize Express app
 const app = express();
 const httpServer = createServer(app);
@@ -159,9 +165,6 @@ app.get('/health', async (req, res) => {
   res.status(dbHealthy ? 200 : 503).json({
     status: dbHealthy ? 'healthy' : 'unhealthy',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV,
-    version: API_VERSION,
     database: dbHealthy ? 'connected' : 'disconnected',
   });
 });
@@ -348,7 +351,7 @@ import errorReportRoutes from './routes/errors.js';
 import aiRetrainingRoutes from './routes/aiRetraining.js';
 import aiCostRoutes from './routes/aiCost.js';
 import batchRoutes from './routes/batch.js';
-import mobileRoutes from './routes/mobile.js';
+import mobileRoutes from './routes/mobile/index.js';
 import auditLogRoutes from './routes/auditLogs.js';
 import slashCommandRoutes from './routes/slashCommands.js';
 import complianceRulesRoutes from './routes/complianceRules.js';
