@@ -9,6 +9,7 @@ import * as clinicalWorkflow from '../services/clinicalWorkflow.js';
 import * as encounterService from '../services/encounters.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
+import { readLimiter } from '../middleware/rateLimiting.js';
 import {
   createEncounterSchema,
   updateEncounterSchema,
@@ -102,6 +103,7 @@ router.post('/validate', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res
  */
 router.get(
   '/',
+  readLimiter,
   requireRole(['ADMIN', 'PRACTITIONER']),
   validate(getEncountersSchema),
   encounterController.getEncounters
