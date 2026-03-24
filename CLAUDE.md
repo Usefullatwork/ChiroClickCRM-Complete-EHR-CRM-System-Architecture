@@ -46,19 +46,19 @@ cd frontend && npx playwright test              # E2E tests
 - `frontend/src/components/` — 39 subdirs, ~300 components
 - `backend/src/services/` — 97 service files (ai/, providers/, crm, exercises, pdf, etc.)
 - `backend/src/routes/` — 49 route files (47 registered + 2 regulatory stubs). Swagger at `/api-docs` (109 endpoints)
-- `database/migrations/` — 078 migrations (PGlite auto-applies on startup via `db-init.js`)
+- `database/migrations/` — 078 migrations (PGlite auto-applies on startup via `db-init.js`). Gap at 025 is intentional (removed in commit 201f79b)
 
 ## Patient Connectivity (v2.1 — COMPLETE)
 
-| Service                    | Role                                                          |
-| -------------------------- | ------------------------------------------------------------- |
-| `documentDelivery.js`      | PDF generate → portal doc → email/SMS/push pipeline           |
-| `pushNotification.js`      | Expo Push API wrapper (mock in desktop)                       |
-| `appointmentReminders.js`  | Schedule on create, cancel on cancel, \*/15 cron              |
-| `communications.js`        | Core SMS/email abstraction — all delivery routes through here |
-| `patientPortal.js` (route) | Booking, messaging, documents, preferences                    |
-| `mobile.js` (route)        | +8 endpoints: messages, documents, booking                    |
-| `automations/actions.js`   | 9 action types incl. SEND_BOOKING_LINK                        |
+| Service                    | Role                                                                          |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| `documentDelivery.js`      | PDF generate → portal doc → email/SMS/push pipeline                           |
+| `pushNotification.js`      | Expo Push API wrapper (mock in desktop)                                       |
+| `appointmentReminders.js`  | Schedule on create, cancel on cancel, \*/15 cron                              |
+| `communications.js`        | Core SMS/email abstraction — all delivery routes through here                 |
+| `patientPortal.js` (route) | Booking, messaging, documents, preferences                                    |
+| `routes/mobile/` (dir)     | Split into 7 sub-routes: auth, profile, exercises, programs, workouts, clinic |
+| `automations/actions.js`   | 9 action types incl. SEND_BOOKING_LINK                                        |
 
 **Provider strategy**: Mock in desktop mode. Set `EMAIL_PROVIDER=smtp` + `SMS_PROVIDER=twilio` + Firebase creds for real delivery.
 
