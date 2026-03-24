@@ -26,6 +26,7 @@ import {
 import { TRIGGER_TYPES, evaluateTrigger } from './triggers.js';
 import { OPERATORS, evaluateConditions } from './conditions.js';
 import { ACTION_TYPES, executeActions } from './actions.js';
+import { checkDaysSinceVisitTriggers, checkBirthdayTriggers } from '../automationTriggers.js';
 import logger from '../../utils/logger.js';
 
 // Wire encounter domain events to automation engine
@@ -80,4 +81,6 @@ export default {
   executeActions,
   testWorkflow,
   checkAppointmentReminders,
+  checkDaysSinceVisitTriggers,
+  checkBirthdayTriggers,
 };

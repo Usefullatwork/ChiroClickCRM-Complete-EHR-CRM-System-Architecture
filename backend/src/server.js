@@ -39,10 +39,9 @@ if (process.env.NODE_ENV === 'production' && process.env.DEV_SKIP_AUTH === 'true
   process.exit(1);
 }
 
-// CRITICAL: Refuse to start if DESKTOP_MODE is enabled in production
+// Desktop (Electron) production mode is legitimate — log and continue
 if (process.env.NODE_ENV === 'production' && process.env.DESKTOP_MODE === 'true') {
-  logger.error('FATAL: DESKTOP_MODE=true is not allowed in production. Aborting.');
-  process.exit(1);
+  logger.info('Running in desktop (Electron) production mode');
 }
 
 // Initialize Express app

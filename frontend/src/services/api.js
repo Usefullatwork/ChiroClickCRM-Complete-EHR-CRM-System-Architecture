@@ -500,7 +500,7 @@ export const crmAPI = {
 
   // Retention
   getRetentionDashboard: (period) => apiClient.get('/crm/retention', { params: { period } }),
-  getChurnAnalysis: () => apiClient.get('/crm/retention/churn'),
+  getChurnAnalysis: (params) => apiClient.get('/crm/retention/churn', { params }),
   getCohortRetention: (months) => apiClient.get('/crm/retention/cohorts', { params: { months } }),
 
   // Waitlist

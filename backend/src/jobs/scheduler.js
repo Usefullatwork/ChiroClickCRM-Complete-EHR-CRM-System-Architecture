@@ -491,7 +491,7 @@ const sendAppointmentReminders = async () => {
 
   try {
     logger.info('Checking for appointment reminders...');
-    const result = await automationsService.checkAppointmentReminders24h();
+    const result = await automationsService.checkAppointmentReminders();
     logger.info('Appointment reminders processed:', result);
     return result;
   } catch (error) {
