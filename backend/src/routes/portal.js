@@ -6,14 +6,11 @@
  */
 
 import express from 'express';
-import { query } from '../config/database.js';
 import { requireAuth, requireOrganization } from '../middleware/auth.js';
 import { requireModule } from '../middleware/featureGate.js';
 import validate from '../middleware/validation.js';
 import { handleBookingSchema } from '../validators/patientPortal.validators.js';
-import logger from '../utils/logger.js';
-import crypto from 'crypto';
-import { sendSMS } from '../services/communications.js';
+import * as portalController from '../controllers/portal.js';
 
 const router = express.Router();
 
@@ -57,66 +54,7 @@ router.use(requireModule('patient_portal'));
  *       404:
  *         description: Patient not found
  */
-router.get('/patient/:patientId', async (req, res) => {
-  try {
-    const { patientId } = req.params;
-    const orgId = req.organizationId;
-
-    const patientResult = await query(
-      `SELECT id, first_name, last_name, email, phone, date_of_birth, status,
-              portal_pin_hash IS NOT NULL AS portal_enabled
-       FROM patients
-       WHERE id = $1 AND organization_id = $2`,
-      [patientId, orgId]
-    );
-
-    if (patientResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Patient not found' });
-    }
-
-    const patient = patientResult.rows[0];
-
-    // Get counts for dashboard
-    const [appointmentCount, exerciseCount, outcomeCount] = await Promise.all([
-      query(
-        `SELECT COUNT(*) as count FROM appointments
-         WHERE patient_id = $1 AND organization_id = $2 AND appointment_date >= CURRENT_DATE`,
-        [patientId, orgId]
-      ),
-      query(
-        `SELECT COUNT(*) as count FROM patient_exercise_prescriptions
-         WHERE patient_id = $1 AND status = 'active'`,
-        [patientId]
-      ).catch(() => ({ rows: [{ count: 0 }] })),
-      query(
-        `SELECT COUNT(*) as count FROM outcome_submissions
-         WHERE patient_id = $1`,
-        [patientId]
-      ).catch(() => ({ rows: [{ count: 0 }] })),
-    ]);
-
-    res.json({
-      patient: {
-        id: patient.id,
-        firstName: patient.first_name,
-        lastName: patient.last_name,
-        email: patient.email,
-        phone: patient.phone,
-        dateOfBirth: patient.date_of_birth,
-        status: patient.status,
-        portalEnabled: patient.portal_enabled,
-      },
-      counts: {
-        upcomingAppointments: parseInt(appointmentCount.rows[0].count, 10),
-        activeExercises: parseInt(exerciseCount.rows[0].count, 10),
-        outcomeSubmissions: parseInt(outcomeCount.rows[0].count, 10),
-      },
-    });
-  } catch (error) {
-    logger.error('Error getting portal patient data:', error);
-    res.status(500).json({ error: 'Failed to get patient portal data' });
-  }
-});
+router.get('/patient/:patientId', portalController.getPatientDashboard);
 
 /**
  * @swagger
@@ -142,29 +80,7 @@ router.get('/patient/:patientId', async (req, res) => {
  *       200:
  *         description: Patient appointments
  */
-router.get('/patient/:patientId/appointments', async (req, res) => {
-  try {
-    const { patientId } = req.params;
-    const orgId = req.organizationId;
-    const upcomingOnly = req.query.upcoming === 'true';
-
-    let sql = `
-      SELECT id, appointment_date, appointment_time, duration, visit_type, status, notes
-      FROM appointments
-      WHERE patient_id = $1 AND organization_id = $2
-    `;
-    if (upcomingOnly) {
-      sql += ` AND appointment_date >= CURRENT_DATE AND status NOT IN ('cancelled', 'no_show')`;
-    }
-    sql += ` ORDER BY appointment_date DESC, appointment_time DESC LIMIT 100`;
-
-    const result = await query(sql, [patientId, orgId]);
-    res.json({ appointments: result.rows });
-  } catch (error) {
-    logger.error('Error getting portal patient appointments:', error);
-    res.status(500).json({ error: 'Failed to get patient appointments' });
-  }
-});
+router.get('/patient/:patientId/appointments', portalController.getPatientAppointments);
 
 /**
  * @swagger
@@ -205,47 +121,7 @@ router.get('/patient/:patientId/appointments', async (req, res) => {
  *       201:
  *         description: Appointment request created
  */
-router.post('/patient/:patientId/appointments', async (req, res) => {
-  try {
-    const { patientId } = req.params;
-    const orgId = req.organizationId;
-    const { appointment_date, appointment_time, duration, visit_type, notes } = req.body;
-
-    if (!appointment_date || !appointment_time) {
-      return res.status(400).json({ error: 'appointment_date and appointment_time are required' });
-    }
-
-    // Verify patient belongs to this organization before creating appointment
-    const patientCheck = await query(
-      'SELECT id FROM patients WHERE id = $1 AND organization_id = $2',
-      [patientId, orgId]
-    );
-    if (patientCheck.rows.length === 0) {
-      return res.status(404).json({ error: 'Patient not found' });
-    }
-
-    const result = await query(
-      `INSERT INTO appointments (patient_id, organization_id, appointment_date, appointment_time, duration, visit_type, status, notes, created_by)
-       VALUES ($1, $2, $3, $4, $5, $6, 'pending', $7, $8)
-       RETURNING *`,
-      [
-        patientId,
-        orgId,
-        appointment_date,
-        appointment_time,
-        duration || 30,
-        visit_type || 'consultation',
-        notes,
-        req.user.id,
-      ]
-    );
-
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    logger.error('Error creating portal appointment:', error);
-    res.status(500).json({ error: 'Failed to create appointment' });
-  }
-});
+router.post('/patient/:patientId/appointments', portalController.createPatientAppointment);
 
 /**
  * @swagger
@@ -266,32 +142,7 @@ router.post('/patient/:patientId/appointments', async (req, res) => {
  *       200:
  *         description: Active exercise prescriptions
  */
-router.get('/patient/:patientId/exercises', async (req, res) => {
-  try {
-    const { patientId } = req.params;
-
-    const result = await query(
-      `SELECT
-        pep.id, pep.exercise_id, pep.sets, pep.reps, pep.hold_seconds,
-        pep.frequency, pep.instructions, pep.status, pep.start_date, pep.end_date,
-        el.name, el.name_no, el.description, el.description_no,
-        el.category, el.body_region, el.difficulty, el.video_url, el.image_url
-      FROM patient_exercise_prescriptions pep
-      JOIN exercise_library el ON el.id = pep.exercise_id
-      WHERE pep.patient_id = $1 AND pep.organization_id = $2 AND pep.status = 'active'
-      ORDER BY pep.created_at DESC`,
-      [patientId, req.organizationId]
-    );
-
-    res.json({ exercises: result.rows });
-  } catch (error) {
-    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-      return res.json({ exercises: [] });
-    }
-    logger.error('Error getting portal patient exercises:', error);
-    res.status(500).json({ error: 'Failed to get patient exercises' });
-  }
-});
+router.get('/patient/:patientId/exercises', portalController.getPatientExercises);
 
 /**
  * @swagger
@@ -312,31 +163,7 @@ router.get('/patient/:patientId/exercises', async (req, res) => {
  *       200:
  *         description: Outcome submissions
  */
-router.get('/patient/:patientId/outcomes', async (req, res) => {
-  try {
-    const { patientId } = req.params;
-
-    const result = await query(
-      `SELECT os.id, os.questionnaire_id, os.score, os.responses, os.submitted_at,
-              oq.name, oq.name_no, oq.category
-       FROM outcome_submissions os
-       LEFT JOIN outcome_questionnaires oq ON oq.id = os.questionnaire_id
-       JOIN patients p ON p.id = os.patient_id
-       WHERE os.patient_id = $1 AND p.organization_id = $2
-       ORDER BY os.submitted_at DESC
-       LIMIT 50`,
-      [patientId, req.organizationId]
-    );
-
-    res.json({ outcomes: result.rows });
-  } catch (error) {
-    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-      return res.json({ outcomes: [] });
-    }
-    logger.error('Error getting portal patient outcomes:', error);
-    res.status(500).json({ error: 'Failed to get patient outcomes' });
-  }
-});
+router.get('/patient/:patientId/outcomes', portalController.getPatientOutcomes);
 
 /**
  * @swagger
@@ -361,54 +188,7 @@ router.get('/patient/:patientId/outcomes', async (req, res) => {
  *       200:
  *         description: Magic link generated (returns token, not emailed in dev)
  */
-router.post('/auth/magic-link', async (req, res) => {
-  try {
-    const { patientId } = req.body;
-    const orgId = req.organizationId;
-
-    if (!patientId) {
-      return res.status(400).json({ error: 'patientId is required' });
-    }
-
-    // Verify patient belongs to organization
-    const patientResult = await query(
-      `SELECT id, email, first_name FROM patients WHERE id = $1 AND organization_id = $2`,
-      [patientId, orgId]
-    );
-
-    if (patientResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Patient not found' });
-    }
-
-    // Generate magic link token
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-    try {
-      await query(
-        `INSERT INTO portal_sessions (patient_id, token, expires_at, ip_address)
-         VALUES ($1, $2, $3, $4)`,
-        [patientId, token, expiresAt, req.ip]
-      );
-    } catch (tableError) {
-      if (!tableError.message?.includes('relation "portal_sessions" does not exist')) {
-        throw tableError;
-      }
-    }
-
-    res.json({
-      token,
-      expiresAt,
-      patient: {
-        id: patientResult.rows[0].id,
-        firstName: patientResult.rows[0].first_name,
-      },
-    });
-  } catch (error) {
-    logger.error('Error generating magic link:', error);
-    res.status(500).json({ error: 'Failed to generate magic link' });
-  }
-});
+router.post('/auth/magic-link', portalController.generateMagicLink);
 
 /**
  * @swagger
@@ -440,42 +220,7 @@ router.post('/auth/magic-link', async (req, res) => {
  *       200:
  *         description: Portal access enabled
  */
-router.post('/patient/:patientId/portal-access', async (req, res) => {
-  try {
-    const { patientId } = req.params;
-    const { pin } = req.body;
-    const orgId = req.organizationId;
-
-    if (!pin || !/^\d{4,6}$/.test(pin)) {
-      return res.status(400).json({ error: 'PIN must be 4-6 digits' });
-    }
-
-    // Verify patient belongs to org
-    const patientResult = await query(
-      'SELECT id FROM patients WHERE id = $1 AND organization_id = $2',
-      [patientId, orgId]
-    );
-
-    if (patientResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Patient not found' });
-    }
-
-    const pinHash = crypto
-      .createHash('sha256')
-      .update(pin + patientId)
-      .digest('hex');
-
-    await query('UPDATE patients SET portal_pin_hash = $1 WHERE id = $2', [pinHash, patientId]);
-
-    res.json({ success: true, message: 'Portal access enabled' });
-  } catch (error) {
-    if (error.message?.includes('column "portal_pin_hash" does not exist')) {
-      return res.status(503).json({ error: 'Portal not yet configured - run migration 030' });
-    }
-    logger.error('Error setting portal access:', error);
-    res.status(500).json({ error: 'Failed to set portal access' });
-  }
-});
+router.post('/patient/:patientId/portal-access', portalController.setPortalAccess);
 
 // =============================================================================
 // BOOKING REQUESTS (staff-facing)
@@ -485,149 +230,23 @@ router.post('/patient/:patientId/portal-access', async (req, res) => {
  * GET /portal/booking-requests
  * List booking requests for the organization
  */
-router.get('/booking-requests', async (req, res) => {
-  try {
-    const orgId = req.organizationId;
-    const { status, page = 1, limit = 20 } = req.query;
-    const offset = (parseInt(page, 10) - 1) * parseInt(limit, 10);
-
-    let whereClause = 'WHERE pbr.organization_id = $1';
-    const params = [orgId];
-    let paramIdx = 2;
-
-    if (status) {
-      whereClause += ` AND pbr.status = $${paramIdx}`;
-      params.push(status);
-      paramIdx++;
-    }
-
-    params.push(parseInt(limit, 10), offset);
-
-    const result = await query(
-      `SELECT pbr.*, p.first_name, p.last_name, p.email, p.phone
-       FROM portal_booking_requests pbr
-       JOIN patients p ON pbr.patient_id = p.id
-       ${whereClause}
-       ORDER BY pbr.created_at DESC
-       LIMIT $${paramIdx} OFFSET $${paramIdx + 1}`,
-      params
-    );
-
-    const countResult = await query(
-      `SELECT COUNT(*) FROM portal_booking_requests pbr ${whereClause}`,
-      params.slice(0, paramIdx - 1)
-    );
-
-    const total = parseInt(countResult.rows[0].count, 10);
-
-    res.json({
-      requests: result.rows,
-      pagination: {
-        page: parseInt(page, 10),
-        limit: parseInt(limit, 10),
-        total,
-      },
-    });
-  } catch (error) {
-    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-      return res.json({ requests: [], pagination: { page: 1, limit: 20, total: 0 } });
-    }
-    logger.error('Error getting booking requests:', error);
-    res.status(500).json({ error: 'Failed to get booking requests' });
-  }
-});
+router.get('/booking-requests', portalController.listBookingRequests);
 
 /**
  * PATCH /portal/booking-requests/:id
  * Approve or reject a booking request
  */
-router.patch('/booking-requests/:id', validate(handleBookingSchema), async (req, res) => {
-  try {
-    const { id } = req.params;
-    const orgId = req.organizationId;
-    const { action, appointment_date, appointment_time, duration, visit_type } = req.body;
-
-    // Verify request belongs to this org
-    const reqResult = await query(
-      `SELECT * FROM portal_booking_requests WHERE id = $1 AND organization_id = $2`,
-      [id, orgId]
-    );
-
-    if (reqResult.rows.length === 0) {
-      return res.status(404).json({ error: 'Booking request not found' });
-    }
-
-    const bookingReq = reqResult.rows[0];
-
-    if (action === 'approve') {
-      // Create the appointment
-      const apptResult = await query(
-        `INSERT INTO appointments
-          (patient_id, organization_id, appointment_date, appointment_time, duration, visit_type, status, created_by)
-         VALUES ($1, $2, $3, $4, $5, $6, 'confirmed', $7)
-         RETURNING *`,
-        [
-          bookingReq.patient_id,
-          orgId,
-          appointment_date,
-          appointment_time,
-          duration || 30,
-          visit_type || 'consultation',
-          req.user.id,
-        ]
-      );
-
-      await query(
-        `UPDATE portal_booking_requests
-         SET status = 'CONFIRMED', handled_by = $1, handled_at = NOW(), appointment_id = $2
-         WHERE id = $3`,
-        [req.user.id, apptResult.rows[0].id, id]
-      );
-
-      res.json({ ...bookingReq, status: 'CONFIRMED', appointment_id: apptResult.rows[0].id });
-    } else {
-      // Reject
-      await query(
-        `UPDATE portal_booking_requests
-         SET status = 'REJECTED', handled_by = $1, handled_at = NOW()
-         WHERE id = $2`,
-        [req.user.id, id]
-      );
-
-      res.json({ ...bookingReq, status: 'REJECTED' });
-    }
-  } catch (error) {
-    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-      return res.status(503).json({ error: 'Booking system not yet configured' });
-    }
-    logger.error('Error handling booking request:', error);
-    res.status(500).json({ error: 'Failed to handle booking request' });
-  }
-});
+router.patch(
+  '/booking-requests/:id',
+  validate(handleBookingSchema),
+  portalController.handleBookingRequest
+);
 
 /**
  * GET /portal/booking-requests/count
  * Get count of pending booking requests
  */
-router.get('/booking-requests/count', async (req, res) => {
-  try {
-    const orgId = req.organizationId;
-
-    const result = await query(
-      `SELECT COUNT(*) FROM portal_booking_requests
-       WHERE organization_id = $1 AND status = 'PENDING'`,
-      [orgId]
-    );
-
-    res.json({ pending: parseInt(result.rows[0].count, 10) });
-  } catch (error) {
-    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-      return res.json({ pending: 0 });
-    }
-    logger.error('Error getting booking request count:', error);
-    res.status(500).json({ error: 'Failed to get booking request count' });
-  }
-});
+router.get('/booking-requests/count', portalController.getBookingRequestCount);
 
 // =============================================================================
 // MESSAGING (staff-facing)
@@ -637,122 +256,12 @@ router.get('/booking-requests/count', async (req, res) => {
  * GET /portal/patient/:patientId/messages
  * Staff retrieves messages for a patient
  */
-router.get('/patient/:patientId/messages', async (req, res) => {
-  try {
-    const { patientId } = req.params;
-    const orgId = req.organizationId;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 50;
-    const offset = (page - 1) * limit;
-
-    // Verify patient belongs to org
-    const patientCheck = await query(
-      'SELECT id FROM patients WHERE id = $1 AND organization_id = $2',
-      [patientId, orgId]
-    );
-    if (patientCheck.rows.length === 0) {
-      return res.status(404).json({ error: 'Patient not found' });
-    }
-
-    const [messagesResult, countResult] = await Promise.all([
-      query(
-        `SELECT pm.id, pm.sender_type, pm.sender_id, pm.subject, pm.body, pm.is_read, pm.read_at,
-                pm.parent_message_id, pm.created_at,
-                u.full_name as sender_name
-         FROM patient_messages pm
-         LEFT JOIN users u ON pm.sender_id = u.id
-         WHERE pm.patient_id = $1 AND pm.organization_id = $2
-         ORDER BY pm.created_at ASC
-         LIMIT $3 OFFSET $4`,
-        [patientId, orgId, limit, offset]
-      ),
-      query(
-        'SELECT COUNT(*) as total FROM patient_messages WHERE patient_id = $1 AND organization_id = $2',
-        [patientId, orgId]
-      ),
-    ]);
-
-    res.json({
-      messages: messagesResult.rows,
-      pagination: { page, limit, total: parseInt(countResult.rows[0].total, 10) },
-    });
-  } catch (error) {
-    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-      return res.json({ messages: [], pagination: { page: 1, limit: 50, total: 0 } });
-    }
-    logger.error('Error getting patient messages:', error);
-    res.status(500).json({ error: 'Failed to get messages' });
-  }
-});
+router.get('/patient/:patientId/messages', portalController.getPatientMessages);
 
 /**
  * POST /portal/patient/:patientId/messages
  * Staff sends a message to a patient
  */
-router.post('/patient/:patientId/messages', async (req, res) => {
-  try {
-    const { patientId } = req.params;
-    const orgId = req.organizationId;
-    const { subject, body: msgBody, parent_message_id } = req.body;
-
-    if (!msgBody) {
-      return res.status(400).json({ error: 'Message body is required' });
-    }
-
-    // Verify patient belongs to org
-    const patientCheck = await query(
-      'SELECT id, phone, first_name FROM patients WHERE id = $1 AND organization_id = $2',
-      [patientId, orgId]
-    );
-    if (patientCheck.rows.length === 0) {
-      return res.status(404).json({ error: 'Patient not found' });
-    }
-
-    const result = await query(
-      `INSERT INTO patient_messages (patient_id, organization_id, sender_type, sender_id, subject, body, parent_message_id)
-       VALUES ($1, $2, 'CLINICIAN', $3, $4, $5, $6)
-       RETURNING *`,
-      [patientId, orgId, req.user.id, subject || null, msgBody, parent_message_id || null]
-    );
-
-    // Best-effort SMS notification to patient
-    const patient = patientCheck.rows[0];
-    if (patient.phone) {
-      try {
-        await sendSMS(
-          orgId,
-          {
-            to: patient.phone,
-            message: `Ny melding fra klinikken. Logg inn på pasientportalen for å lese.`,
-            patientId,
-          },
-          req.user.id
-        );
-      } catch (smsError) {
-        logger.error('Failed to send SMS notification for message:', smsError);
-      }
-    }
-
-    // Best-effort push notification to patient's mobile app
-    try {
-      const { sendPushToPatient } = await import('../services/pushNotification.js');
-      await sendPushToPatient(patientId, {
-        title: 'Ny melding fra klinikken',
-        body: (subject || msgBody).substring(0, 100),
-        data: { type: 'message', id: result.rows[0].id, route: '/clinic/messages' },
-      });
-    } catch (_pushErr) {
-      logger.debug('Push to patient mobile app skipped:', _pushErr.message);
-    }
-
-    res.status(201).json(result.rows[0]);
-  } catch (error) {
-    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-      return res.status(503).json({ error: 'Messaging not yet configured' });
-    }
-    logger.error('Error sending patient message:', error);
-    res.status(500).json({ error: 'Failed to send message' });
-  }
-});
+router.post('/patient/:patientId/messages', portalController.sendPatientMessage);
 
 export default router;
