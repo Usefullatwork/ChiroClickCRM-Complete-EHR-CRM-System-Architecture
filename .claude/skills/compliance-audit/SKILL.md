@@ -2,6 +2,9 @@
 name: compliance-audit
 description: Full Norwegian healthcare compliance audit. Activates when discussing Normen, GDPR, HelseID, WCAG, regulatory compliance, release preparation, or security review. Run before any production release.
 allowed-tools: Read, Grep, Glob, Bash(npm run test *), Bash(npx vitest *), Bash(npx playwright *)
+user-invocable: true
+model: opus
+effort: high
 ---
 
 # Norwegian Healthcare Compliance Audit

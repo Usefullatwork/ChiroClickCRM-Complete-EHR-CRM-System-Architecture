@@ -2,6 +2,9 @@
 name: wcag-audit
 description: Scans frontend components for WCAG 2.1 AA compliance issues. Activates before releases or when modifying UI components.
 allowed-tools: Read, Grep, Glob
+user-invocable: true
+model: opus
+effort: high
 ---
 
 # WCAG 2.1 AA Audit

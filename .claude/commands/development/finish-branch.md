@@ -3,6 +3,7 @@ Pre-merge checklist for the current feature branch.
 ## Steps
 
 1. **Run all tests:**
+
    ```bash
    cd backend && npm test
    cd frontend && npx vitest --run
@@ -13,6 +14,7 @@ Pre-merge checklist for the current feature branch.
    - `grep -rn 'TODO\|FIXME\|HACK\|XXX' backend/src/ frontend/src/ --include='*.js' --include='*.jsx'`
 
 3. **Verify build:**
+
    ```bash
    cd frontend && npm run build
    ```
@@ -26,7 +28,6 @@ Pre-merge checklist for the current feature branch.
 5. **Present options:**
 
    Only if ALL tests pass and build succeeds:
-
    - **A) Squash merge** — `git checkout main && git merge --squash <branch> && git commit`
    - **B) Regular merge** — `git checkout main && git merge <branch>`
    - **C) Push for PR** — `git push -u origin <branch>` then `gh pr create`

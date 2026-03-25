@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "lastUpdated": null,
+  "registries": [
+    {
+      "name": "system-basics-v2",
+      "repo": "Usefullatwork/system-basics-v2",
+      "branch": "main",
+      "type": "skills+agents",
+      "paths": [
+        ".claude/skills/",
+        ".claude/agents/",
+        ".claude/commands/",
+        ".claude/rules/"
+      ],
+      "description": "Core skill stack: agents, skills, commands, rules, presets"
+    },
+    {
+      "name": "get-shit-done",
+      "repo": "gsd-build/get-shit-done",
+      "branch": "main",
+      "type": "framework",
+      "versionFile": ".claude/get-shit-done/VERSION",
+      "installPath": ".claude/get-shit-done/",
+      "description": "GSD workflow framework"
+    },
+    {
+      "name": "ui-ux-pro-max",
+      "repo": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "branch": "main",
+      "type": "skill",
+      "installPath": ".claude/skills/ui-ux-pro-max/",
+      "description": "UI/UX design skill"
+    },
+    {
+      "name": "superpowers",
+      "repo": "obra/superpowers",
+      "branch": "main",
+      "type": "plugin",
+      "pluginId": "superpowers@claude-plugins-official",
+      "description": "Advanced capabilities plugin"
+    },
+    {
+      "name": "claude-mem",
+      "repo": "thedotmack/claude-mem",
+      "branch": "main",
+      "type": "skill",
+      "installPath": ".claude/skills/claude-mem/",
+      "description": "Memory management skill"
+    },
+    {
+      "name": "agency-agents",
+      "repo": "msitarzewski/agency-agents",
+      "branch": "main",
+      "type": "agents",
+      "installPath": ".claude/agents/agency/",
+      "description": "Agent patterns library"
+    },
+    {
+      "name": "impeccable",
+      "repo": "pbakaus/impeccable",
+      "branch": "main",
+      "type": "plugin",
+      "pluginId": "impeccable@claude-plugins-official",
+      "description": "Code quality plugin"
+    },
+    {
+      "name": "stitch-mcp",
+      "repo": "davideast/stitch-mcp",
+      "branch": "main",
+      "type": "mcp",
+      "description": "MCP stitching server"
+    },
+    {
+      "name": "promptfoo",
+      "repo": "promptfoo/promptfoo",
+      "branch": "main",
+      "type": "npm",
+      "package": "promptfoo",
+      "description": "LLM security and eval testing"
+    },
+    {
+      "name": "claude-flow",
+      "repo": "ruvnet/claude-flow",
+      "branch": "main",
+      "type": "npm",
+      "package": "@claude-flow/cli",
+      "description": "Multi-agent orchestration CLI"
+    },
+    {
+      "name": "playwright-mcp",
+      "type": "npm",
+      "package": "@playwright/mcp",
+      "description": "Playwright MCP server"
+    },
+    {
+      "name": "cot-explorer",
+      "repo": "Usefullatwork/Cot-ExplorerV2",
+      "branch": "main",
+      "type": "agents",
+      "paths": ["agents/"],
+      "description": "Chain-of-thought explorer agents"
+    },
+    {
+      "name": "firecrawl",
+      "repo": "mendableai/firecrawl",
+      "branch": "main",
+      "type": "npm",
+      "package": "firecrawl",
+      "description": "Web scraping and crawling tool. Converts pages to clean markdown for research agents."
+    }
+  ]
+}

@@ -1,8 +1,13 @@
 ---
 name: frontend-dev
 description: Frontend development specialist for React/Vite/Zustand/Tailwind. Use for UI changes, component work, hook refactoring, bundle optimization, and frontend test writing.
-model: claude-sonnet-4-6
+model: sonnet
 tools: Read, Edit, Write, Bash, Grep, Glob
+permissionMode: bypassPermissions
+maxTurns: 30
+color: green
+skills: [rpi-workflow, tool-mastery]
+effort: medium
 ---
 
 You are a frontend development specialist for ChiroClickCRM, a Norwegian-compliant EHR-CRM system.

@@ -44,7 +44,29 @@ grep -rn "test\.skip\|it\.skip\|describe\.skip\|xit\|xdescribe" backend/__tests_
 
 Flag any skip without a TODO comment explaining why.
 
-### 6. Known Debt from CLAUDE.md
+### 6. Debug Statements
+
+```bash
+cd backend && grep -rn "console.log|console.error" src/ --include="*.js" | grep -v "// allowed" | head -20
+cd frontend && grep -rn "console.log|console.error" src/ --include="*.{js,jsx}" | grep -v "// allowed" | head -20
+```
+
+Flag any console.log/console.error in source (not test) files.
+
+### 7. Commented-Out Code Blocks
+
+Search for blocks of 3+ consecutive commented-out lines that look like code (not documentation comments). These should be deleted — git has the history.
+
+### 8. Outdated Dependencies
+
+```bash
+cd backend && npm outdated 2>/dev/null
+cd frontend && npm outdated 2>/dev/null
+```
+
+Flag major version bumps and check for duplicated dependencies across backend and frontend.
+
+### 9. Known Debt from CLAUDE.md
 
 Read the "Known Tech Debt" section in CLAUDE.md and verify each item still exists.
 
@@ -61,6 +83,9 @@ Write report to `reports/tech-debt-{date}.md`:
 - Long files: X over 500 lines
 - Long functions: X over 80 lines
 - Skipped tests: X without explanation
+- Debug statements: X in source files
+- Commented code: X blocks
+- Outdated deps: X major, Y minor
 
 ## CRITICAL
 [items requiring immediate attention]

@@ -23,12 +23,14 @@ $ARGUMENTS
 ## Conflict Detection
 
 Before spawning, check for overlapping files:
+
 - If two tasks might edit the same file, run them sequentially instead
 - If tasks are in different directories (backend/ vs frontend/), they're safe to parallelize
 
 ## After Completion
 
 Report summary:
+
 ```
 PARALLEL RESULTS (N tasks)
 1. [task] — OK/FAILED — [files changed]
