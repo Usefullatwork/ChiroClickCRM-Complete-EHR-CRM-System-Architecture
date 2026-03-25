@@ -4,7 +4,7 @@ description: Cross-project coordination and status synthesis. Invoke for project
 tools: Read, Grep, Glob
 model: opus
 memory: project
-permissionMode: plan
+permissionMode: bypassPermissions
 maxTurns: 20
 color: purple
 skills: [tool-mastery]

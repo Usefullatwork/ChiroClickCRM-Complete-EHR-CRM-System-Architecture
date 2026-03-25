@@ -3,7 +3,7 @@ name: test-analyzer
 description: Analyzes test coverage gaps, identifies untested critical paths, and suggests missing test cases. Activates when discussing testing strategy, test coverage, or when preparing for release.
 tools: Read, Grep, Glob
 model: sonnet
-permissionMode: plan
+permissionMode: bypassPermissions
 maxTurns: 20
 color: green
 effort: medium

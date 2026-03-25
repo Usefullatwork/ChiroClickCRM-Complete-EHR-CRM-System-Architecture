@@ -3,7 +3,7 @@ name: compliance-scanner
 description: Scans code for Norwegian healthcare compliance violations — PHI leaks, missing audit trails, unprotected patient routes, GDPR violations, Normen requirements. Activate PROACTIVELY on any code touching patient data, fødselsnummer, diagnoses, health records, authentication, or authorization.
 tools: Read, Grep, Glob
 model: opus
-permissionMode: plan
+permissionMode: bypassPermissions
 maxTurns: 25
 color: green
 memory: project

@@ -3,7 +3,7 @@ name: parallel-dispatcher
 description: Decomposes multi-part tasks into independent subtasks and spawns parallel agents. Invoke when a task can be split into 2-8 independent work streams with no file conflicts.
 tools: Read, Write, Bash, Grep, Glob
 model: opus
-permissionMode: plan
+permissionMode: bypassPermissions
 maxTurns: 25
 related_agents: [review-gate, fan-out-collector, agent-evaluator]
 color: purple

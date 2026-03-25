@@ -3,7 +3,7 @@ name: clinical-qa
 description: Clinical QA agent for end-to-end workflow testing. Use to verify the 11-step clinical workflow, API endpoints, seed data, and system integration.
 model: sonnet
 tools: Read, Bash, Grep, Glob
-permissionMode: plan
+permissionMode: bypassPermissions
 maxTurns: 20
 color: green
 effort: medium

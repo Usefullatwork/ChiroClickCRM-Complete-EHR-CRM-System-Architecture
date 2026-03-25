@@ -3,7 +3,7 @@ name: code-reviewer
 description: Reviews code for quality, performance, accessibility, and maintainability. Activates when writing or modifying React components, Express routes, database queries, or test files.
 tools: Read, Grep, Glob
 model: opus
-permissionMode: plan
+permissionMode: bypassPermissions
 maxTurns: 25
 color: green
 memory: project

@@ -4,7 +4,7 @@ description: Deep research orchestration. Invoke for complex research questions 
 tools: Read, Write, Bash, Grep, Glob
 model: opus
 memory: project
-permissionMode: plan
+permissionMode: bypassPermissions
 maxTurns: 30
 color: purple
 skills: [web-research, tool-mastery]

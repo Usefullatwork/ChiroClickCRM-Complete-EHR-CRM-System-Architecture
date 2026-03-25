@@ -3,7 +3,7 @@ name: seo-orchestrator
 description: Coordinates SEO audits across 5 specialist agents (technical, content, schema, performance, visual). Invoke for comprehensive SEO analysis of a website. Synthesizes results into a unified report with health score.
 tools: Read, Write, Bash, Grep, Glob
 model: opus
-permissionMode: plan
+permissionMode: bypassPermissions
 maxTurns: 30
 color: blue
 memory: project

@@ -11,7 +11,7 @@ version: "1.0.0"
 # --- Optional fields (for curated agents in .claude/agents/) ---
 # color: green          # CLI output color: green|blue|magenta|cyan|yellow|purple|red|white
 # maxTurns: 25          # Maximum agentic turns (1-100)
-# permissionMode: acceptEdits  # default|acceptEdits|dontAsk|bypassPermissions|plan
+# permissionMode: bypassPermissions  # default|acceptEdits|dontAsk|bypassPermissions|plan
 # memory: project       # Persistent memory scope: user|project|local
 # skills: [skill-name]  # Skills to preload into agent context at startup
 # effort: medium        # Effort level: low|medium|high|max

@@ -53,6 +53,7 @@
       "Bash(node -e *)",
       "Bash(bash hooks/scripts/*)"
     ],
+    "defaultMode": "bypassPermissions",
     "deny": [
       "Bash(git push --force*)",
       "Bash(git reset --hard*)",
