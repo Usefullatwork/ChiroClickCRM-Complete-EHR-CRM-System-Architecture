@@ -234,7 +234,6 @@ export const getInvoiceById = async (organizationId, invoiceId) => {
             p.city as patient_city,
             p.email as patient_email,
             p.phone as patient_phone,
-            p.national_id as patient_national_id,
             o.name as organization_name,
             o.address as organization_address,
             o.postal_code as organization_postal_code,
@@ -764,7 +763,7 @@ export const getHelfoReportData = async (organizationId, startDate, endDate) => 
       i.helfo_refund,
       i.items,
       p.first_name || ' ' || p.last_name as patient_name,
-      p.national_id as patient_fnr
+      p.date_of_birth as patient_dob
      FROM invoices i
      JOIN patients p ON p.id = i.patient_id
      WHERE i.organization_id = $1
