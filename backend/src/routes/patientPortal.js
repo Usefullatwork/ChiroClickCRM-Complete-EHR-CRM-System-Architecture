@@ -16,6 +16,7 @@ import {
   messageSchema,
 } from '../validators/patientPortal.validators.js';
 import logger from '../utils/logger.js';
+import { strictLimiter } from '../middleware/rateLimiting.js';
 import * as patientPortalController from '../controllers/patientPortal.js';
 
 const router = express.Router();
@@ -284,7 +285,7 @@ router.patch('/messages/:id/read', requirePortalAuth, patientPortalController.ma
 
 router.get('/documents', requirePortalAuth, patientPortalController.getDocuments);
 
-router.get('/documents/:token/download', patientPortalController.downloadDocument);
+router.get('/documents/:token/download', strictLimiter, patientPortalController.downloadDocument);
 
 // =============================================================================
 // COMMUNICATION PREFERENCES

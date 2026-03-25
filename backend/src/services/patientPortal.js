@@ -424,7 +424,7 @@ export const downloadDocument = async (token) => {
     [doc.id]
   );
 
-  return { buffer, filename };
+  return { buffer, filename, documentId: doc.id, organizationId: doc.organization_id };
 };
 
 /** Get patient communication preferences. */

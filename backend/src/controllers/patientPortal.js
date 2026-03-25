@@ -4,6 +4,7 @@
  */
 
 import * as patientPortalService from '../services/patientPortal.js';
+import { logAction } from '../services/auditLog.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -348,6 +349,13 @@ export const downloadDocument = async (req, res) => {
     if (result.error === 'EXPIRED') {
       return res.status(410).json({ error: 'Download link has expired' });
     }
+
+    await logAction('DOCUMENT_DOWNLOAD', null, {
+      resourceType: 'portal_document',
+      resourceId: result.documentId,
+      ipAddress: req.ip,
+      metadata: { organizationId: result.organizationId, method: 'token_download' },
+    });
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
