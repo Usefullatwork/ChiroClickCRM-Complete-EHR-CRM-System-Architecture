@@ -6,6 +6,7 @@ description: >
   user says "image optimization", "alt text", "image SEO", "image size",
   or "image audit".
 user-invocable: true
+model: sonnet
 effort: medium
 argument-hint: "[url-or-path]"
 ---

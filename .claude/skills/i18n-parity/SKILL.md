@@ -6,6 +6,7 @@ description: >
   says "i18n parity", "locale check", "translation audit", "missing translations",
   or "i18n diff".
 user-invocable: true
+model: sonnet
 effort: medium
 argument-hint: "[locale-pair]"
 ---

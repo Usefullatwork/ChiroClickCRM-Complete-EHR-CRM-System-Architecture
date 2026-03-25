@@ -5,6 +5,7 @@ description: >
   design. Scores each pillar 1-4 and provides specific, actionable findings. Use when user says
   "UI audit", "design review", "UX check", "audit the interface", or "check the design".
 user-invocable: true
+model: opus
 effort: high
 argument-hint: "[url-or-path]"
 ---

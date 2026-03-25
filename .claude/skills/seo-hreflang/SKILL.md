@@ -6,6 +6,7 @@ description: >
   hreflang implementations. Use when user says "hreflang", "i18n SEO",
   "international SEO", "multi-language", "multi-region", or "language tags".
 user-invocable: true
+model: sonnet
 effort: medium
 argument-hint: "[url-or-path]"
 ---

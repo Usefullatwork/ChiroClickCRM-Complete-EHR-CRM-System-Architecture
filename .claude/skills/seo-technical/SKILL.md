@@ -6,6 +6,7 @@ description: >
   rendering. Use when user says "technical SEO", "crawl issues", "robots.txt",
   "Core Web Vitals", "site speed", or "security headers".
 user-invocable: true
+model: sonnet
 effort: medium
 argument-hint: "[url-or-path]"
 ---

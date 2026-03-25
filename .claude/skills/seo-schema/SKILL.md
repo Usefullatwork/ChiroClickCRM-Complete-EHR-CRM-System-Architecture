@@ -5,6 +5,7 @@ description: >
   preferred. Use when user says "schema", "structured data", "rich results",
   "JSON-LD", or "markup".
 user-invocable: true
+model: sonnet
 effort: medium
 argument-hint: "[url-or-path]"
 ---

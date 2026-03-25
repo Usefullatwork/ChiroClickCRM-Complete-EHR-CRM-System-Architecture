@@ -113,7 +113,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "CF=/tmp/claude_tc; C=$(cat $CF 2>/dev/null||echo 0); C=$((C+1)); echo $C>$CF; [ $C -eq 40 ] && echo '{\"systemMessage\":\"40 tool calls. Consider /save-state then /compact at next logical boundary.\"}'; [ $C -eq 60 ] && echo '{\"systemMessage\":\"60 tool calls. Context degradation likely. Run /save-state NOW.\"}'",
+            "command": "CF=/tmp/claude_tc; C=$(cat $CF 2>/dev/null||echo 0); C=$((C+1)); echo $C>$CF; [ $C -eq 40 ] && echo '{\"systemMessage\":\"40 tool calls. Consider /session:save-state then /compact at next logical boundary.\"}'; [ $C -eq 60 ] && echo '{\"systemMessage\":\"60 tool calls. Context degradation likely. Run /session:save-state NOW.\"}'",
             "timeout": 2
           }
         ]
@@ -155,6 +155,16 @@
             "type": "command",
             "command": "bash hooks/scripts/notify-stop.sh",
             "timeout": 8000
+          }
+        ]
+      },
+      {
+        "description": "Check if 24+ hours since last /dream consolidation and suggest running it.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/should-dream.sh",
+            "timeout": 3000
           }
         ]
       }
@@ -201,7 +211,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "SNAP=$(ls -t .planning/snapshots/pre-compact-*.md 2>/dev/null | head -1); if [ -n \"$SNAP\" ]; then CONTENT=$(head -20 \"$SNAP\" | sed 's/\\\\\\\\/\\\\\\\\\\\\\\\\/g; s/\\\"/\\\\\\\\\\\"/g; s/\\\\t/\\\\\\\\t/g' | tr '\\\\n' ' '); echo \"{\\\\\"systemMessage\\\\\":\\\\\"Post-compact: state snapshot available at $SNAP. Review it to restore context.\\\\\"}\"; fi",
+            "command": "SNAP=$(ls -t .planning/snapshots/snapshot-*.md 2>/dev/null | head -1); if [ -n \"$SNAP\" ]; then echo \"{\\\"systemMessage\\\":\\\"Post-compact: state snapshot available at $SNAP. Read it to restore context.\\\"}\"; fi",
             "timeout": 5000
           }
         ]

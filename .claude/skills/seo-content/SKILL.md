@@ -5,6 +5,7 @@ description: >
   Use when user says "content quality", "E-E-A-T", "content analysis",
   "readability check", "thin content", or "content audit".
 user-invocable: true
+model: sonnet
 effort: medium
 argument-hint: "[url-or-path]"
 ---
