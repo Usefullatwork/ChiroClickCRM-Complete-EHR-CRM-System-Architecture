@@ -6,13 +6,10 @@
  * and payment tracking for Norwegian chiropractic clinics
  */
 
-import { createRequire } from 'module';
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 import { DEFAULT_PAGE_SIZE_LARGE, DEFAULT_INVOICE_DUE_DAYS } from '../config/constants.js';
-
-const require = createRequire(import.meta.url);
-const takstCodes = require('../data/takst-codes.json');
+import takstCodes from '../data/takst-codes.json' with { type: 'json' };
 
 // Invoice statuses
 export const INVOICE_STATUS = {

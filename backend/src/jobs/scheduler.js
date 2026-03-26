@@ -41,7 +41,8 @@ const loadServices = async () => {
   }
 
   try {
-    aiRetrainingService = await import('../services/aiRetraining.js');
+    const mod = await import('../application/services/AIRetrainingService.js');
+    aiRetrainingService = mod.aiRetrainingService;
     logger.info('AI Retraining service loaded');
   } catch (e) {
     logger.warn('AI Retraining service not available:', e.message);
