@@ -415,4 +415,376 @@ describe('Billing Service', () => {
       expect(billingService.PAYMENT_METHODS.HELFO).toBe('helfo');
     });
   });
+
+  // =============================================================================
+  // TAKST CODE LOOKUP — ADDITIONAL CODES & REAL CODE CALCULATIONS
+  // =============================================================================
+
+  describe('getTakstCode (extended)', () => {
+    it('should return null for empty string input', () => {
+      const result = billingService.getTakstCode('');
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('calculateInvoiceTotals (with real codes)', () => {
+    it('should calculate correct totals for a known code (1a)', () => {
+      // takst 1a: price=675, helfoRefund=254, patientShare=421
+      const result = billingService.calculateInvoiceTotals([{ code: '1a', quantity: 1 }]);
+
+      expect(result.totalGross).toBe(675);
+      expect(result.totalHelfoRefund).toBe(254);
+      expect(result.totalPatientShare).toBe(421);
+      expect(result.totalDue).toBe(421);
+      expect(result.currency).toBe('NOK');
+      expect(result.items).toHaveLength(1);
+      expect(result.items[0].code).toBe('1a');
+    });
+
+    it('should multiply amounts correctly for quantity > 1', () => {
+      // takst 1c: price=495, helfoRefund=185, patientShare=310
+      const result = billingService.calculateInvoiceTotals([{ code: '1c', quantity: 2 }]);
+
+      expect(result.totalGross).toBe(990);
+      expect(result.totalHelfoRefund).toBe(370);
+      expect(result.totalPatientShare).toBe(620);
+    });
+
+    it('should apply 50% reduction in patient share when hasExemption is true', () => {
+      // takst 1a: patientShare=421 → 421 * 0.5 = 210 (Math.round)
+      const result = billingService.calculateInvoiceTotals([{ code: '1a', quantity: 1 }], {
+        hasExemption: true,
+      });
+
+      expect(result.totalPatientShare).toBe(Math.round(421 * 0.5));
+      expect(result.totalGross).toBe(675); // gross unchanged
+    });
+
+    it('should zero out patient share for children even with known code', () => {
+      const result = billingService.calculateInvoiceTotals([{ code: '1c', quantity: 1 }], {
+        isChild: true,
+      });
+
+      expect(result.totalPatientShare).toBe(0);
+      expect(result.totalGross).toBe(495); // gross still reflects full price
+    });
+
+    it('should accumulate totals across multiple items', () => {
+      // 1a: 675/254/421  +  1b: 295/107/188
+      const result = billingService.calculateInvoiceTotals([
+        { code: '1a', quantity: 1 },
+        { code: '1b', quantity: 1 },
+      ]);
+
+      expect(result.totalGross).toBe(675 + 295);
+      expect(result.totalHelfoRefund).toBe(254 + 107);
+      expect(result.totalPatientShare).toBe(421 + 188);
+      expect(result.items).toHaveLength(2);
+    });
+  });
+
+  // =============================================================================
+  // GET INVOICES — DATE RANGE, SEARCH, SORT ORDER
+  // =============================================================================
+
+  describe('getInvoices (extended filters)', () => {
+    it('should filter by date range', async () => {
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ count: '1' }] })
+        .mockResolvedValueOnce({ rows: [{ id: 'inv-10', status: 'sent' }] });
+
+      const result = await billingService.getInvoices(testOrgId, {
+        start_date: '2026-01-01',
+        end_date: '2026-03-31',
+      });
+
+      expect(result.invoices).toHaveLength(1);
+      const countQuery = mockQuery.mock.calls[0][0];
+      expect(countQuery).toContain('invoice_date >=');
+      expect(countQuery).toContain('invoice_date <=');
+    });
+
+    it('should include ILIKE search in query when search option is provided', async () => {
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ count: '0' }] })
+        .mockResolvedValueOnce({ rows: [] });
+
+      await billingService.getInvoices(testOrgId, { search: 'Hansen' });
+
+      const countQuery = mockQuery.mock.calls[0][0];
+      expect(countQuery).toContain('ILIKE');
+    });
+
+    it('should default to DESC sort order for invalid sort_order value', async () => {
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ count: '0' }] })
+        .mockResolvedValueOnce({ rows: [] });
+
+      await billingService.getInvoices(testOrgId, { sort_order: 'INVALID' });
+
+      const dataQuery = mockQuery.mock.calls[1][0];
+      expect(dataQuery).toContain('DESC');
+    });
+
+    it('should use ASC sort order when specified', async () => {
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ count: '0' }] })
+        .mockResolvedValueOnce({ rows: [] });
+
+      await billingService.getInvoices(testOrgId, { sort_order: 'ASC' });
+
+      const dataQuery = mockQuery.mock.calls[1][0];
+      expect(dataQuery).toContain('ASC');
+    });
+  });
+
+  // =============================================================================
+  // GET INVOICE PAYMENTS
+  // =============================================================================
+
+  describe('getInvoicePayments', () => {
+    it('should return payments for a given invoice', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          { id: 'pay-1', amount: 300, payment_method: 'card', payment_date: '2026-03-01' },
+          { id: 'pay-2', amount: 200, payment_method: 'vipps', payment_date: '2026-03-05' },
+        ],
+      });
+
+      const result = await billingService.getInvoicePayments(testOrgId, 'inv-123');
+
+      expect(result).toHaveLength(2);
+      expect(result[0].payment_method).toBe('card');
+    });
+
+    it('should return empty array when invoice has no payments', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await billingService.getInvoicePayments(testOrgId, 'inv-no-payments');
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  // =============================================================================
+  // CANCEL INVOICE
+  // =============================================================================
+
+  describe('cancelInvoice', () => {
+    it('should cancel an invoice and return the cancelled record', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'inv-123',
+            invoice_number: 'F202602-0001',
+            status: 'cancelled',
+            cancellation_reason: 'Patient no-show',
+          },
+        ],
+      });
+
+      const result = await billingService.cancelInvoice(testOrgId, 'inv-123', 'Patient no-show');
+
+      expect(result.status).toBe('cancelled');
+      expect(result.cancellation_reason).toBe('Patient no-show');
+    });
+
+    it('should throw when invoice is already paid or cancelled', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      await expect(
+        billingService.cancelInvoice(testOrgId, 'inv-paid', 'Duplicate')
+      ).rejects.toThrow('Invoice not found or cannot be cancelled');
+    });
+  });
+
+  // =============================================================================
+  // GET INVOICE STATISTICS
+  // =============================================================================
+
+  describe('getInvoiceStatistics', () => {
+    it('should return statistics for the organization', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          {
+            paid_count: '12',
+            pending_count: '3',
+            overdue_count: '1',
+            draft_count: '2',
+            total_paid: '5400',
+            total_outstanding: '1200',
+            total_overdue: '310',
+            total_helfo_refund: '2540',
+            total_invoices: '18',
+          },
+        ],
+      });
+
+      const result = await billingService.getInvoiceStatistics(testOrgId);
+
+      expect(result.paid_count).toBe('12');
+      expect(result.total_helfo_refund).toBe('2540');
+    });
+
+    it('should append date filter params when start_date and end_date provided', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [{ paid_count: '0' }] });
+
+      await billingService.getInvoiceStatistics(testOrgId, {
+        start_date: '2026-01-01',
+        end_date: '2026-01-31',
+      });
+
+      const calledSql = mockQuery.mock.calls[0][0];
+      expect(calledSql).toContain('invoice_date >=');
+      expect(calledSql).toContain('invoice_date <=');
+      // Params should include both date values
+      const calledParams = mockQuery.mock.calls[0][1];
+      expect(calledParams).toContain('2026-01-01');
+      expect(calledParams).toContain('2026-01-31');
+    });
+  });
+
+  // =============================================================================
+  // UPDATE OVERDUE INVOICES
+  // =============================================================================
+
+  describe('updateOverdueInvoices', () => {
+    it('should return invoices that were marked overdue', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          { id: 'inv-1', status: 'overdue', invoice_number: 'F202601-0001' },
+          { id: 'inv-2', status: 'overdue', invoice_number: 'F202601-0002' },
+        ],
+      });
+
+      const result = await billingService.updateOverdueInvoices(testOrgId);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].status).toBe('overdue');
+    });
+
+    it('should return empty array when no invoices are overdue', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await billingService.updateOverdueInvoices(testOrgId);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  // =============================================================================
+  // GENERATE INVOICE HTML
+  // =============================================================================
+
+  describe('generateInvoiceHTML', () => {
+    const baseInvoice = {
+      invoice_number: 'F202603-0001',
+      invoice_date: '2026-03-01T00:00:00.000Z',
+      due_date: '2026-03-15T00:00:00.000Z',
+      items: [
+        {
+          code: '1a',
+          name: 'Forstegangsundersokelse',
+          description: 'Test',
+          quantity: 1,
+          unitPrice: 675,
+          lineTotal: 675,
+          helfoRefund: 254,
+          patientShare: 421,
+        },
+      ],
+      gross_amount: 675,
+      helfo_refund: 254,
+      amount_due: 421,
+      organization_name: 'Testklinikk AS',
+      organization_address: 'Testgata 1',
+      organization_postal_code: '0001',
+      organization_city: 'Oslo',
+      organization_org_number: '123456789',
+      organization_phone: '+47 22 22 22 22',
+      organization_email: 'post@testklinikk.no',
+      organization_bank_account: '1234 56 78901',
+      patient_first_name: 'Ola',
+      patient_last_name: 'Nordmann',
+      patient_address: 'Pasientveien 5',
+      patient_postal_code: '0100',
+      patient_city: 'Oslo',
+      practitioner_name: 'Dr. Hansen',
+      practitioner_hpr: '1234567',
+    };
+
+    it('should return an HTML string containing the invoice number', () => {
+      const html = billingService.generateInvoiceHTML(baseInvoice);
+
+      expect(typeof html).toBe('string');
+      expect(html).toContain('F202603-0001');
+    });
+
+    it('should include patient name and organization name in HTML output', () => {
+      const html = billingService.generateInvoiceHTML(baseInvoice);
+
+      expect(html).toContain('Ola');
+      expect(html).toContain('Nordmann');
+      expect(html).toContain('Testklinikk AS');
+    });
+
+    it('should parse items when provided as a JSON string', () => {
+      const invoiceWithStringItems = {
+        ...baseInvoice,
+        items: JSON.stringify(baseInvoice.items),
+      };
+
+      const html = billingService.generateInvoiceHTML(invoiceWithStringItems);
+
+      // Should render without throwing and include the takst code
+      expect(html).toContain('1a');
+    });
+  });
+
+  // =============================================================================
+  // HELFO REPORT DATA
+  // =============================================================================
+
+  describe('getHelfoReportData', () => {
+    it('should return HELFO report with totals for the given period', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          {
+            invoice_number: 'F202603-0001',
+            invoice_date: '2026-03-01',
+            helfo_refund: '254',
+            items: '[]',
+            patient_name: 'Ola Nordmann',
+            patient_dob: '1980-05-15',
+          },
+          {
+            invoice_number: 'F202603-0002',
+            invoice_date: '2026-03-10',
+            helfo_refund: '185',
+            items: '[]',
+            patient_name: 'Kari Hansen',
+            patient_dob: '1975-11-22',
+          },
+        ],
+      });
+
+      const result = await billingService.getHelfoReportData(testOrgId, '2026-03-01', '2026-03-31');
+
+      expect(result.invoices).toHaveLength(2);
+      expect(result.totalRefund).toBeCloseTo(254 + 185);
+      expect(result.invoiceCount).toBe(2);
+      expect(result.period.startDate).toBe('2026-03-01');
+      expect(result.period.endDate).toBe('2026-03-31');
+    });
+
+    it('should return zero totalRefund and empty array when no HELFO claims exist', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await billingService.getHelfoReportData(testOrgId, '2026-03-01', '2026-03-31');
+
+      expect(result.invoices).toHaveLength(0);
+      expect(result.totalRefund).toBe(0);
+      expect(result.invoiceCount).toBe(0);
+    });
+  });
 });
