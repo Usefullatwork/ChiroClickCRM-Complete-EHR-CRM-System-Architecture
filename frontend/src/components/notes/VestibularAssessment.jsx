@@ -6,6 +6,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useTranslation } from '../../i18n/useTranslation';
 import {
   Eye,
   Activity,
@@ -38,6 +39,8 @@ export default function VestibularAssessment({
   onLock,
   readOnly = false,
 }) {
+  const { t } = useTranslation('clinical');
+
   // State for assessment data
   // Tilstand for vurderingsdata
   const [assessment, setAssessment] = useState(
@@ -338,14 +341,14 @@ export default function VestibularAssessment({
                 className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
-                {saving ? 'Lagrer...' : 'Lagre'}
+                {saving ? t('saving', 'Lagrer...') : t('save', 'Lagre')}
               </button>
               <button
                 onClick={onLock}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 <Lock className="w-4 h-4" />
-                Signer
+                {t('sign', 'Signer')}
               </button>
             </>
           )}

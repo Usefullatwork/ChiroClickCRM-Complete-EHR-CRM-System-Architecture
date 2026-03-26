@@ -276,14 +276,16 @@ const ReferralProgram = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Program Info */}
           <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl p-6 text-white">
-            <h3 className="text-xl font-bold mb-4">Aktivt Henvisningsprogram</h3>
+            <h3 className="text-xl font-bold mb-4">
+              {t('activeReferralProgram', 'Aktivt Henvisningsprogram')}
+            </h3>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
                   <Gift className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="font-medium">Henviser får</p>
+                  <p className="font-medium">{t('referrerGets', 'Henviser får')}</p>
                   <p className="text-2xl font-bold">{programSettings.referrerReward} kr</p>
                 </div>
               </div>
@@ -292,14 +294,20 @@ const ReferralProgram = () => {
                   <DollarSign className="w-5 h-5" />
                 </div>
                 <div>
-                  <p className="font-medium">Ny pasient får</p>
-                  <p className="text-2xl font-bold">{programSettings.refereeDiscount} kr rabatt</p>
+                  <p className="font-medium">{t('newPatientGets', 'Ny pasient får')}</p>
+                  <p className="text-2xl font-bold">
+                    {programSettings.refereeDiscount} kr {t('discount', 'rabatt')}
+                  </p>
                 </div>
               </div>
               <div className="pt-4 border-t border-white/20">
                 <p className="text-sm opacity-80">
-                  Maks {programSettings.maxReferrals} henvisninger per pasient. Belønning utløper
-                  etter {programSettings.expiryDays} dager.
+                  {t(
+                    'programLimits',
+                    'Maks {max} henvisninger per pasient. Belønning utløper etter {days} dager.'
+                  )
+                    .replace('{max}', programSettings.maxReferrals)
+                    .replace('{days}', programSettings.expiryDays)}
                 </p>
               </div>
             </div>
@@ -308,8 +316,10 @@ const ReferralProgram = () => {
           {/* Top Referrers */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900">Topp Henvisere</h3>
-              <button className="text-blue-500 text-sm hover:underline">Se alle</button>
+              <h3 className="font-bold text-gray-900">{t('topReferrers', 'Topp Henvisere')}</h3>
+              <button className="text-blue-500 text-sm hover:underline">
+                {t('viewAll', 'Se alle')}
+              </button>
             </div>
             <div className="space-y-3">
               {topReferrers.slice(0, 5).map((referrer, index) => (
@@ -333,14 +343,17 @@ const ReferralProgram = () => {
                   <div className="flex-1">
                     <p className="font-medium text-gray-900">{referrer.name}</p>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {referrer.converted} av {referrer.referrals} konvertert
+                      {referrer.converted} {t('of', 'av')} {referrer.referrals}{' '}
+                      {t('metricConverted', 'konvertert')}
                     </p>
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-green-600">
                       {referrer.totalReward.toLocaleString('nb-NO')} kr
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Totalt opptjent</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('totalEarned', 'Totalt opptjent')}
+                    </p>
                   </div>
                 </div>
               ))}
@@ -350,7 +363,9 @@ const ReferralProgram = () => {
           {/* Recent Referrals */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 lg:col-span-2">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900">Siste Henvisninger</h3>
+              <h3 className="font-bold text-gray-900">
+                {t('recentReferrals', 'Siste Henvisninger')}
+              </h3>
               <button
                 onClick={() => setActiveTab('referrals')}
                 className="text-blue-500 text-sm hover:underline flex items-center gap-1"
@@ -363,19 +378,19 @@ const ReferralProgram = () => {
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      Henviser
+                      {t('referrer', 'Henviser')}
                     </th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      Ny Pasient
+                      {t('newPatient', 'Ny Pasient')}
                     </th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      Kode
+                      {t('code', 'Kode')}
                     </th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      Status
+                      {t('status', 'Status')}
                     </th>
                     <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                      Dato
+                      {t('date', 'Dato')}
                     </th>
                   </tr>
                 </thead>
@@ -435,25 +450,25 @@ const ReferralProgram = () => {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Henviser
+                  {t('referrer', 'Henviser')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Ny Pasient
+                  {t('newPatient', 'Ny Pasient')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Kode
+                  {t('code', 'Kode')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Status
+                  {t('status', 'Status')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Opprettet
+                  {t('created', 'Opprettet')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Konvertert
+                  {t('metricConverted', 'Konvertert')}
                 </th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                  Belønning
+                  {t('reward', 'Belønning')}
                 </th>
               </tr>
             </thead>
@@ -504,7 +519,7 @@ const ReferralProgram = () => {
                           {referral.rewardAmount} kr
                         </span>
                       ) : referral.rewardStatus === 'PENDING' ? (
-                        <span className="text-yellow-600">Ventende</span>
+                        <span className="text-yellow-600">{t('pending', 'Ventende')}</span>
                       ) : (
                         <span className="text-gray-400 dark:text-gray-300">-</span>
                       )}
@@ -519,7 +534,9 @@ const ReferralProgram = () => {
 
       {activeTab === 'leaderboard' && (
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">Henviser Toppliste</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-6">
+            {t('referrerLeaderboard', 'Henviser Toppliste')}
+          </h3>
           <div className="space-y-4">
             {topReferrers.map((referrer, index) => (
               <div
@@ -543,11 +560,12 @@ const ReferralProgram = () => {
                   <p className="font-bold text-gray-900">{referrer.name}</p>
                   <div className="flex gap-4 mt-1">
                     <span className="text-sm text-gray-600 dark:text-gray-300">
-                      <span className="font-medium">{referrer.referrals}</span> henvisninger
+                      <span className="font-medium">{referrer.referrals}</span>{' '}
+                      {t('referrals', 'henvisninger')}
                     </span>
                     <span className="text-sm text-gray-600 dark:text-gray-300">
                       <span className="font-medium text-green-600">{referrer.converted}</span>{' '}
-                      konvertert
+                      {t('metricConverted', 'konvertert')}
                     </span>
                   </div>
                 </div>
@@ -555,7 +573,9 @@ const ReferralProgram = () => {
                   <p className="text-2xl font-bold text-green-600">
                     {referrer.totalReward.toLocaleString('nb-NO')} kr
                   </p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Total belønning</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {t('totalReward', 'Total belønning')}
+                  </p>
                 </div>
               </div>
             ))}
@@ -565,11 +585,13 @@ const ReferralProgram = () => {
 
       {activeTab === 'settings' && (
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-6">Programinnstillinger</h3>
+          <h3 className="text-lg font-bold text-gray-900 mb-6">
+            {t('programSettings', 'Programinnstillinger')}
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Belønning til Henviser (kr)
+                {t('referrerRewardLabel', 'Belønning til Henviser (kr)')}
               </label>
               <input
                 type="number"
@@ -579,7 +601,7 @@ const ReferralProgram = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Rabatt til Ny Pasient (kr)
+                {t('refereeDiscountLabel', 'Rabatt til Ny Pasient (kr)')}
               </label>
               <input
                 type="number"
@@ -589,7 +611,7 @@ const ReferralProgram = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Maks Henvisninger per Pasient
+                {t('maxReferralsLabel', 'Maks Henvisninger per Pasient')}
               </label>
               <input
                 type="number"
@@ -599,7 +621,7 @@ const ReferralProgram = () => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Utløpsdager for Henvisning
+                {t('expiryDaysLabel', 'Utløpsdager for Henvisning')}
               </label>
               <input
                 type="number"
@@ -610,7 +632,7 @@ const ReferralProgram = () => {
           </div>
           <div className="mt-6 pt-6 border-t border-gray-200">
             <button className="px-6 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600">
-              Lagre Endringer
+              {t('saveChanges', 'Lagre Endringer')}
             </button>
           </div>
         </div>
@@ -620,31 +642,33 @@ const ReferralProgram = () => {
       {showNewReferralForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Ny Henvisning</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">
+              {t('newReferral', 'Ny Henvisning')}
+            </h3>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Henviser (Eksisterende Pasient)
+                  {t('referrerExistingPatient', 'Henviser (Eksisterende Pasient)')}
                 </label>
                 <input
                   type="text"
-                  placeholder="Skriv pasientnavn..."
+                  placeholder={t('typePatientName', 'Skriv pasientnavn...')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ny Pasient Navn
+                  {t('newPatientName', 'Ny Pasient Navn')}
                 </label>
                 <input
                   type="text"
-                  placeholder="Skriv inn navn..."
+                  placeholder={t('typeNamePlaceholder', 'Skriv inn navn...')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ny Pasient E-post
+                  {t('newPatientEmail', 'Ny Pasient E-post')}
                 </label>
                 <input
                   type="email"
@@ -654,7 +678,7 @@ const ReferralProgram = () => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Ny Pasient Telefon
+                  {t('newPatientPhone', 'Ny Pasient Telefon')}
                 </label>
                 <input
                   type="tel"
@@ -668,13 +692,13 @@ const ReferralProgram = () => {
                 onClick={() => setShowNewReferralForm(false)}
                 className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
               >
-                Avbryt
+                {t('cancel', 'Avbryt')}
               </button>
               <button
                 onClick={() => setShowNewReferralForm(false)}
                 className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
               >
-                Opprett Henvisning
+                {t('createReferral', 'Opprett Henvisning')}
               </button>
             </div>
           </div>

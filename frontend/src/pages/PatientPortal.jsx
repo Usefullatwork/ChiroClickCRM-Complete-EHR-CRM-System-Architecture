@@ -24,10 +24,13 @@ import {
 import axios from 'axios';
 
 import logger from '../utils/logger';
+import { useTranslation } from '../i18n/useTranslation';
+
 const API_BASE = import.meta.env.VITE_API_URL || '/api/v1';
 
 const PatientPortal = () => {
   const { token } = useParams();
+  const { t } = useTranslation('portal');
 
   // State
   const [prescription, setPrescription] = useState(null);
@@ -64,7 +67,9 @@ const PatientPortal = () => {
       loadProgressHistory();
     } catch (err) {
       logger.error('Error loading prescription:', err);
-      setError(err.response?.data?.message || 'Kunne ikke laste øvelsesprogrammet');
+      setError(
+        err.response?.data?.message || t('exercisesUnavailable', 'Øvelsene er ikke tilgjengelige')
+      );
     } finally {
       setLoading(false);
     }
@@ -139,11 +144,11 @@ const PatientPortal = () => {
   const getDifficultyLabel = (level) => {
     switch (level) {
       case 'beginner':
-        return 'Nybegynner';
+        return t('difficultyBeginner', 'Nybegynner');
       case 'intermediate':
-        return 'Middels';
+        return t('difficultyIntermediate', 'Middels');
       case 'advanced':
-        return 'Avansert';
+        return t('difficultyAdvanced', 'Avansert');
       default:
         return level;
     }
@@ -155,7 +160,9 @@ const PatientPortal = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600 dark:text-gray-300">Laster øvelser...</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            {t('loadingExercises', 'Laster øvelser...')}
+          </p>
         </div>
       </div>
     );
@@ -170,11 +177,11 @@ const PatientPortal = () => {
             <AlertTriangle className="w-8 h-8 text-red-600" />
           </div>
           <h1 className="text-xl font-semibold text-gray-900 mb-2">
-            Øvelsene er ikke tilgjengelige
+            {t('exercisesUnavailable', 'Øvelsene er ikke tilgjengelige')}
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            Kontakt klinikken for å få en ny lenke til øvelsene dine.
+            {t('contactClinicForLink', 'Kontakt klinikken for å få en ny lenke til øvelsene dine.')}
           </p>
         </div>
       </div>
@@ -192,7 +199,9 @@ const PatientPortal = () => {
             </div>
             <div>
               <h1 className="font-semibold text-gray-900">{prescription?.clinicName}</h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Ditt øvelsesprogram</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('exerciseProgram', 'Ditt øvelsesprogram')}
+              </p>
             </div>
           </div>
         </div>
@@ -205,7 +214,9 @@ const PatientPortal = () => {
           <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-300">
             <div className="flex items-center gap-2">
               <User className="w-4 h-4" />
-              <span>Foreskrevet av: {prescription?.prescribedBy}</span>
+              <span>
+                {t('prescribedBy', 'Foreskrevet av:')} {prescription?.prescribedBy}
+              </span>
             </div>
             <div className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
@@ -230,7 +241,9 @@ const PatientPortal = () => {
 
           {prescription?.patientInstructions && (
             <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p className="text-sm font-medium text-blue-900 mb-1">Instruksjoner:</p>
+              <p className="text-sm font-medium text-blue-900 mb-1">
+                {t('instructions', 'Instruksjoner')}:
+              </p>
               <p className="text-sm text-blue-800">{prescription.patientInstructions}</p>
             </div>
           )}
@@ -238,7 +251,9 @@ const PatientPortal = () => {
 
         {/* Progress Summary */}
         <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
-          <h2 className="font-medium text-gray-900 mb-3">Din fremgang i dag</h2>
+          <h2 className="font-medium text-gray-900 mb-3">
+            {t('progressToday', 'Din fremgang i dag')}
+          </h2>
           <div className="flex items-center gap-4">
             <div className="flex-1 bg-gray-100 rounded-full h-3">
               <div
@@ -257,7 +272,7 @@ const PatientPortal = () => {
         {/* Exercise List */}
         <div className="space-y-4">
           <h2 className="font-semibold text-gray-900">
-            Øvelser ({prescription?.exercises?.length})
+            {t('exercises', 'Øvelser')} ({prescription?.exercises?.length})
           </h2>
 
           {prescription?.exercises?.map((exercise, index) => (
@@ -322,24 +337,25 @@ const PatientPortal = () => {
                   {exercise.sets && (
                     <span className="flex items-center gap-1">
                       <Target className="w-4 h-4 text-gray-400 dark:text-gray-300" />
-                      {exercise.sets} sett
+                      {exercise.sets} {t('sets', 'sett')}
                     </span>
                   )}
                   {exercise.reps && (
                     <span className="flex items-center gap-1">
                       <Activity className="w-4 h-4 text-gray-400 dark:text-gray-300" />
-                      {exercise.reps} rep
+                      {exercise.reps} {t('reps', 'rep')}
                     </span>
                   )}
                   {exercise.holdSeconds && (
                     <span className="flex items-center gap-1">
                       <Clock className="w-4 h-4 text-gray-400 dark:text-gray-300" />
-                      Hold {exercise.holdSeconds} sek
+                      {t('hold', 'Hold')} {exercise.holdSeconds} {t('seconds', 'sek')}
                     </span>
                   )}
                   {exercise.frequencyPerDay && (
                     <span className="flex items-center gap-1">
-                      {exercise.frequencyPerDay}× daglig
+                      {exercise.frequencyPerDay}
+                      {t('timesDaily', '× daglig')}
                     </span>
                   )}
                 </div>
@@ -371,7 +387,9 @@ const PatientPortal = () => {
                   {/* Instructions */}
                   <div className="p-4 space-y-4">
                     <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">Instruksjoner</h4>
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">
+                        {t('instructions', 'Instruksjoner')}
+                      </h4>
                       <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">
                         {exercise.instructions}
                       </p>
@@ -380,7 +398,7 @@ const PatientPortal = () => {
                     {exercise.customInstructions && (
                       <div className="p-3 bg-blue-50 rounded-lg">
                         <h4 className="text-sm font-medium text-blue-900 mb-1">
-                          Spesielle instruksjoner
+                          {t('specialInstructions', 'Spesielle instruksjoner')}
                         </h4>
                         <p className="text-sm text-blue-800">{exercise.customInstructions}</p>
                       </div>
@@ -392,7 +410,7 @@ const PatientPortal = () => {
                           <AlertTriangle className="w-4 h-4 text-yellow-600 mt-0.5" />
                           <div>
                             <h4 className="text-sm font-medium text-yellow-800">
-                              Forsiktighetsregler
+                              {t('precautions', 'Forsiktighetsregler')}
                             </h4>
                             <ul className="text-sm text-yellow-700 mt-1">
                               {exercise.precautions.map((p, i) => (
@@ -431,10 +449,10 @@ const PatientPortal = () => {
                       {completedExercises.has(exercise.exerciseId) ? (
                         <span className="flex items-center justify-center gap-2">
                           <Check className="w-4 h-4" />
-                          Fullført i dag
+                          {t('completedToday', 'Fullført i dag')}
                         </span>
                       ) : (
-                        'Marker som fullført'
+                        t('markAsComplete', 'Marker som fullført')
                       )}
                     </button>
                   </div>
@@ -446,8 +464,15 @@ const PatientPortal = () => {
 
         {/* Footer */}
         <div className="mt-8 p-4 text-center text-sm text-gray-500 dark:text-gray-400">
-          <p>Stopp øvelsene hvis du opplever økt smerte og kontakt klinikken.</p>
-          <p className="mt-2">Dette programmet er personlig tilpasset deg.</p>
+          <p>
+            {t(
+              'stopExercisesWarning',
+              'Stopp øvelsene hvis du opplever økt smerte og kontakt klinikken.'
+            )}
+          </p>
+          <p className="mt-2">
+            {t('programPersonalized', 'Dette programmet er personlig tilpasset deg.')}
+          </p>
         </div>
       </main>
 
@@ -456,7 +481,9 @@ const PatientPortal = () => {
         <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50">
           <div className="bg-white w-full sm:max-w-md sm:rounded-xl rounded-t-xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Registrer fremgang</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t('registerProgress', 'Registrer fremgang')}
+              </h3>
               <button
                 onClick={() => setShowFeedbackModal(null)}
                 className="p-2 hover:bg-gray-100 rounded-lg"
@@ -474,7 +501,7 @@ const PatientPortal = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Sett fullført
+                    {t('setsCompleted', 'Sett fullført')}
                   </label>
                   <input
                     type="number"
@@ -492,7 +519,7 @@ const PatientPortal = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Repetisjoner
+                    {t('repsCompleted', 'Repetisjoner')}
                   </label>
                   <input
                     type="number"
@@ -513,7 +540,7 @@ const PatientPortal = () => {
               {/* Difficulty Rating */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Hvor vanskelig var øvelsen?
+                  {t('exerciseDifficulty', 'Hvor vanskelig var øvelsen?')}
                 </label>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((rating) => (
@@ -533,15 +560,15 @@ const PatientPortal = () => {
                   ))}
                 </div>
                 <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
-                  <span>Lett</span>
-                  <span>Vanskelig</span>
+                  <span>{t('easy', 'Lett')}</span>
+                  <span>{t('difficult', 'Vanskelig')}</span>
                 </div>
               </div>
 
               {/* Pain Rating */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Smertenivå under øvelsen (0-10)
+                  {t('painLevel', 'Smertenivå under øvelsen (0-10)')}
                 </label>
                 <input
                   type="range"
@@ -557,23 +584,23 @@ const PatientPortal = () => {
                   max="10"
                 />
                 <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                  <span>Ingen smerte</span>
+                  <span>{t('noPain', 'Ingen smerte')}</span>
                   <span className="font-medium">{feedbackData.painRating}</span>
-                  <span>Verst tenkelig</span>
+                  <span>{t('worstPain', 'Verst tenkelig')}</span>
                 </div>
               </div>
 
               {/* Notes */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Notater (valgfritt)
+                  {t('notesOptional', 'Notater (valgfritt)')}
                 </label>
                 <textarea
                   value={feedbackData.notes}
                   onChange={(e) => setFeedbackData((prev) => ({ ...prev, notes: e.target.value }))}
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg"
                   rows={2}
-                  placeholder="Hvordan føltes øvelsen?"
+                  placeholder={t('exerciseFeedback', 'Hvordan føltes øvelsen?')}
                 />
               </div>
 
@@ -582,7 +609,7 @@ const PatientPortal = () => {
                 onClick={handleRecordProgress}
                 className="w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
               >
-                Registrer fremgang
+                {t('submitProgress', 'Registrer fremgang')}
               </button>
             </div>
           </div>

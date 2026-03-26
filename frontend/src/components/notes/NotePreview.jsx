@@ -178,7 +178,7 @@ export default function NotePreview({
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="font-semibold text-gray-900">
-                  {getNoteTypeLabel(note?.template_type)} Notat
+                  {getNoteTypeLabel(note?.template_type)} {t('note', 'Notat')}
                 </h2>
                 <span
                   className={`px-2 py-0.5 text-xs font-medium rounded ${getNoteTypeBadge(
@@ -257,7 +257,7 @@ export default function NotePreview({
                   {note?.patient_name && (
                     <div>
                       <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                        Pasient
+                        {t('patient', 'Pasient')}
                       </dt>
                       <dd className="text-sm font-medium text-gray-900">{note.patient_name}</dd>
                     </div>
@@ -265,7 +265,7 @@ export default function NotePreview({
                   {note?.practitioner_name && (
                     <div>
                       <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                        Behandler
+                        {t('practitioner', 'Behandler')}
                       </dt>
                       <dd className="text-sm text-gray-900">{note.practitioner_name}</dd>
                     </div>
@@ -273,15 +273,17 @@ export default function NotePreview({
                   {note?.duration_minutes && (
                     <div>
                       <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                        Varighet
+                        {t('duration', 'Varighet')}
                       </dt>
-                      <dd className="text-sm text-gray-900">{note.duration_minutes} minutter</dd>
+                      <dd className="text-sm text-gray-900">
+                        {note.duration_minutes} {t('minutes', 'minutter')}
+                      </dd>
                     </div>
                   )}
                   {note?.vas_pain_start !== null && note?.vas_pain_start !== undefined && (
                     <div>
                       <dt className="text-xs font-medium text-gray-500 dark:text-gray-400">
-                        VAS smerte
+                        {t('vasPain', 'VAS smerte')}
                       </dt>
                       <dd className="text-sm text-gray-900">
                         {note.vas_pain_start}/10 {'->'} {note.vas_pain_end}/10
@@ -294,7 +296,9 @@ export default function NotePreview({
               {/* Diagnosis Codes / Diagnosekoder */}
               {(note?.icd10_codes?.length > 0 || note?.icpc_codes?.length > 0) && (
                 <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                  <h4 className="text-sm font-medium text-blue-900 mb-2">Diagnosekoder</h4>
+                  <h4 className="text-sm font-medium text-blue-900 mb-2">
+                    {t('diagnosisCodes', 'Diagnosekoder')}
+                  </h4>
                   <div className="flex flex-wrap gap-2">
                     {note?.icd10_codes?.map((code, index) => (
                       <span
@@ -317,93 +321,113 @@ export default function NotePreview({
               )}
 
               {/* Subjective Section / Subjektiv seksjon */}
-              <Section title="Subjektiv (S)" icon={User} color="blue">
+              <Section title={t('soapSubjectiveTitle', 'S - Subjektiv')} icon={User} color="blue">
                 <Field
-                  label="Hovedklage"
+                  label={t('soapChiefComplaint', 'Hovedklage')}
                   value={subjective.chiefComplaint || subjective.chief_complaint}
                 />
                 <Field
-                  label="Sykehistorie"
+                  label={t('soapHpi', 'Sykehistorie')}
                   value={subjective.historyOfPresentIllness || subjective.history}
                 />
                 <Field
-                  label="Smertelokalisering"
+                  label={t('soapPainLocation', 'Smertelokalisering')}
                   value={subjective.painLocation || subjective.pain_location}
                 />
                 {subjective.painIntensity !== null && subjective.painIntensity !== undefined && (
-                  <Field label="Smerteintensitet" value={`${subjective.painIntensity}/10`} />
+                  <Field
+                    label={t('soapPainIntensity', 'Smerteintensitet')}
+                    value={`${subjective.painIntensity}/10`}
+                  />
                 )}
                 <Field
-                  label="Smertekvalitet"
+                  label={t('painQuality', 'Smertekvalitet')}
                   value={subjective.painQuality || subjective.pain_quality}
                 />
                 <Field
-                  label="Forverrende faktorer"
+                  label={t('soapAggravatingFactors', 'Forverrende faktorer')}
                   value={subjective.aggravatingFactors || subjective.aggravating_factors}
                 />
                 <Field
-                  label="Lindrende faktorer"
+                  label={t('soapRelievingFactors', 'Lindrende faktorer')}
                   value={subjective.relievingFactors || subjective.relieving_factors}
                 />
                 <Field
-                  label="Funksjonsbegrensninger"
+                  label={t('soapFunctionalLimitations', 'Funksjonsbegrensninger')}
                   value={subjective.functionalLimitations || subjective.functional_limitations}
                 />
-                <Field label="Medikamenter" value={subjective.medications} />
+                <Field label={t('medications', 'Medikamenter')} value={subjective.medications} />
                 <Field
-                  label="Tidligere behandling"
+                  label={t('previousTreatment', 'Tidligere behandling')}
                   value={subjective.previousTreatment || subjective.previous_treatment}
                 />
               </Section>
 
               {/* Objective Section / Objektiv seksjon */}
-              <Section title="Objektiv (O)" icon={Stethoscope} color="green">
+              <Section
+                title={t('soapObjectiveTitle', 'O - Objektiv')}
+                icon={Stethoscope}
+                color="green"
+              >
                 {objective.vitalSigns && (
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    <Field label="Blodtrykk" value={objective.vitalSigns?.bloodPressure} />
-                    <Field label="Puls" value={objective.vitalSigns?.pulse} />
-                    <Field label="Resp. frekvens" value={objective.vitalSigns?.respiratoryRate} />
-                    <Field label="Temperatur" value={objective.vitalSigns?.temperature} />
+                    <Field
+                      label={t('soapBloodPressure', 'Blodtrykk')}
+                      value={objective.vitalSigns?.bloodPressure}
+                    />
+                    <Field label={t('soapPulse', 'Puls')} value={objective.vitalSigns?.pulse} />
+                    <Field
+                      label={t('soapRespRate', 'Resp. frekvens')}
+                      value={objective.vitalSigns?.respiratoryRate}
+                    />
+                    <Field
+                      label={t('soapTemperature', 'Temperatur')}
+                      value={objective.vitalSigns?.temperature}
+                    />
                   </div>
                 )}
-                <Field label="Observasjon" value={objective.observation} />
-                <Field label="Palpasjon" value={objective.palpation} />
+                <Field label={t('soapObservation', 'Observasjon')} value={objective.observation} />
+                <Field label={t('soapPalpation', 'Palpasjon')} value={objective.palpation} />
                 <Field
-                  label="Bevegelsesutslag (ROM)"
+                  label={t('soapRom', 'Bevegelsesutslag (ROM)')}
                   value={objective.rangeOfMotion || objective.rom}
                 />
                 <Field
-                  label="Nevrologisk undersokelse"
+                  label={t('soapNeurologicalExam', 'Nevrologisk undersøkelse')}
                   value={objective.neurologicalExam || objective.neuro_tests}
                 />
                 <Field
-                  label="Ortopediske tester"
+                  label={t('soapOrthopedicTests', 'Ortopediske tester')}
                   value={objective.orthopedicTests || objective.ortho_tests}
                 />
                 <Field
-                  label="Spesialtester"
+                  label={t('specialTests', 'Spesialtester')}
                   value={objective.specialTests || objective.special_tests}
                 />
               </Section>
 
               {/* Assessment Section / Vurderingsseksjon */}
-              <Section title="Vurdering (A)" icon={ClipboardCheck} color="purple">
-                <Field label="Diagnose" value={assessment.diagnosis} />
+              <Section
+                title={t('soapAssessmentTitle', 'A - Vurdering')}
+                icon={ClipboardCheck}
+                color="purple"
+              >
+                <Field label={t('soapDiagnosis', 'Diagnose')} value={assessment.diagnosis} />
                 <Field
-                  label="Differensialdiagnoser"
+                  label={t('soapDifferentialDiagnosis', 'Differensialdiagnoser')}
                   value={assessment.differentialDiagnosis || assessment.differential_diagnosis}
                 />
                 <Field
-                  label="Klinisk vurdering"
+                  label={t('soapClinicalImpression', 'Klinisk vurdering')}
                   value={assessment.clinicalImpression || assessment.clinical_impression}
                 />
-                <Field label="Prognose" value={assessment.prognosis} />
+                <Field label={t('prognosis', 'Prognose')} value={assessment.prognosis} />
 
-                {/* Red Flags / Rode flagg */}
+                {/* Red Flags */}
                 {assessment.redFlags?.length > 0 && (
                   <div>
                     <dt className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
-                      Rode flagg
+                      {t('redFlags', 'Røde flagg')}
                     </dt>
                     <div className="space-y-1">
                       {assessment.redFlags.map((flag, index) => (
@@ -421,31 +445,53 @@ export default function NotePreview({
               </Section>
 
               {/* Plan Section / Planseksjon */}
-              <Section title="Plan (P)" icon={Target} color="orange">
-                <Field label="Behandling" value={plan.treatment} />
-                <Field label="Ovelser/Hjemmeoppgaver" value={plan.exercises} />
+              <Section title={t('soapPlanTitle', 'P - Plan')} icon={Target} color="orange">
+                <Field label={t('treatment', 'Behandling')} value={plan.treatment} />
                 <Field
-                  label="Pasientundervisning"
+                  label={t('soapExercises', 'Øvelser/Hjemmeoppgaver')}
+                  value={plan.exercises}
+                />
+                <Field
+                  label={t('patientEducation', 'Pasientundervisning')}
                   value={plan.patientEducation || plan.patient_education}
                 />
-                <Field label="Oppfolging" value={plan.followUp || plan.follow_up} />
-                <Field label="Henvisninger" value={plan.referrals} />
-                <Field label="Mal" value={plan.goals} />
+                <Field
+                  label={t('soapFollowUp', 'Oppfølging')}
+                  value={plan.followUp || plan.follow_up}
+                />
+                <Field label={t('referrals', 'Henvisninger')} value={plan.referrals} />
+                <Field label={t('soapGoals', 'Mål')} value={plan.goals} />
               </Section>
 
               {/* Vestibular Data (if applicable) / Vestibulare data (hvis relevant) */}
               {note?.vestibular_data && (
-                <Section title="Vestibular vurdering" icon={Activity} color="teal">
+                <Section
+                  title={t('vngAssessment', 'Vestibular vurdering')}
+                  icon={Activity}
+                  color="teal"
+                >
                   {(() => {
                     const vestibular = parseField(note.vestibular_data);
                     return (
                       <>
-                        <Field label="Diagnose" value={vestibular.clinicalAssessment?.diagnosis} />
-                        <Field label="Type svimmelhet" value={vestibular.symptoms?.dizzinessType} />
-                        <Field label="Utlosere" value={vestibular.symptoms?.triggers} />
-                        <Field label="Behandling" value={vestibular.plan?.treatment} />
                         <Field
-                          label="Vestibular rehabilitering"
+                          label={t('soapDiagnosis', 'Diagnose')}
+                          value={vestibular.clinicalAssessment?.diagnosis}
+                        />
+                        <Field
+                          label={t('vestibularDizzinessTypeLabel', 'Type svimmelhet')}
+                          value={vestibular.symptoms?.dizzinessType}
+                        />
+                        <Field
+                          label={t('vestibularTriggeringEvent', 'Utløsere')}
+                          value={vestibular.symptoms?.triggers}
+                        />
+                        <Field
+                          label={t('treatment', 'Behandling')}
+                          value={vestibular.plan?.treatment}
+                        />
+                        <Field
+                          label={t('vestibularVrtExercises', 'Vestibular rehabilitering')}
                           value={vestibular.plan?.vestibularRehabilitation}
                         />
                       </>
@@ -464,7 +510,8 @@ export default function NotePreview({
                         {t('notePreviewSignedAndLocked', 'Signert og låst')}
                       </p>
                       <p className="text-sm text-green-600">
-                        {note?.signed_by_name && `Signert av ${note.signed_by_name}`}
+                        {note?.signed_by_name &&
+                          `${t('signedBy', 'Signert av')} ${note.signed_by_name}`}
                         {note?.signed_at && ` - ${formatDateTime(note.signed_at)}`}
                       </p>
                     </div>
@@ -479,9 +526,15 @@ export default function NotePreview({
         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
             <div className="flex items-center gap-4">
-              {note?.created_at && <span>Opprettet: {formatDateTime(note.created_at)}</span>}
+              {note?.created_at && (
+                <span>
+                  {t('created', 'Opprettet')}: {formatDateTime(note.created_at)}
+                </span>
+              )}
               {note?.updated_at && note.updated_at !== note.created_at && (
-                <span>Sist endret: {formatDateTime(note.updated_at)}</span>
+                <span>
+                  {t('lastModified', 'Sist endret')}: {formatDateTime(note.updated_at)}
+                </span>
               )}
             </div>
             {note?.id && <span>ID: {note.id.slice(0, 8)}...</span>}

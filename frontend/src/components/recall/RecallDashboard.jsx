@@ -21,8 +21,10 @@ import {
 } from 'lucide-react';
 import { followUpsAPI } from '../../services/api';
 import toast from '../../utils/toast';
+import { useTranslation } from '../../i18n';
 
 export default function RecallDashboard() {
+  const { t } = useTranslation('appointments');
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState('days_overdue');
@@ -229,7 +231,7 @@ export default function RecallDashboard() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Søk pasient eller tilstand..."
+              placeholder={t('searchPatientOrCondition', 'Søk pasient eller tilstand...')}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
           </div>

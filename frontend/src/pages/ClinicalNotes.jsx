@@ -9,6 +9,7 @@ import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useConfirm } from '../components/ui/ConfirmDialog';
+import { useTranslation } from '../i18n';
 import {
   FileText,
   Plus,
@@ -44,6 +45,7 @@ export default function ClinicalNotes() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const confirm = useConfirm();
+  const { t } = useTranslation();
 
   // State management
   const [selectedPatientId, setSelectedPatientId] = useState(routePatientId || null);
@@ -439,7 +441,9 @@ export default function ClinicalNotes() {
                     {selectedPatient?.data?.last_name || selectedPatient?.last_name}
                   </span>
                 ) : (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Velg pasient...</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {t('clinical.selectPatient', 'Velg pasient')}...
+                  </span>
                 )}
                 <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
               </button>
@@ -491,7 +495,9 @@ export default function ClinicalNotes() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">Forstegangskonsultasjon</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Ny pasient</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {t('clinical.newPatient', 'Ny pasient')}
+                        </p>
                       </div>
                     </button>
                     <button
@@ -504,7 +510,7 @@ export default function ClinicalNotes() {
                       <div>
                         <p className="font-medium text-gray-900">Oppfolgingskonsultasjon</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          Eksisterende pasient
+                          {t('clinical.existingPatient', 'Eksisterende pasient')}
                         </p>
                       </div>
                     </button>
@@ -516,7 +522,9 @@ export default function ClinicalNotes() {
                         <Activity className="w-4 h-4 text-teal-600" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">Vestibular vurdering</p>
+                        <p className="font-medium text-gray-900">
+                          {t('clinical.vestibularAssessment', 'Vestibulær vurdering')}
+                        </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           Svimmelhet/balanse
                         </p>
@@ -589,7 +597,9 @@ export default function ClinicalNotes() {
                   </div>
                   <div className="text-left">
                     <p className="font-medium text-gray-900">Forstegangskonsultasjon</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Ny pasient</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('clinical.newPatient', 'Ny pasient')}
+                    </p>
                   </div>
                 </button>
                 <button
@@ -601,7 +611,9 @@ export default function ClinicalNotes() {
                   </div>
                   <div className="text-left">
                     <p className="font-medium text-gray-900">Oppfolgingskonsultasjon</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Eksisterende pasient</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('clinical.existingPatient', 'Eksisterende pasient')}
+                    </p>
                   </div>
                 </button>
                 <button
@@ -612,7 +624,9 @@ export default function ClinicalNotes() {
                     <Activity className="w-5 h-5 text-teal-600" />
                   </div>
                   <div className="text-left">
-                    <p className="font-medium text-gray-900">Vestibular vurdering</p>
+                    <p className="font-medium text-gray-900">
+                      {t('clinical.vestibularAssessment', 'Vestibulær vurdering')}
+                    </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">Svimmelhet/balanse</p>
                   </div>
                 </button>
@@ -639,7 +653,7 @@ export default function ClinicalNotes() {
                   onChange={(e) => setNoteTypeFilter(e.target.value)}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="all">Alle typer</option>
+                  <option value="all">{t('clinical.allTypes', 'Alle typer')}</option>
                   <option value="soap">SOAP</option>
                   <option value="initial">Forstegangskonsultasjon</option>
                   <option value="followup">Oppfolging</option>
@@ -684,7 +698,9 @@ export default function ClinicalNotes() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl max-w-lg w-full mx-4 overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900">Velg pasient</h3>
+              <h3 className="font-semibold text-gray-900">
+                {t('clinical.selectPatient', 'Velg pasient')}
+              </h3>
               <button
                 onClick={() => setShowPatientSelector(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg"

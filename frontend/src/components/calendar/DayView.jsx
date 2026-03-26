@@ -15,6 +15,7 @@ import { format, parseISO, isToday, differenceInMinutes } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { Calendar as CalendarIcon, Plus, Clock, User } from 'lucide-react';
 import AppointmentCard from './AppointmentCard';
+import { useTranslation } from '../../i18n';
 
 // =============================================================================
 // CONSTANTS
@@ -136,6 +137,7 @@ export default function DayView({
   statusColors,
   isLoading,
 }) {
+  const { t } = useTranslation('appointments');
   const scrollContainerRef = useRef(null);
   const isTodayDate = isToday(date);
   const slots = generateTimeSlots(workHours);
@@ -331,7 +333,9 @@ export default function DayView({
       <div className="w-80 border-l border-gray-200 flex flex-col bg-gray-50">
         <div className="p-4 border-b border-gray-200 bg-white">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900">Dagens avtaler</h3>
+            <h3 className="font-semibold text-gray-900">
+              {t('todaysAppointments', 'Dagens avtaler')}
+            </h3>
             <button
               onClick={() => onSlotClick(date, 9, 0)}
               className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"

@@ -8,11 +8,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Dumbbell, Loader2, AlertTriangle, CheckCircle, ArrowRight } from 'lucide-react';
 import { patientApi, storeToken } from '../../api/patientApi';
+import { useTranslation } from '../../i18n/useTranslation';
 
 import logger from '../../utils/logger';
 const PatientLogin = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t } = useTranslation('portal');
 
   // State
   const [loading, setLoading] = useState(true);
@@ -51,12 +53,12 @@ const PatientLogin = () => {
           navigate(`/portal/mine-ovelser?token=${token}`);
         }, 2000);
       } else {
-        setError(response.error || 'Tilgangskoden er ugyldig');
+        setError(response.error || t('invalidToken', 'Tilgangskoden er ugyldig'));
         setShowManualEntry(true);
       }
     } catch (err) {
       logger.error('Token validation error:', err);
-      setError(err.message || 'Kunne ikke validere tilgangskoden');
+      setError(err.message || t('couldNotValidateToken', 'Kunne ikke validere tilgangskoden'));
       setShowManualEntry(true);
     } finally {
       setLoading(false);
@@ -71,7 +73,7 @@ const PatientLogin = () => {
     if (manualToken.trim().length >= 32) {
       validateToken(manualToken.trim());
     } else {
-      setError('Tilgangskoden må være minst 32 tegn');
+      setError(t('tokenTooShort', 'Tilgangskoden må være minst 32 tegn'));
     }
   };
 
@@ -83,8 +85,10 @@ const PatientLogin = () => {
           <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
           </div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Validerer tilgang...</h1>
-          <p className="text-gray-500 dark:text-gray-400">Vennligst vent</p>
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">
+            {t('validatingAccess', 'Validerer tilgang...')}
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400">{t('pleaseWait', 'Vennligst vent')}</p>
         </div>
       </div>
     );
@@ -99,14 +103,16 @@ const PatientLogin = () => {
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            Velkommen, {tokenData.patient?.firstName}!
+            {t('welcome', 'Velkommen, ')}
+            {tokenData.patient?.firstName}!
           </h1>
           <p className="text-gray-600 dark:text-gray-300 mb-4">
-            Du er logget inn hos {tokenData.clinic?.name}
+            {t('loggedInAt', 'Du er logget inn hos ')}
+            {tokenData.clinic?.name}
           </p>
           <div className="flex items-center justify-center gap-2 text-sm text-gray-500 dark:text-gray-400">
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Laster øvelsene dine...</span>
+            <span>{t('loadingYourExercises', 'Laster øvelsene dine...')}</span>
           </div>
         </div>
       </div>
@@ -122,8 +128,10 @@ const PatientLogin = () => {
           <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
             <Dumbbell className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Pasientportalen</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Logg inn for å se øvelsene dine</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('title', 'Pasientportalen')}</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">
+            {t('loginSubtitle', 'Logg inn for å se øvelsene dine')}
+          </p>
         </div>
 
         {/* Error Message */}
@@ -132,7 +140,7 @@ const PatientLogin = () => {
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
               <div>
-                <h3 className="font-medium text-red-800">Tilgang avvist</h3>
+                <h3 className="font-medium text-red-800">{t('accessDenied', 'Tilgang avvist')}</h3>
                 <p className="text-sm text-red-600 mt-1">{error}</p>
               </div>
             </div>
@@ -142,23 +150,27 @@ const PatientLogin = () => {
         {/* Manual Token Entry */}
         {showManualEntry && (
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Skriv inn tilgangskode</h2>
+            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+              {t('enterAccessCode', 'Skriv inn tilgangskode')}
+            </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-              Du finner tilgangskoden i e-posten du fikk fra klinikken. Koden er en lang rekke med
-              bokstaver og tall.
+              {t(
+                'accessCodeDescription',
+                'Du finner tilgangskoden i e-posten du fikk fra klinikken. Koden er en lang rekke med bokstaver og tall.'
+              )}
             </p>
 
             <form onSubmit={handleManualSubmit} className="space-y-4">
               <div>
                 <label htmlFor="token" className="block text-sm font-medium text-gray-700 mb-1">
-                  Tilgangskode
+                  {t('accessCodeLabel', 'Tilgangskode')}
                 </label>
                 <input
                   type="text"
                   id="token"
                   value={manualToken}
                   onChange={(e) => setManualToken(e.target.value)}
-                  placeholder="Lim inn tilgangskoden her..."
+                  placeholder={t('accessCodePlaceholder', 'Lim inn tilgangskoden her...')}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                   autoComplete="off"
                 />
@@ -169,7 +181,7 @@ const PatientLogin = () => {
                 disabled={manualToken.length < 32}
                 className="w-full flex items-center justify-center gap-2 py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <span>Logg inn</span>
+                <span>{t('login', 'Logg inn')}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </form>
@@ -179,11 +191,11 @@ const PatientLogin = () => {
         {/* Help Section */}
         <div className="mt-8 text-center">
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            Finner du ikke tilgangskoden?
+            {t('cannotFindCode', 'Finner du ikke tilgangskoden?')}
           </p>
           <div className="space-y-2">
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Kontakt klinikken din for å få en ny lenke.
+              {t('contactClinic', 'Kontakt klinikken din for å få en ny lenke.')}
             </p>
           </div>
         </div>
@@ -191,8 +203,10 @@ const PatientLogin = () => {
         {/* Footer */}
         <div className="mt-12 pt-6 border-t border-gray-200 text-center">
           <p className="text-xs text-gray-400 dark:text-gray-300">
-            Dette er en sikker innloggingsside. Din tilgangskode er personlig og bør ikke deles med
-            andre.
+            {t(
+              'securityNotice',
+              'Dette er en sikker innloggingsside. Din tilgangskode er personlig og bør ikke deles med andre.'
+            )}
           </p>
         </div>
       </div>

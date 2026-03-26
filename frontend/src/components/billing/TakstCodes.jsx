@@ -21,6 +21,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { billingAPI } from '../../services/api';
+import { useTranslation } from '../../i18n/useTranslation';
 
 /**
  * Get icon for takst category
@@ -54,6 +55,7 @@ export default function TakstCodes({
   hasExemption = false,
   readOnly = false,
 }) {
+  const { t } = useTranslation('financial');
   const [searchTerm, setSearchTerm] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [expandedCode, setExpandedCode] = useState(null);
@@ -189,7 +191,9 @@ export default function TakstCodes({
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <span className="ml-3 text-gray-600 dark:text-gray-300">Laster takstkoder...</span>
+        <span className="ml-3 text-gray-600 dark:text-gray-300">
+          {t('loadingTakstCodes', 'Laster takstkoder...')}
+        </span>
       </div>
     );
   }
@@ -197,7 +201,9 @@ export default function TakstCodes({
   if (error) {
     return (
       <div className="bg-red-50 text-red-700 p-4 rounded-lg">
-        <p>Kunne ikke laste takstkoder: {error.message}</p>
+        <p>
+          {t('couldNotLoadTakstCodes', 'Kunne ikke laste takstkoder')}: {error.message}
+        </p>
       </div>
     );
   }
@@ -210,7 +216,7 @@ export default function TakstCodes({
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
           <input
             type="text"
-            placeholder="Sok etter takst eller beskrivelse..."
+            placeholder={t('searchTakstPlaceholder', 'Søk etter takst eller beskrivelse...')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -221,7 +227,7 @@ export default function TakstCodes({
           onChange={(e) => setActiveCategory(e.target.value)}
           className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
         >
-          <option value="all">Alle kategorier</option>
+          <option value="all">{t('allCategories', 'Alle kategorier')}</option>
           {categories.map((cat) => (
             <option key={cat.id} value={cat.id}>
               {cat.name}
@@ -236,13 +242,13 @@ export default function TakstCodes({
           {isChild && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 text-sm rounded-full">
               <Check className="w-4 h-4" />
-              Barn under 16 ar - ingen egenandel
+              {t('childNoCharge', 'Barn under 16 år – ingen egenandel')}
             </span>
           )}
           {hasExemption && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">
               <Check className="w-4 h-4" />
-              Frikort - redusert egenandel
+              {t('exemptionReduced', 'Frikort – redusert egenandel')}
             </span>
           )}
         </div>
@@ -252,7 +258,7 @@ export default function TakstCodes({
       <div className="border border-gray-200 rounded-lg divide-y divide-gray-100 max-h-96 overflow-y-auto">
         {filteredCodes.length === 0 ? (
           <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-            Ingen takstkoder funnet
+            {t('noTakstCodes', 'Ingen takstkoder funnet')}
           </div>
         ) : (
           filteredCodes.map((code) => {
@@ -292,13 +298,13 @@ export default function TakstCodes({
                       {/* Price breakdown */}
                       <div className="flex flex-wrap gap-4 mt-2 text-sm">
                         <span className="text-gray-700">
-                          <strong>Pris:</strong> {formatCurrency(code.price)}
+                          <strong>{t('price', 'Pris')}:</strong> {formatCurrency(code.price)}
                         </span>
                         <span className="text-green-600">
                           <strong>HELFO:</strong> {formatCurrency(code.helfoRefund)}
                         </span>
                         <span className="text-orange-600">
-                          <strong>Egenandel:</strong>{' '}
+                          <strong>{t('copayment', 'Egenandel')}:</strong>{' '}
                           {formatCurrency(
                             isChild
                               ? 0
@@ -314,7 +320,8 @@ export default function TakstCodes({
                         <div className="mt-3 p-3 bg-gray-50 rounded-lg text-sm space-y-2">
                           {code.canCombineWith?.length > 0 && (
                             <p>
-                              <strong>Kan kombineres med:</strong> {code.canCombineWith.join(', ')}
+                              <strong>{t('canCombineWith', 'Kan kombineres med')}:</strong>{' '}
+                              {code.canCombineWith.join(', ')}
                             </p>
                           )}
                           {code.notes && (
@@ -335,7 +342,7 @@ export default function TakstCodes({
                     <button
                       onClick={() => setExpandedCode(isExpanded ? null : code.code)}
                       className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded"
-                      title="Vis detaljer"
+                      title={t('showDetails', 'Vis detaljer')}
                     >
                       {isExpanded ? (
                         <ChevronUp className="w-5 h-5" />
@@ -374,7 +381,9 @@ export default function TakstCodes({
       {/* Selected Codes Summary */}
       {selectedCodes.length > 0 && (
         <div className="bg-gray-50 rounded-lg p-4">
-          <h4 className="font-semibold text-gray-900 mb-3">Valgte takstkoder</h4>
+          <h4 className="font-semibold text-gray-900 mb-3">
+            {t('selectedCodes', 'Valgte takstkoder')}
+          </h4>
 
           <div className="space-y-2 mb-4">
             {selectedCodes.map((item) => {
@@ -396,15 +405,15 @@ export default function TakstCodes({
 
           <div className="border-t border-gray-200 pt-3 space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600 dark:text-gray-300">Brutto:</span>
+              <span className="text-gray-600 dark:text-gray-300">{t('gross', 'Brutto')}:</span>
               <span className="font-medium">{formatCurrency(totals.grossAmount)}</span>
             </div>
             <div className="flex justify-between text-sm text-green-600">
-              <span>HELFO-refusjon:</span>
+              <span>{t('helfoRefund', 'HELFO-refusjon')}:</span>
               <span className="font-medium">- {formatCurrency(totals.helfoRefund)}</span>
             </div>
             <div className="flex justify-between text-lg font-bold border-t border-gray-300 pt-2 mt-2">
-              <span>Pasient betaler:</span>
+              <span>{t('patientPays', 'Pasient betaler')}:</span>
               <span className="text-blue-600">{formatCurrency(totals.patientShare)}</span>
             </div>
           </div>

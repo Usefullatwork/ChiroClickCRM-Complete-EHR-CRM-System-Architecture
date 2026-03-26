@@ -18,6 +18,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import { DollarSign, TrendingUp, TrendingDown } from 'lucide-react';
+import { useTranslation } from '../../i18n/useTranslation';
 
 /**
  * Format currency in Norwegian format
@@ -56,6 +57,8 @@ const formatShortNumber = (value) => {
  * @param {boolean} loading - Loading state
  */
 export const RevenueChart = ({ data = [], stats = {}, chartType = 'area', loading = false }) => {
+  const { t } = useTranslation('analytics');
+
   // Format data for chart
   const chartData = useMemo(() => {
     if (!data || data.length === 0) {
@@ -113,21 +116,29 @@ export const RevenueChart = ({ data = [], stats = {}, chartType = 'area', loadin
               <DollarSign size={20} className="text-green-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Inntekter</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Siste 30 dager</p>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t('revenueTitle', 'Inntekter')}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('revenueLast30Days', 'Siste 30 dager')}
+              </p>
             </div>
           </div>
 
           {/* Summary stats */}
           <div className="hidden md:flex items-center gap-6">
             <div className="text-right">
-              <p className="text-xs text-gray-500 dark:text-gray-400">Denne maned</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t('revenueThisMonth', 'Denne måneden')}
+              </p>
               <p className="text-lg font-bold text-gray-900">
                 {formatCurrency(stats.thisMonth?.totalRevenue || 0)}
               </p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-500 dark:text-gray-400">Endring</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                {t('revenueChange', 'Endring')}
+              </p>
               <div
                 className={`flex items-center gap-1 justify-end ${isPositiveChange ? 'text-green-600' : 'text-red-600'}`}
               >
@@ -207,7 +218,7 @@ export const RevenueChart = ({ data = [], stats = {}, chartType = 'area', loadin
           <div className="h-64 flex items-center justify-center text-gray-400 dark:text-gray-300">
             <div className="text-center">
               <DollarSign size={48} className="mx-auto mb-2 opacity-50" />
-              <p>Ingen inntektsdata tilgjengelig</p>
+              <p>{t('revenueNoData', 'Ingen inntektsdata tilgjengelig')}</p>
             </div>
           </div>
         )}
@@ -217,25 +228,33 @@ export const RevenueChart = ({ data = [], stats = {}, chartType = 'area', loadin
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Totalt (denne mnd)</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              {t('revenueTotalThisMonth', 'Totalt (denne mnd)')}
+            </p>
             <p className="text-xl font-bold text-gray-900">
               {formatCurrency(stats.thisMonth?.totalRevenue || 0)}
             </p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Pasientandel</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              {t('revenuePatientShare', 'Pasientandel')}
+            </p>
             <p className="text-xl font-bold text-blue-600">
               {formatCurrency(stats.thisMonth?.patientRevenue || 0)}
             </p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Forsikring</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              {t('revenueInsurance', 'Forsikring')}
+            </p>
             <p className="text-xl font-bold text-purple-600">
               {formatCurrency(stats.thisMonth?.insuranceRevenue || 0)}
             </p>
           </div>
           <div className="text-center">
-            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Transaksjoner</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              {t('revenueTransactions', 'Transaksjoner')}
+            </p>
             <p className="text-xl font-bold text-gray-900">
               {stats.thisMonth?.transactionCount || 0}
             </p>
@@ -250,6 +269,8 @@ export const RevenueChart = ({ data = [], stats = {}, chartType = 'area', loadin
  * RevenueCompact - Compact revenue display for smaller spaces
  */
 export const RevenueCompact = ({ totalRevenue = 0, changePercent = 0, loading = false }) => {
+  const { t } = useTranslation('analytics');
+
   if (loading) {
     return (
       <div className="animate-pulse">
@@ -270,7 +291,9 @@ export const RevenueCompact = ({ totalRevenue = 0, changePercent = 0, loading = 
           {changePercent >= 0 ? '+' : ''}
           {changePercent}%
         </span>
-        <span className="text-gray-500 dark:text-gray-400">vs forrige mnd</span>
+        <span className="text-gray-500 dark:text-gray-400">
+          {t('revenuePrevMonth', 'vs forrige mnd')}
+        </span>
       </div>
     </div>
   );

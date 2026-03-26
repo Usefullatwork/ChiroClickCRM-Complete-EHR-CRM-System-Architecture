@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Play, TestTube, Clock, Columns, Monitor, Zap } from 'lucide-react';
 import { trainingAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 
 const MODELS = [
   { value: 'chiro-no', label: 'chiro-no (Standard)' },
@@ -55,6 +56,7 @@ const PRESET_PROMPTS = [
 ];
 
 export default function PlaygroundTab() {
+  const { t } = useTranslation('clinical');
   const [prompt, setPrompt] = useState('');
   const [modelA, setModelA] = useState('chiro-no');
   const [modelB, setModelB] = useState('chiro-norwegian');
@@ -120,7 +122,7 @@ export default function PlaygroundTab() {
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           rows={4}
-          placeholder="Skriv en prompt for å teste modellen..."
+          placeholder={t('playgroundPromptPlaceholder', 'Skriv en prompt for å teste modellen...')}
           className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm dark:bg-gray-700 dark:text-gray-200"
         />
 

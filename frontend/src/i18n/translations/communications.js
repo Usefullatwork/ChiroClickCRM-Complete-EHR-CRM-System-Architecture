@@ -125,6 +125,8 @@ export const communications = {
     reject: 'Reject',
     sending: 'Sending...',
     approveAndSend: 'Approve & Send',
+    // NoShowImporter
+    notFound: 'Not found',
   },
   no: {
     title: 'Kommunikasjon',
@@ -251,5 +253,7 @@ export const communications = {
     reject: 'Avvis',
     sending: 'Sender...',
     approveAndSend: 'Godkjenn & Send',
+    // NoShowImporter
+    notFound: 'Ikke funnet',
   },
 };

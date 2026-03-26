@@ -8,6 +8,7 @@
 import { useMemo } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { Calendar, Clock, CheckCircle, XCircle, UserX, TrendingUp } from 'lucide-react';
+import { useTranslation } from '../../i18n/useTranslation';
 
 /**
  * Status colors for appointment states
@@ -21,14 +22,14 @@ const STATUS_COLORS = {
 };
 
 /**
- * Status labels in Norwegian
+ * Status labels — kept as module-level fallback strings; components use t() at render time
  */
-const STATUS_LABELS = {
+const STATUS_LABELS_FALLBACK = {
   CONFIRMED: 'Bekreftet',
-  COMPLETED: 'Fullfort',
+  COMPLETED: 'Fullført',
   PENDING: 'Venter',
   CANCELLED: 'Avlyst',
-  NO_SHOW: 'Ikke mott',
+  NO_SHOW: 'Ikke møtt',
 };
 
 /**
@@ -38,19 +39,33 @@ const STATUS_LABELS = {
  * @param {boolean} loading - Loading state
  */
 export const AppointmentStats = ({ data = {}, loading = false }) => {
+  const { t } = useTranslation('analytics');
+
   // Prepare data for status pie chart
   const statusPieData = useMemo(() => {
     const today = data.today || {};
     const thisWeek = data.thisWeek || {};
 
     return [
-      { name: 'Fullfort', value: thisWeek.completed || 0, color: STATUS_COLORS.COMPLETED },
+      {
+        name: t('complianceCompleted', 'Fullført'),
+        value: thisWeek.completed || 0,
+        color: STATUS_COLORS.COMPLETED,
+      },
       { name: 'Bekreftet', value: today.confirmed || 0, color: STATUS_COLORS.CONFIRMED },
       { name: 'Venter', value: today.pending || 0, color: STATUS_COLORS.PENDING },
-      { name: 'Avlyst', value: thisWeek.cancelled || 0, color: STATUS_COLORS.CANCELLED },
-      { name: 'Ikke mott', value: thisWeek.noShow || 0, color: STATUS_COLORS.NO_SHOW },
+      {
+        name: t('appointmentCancelled', 'Avlyst'),
+        value: thisWeek.cancelled || 0,
+        color: STATUS_COLORS.CANCELLED,
+      },
+      {
+        name: t('appointmentNoShow', 'Ikke møtt'),
+        value: thisWeek.noShow || 0,
+        color: STATUS_COLORS.NO_SHOW,
+      },
     ].filter((item) => item.value > 0);
-  }, [data]);
+  }, [data, t]);
 
   // Calculate completion rate
   const completionRate = useMemo(() => {
@@ -121,8 +136,12 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
               <Calendar size={20} className="text-teal-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Avtalestatistikk</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Denne uken</p>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t('appointmentStatsTitle', 'Avtalestatistikk')}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('appointmentThisWeek', 'Denne uken')}
+              </p>
             </div>
           </div>
 
@@ -137,7 +156,7 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
                     : 'bg-red-100 text-red-700'
               }`}
             >
-              {completionRate}% fullforingsrate
+              {completionRate}% {t('appointmentCompletionRate', 'fullføringsrate')}
             </div>
           </div>
         </div>
@@ -171,7 +190,7 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
               <div className="h-60 flex items-center justify-center text-gray-400 dark:text-gray-300">
                 <div className="text-center">
                   <Calendar size={48} className="mx-auto mb-2 opacity-50" />
-                  <p>Ingen avtaler denne uken</p>
+                  <p>{t('appointmentNoData', 'Ingen avtaler denne uken')}</p>
                 </div>
               </div>
             )}
@@ -196,13 +215,19 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
                   <Clock size={18} className="text-blue-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600 dark:text-gray-300">I dag</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {t('appointmentToday', 'I dag')}
+                  </p>
                   <p className="text-2xl font-bold text-gray-900">{data.today?.total || 0}</p>
                 </div>
                 <div className="text-right text-sm">
-                  <span className="text-green-600">{data.today?.completed || 0} fullfort</span>
+                  <span className="text-green-600">
+                    {data.today?.completed || 0} {t('appointmentCompleted', 'fullført')}
+                  </span>
                   <br />
-                  <span className="text-yellow-600">{data.today?.pending || 0} venter</span>
+                  <span className="text-yellow-600">
+                    {data.today?.pending || 0} {t('appointmentPending', 'venter')}
+                  </span>
                 </div>
               </div>
             </div>
@@ -214,13 +239,16 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
                   <CheckCircle size={18} className="text-green-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Fullfort denne uken</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {t('appointmentCompletedThisWeek', 'Fullført denne uken')}
+                  </p>
                   <p className="text-2xl font-bold text-gray-900">
                     {data.thisWeek?.completed || 0}
                   </p>
                 </div>
                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                  av {data.thisWeek?.total || 0} totalt
+                  {t('appointmentOf', 'av')} {data.thisWeek?.total || 0}{' '}
+                  {t('appointmentTotal', 'totalt')}
                 </div>
               </div>
             </div>
@@ -232,7 +260,9 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
                   <TrendingUp size={18} className="text-purple-600" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Fullfort denne mnd</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {t('appointmentCompletedThisMonth', 'Fullført denne mnd')}
+                  </p>
                   <p className="text-2xl font-bold text-gray-900">{data.completedThisMonth || 0}</p>
                 </div>
               </div>
@@ -243,14 +273,18 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
               <div className="bg-red-50 rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-1">
                   <XCircle size={14} className="text-red-500" />
-                  <span className="text-xs text-red-700">Avlyst</span>
+                  <span className="text-xs text-red-700">
+                    {t('appointmentCancelled', 'Avlyst')}
+                  </span>
                 </div>
                 <p className="text-lg font-bold text-red-700">{data.thisWeek?.cancelled || 0}</p>
               </div>
               <div className="bg-orange-50 rounded-lg p-3">
                 <div className="flex items-center gap-2 mb-1">
                   <UserX size={14} className="text-orange-500" />
-                  <span className="text-xs text-orange-700">Ikke mott</span>
+                  <span className="text-xs text-orange-700">
+                    {t('appointmentNoShow', 'Ikke møtt')}
+                  </span>
                 </div>
                 <p className="text-lg font-bold text-orange-700">
                   {data.thisWeek?.noShow || 0}
@@ -268,7 +302,7 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
       {data.upcomingToday && data.upcomingToday.length > 0 && (
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
           <h4 className="text-sm font-semibold text-gray-900 mb-3">
-            Kommende avtaler i dag ({data.upcomingToday.length})
+            {t('appointmentUpcomingToday', 'Kommende avtaler i dag')} ({data.upcomingToday.length})
           </h4>
           <div className="space-y-2 max-h-48 overflow-y-auto">
             {data.upcomingToday.slice(0, 5).map((apt, index) => (
@@ -286,7 +320,8 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
                   <div>
                     <p className="text-sm font-medium text-gray-900">{apt.patientName}</p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {apt.appointmentType || 'Konsultasjon'} ({apt.durationMinutes || 30} min)
+                      {apt.appointmentType || t('appointmentConsultation', 'Konsultasjon')} (
+                      {apt.durationMinutes || 30} min)
                     </p>
                   </div>
                 </div>
@@ -297,7 +332,7 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
                       : 'bg-yellow-100 text-yellow-700'
                   }`}
                 >
-                  {STATUS_LABELS[apt.status] || apt.status}
+                  {STATUS_LABELS_FALLBACK[apt.status] || apt.status}
                 </span>
               </div>
             ))}
@@ -312,6 +347,8 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
  * AppointmentStatsCompact - Compact version for sidebars
  */
 export const AppointmentStatsCompact = ({ data = {}, loading = false }) => {
+  const { t } = useTranslation('analytics');
+
   if (loading) {
     return (
       <div className="space-y-3 animate-pulse">
@@ -324,15 +361,21 @@ export const AppointmentStatsCompact = ({ data = {}, loading = false }) => {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-600 dark:text-gray-300">I dag</span>
+        <span className="text-sm text-gray-600 dark:text-gray-300">
+          {t('appointmentToday', 'I dag')}
+        </span>
         <span className="text-lg font-bold text-gray-900">{data.today?.total || 0}</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-600 dark:text-gray-300">Denne uken</span>
+        <span className="text-sm text-gray-600 dark:text-gray-300">
+          {t('appointmentThisWeek', 'Denne uken')}
+        </span>
         <span className="text-lg font-bold text-gray-900">{data.thisWeek?.total || 0}</span>
       </div>
       <div className="flex items-center justify-between">
-        <span className="text-sm text-gray-600 dark:text-gray-300">Denne mnd</span>
+        <span className="text-sm text-gray-600 dark:text-gray-300">
+          {t('revenueThisMonth', 'Denne måneden')}
+        </span>
         <span className="text-lg font-bold text-gray-900">{data.completedThisMonth || 0}</span>
       </div>
     </div>

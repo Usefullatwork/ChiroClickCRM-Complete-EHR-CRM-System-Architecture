@@ -22,75 +22,75 @@ function ShortcutKey({ children }) {
 }
 
 export default function Help() {
-  const { t: _t } = useTranslation('common');
+  const { t } = useTranslation('common');
 
   const sections = [
     {
       icon: Calendar,
-      title: 'Daglig arbeidsflyt',
+      title: t('helpSectionDailyWorkflow', 'Daglig arbeidsflyt'),
       color: 'blue',
       items: [
-        'Aapne appen og sjekk Dashbordet for dagens oversikt',
-        'Gaa til Kalender for aa se timeplan og neste pasient',
-        'Klikk paa en pasient for aa starte konsultasjon',
-        'Fyll ut SOAP-notat (Subjektiv, Objektiv, Analyse, Plan)',
-        'Legg til ovelser og oppfolgingsplan',
-        'Signer journalnotatet og bestill neste time',
+        t('helpDailyStep1', 'Åpne appen og sjekk Dashbordet for dagens oversikt'),
+        t('helpDailyStep2', 'Gå til Kalender for å se timeplan og neste pasient'),
+        t('helpDailyStep3', 'Klikk på en pasient for å starte konsultasjon'),
+        t('helpDailyStep4', 'Fyll ut SOAP-notat (Subjektiv, Objektiv, Analyse, Plan)'),
+        t('helpDailyStep5', 'Legg til øvelser og oppfølgingsplan'),
+        t('helpDailyStep6', 'Signer journalnotatet og bestill neste time'),
       ],
     },
     {
       icon: Users,
-      title: 'Pasienthåndtering',
+      title: t('helpSectionPatientManagement', 'Pasienthåndtering'),
       color: 'green',
       items: [
-        'Ctrl+N: Opprett ny pasient',
-        'Sok etter pasient med Ctrl+K (kommandopalett)',
-        'Se pasientjournal, tidligere konsultasjoner og ovelser',
-        'Eksporter pasientdata via Fil-menyen',
+        t('helpPatientStep1', 'Ctrl+N: Opprett ny pasient'),
+        t('helpPatientStep2', 'Søk etter pasient med Ctrl+K (kommandopalett)'),
+        t('helpPatientStep3', 'Se pasientjournal, tidligere konsultasjoner og øvelser'),
+        t('helpPatientStep4', 'Eksporter pasientdata via Fil-menyen'),
       ],
     },
     {
       icon: FileText,
-      title: 'SOAP-journalformat',
+      title: t('helpSectionSOAP', 'SOAP-journalformat'),
       color: 'purple',
       items: [
-        'S (Subjektiv): Pasientens symptomer og sykehistorie',
-        'O (Objektiv): Undersokelse, tester, funn',
-        'A (Analyse): Diagnose, vurdering, rorode flagg',
-        'P (Plan): Behandlingsplan, ovelser, oppfolging',
+        t('helpSOAPStep1', 'S (Subjektiv): Pasientens symptomer og sykehistorie'),
+        t('helpSOAPStep2', 'O (Objektiv): Undersøkelse, tester, funn'),
+        t('helpSOAPStep3', 'A (Analyse): Diagnose, vurdering, røde flagg'),
+        t('helpSOAPStep4', 'P (Plan): Behandlingsplan, øvelser, oppfølging'),
       ],
     },
     {
       icon: Cpu,
-      title: 'AI-funksjoner',
+      title: t('helpSectionAI', 'AI-funksjoner'),
       color: 'amber',
       items: [
-        'AI-forslag vises automatisk under journalskriving',
-        'Krever Ollama installert lokalt (port 11434)',
-        'Gronn prikk = AI tilgjengelig, graa = ikke tilkoblet',
-        'AI-forslag er veiledende — behandler har alltid siste ord',
+        t('helpAIStep1', 'AI-forslag vises automatisk under journalskriving'),
+        t('helpAIStep2', 'Krever Ollama installert lokalt (port 11434)'),
+        t('helpAIStep3', 'Grønn prikk = AI tilgjengelig, grå = ikke tilkoblet'),
+        t('helpAIStep4', 'AI-forslag er veiledende — behandler har alltid siste ord'),
       ],
     },
     {
       icon: Database,
-      title: 'Sikkerhetskopiering',
+      title: t('helpSectionBackup', 'Sikkerhetskopiering'),
       color: 'teal',
       items: [
-        'Fil > Eksporter data (Ctrl+Shift+E) for SQL-backup',
-        'Fil > Importer data (Ctrl+Shift+I) for gjenoppretting',
-        'Data lagres lokalt i %APPDATA%\\chiroclickehr-desktop\\data\\',
-        'Anbefalt: Daglig backup til USB eller skymappe',
+        t('helpBackupStep1', 'Fil > Eksporter data (Ctrl+Shift+E) for SQL-backup'),
+        t('helpBackupStep2', 'Fil > Importer data (Ctrl+Shift+I) for gjenoppretting'),
+        t('helpBackupStep3', 'Data lagres lokalt i %APPDATA%\\chiroclickehr-desktop\\data\\'),
+        t('helpBackupStep4', 'Anbefalt: Daglig backup til USB eller skymappe'),
       ],
     },
     {
       icon: Shield,
-      title: 'Personvern og sikkerhet',
+      title: t('helpSectionPrivacy', 'Personvern og sikkerhet'),
       color: 'red',
       items: [
-        'All data lagres kun paa din maskin — ingen sky',
-        'Kryptering med maskinspesifikk nokkel',
-        'Revisjonslogg over all tilgang til pasientdata',
-        'Kompatibel med Normen og personvernforskriften',
+        t('helpPrivacyStep1', 'All data lagres kun på din maskin — ingen sky'),
+        t('helpPrivacyStep2', 'Kryptering med maskinspesifikk nøkkel'),
+        t('helpPrivacyStep3', 'Revisjonslogg over all tilgang til pasientdata'),
+        t('helpPrivacyStep4', 'Kompatibel med Normen og personvernforskriften'),
       ],
     },
   ];
@@ -102,9 +102,11 @@ export default function Help() {
           <HelpCircle className="w-8 h-8 text-blue-600" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Hjelp</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            {t('helpTitle', 'Hjelp')}
+          </h1>
           <p className="text-gray-500 dark:text-gray-400">
-            Hurtigguide og tastatursnarveier for ChiroClickEHR
+            {t('helpSubtitle', 'Hurtigguide og tastatursnarveier for ChiroClickEHR')}
           </p>
         </div>
       </div>
@@ -113,7 +115,9 @@ export default function Help() {
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mb-6">
         <div className="flex items-center gap-2 mb-4">
           <Keyboard className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Tastatursnarveier</h2>
+          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+            {t('keyboardShortcuts', 'Tastatursnarveier')}
+          </h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {SHORTCUTS.map((shortcut, idx) => (
@@ -132,7 +136,9 @@ export default function Help() {
             </div>
           ))}
           <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <span className="text-sm text-gray-700 dark:text-gray-300">Eksporter data</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              {t('exportData', 'Eksporter data')}
+            </span>
             <div className="flex items-center gap-1">
               <ShortcutKey>Ctrl</ShortcutKey>
               <ShortcutKey>Shift</ShortcutKey>
@@ -140,7 +146,9 @@ export default function Help() {
             </div>
           </div>
           <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-            <span className="text-sm text-gray-700 dark:text-gray-300">Importer data</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">
+              {t('importData', 'Importer data')}
+            </span>
             <div className="flex items-center gap-1">
               <ShortcutKey>Ctrl</ShortcutKey>
               <ShortcutKey>Shift</ShortcutKey>
@@ -180,10 +188,15 @@ export default function Help() {
 
       {/* Version Info */}
       <div className="mt-8 text-center text-sm text-gray-400 dark:text-gray-500">
-        <p>ChiroClickEHR Desktop Edition</p>
+        <p>{t('appName', 'ChiroClickEHR Desktop Edition')}</p>
         <p className="flex items-center justify-center gap-1 mt-1">
           <BookOpen className="w-3.5 h-3.5" />
-          <span>Fullstendig dokumentasjon finnes i docs/-mappen i installasjonen</span>
+          <span>
+            {t(
+              'fullDocumentation',
+              'Fullstendig dokumentasjon finnes i docs/-mappen i installasjonen'
+            )}
+          </span>
         </p>
       </div>
     </div>
