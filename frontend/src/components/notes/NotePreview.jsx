@@ -432,7 +432,7 @@ export default function NotePreview({
                     <div className="space-y-1">
                       {assessment.redFlags.map((flag, index) => (
                         <div
-                          key={index}
+                          key={`redflag-${flag}-${index}`}
                           className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg"
                         >
                           <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />

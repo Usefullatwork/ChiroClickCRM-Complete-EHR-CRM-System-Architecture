@@ -123,9 +123,9 @@ function SectionQuestion({ section, answer, onChange, lang }) {
         )}
       </h3>
       <div className="space-y-2">
-        {section.options.map((option, index) => (
+        {section.options.map((option) => (
           <label
-            key={index}
+            key={option.score}
             className={`flex items-start p-4 rounded-lg border-2 cursor-pointer transition-all ${
               answer === option.score
                 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'

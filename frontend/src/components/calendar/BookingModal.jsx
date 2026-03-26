@@ -181,8 +181,11 @@ function ConflictWarning({ conflicts }) {
             Denne tiden overlapper med eksisterende avtaler:
           </p>
           <ul className="mt-2 space-y-1">
-            {conflicts.map((conflict, index) => (
-              <li key={index} className="text-sm text-red-700">
+            {conflicts.map((conflict) => (
+              <li
+                key={`${conflict.start_time}-${conflict.patient_name}`}
+                className="text-sm text-red-700"
+              >
                 {format(parseISO(conflict.start_time), 'HH:mm')} -{' '}
                 {format(parseISO(conflict.end_time), 'HH:mm')}: {conflict.patient_name}
               </li>

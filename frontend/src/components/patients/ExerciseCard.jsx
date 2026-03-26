@@ -256,7 +256,17 @@ export default function ExerciseCard({
       }`}
     >
       {/* Card Header / Kortoverskrift */}
-      <div className="p-4 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
+      <button
+        className="w-full p-4 text-left cursor-pointer"
+        onClick={() => setIsExpanded(!isExpanded)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setIsExpanded(!isExpanded);
+          }
+        }}
+        aria-expanded={isExpanded}
+      >
         <div className="flex items-start gap-3">
           {/* Status Indicator / Statusindikator */}
           <div
@@ -320,7 +330,7 @@ export default function ExerciseCard({
             {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
           </div>
         </div>
-      </div>
+      </button>
 
       {/* Expanded Content / Utvidet innhold */}
       {isExpanded && (
@@ -369,7 +379,7 @@ export default function ExerciseCard({
                     <h4 className="text-sm font-medium text-yellow-800">Forsiktighetsregler</h4>
                     <ul className="text-sm text-yellow-700 mt-1">
                       {exercise.precautions.map((precaution, index) => (
-                        <li key={index}>- {precaution}</li>
+                        <li key={`precaution-${precaution}-${index}`}>- {precaution}</li>
                       ))}
                     </ul>
                   </div>

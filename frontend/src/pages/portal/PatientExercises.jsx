@@ -79,7 +79,7 @@ const PinEntry = ({ onSubmit, error, isLoading, t }) => {
         <div className="flex justify-center gap-3 mb-6">
           {pin.map((digit, index) => (
             <input
-              key={index}
+              key={`pin-${index}`}
               ref={inputRefs[index]}
               type="text"
               inputMode="numeric"

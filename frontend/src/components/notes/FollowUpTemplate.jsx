@@ -730,7 +730,7 @@ export default function FollowUpTemplate({
           <div className="space-y-2">
             {(followUpData.assessment.redFlags || []).map((flag, index) => (
               <div
-                key={index}
+                key={`redflag-${flag}-${index}`}
                 className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg"
               >
                 <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
@@ -798,9 +798,9 @@ export default function FollowUpTemplate({
               )}
             </div>
             <div className="flex flex-wrap gap-2">
-              {(followUpData.icd10_codes || []).map((code, index) => (
+              {(followUpData.icd10_codes || []).map((code) => (
                 <span
-                  key={index}
+                  key={code}
                   className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-lg text-sm"
                 >
                   {code}

@@ -317,7 +317,7 @@ export default function Calendar() {
 
           {/* Calendar Grid */}
           <div className="grid grid-cols-7">
-            {calendarDays.map((day, index) => {
+            {calendarDays.map((day) => {
               const dayAppointments = getAppointmentsForDate(day);
               const isCurrentMonth = isSameMonth(day, currentDate);
               const isSelectedDay = isSameDay(day, selectedDate);
@@ -325,7 +325,7 @@ export default function Calendar() {
 
               return (
                 <div
-                  key={index}
+                  key={day.toISOString()}
                   onClick={() => {
                     setSelectedDate(day);
                     setView('day');

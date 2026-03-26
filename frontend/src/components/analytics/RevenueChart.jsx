@@ -79,8 +79,8 @@ export const RevenueChart = ({ data = [], stats = {}, chartType = 'area', loadin
       return (
         <div className="bg-white px-4 py-3 shadow-lg rounded-lg border border-gray-200">
           <p className="text-sm font-semibold text-gray-900 mb-2">{label}</p>
-          {payload.map((entry, index) => (
-            <div key={index} className="flex items-center gap-2 text-sm">
+          {payload.map((entry) => (
+            <div key={entry.name} className="flex items-center gap-2 text-sm">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
               <span className="text-gray-600 dark:text-gray-300">{entry.name}:</span>
               <span className="font-semibold text-gray-900">{formatCurrency(entry.value)}</span>

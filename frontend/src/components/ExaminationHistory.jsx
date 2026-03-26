@@ -163,8 +163,11 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
                 </div>
               </div>
 
-              {comparisons.map((comparison, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+              {comparisons.map((comparison) => (
+                <div
+                  key={comparison.current.id}
+                  className="border border-gray-200 rounded-lg overflow-hidden"
+                >
                   <button
                     onClick={() => toggleTestExpansion(comparison.current.id)}
                     className="w-full px-3 py-2 hover:bg-gray-50 transition-colors flex items-center justify-between"

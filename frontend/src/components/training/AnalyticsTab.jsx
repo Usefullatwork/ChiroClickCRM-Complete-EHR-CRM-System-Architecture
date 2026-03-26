@@ -414,8 +414,11 @@ export default function AnalyticsTab() {
                     `${task_type} (${(percent * 100).toFixed(0)}%)`
                   }
                 >
-                  {usage.taskTypes.map((_, index) => (
-                    <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                  {usage.taskTypes.map((entry, index) => (
+                    <Cell
+                      key={`cell-${entry.task_type || index}`}
+                      fill={CHART_COLORS[index % CHART_COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip />

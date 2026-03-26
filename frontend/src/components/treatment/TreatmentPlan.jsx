@@ -526,7 +526,7 @@ export default function TreatmentPlan({ _patientId, plan, onSave, _onDelete, lan
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {formData.phases.map((phase, index) => (
                 <PhaseCard
-                  key={index}
+                  key={phase.id || phase.name || index}
                   phase={phase}
                   index={index}
                   currentPhaseIndex={currentPhaseIndex}

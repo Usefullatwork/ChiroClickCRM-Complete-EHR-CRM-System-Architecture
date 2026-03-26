@@ -21,6 +21,11 @@ export default function Appointments() {
   const [statusFilter, setStatusFilter] = useState('');
   const [viewMode, setViewMode] = useState('list');
   const confirm = useConfirm();
+  const [cancelReasonModal, setCancelReasonModal] = useState({
+    open: false,
+    appointment: null,
+    reason: '',
+  });
 
   // Fetch appointments
   const { data: appointmentsResponse, isLoading } = useQuery({
@@ -58,10 +63,18 @@ export default function Appointments() {
     if (!ok) {
       return;
     }
-    const reason = window.prompt(t('cancellationReasonPrompt'));
-    if (reason) {
-      cancelMutation.mutate({ id: appointment.id, reason });
+    setCancelReasonModal({ open: true, appointment, reason: '' });
+  };
+
+  const handleCancelReasonConfirm = () => {
+    if (!cancelReasonModal.reason.trim()) {
+      return;
     }
+    cancelMutation.mutate({
+      id: cancelReasonModal.appointment.id,
+      reason: cancelReasonModal.reason,
+    });
+    setCancelReasonModal({ open: false, appointment: null, reason: '' });
   };
 
   const handleConfirm = (appointment) => {
@@ -266,6 +279,49 @@ export default function Appointments() {
             </div>
           )}
         </>
+      )}
+      {/* Cancel reason modal */}
+      {cancelReasonModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              {t('cancellationReasonTitle') || 'Grunn for kansellering'}
+            </h2>
+            {cancelReasonModal.appointment && (
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                {cancelReasonModal.appointment.patient_name}
+              </p>
+            )}
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('cancellationReasonPrompt') || 'Angi grunn for kansellering:'}
+            </label>
+            <textarea
+              value={cancelReasonModal.reason}
+              onChange={(e) =>
+                setCancelReasonModal({ ...cancelReasonModal, reason: e.target.value })
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              rows={3}
+              placeholder={t('cancellationReasonPlaceholder') || 'Skriv inn grunn...'}
+              autoFocus
+            />
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => setCancelReasonModal({ open: false, appointment: null, reason: '' })}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
+                {t('cancel') || 'Avbryt'}
+              </button>
+              <button
+                onClick={handleCancelReasonConfirm}
+                disabled={!cancelReasonModal.reason.trim() || cancelMutation.isPending}
+                className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {t('confirmCancellation') || 'Bekreft kansellering'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

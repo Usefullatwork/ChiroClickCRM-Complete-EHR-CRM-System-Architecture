@@ -36,7 +36,7 @@ export default function Communications() {
   const [viewMode, setViewMode] = useState('flat');
 
   // Fetch templates
-  const { data: templatesResponse } = useQuery({
+  const { data: templatesResponse, isLoading: templatesLoading } = useQuery({
     queryKey: ['communication-templates'],
     queryFn: () => communicationsAPI.getTemplates(),
   });
@@ -381,7 +381,11 @@ export default function Communications() {
               </h3>
 
               <div className="space-y-2">
-                {templates.length > 0 ? (
+                {templatesLoading ? (
+                  <div className="text-center py-6 text-sm text-gray-500 dark:text-gray-400">
+                    {t('loading', 'Laster...')}
+                  </div>
+                ) : templates.length > 0 ? (
                   templates
                     .filter((tmpl) => !messageType || tmpl.type === messageType.toUpperCase())
                     .map((template) => (

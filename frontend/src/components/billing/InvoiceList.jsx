@@ -87,6 +87,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [cancelModal, setCancelModal] = useState({ open: false, invoiceId: null, reason: '' });
 
   // Fetch invoices
   const { data, isLoading, error } = useQuery({
@@ -160,17 +161,23 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
   };
 
   /**
-   * Handle cancel invoice
+   * Handle cancel invoice — opens modal to collect reason
    */
-  const handleCancelInvoice = async (invoiceId) => {
-    const reason = window.prompt(t('cancelReason', 'Angi grunn for kansellering:'));
-    if (!reason) {
+  const handleCancelInvoice = (invoiceId) => {
+    setCancelModal({ open: true, invoiceId, reason: '' });
+    setActiveDropdown(null);
+  };
+
+  const handleCancelConfirm = async () => {
+    if (!cancelModal.reason.trim()) {
       return;
     }
-
     try {
-      await cancelMutation.mutateAsync({ invoiceId, reason });
-      setActiveDropdown(null);
+      await cancelMutation.mutateAsync({
+        invoiceId: cancelModal.invoiceId,
+        reason: cancelModal.reason,
+      });
+      setCancelModal({ open: false, invoiceId: null, reason: '' });
     } catch (error) {
       logger.error('Failed to cancel invoice:', error);
     }
@@ -524,6 +531,43 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
       {/* Click outside to close dropdown */}
       {activeDropdown && (
         <div className="fixed inset-0 z-0" onClick={() => setActiveDropdown(null)} />
+      )}
+
+      {/* Cancel invoice modal */}
+      {cancelModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              {t('cancelInvoiceTitle', 'Kanseller faktura')}
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              {t('cancelReason', 'Angi grunn for kansellering:')}
+            </p>
+            <textarea
+              value={cancelModal.reason}
+              onChange={(e) => setCancelModal({ ...cancelModal, reason: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              rows={3}
+              placeholder={t('cancelReasonPlaceholder', 'Skriv inn grunn...')}
+              autoFocus
+            />
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => setCancelModal({ open: false, invoiceId: null, reason: '' })}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
+                {t('cancelBtn', 'Avbryt')}
+              </button>
+              <button
+                onClick={handleCancelConfirm}
+                disabled={!cancelModal.reason.trim() || cancelMutation.isPending}
+                className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {t('confirmCancelBtn', 'Kanseller faktura')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

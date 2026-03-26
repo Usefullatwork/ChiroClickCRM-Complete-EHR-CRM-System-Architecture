@@ -411,8 +411,8 @@ const ExerciseDetail = () => {
 
               {showHistory && (
                 <div className="border-t border-gray-100 divide-y divide-gray-100">
-                  {exercise.progressHistory.map((entry, index) => (
-                    <div key={index} className="p-4">
+                  {exercise.progressHistory.map((entry) => (
+                    <div key={entry.completedAt || entry.id} className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm text-gray-500 dark:text-gray-400">
                           {new Date(entry.completedAt).toLocaleDateString('nb-NO', {

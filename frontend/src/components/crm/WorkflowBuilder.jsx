@@ -363,7 +363,7 @@ const WorkflowBuilder = () => {
                       const action = actionTypes.find((a) => a.id === step.type);
                       const ActionIcon = action?.icon || Zap;
                       return (
-                        <React.Fragment key={index}>
+                        <React.Fragment key={`${step.type}-${index}`}>
                           <ArrowRight className="w-3 h-3 text-gray-400 dark:text-gray-300" />
                           <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
                             <ActionIcon className="w-3 h-3" />
@@ -583,7 +583,10 @@ const WorkflowBuilder = () => {
                   const action = actionTypes.find((a) => a.id === step.type);
                   const ActionIcon = action?.icon || Zap;
                   return (
-                    <div key={index} className="flex items-center gap-4 mb-4 ml-6">
+                    <div
+                      key={`step-${step.type}-${index}`}
+                      className="flex items-center gap-4 mb-4 ml-6"
+                    >
                       <div className="w-8 border-l-2 border-gray-200 h-8 -mt-8" />
                       <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center -ml-5">
                         <ActionIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />

@@ -519,7 +519,7 @@ export default function SOAPTemplate({
           <div className="space-y-2">
             {(soapData.assessment.redFlags || []).map((flag, index) => (
               <div
-                key={index}
+                key={`redflag-${flag}-${index}`}
                 className="flex items-center gap-2 p-2 sm:p-3 bg-red-50 border border-red-200 rounded-lg"
               >
                 <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
@@ -655,9 +655,9 @@ export default function SOAPTemplate({
             <div className="p-4 overflow-y-auto" style={{ maxHeight: isMobile ? '70vh' : '60vh' }}>
               {templates.length > 0 ? (
                 <div className="space-y-2">
-                  {templates.map((template, index) => (
+                  {templates.map((template) => (
                     <button
-                      key={index}
+                      key={template.id || template.name}
                       onClick={() => applyTemplate(template)}
                       className="w-full text-left p-4 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 active:bg-blue-100 transition-colors min-h-[64px] touch-manipulation"
                     >

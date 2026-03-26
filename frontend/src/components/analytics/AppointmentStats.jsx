@@ -197,8 +197,8 @@ export const AppointmentStats = ({ data = {}, loading = false }) => {
 
             {/* Legend */}
             <div className="flex flex-wrap justify-center gap-4 mt-4">
-              {statusPieData.map((item, index) => (
-                <div key={index} className="flex items-center gap-2">
+              {statusPieData.map((item) => (
+                <div key={item.name} className="flex items-center gap-2">
                   <div className="w-3 h-3 rounded-full" style={{ backgroundColor: item.color }} />
                   <span className="text-xs text-gray-600 dark:text-gray-300">{item.name}</span>
                 </div>

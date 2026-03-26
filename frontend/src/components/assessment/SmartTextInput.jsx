@@ -111,9 +111,9 @@ export default function SmartTextInput({
       {/* Quick Phrases Bar */}
       {showQuickPhrases && quickPhrases.length > 0 && (
         <div className="flex flex-wrap gap-1.5">
-          {quickPhrases.slice(0, 6).map((phrase, index) => (
+          {quickPhrases.slice(0, 6).map((phrase) => (
             <button
-              key={index}
+              key={phrase.label || phrase.text || phrase}
               type="button"
               onClick={() => insertPhrase(phrase.text || phrase)}
               className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 transition-colors border border-blue-200"
@@ -137,9 +137,9 @@ export default function SmartTextInput({
               {showPhraseDropdown && (
                 <div className="absolute top-full left-0 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg z-20 max-h-64 overflow-y-auto">
                   <div className="py-1">
-                    {quickPhrases.slice(6).map((phrase, index) => (
+                    {quickPhrases.slice(6).map((phrase) => (
                       <button
-                        key={index}
+                        key={phrase.label || phrase.text || phrase}
                         type="button"
                         onClick={() => insertPhrase(phrase.text || phrase)}
                         className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 transition-colors"
@@ -191,9 +191,9 @@ export default function SmartTextInput({
             <Clock className="w-3 h-3" />
             Recent:
           </span>
-          {recentPhrases.slice(0, 4).map((phrase, index) => (
+          {recentPhrases.slice(0, 4).map((phrase) => (
             <button
-              key={index}
+              key={phrase}
               type="button"
               onClick={() => insertPhrase(phrase)}
               className="px-2 py-0.5 text-xs text-gray-600 dark:text-gray-300 bg-gray-100 rounded hover:bg-gray-200 transition-colors"

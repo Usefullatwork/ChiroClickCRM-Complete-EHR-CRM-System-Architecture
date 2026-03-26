@@ -1000,7 +1000,10 @@ export default function WorkflowBuilder({
             <div className="px-4 pb-4 border-t border-gray-100">
               <div className="mt-4 space-y-3">
                 {conditions.map((condition, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+                  <div
+                    key={`condition-${condition.field || index}`}
+                    className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+                  >
                     {index > 0 && (
                       <span className="text-xs font-medium text-gray-500 dark:text-gray-400">
                         {t.and}
@@ -1100,7 +1103,10 @@ export default function WorkflowBuilder({
                   const Icon = actionType.icon;
 
                   return (
-                    <div key={index} className="border border-gray-200 rounded-lg p-4">
+                    <div
+                      key={`action-${action.type}-${index}`}
+                      className="border border-gray-200 rounded-lg p-4"
+                    >
                       <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-3">
                           <div className="flex items-center gap-1 text-gray-400 dark:text-gray-300">

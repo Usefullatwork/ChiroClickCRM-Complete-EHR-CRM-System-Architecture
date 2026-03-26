@@ -181,13 +181,13 @@ export default function MobileNav({
           }}
         >
           <div className="flex items-stretch justify-around">
-            {bottomNavItems.map((item, index) => {
+            {bottomNavItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
 
               return (
                 <button
-                  key={index}
+                  key={item.path || item.label}
                   onClick={() => handleNavClick(item)}
                   className={`flex flex-col items-center justify-center flex-1 py-2 min-h-[56px] transition-colors ${
                     active
@@ -268,13 +268,13 @@ export default function MobileNav({
 
           {/* Menu Items */}
           <div className="px-2 py-2">
-            {drawerMenuItems.map((item, index) => {
+            {drawerMenuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
 
               return (
                 <button
-                  key={index}
+                  key={item.path || item.label}
                   onClick={() => {
                     if (item.path) {
                       navigate(item.path);

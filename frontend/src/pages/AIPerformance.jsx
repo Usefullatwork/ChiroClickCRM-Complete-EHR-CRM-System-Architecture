@@ -106,7 +106,7 @@ const AcceptanceLineChart = ({ data = [], color = '#14b8a6', t }) => {
               chartData.length === 1 ? svgWidth / 2 : (index / (chartData.length - 1)) * svgWidth;
             const y = svgHeight - item.percentage;
             return (
-              <g key={index}>
+              <g key={item.period}>
                 <circle
                   cx={x}
                   cy={y}
@@ -134,9 +134,9 @@ const AcceptanceLineChart = ({ data = [], color = '#14b8a6', t }) => {
 
         {/* X-axis labels */}
         <div className="flex justify-between mt-2">
-          {chartData.slice(0, 7).map((item, index) => (
+          {chartData.slice(0, 7).map((item) => (
             <span
-              key={index}
+              key={item.period}
               className="text-xs text-slate-600 dark:text-slate-300 font-medium truncate"
               style={{ maxWidth: `${100 / Math.min(chartData.length, 7)}%` }}
             >
@@ -183,7 +183,7 @@ const TypeBarChart = ({ data = [], t }) => {
         const typeLabel = t(typeKey, item.type);
 
         return (
-          <div key={index} className="space-y-1">
+          <div key={item.type || index} className="space-y-1">
             <div className="flex items-center justify-between text-sm">
               <span className="font-medium text-slate-700">{typeLabel}</span>
               <div className="flex items-center gap-3">

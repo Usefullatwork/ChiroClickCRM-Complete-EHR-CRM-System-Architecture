@@ -96,8 +96,8 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
       return (
         <div className="bg-white px-4 py-3 shadow-lg rounded-lg border border-gray-200">
           <p className="text-sm font-semibold text-gray-900 mb-2">{label}</p>
-          {payload.map((entry, index) => (
-            <div key={index} className="flex items-center gap-2 text-sm">
+          {payload.map((entry) => (
+            <div key={entry.name} className="flex items-center gap-2 text-sm">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
               <span className="text-gray-600 dark:text-gray-300">{entry.name}:</span>
               <span className="font-semibold text-gray-900">
@@ -342,12 +342,12 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
         {/* Progress bar */}
         <div className="mt-4">
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden flex">
-            {statusDistribution.map((item, index) => {
+            {statusDistribution.map((item) => {
               const total = data.totalPrescriptions || 1;
               const percentage = (item.value / total) * 100;
               return (
                 <div
-                  key={index}
+                  key={item.name}
                   className="h-full transition-all duration-500"
                   style={{
                     width: `${percentage}%`,

@@ -647,7 +647,7 @@ const AutoAcceptSettings = () => {
               ) : (
                 <div className="divide-y divide-gray-100">
                   {log.map((entry, index) => (
-                    <div key={index} className="p-3 flex items-center gap-3 text-sm">
+                    <div key={entry.id || index} className="p-3 flex items-center gap-3 text-sm">
                       <div
                         className={`w-2 h-2 rounded-full ${
                           entry.action === 'accepted' ? 'bg-green-500' : 'bg-red-500'

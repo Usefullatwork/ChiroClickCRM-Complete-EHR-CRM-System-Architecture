@@ -5,7 +5,7 @@
  * Clinical notes and SOAP documentation management
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useConfirm } from '../components/ui/ConfirmDialog';
@@ -61,6 +61,31 @@ export default function ClinicalNotes() {
   const [previewNoteId, setPreviewNoteId] = useState(null);
   const [showNewNoteMenu, setShowNewNoteMenu] = useState(false);
 
+  // Dismiss overlays on Escape key
+  const handleGlobalKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Escape') {
+        if (showPatientSelector) {
+          setShowPatientSelector(false);
+        } else if (showNewNoteMenu) {
+          setShowNewNoteMenu(false);
+        } else if (showPreview) {
+          setShowPreview(false);
+          setPreviewNoteId(null);
+        } else if (showNoteEditor) {
+          setShowNoteEditor(false);
+          setSelectedNoteId(null);
+        }
+      }
+    },
+    [showPatientSelector, showNewNoteMenu, showPreview, showNoteEditor]
+  );
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [handleGlobalKeyDown]);
+
   // Get note type from URL if present
   useEffect(() => {
     const type = searchParams.get('type');
@@ -82,7 +107,11 @@ export default function ClinicalNotes() {
   });
 
   // Fetch selected patient details
-  const { data: selectedPatient, isLoading: _patientLoading } = useQuery({
+  const {
+    data: selectedPatient,
+    isLoading: patientLoading,
+    isError: patientError,
+  } = useQuery({
     queryKey: ['patient', selectedPatientId],
     queryFn: () => api.patients.getById(selectedPatientId),
     enabled: !!selectedPatientId,
@@ -435,7 +464,15 @@ export default function ClinicalNotes() {
                 className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                {selectedPatient?.data?.first_name || selectedPatient?.first_name ? (
+                {patientLoading ? (
+                  <span className="text-sm text-gray-400 dark:text-gray-500">
+                    {t('clinical.loadingPatient', 'Laster...')}
+                  </span>
+                ) : patientError ? (
+                  <span className="text-sm text-red-600">
+                    {t('clinical.patientLoadError', 'Feil ved lasting')}
+                  </span>
+                ) : selectedPatient?.data?.first_name || selectedPatient?.first_name ? (
                   <span className="text-sm font-medium text-gray-900">
                     {selectedPatient?.data?.first_name || selectedPatient?.first_name}{' '}
                     {selectedPatient?.data?.last_name || selectedPatient?.last_name}
@@ -696,7 +733,12 @@ export default function ClinicalNotes() {
       {/* Patient Selector Modal / Pasientvelger-modal */}
       {showPatientSelector && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl max-w-lg w-full mx-4 overflow-hidden">
+          <div
+            className="bg-white rounded-xl max-w-lg w-full mx-4 overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('clinical.selectPatient', 'Velg pasient')}
+          >
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h3 className="font-semibold text-gray-900">
                 {t('clinical.selectPatient', 'Velg pasient')}

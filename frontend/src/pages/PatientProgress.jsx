@@ -55,7 +55,11 @@ export default function PatientProgress() {
   const [sortOrder, setSortOrder] = useState('DESC');
 
   // Fetch patient progress stats (single patient view)
-  const { data: patientStatsResponse, isLoading: _statsLoading } = useQuery({
+  const {
+    data: patientStatsResponse,
+    isLoading: statsLoading,
+    isError: statsError,
+  } = useQuery({
     queryKey: ['patient-progress-stats', patientId],
     queryFn: () => progressAPI.getPatientStats(patientId),
     enabled: !!patientId && viewMode === 'patient',
@@ -96,7 +100,11 @@ export default function PatientProgress() {
   });
 
   // Fetch clinic overview (therapist view)
-  const { data: overviewResponse, isLoading: _overviewLoading } = useQuery({
+  const {
+    data: overviewResponse,
+    isLoading: overviewLoading,
+    isError: overviewError,
+  } = useQuery({
     queryKey: ['clinic-compliance-overview'],
     queryFn: () => progressAPI.getClinicOverview(),
     enabled: viewMode === 'therapist',
@@ -174,6 +182,23 @@ export default function PatientProgress() {
             )}
           </p>
         </div>
+
+        {/* Clinic Overview loading/error */}
+        {overviewLoading && (
+          <div className="flex items-center justify-center py-6">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p className="text-sm text-gray-500 dark:text-gray-400 ml-3">
+              {t('patients.loadingOverview', 'Laster oversikt...')}
+            </p>
+          </div>
+        )}
+        {overviewError && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-800">
+              {t('patients.overviewError', 'Kunne ikke laste klinikksoversikt.')}
+            </p>
+          </div>
+        )}
 
         {/* Clinic Overview Stats */}
         {clinicOverview && (
@@ -447,6 +472,23 @@ export default function PatientProgress() {
           </p>
         </div>
       </div>
+
+      {/* Patient Stats loading/error */}
+      {statsLoading && (
+        <div className="flex items-center justify-center py-6">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+          <p className="text-sm text-gray-500 dark:text-gray-400 ml-3">
+            {t('patients.loadingStats', 'Laster statistikk...')}
+          </p>
+        </div>
+      )}
+      {statsError && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-sm text-red-800">
+            {t('patients.statsError', 'Kunne ikke laste pasientstatistikk.')}
+          </p>
+        </div>
+      )}
 
       {/* Summary Stats */}
       {patientStats && (

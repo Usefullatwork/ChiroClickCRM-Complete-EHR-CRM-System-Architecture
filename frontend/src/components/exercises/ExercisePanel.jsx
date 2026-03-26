@@ -3,7 +3,7 @@
  * Combined panel for exercise prescription within clinical encounters
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { X, Dumbbell, AlertCircle, Check, Download, Loader2 } from 'lucide-react';
 import ExerciseLibrary from './ExerciseLibrary';
 import ExercisePrescription from './ExercisePrescription';
@@ -23,6 +23,16 @@ const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSa
   const [success, setSuccess] = useState(null);
   const [panelWidth, setPanelWidth] = useState(50); // percentage
   const [downloadingPDF, setDownloadingPDF] = useState(false);
+
+  // Dismiss panel on Escape key
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    },
+    [onClose]
+  );
 
   // Load exercises and categories
   useEffect(() => {
@@ -266,7 +276,13 @@ const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSa
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       {/* Panel */}
-      <div className="relative ml-auto w-full max-w-6xl bg-white shadow-xl flex flex-col">
+      <div
+        className="relative ml-auto w-full max-w-6xl bg-white shadow-xl flex flex-col"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Øvelsesprogram"
+        onKeyDown={handleKeyDown}
+      >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
           <div className="flex items-center gap-3">
