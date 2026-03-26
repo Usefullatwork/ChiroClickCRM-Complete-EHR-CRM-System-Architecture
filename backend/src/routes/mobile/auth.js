@@ -5,6 +5,7 @@
 
 import express from 'express';
 import * as mobileAuth from '../../services/mobileAuth.js';
+import { logAction } from '../../services/auditLog.js';
 
 const router = express.Router();
 
@@ -51,9 +52,35 @@ router.post('/auth/send-otp', async (req, res) => {
     }
 
     const result = await mobileAuth.sendOTP(phoneNumber);
+
+    await logAction('AUTH', null, {
+      resourceType: 'mobile_auth',
+      metadata: {
+        action: 'send_otp',
+        success: true,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
+
     res.json(result);
   } catch (error) {
     logger.error('Send OTP error:', error);
+
+    await logAction('AUTH', null, {
+      resourceType: 'mobile_auth',
+      metadata: {
+        action: 'send_otp',
+        success: false,
+        errorMessage: error.message,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: false,
+      errorMessage: error.message,
+    });
+
     res.status(400).json({ error: error.message });
   }
 });
@@ -91,9 +118,36 @@ router.post('/auth/verify-otp', async (req, res) => {
     }
 
     const result = await mobileAuth.verifyOTP(phoneNumber, code);
+
+    await logAction('AUTH', result?.user?.id ?? null, {
+      resourceType: 'mobile_auth',
+      metadata: {
+        action: 'verify_otp',
+        success: true,
+        isNewUser: result?.isNewUser ?? false,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
+
     res.json(result);
   } catch (error) {
     logger.error('Verify OTP error:', error);
+
+    await logAction('AUTH', null, {
+      resourceType: 'mobile_auth',
+      metadata: {
+        action: 'verify_otp',
+        success: false,
+        errorMessage: error.message,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: false,
+      errorMessage: error.message,
+    });
+
     res.status(400).json({ error: error.message });
   }
 });
@@ -129,9 +183,36 @@ router.post('/auth/google', async (req, res) => {
     }
 
     const result = await mobileAuth.verifyGoogleToken(idToken);
+
+    await logAction('AUTH', result?.user?.id ?? null, {
+      resourceType: 'mobile_auth',
+      metadata: {
+        action: 'google_auth',
+        success: true,
+        isNewUser: result?.isNewUser ?? false,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
+
     res.json(result);
   } catch (error) {
     logger.error('Google auth error:', error);
+
+    await logAction('AUTH', null, {
+      resourceType: 'mobile_auth',
+      metadata: {
+        action: 'google_auth',
+        success: false,
+        errorMessage: error.message,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: false,
+      errorMessage: error.message,
+    });
+
     res.status(400).json({ error: error.message });
   }
 });
@@ -169,9 +250,36 @@ router.post('/auth/apple', async (req, res) => {
     }
 
     const result = await mobileAuth.verifyAppleToken(identityToken, user);
+
+    await logAction('AUTH', result?.user?.id ?? null, {
+      resourceType: 'mobile_auth',
+      metadata: {
+        action: 'apple_auth',
+        success: true,
+        isNewUser: result?.isNewUser ?? false,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
+
     res.json(result);
   } catch (error) {
     logger.error('Apple auth error:', error);
+
+    await logAction('AUTH', null, {
+      resourceType: 'mobile_auth',
+      metadata: {
+        action: 'apple_auth',
+        success: false,
+        errorMessage: error.message,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: false,
+      errorMessage: error.message,
+    });
+
     res.status(400).json({ error: error.message });
   }
 });
@@ -207,9 +315,35 @@ router.post('/auth/refresh', async (req, res) => {
     }
 
     const result = await mobileAuth.refreshAccessToken(refreshToken);
+
+    await logAction('AUTH', result?.userId ?? null, {
+      resourceType: 'mobile_auth',
+      metadata: {
+        action: 'token_refresh',
+        success: true,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
+
     res.json(result);
   } catch (error) {
     logger.error('Refresh token error:', error);
+
+    await logAction('AUTH', null, {
+      resourceType: 'mobile_auth',
+      metadata: {
+        action: 'token_refresh',
+        success: false,
+        errorMessage: error.message,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: false,
+      errorMessage: error.message,
+    });
+
     res.status(401).json({ error: error.message });
   }
 });
@@ -241,9 +375,35 @@ router.post('/auth/logout', async (req, res) => {
       await mobileAuth.revokeToken(refreshToken);
     }
 
+    await logAction('AUTH', null, {
+      resourceType: 'mobile_auth',
+      metadata: {
+        action: 'logout',
+        success: true,
+        tokenProvided: Boolean(refreshToken),
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
+
     res.json({ success: true });
   } catch (error) {
     logger.error('Logout error:', error);
+
+    await logAction('AUTH', null, {
+      resourceType: 'mobile_auth',
+      metadata: {
+        action: 'logout',
+        success: false,
+        errorMessage: error.message,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: false,
+      errorMessage: error.message,
+    });
+
     res.json({ success: true }); // Always return success for logout
   }
 });

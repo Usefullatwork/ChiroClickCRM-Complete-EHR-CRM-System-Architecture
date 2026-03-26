@@ -6,6 +6,7 @@
 import express from 'express';
 import { authenticateMobile, resolvePatientContext } from '../../middleware/mobileAuth.js';
 import * as mobileClinic from '../../services/mobileClinic.js';
+import { logAction } from '../../services/auditLog.js';
 
 const router = express.Router();
 
@@ -30,6 +31,17 @@ router.get('/messages', authenticateMobile, resolvePatientContext, async (req, r
       req.mobileUser.organizationId,
       { page: req.query.page, limit: req.query.limit }
     );
+    await logAction('MOBILE_MESSAGES_READ', req.mobileUser.id, {
+      resourceType: 'mobile_clinic',
+      resourceId: req.mobileUser.patientId,
+      metadata: {
+        organization_id: req.mobileUser.organizationId,
+        patientId: req.mobileUser.patientId,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json(result);
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -54,6 +66,18 @@ router.post('/messages', authenticateMobile, resolvePatientContext, async (req, 
       req.mobileUser.organizationId,
       req.body
     );
+    await logAction('MOBILE_MESSAGE_SEND', req.mobileUser.id, {
+      resourceType: 'mobile_clinic',
+      resourceId: req.mobileUser.patientId,
+      metadata: {
+        organization_id: req.mobileUser.organizationId,
+        patientId: req.mobileUser.patientId,
+        messageId: message?.id,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.status(201).json(message);
   } catch (error) {
     if (error.message === 'Meldingstekst er påkrevd') {
@@ -77,6 +101,17 @@ router.patch('/messages/:id/read', authenticateMobile, resolvePatientContext, as
       req.mobileUser.organizationId,
       req.params.id
     );
+    await logAction('MOBILE_MESSAGE_READ', req.mobileUser.id, {
+      resourceType: 'mobile_clinic',
+      resourceId: req.params.id,
+      metadata: {
+        organization_id: req.mobileUser.organizationId,
+        patientId: req.mobileUser.patientId,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json({ success: true });
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -96,6 +131,17 @@ router.get('/documents', authenticateMobile, resolvePatientContext, async (req, 
       req.mobileUser.patientId,
       req.mobileUser.organizationId
     );
+    await logAction('MOBILE_DOCUMENTS_READ', req.mobileUser.id, {
+      resourceType: 'mobile_clinic',
+      resourceId: req.mobileUser.patientId,
+      metadata: {
+        organization_id: req.mobileUser.organizationId,
+        patientId: req.mobileUser.patientId,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json(result);
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -120,6 +166,17 @@ router.get('/documents/:token/download', authenticateMobile, async (req, res) =>
     if (result.error === 'expired') {
       return res.status(410).json({ error: 'Download link has expired' });
     }
+
+    await logAction('MOBILE_DOCUMENT_DOWNLOAD', req.mobileUser.id, {
+      resourceType: 'mobile_clinic',
+      resourceId: req.params.token,
+      metadata: {
+        filename: result.filename,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${result.filename}"`);
@@ -150,6 +207,17 @@ router.get(
         date,
         practitioner_id
       );
+      await logAction('MOBILE_SLOTS_READ', req.mobileUser.id, {
+        resourceType: 'mobile_clinic',
+        metadata: {
+          organization_id: req.mobileUser.organizationId,
+          date,
+          practitioner_id: practitioner_id || null,
+        },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
       res.json(result);
     } catch (error) {
       if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -175,6 +243,18 @@ router.post(
         req.mobileUser.organizationId,
         req.body
       );
+      await logAction('MOBILE_BOOKING_REQUEST_CREATE', req.mobileUser.id, {
+        resourceType: 'mobile_clinic',
+        resourceId: req.mobileUser.patientId,
+        metadata: {
+          organization_id: req.mobileUser.organizationId,
+          patientId: req.mobileUser.patientId,
+          requestId: result?.id,
+        },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
       res.status(201).json(result);
     } catch (error) {
       if (error.message === 'preferredDate is required') {
@@ -202,6 +282,17 @@ router.get(
         req.mobileUser.patientId,
         req.mobileUser.organizationId
       );
+      await logAction('MOBILE_BOOKING_REQUESTS_READ', req.mobileUser.id, {
+        resourceType: 'mobile_clinic',
+        resourceId: req.mobileUser.patientId,
+        metadata: {
+          organization_id: req.mobileUser.organizationId,
+          patientId: req.mobileUser.patientId,
+        },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
       res.json(result);
     } catch (error) {
       if (error.message?.includes('relation') && error.message?.includes('does not exist')) {

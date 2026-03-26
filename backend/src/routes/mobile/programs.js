@@ -6,6 +6,7 @@
 import express from 'express';
 import { authenticateMobile } from '../../middleware/mobileAuth.js';
 import * as mobilePrograms from '../../services/mobilePrograms.js';
+import { logAction } from '../../services/auditLog.js';
 
 const router = express.Router();
 
@@ -50,6 +51,13 @@ try {
 router.get('/programs', authenticateMobile, async (req, res) => {
   try {
     const programs = await mobilePrograms.listPrograms(req.query);
+    await logAction('mobile_program.list', req.mobileUser.id, {
+      resourceType: 'mobile_programs',
+      metadata: { query: req.query },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json(programs);
   } catch (error) {
     logger.error('Get programs error:', error);
@@ -85,9 +93,24 @@ router.get('/programs/:id', authenticateMobile, async (req, res) => {
     const program = await mobilePrograms.getProgramDetails(req.params.id, req.mobileUser.id);
 
     if (!program) {
+      await logAction('mobile_program.read', req.mobileUser.id, {
+        resourceType: 'mobile_programs',
+        resourceId: req.params.id,
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: false,
+        errorMessage: 'Program not found',
+      });
       return res.status(404).json({ error: 'Program not found' });
     }
 
+    await logAction('mobile_program.read', req.mobileUser.id, {
+      resourceType: 'mobile_programs',
+      resourceId: req.params.id,
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json(program);
   } catch (error) {
     logger.error('Get program error:', error);
@@ -121,9 +144,25 @@ router.get('/programs/:id', authenticateMobile, async (req, res) => {
 router.post('/programs/:id/enroll', authenticateMobile, async (req, res) => {
   try {
     const enrollment = await mobilePrograms.enrollInProgram(req.params.id, req.mobileUser.id);
+    await logAction('mobile_program.enroll', req.mobileUser.id, {
+      resourceType: 'mobile_programs',
+      resourceId: req.params.id,
+      metadata: { enrollmentId: enrollment?.id },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json(enrollment);
   } catch (error) {
     if (error.message === 'Already enrolled in this program') {
+      await logAction('mobile_program.enroll', req.mobileUser.id, {
+        resourceType: 'mobile_programs',
+        resourceId: req.params.id,
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: false,
+        errorMessage: error.message,
+      });
       return res.status(400).json({ error: error.message });
     }
     logger.error('Enroll error:', error);
@@ -148,6 +187,12 @@ router.post('/programs/:id/enroll', authenticateMobile, async (req, res) => {
 router.get('/my-programs', authenticateMobile, async (req, res) => {
   try {
     const programs = await mobilePrograms.getMyPrograms(req.mobileUser.id);
+    await logAction('mobile_program.list_enrolled', req.mobileUser.id, {
+      resourceType: 'mobile_programs',
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json(programs);
   } catch (error) {
     logger.error('Get my programs error:', error);

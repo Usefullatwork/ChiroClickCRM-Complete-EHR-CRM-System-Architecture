@@ -392,10 +392,23 @@ export const signEncounter = async (req, res) => {
  */
 export const generateNote = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const { id } = req.params;
 
     const note = await encounterService.generateFormattedNote(organizationId, id);
+
+    // Log audit — reads patient data to generate note
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'READ',
+      resourceType: 'ENCOUNTER',
+      resourceId: id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
 
     res.json({ note });
   } catch (error) {

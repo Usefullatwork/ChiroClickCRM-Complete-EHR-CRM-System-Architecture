@@ -6,6 +6,7 @@
 import express from 'express';
 import { authenticateMobile } from '../../middleware/mobileAuth.js';
 import * as mobileWorkouts from '../../services/mobileWorkouts.js';
+import { logAction } from '../../services/auditLog.js';
 
 const router = express.Router();
 
@@ -37,6 +38,12 @@ try {
 router.get('/today', authenticateMobile, async (req, res) => {
   try {
     const todayData = await mobileWorkouts.getTodayWorkout(req.mobileUser.id);
+    await logAction('mobile_workout.today', req.mobileUser.id, {
+      resourceType: 'mobile_workouts',
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json(todayData);
   } catch (error) {
     logger.error('Get today error:', error);
@@ -95,6 +102,18 @@ router.get('/today', authenticateMobile, async (req, res) => {
 router.post('/log', authenticateMobile, async (req, res) => {
   try {
     const logEntry = await mobileWorkouts.logWorkout(req.mobileUser.id, req.body);
+    await logAction('mobile_workout.log', req.mobileUser.id, {
+      resourceType: 'mobile_workouts',
+      resourceId: logEntry?.id,
+      metadata: {
+        programExerciseId: req.body.programExerciseId,
+        exerciseId: req.body.exerciseId,
+        enrollmentId: req.body.enrollmentId,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json(logEntry);
   } catch (error) {
     logger.error('Log workout error:', error);
@@ -125,6 +144,13 @@ router.post('/log', authenticateMobile, async (req, res) => {
 router.get('/progress', authenticateMobile, async (req, res) => {
   try {
     const progress = await mobileWorkouts.getProgress(req.mobileUser.id, req.query.days);
+    await logAction('mobile_workout.progress', req.mobileUser.id, {
+      resourceType: 'mobile_workouts',
+      metadata: { days: req.query.days },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json(progress);
   } catch (error) {
     logger.error('Get progress error:', error);
@@ -149,6 +175,12 @@ router.get('/progress', authenticateMobile, async (req, res) => {
 router.get('/achievements', authenticateMobile, async (req, res) => {
   try {
     const achievements = await mobileWorkouts.getAchievements(req.mobileUser.id);
+    await logAction('mobile_workout.achievements', req.mobileUser.id, {
+      resourceType: 'mobile_workouts',
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json(achievements);
   } catch (error) {
     logger.error('Get achievements error:', error);

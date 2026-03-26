@@ -6,6 +6,7 @@
 import express from 'express';
 import { authenticateMobile } from '../../middleware/mobileAuth.js';
 import * as mobileExercises from '../../services/mobileExercises.js';
+import { logAction } from '../../services/auditLog.js';
 
 const router = express.Router();
 
@@ -64,6 +65,20 @@ try {
 router.get('/exercises', authenticateMobile, async (req, res) => {
   try {
     const result = await mobileExercises.listExercises(req.query);
+    await logAction('MOBILE_EXERCISES_READ', req.mobileUser.id, {
+      resourceType: 'mobile_exercises',
+      metadata: {
+        filters: {
+          category: req.query.category || null,
+          bodyRegion: req.query.bodyRegion || null,
+          difficulty: req.query.difficulty || null,
+          search: req.query.search || null,
+        },
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json(result);
   } catch (error) {
     logger.error('Get exercises error:', error);
@@ -102,6 +117,17 @@ router.get('/exercises/:id', authenticateMobile, async (req, res) => {
       return res.status(404).json({ error: 'Exercise not found' });
     }
 
+    await logAction('MOBILE_EXERCISE_READ', req.mobileUser.id, {
+      resourceType: 'mobile_exercises',
+      resourceId: req.params.id,
+      metadata: {
+        exerciseName: exercise.name,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
+
     res.json(exercise);
   } catch (error) {
     logger.error('Get exercise error:', error);
@@ -126,6 +152,13 @@ router.get('/exercises/:id', authenticateMobile, async (req, res) => {
 router.get('/exercise-categories', authenticateMobile, async (req, res) => {
   try {
     const categories = await mobileExercises.getCategories();
+    await logAction('MOBILE_EXERCISE_CATEGORIES_READ', req.mobileUser.id, {
+      resourceType: 'mobile_exercises',
+      metadata: {},
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
     res.json(categories);
   } catch (error) {
     logger.error('Get categories error:', error);

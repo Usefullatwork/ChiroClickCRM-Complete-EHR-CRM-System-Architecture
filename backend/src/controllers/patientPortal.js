@@ -78,6 +78,14 @@ export const getAppointments = async (req, res) => {
   try {
     const { patient_id, organization_id } = req.portalPatient;
     const appointments = await patientPortalService.getAppointments(patient_id, organization_id);
+
+    await logAction('portal.appointments.read', patient_id, {
+      resourceType: 'portal_appointments',
+      resourceId: patient_id,
+      ipAddress: req.ip,
+      metadata: { organizationId: organization_id, count: appointments.length },
+    });
+
     res.json({ appointments });
   } catch (error) {
     logger.error('Error getting portal appointments:', error);
@@ -110,9 +118,17 @@ export const getExercises = async (req, res) => {
 export const logExerciseCompliance = async (req, res) => {
   try {
     const { id } = req.params;
-    const { patient_id } = req.portalPatient;
+    const { patient_id, organization_id } = req.portalPatient;
 
     const entry = await patientPortalService.logExerciseCompliance(id, patient_id, req.body);
+
+    await logAction('portal.exercise.compliance.create', patient_id, {
+      resourceType: 'exercise_compliance',
+      resourceId: id,
+      ipAddress: req.ip,
+      metadata: { organizationId: organization_id, prescriptionId: id },
+    });
+
     res.status(201).json(entry);
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -167,6 +183,17 @@ export const requestBooking = async (req, res) => {
       req.body
     );
 
+    await logAction('portal.booking.create', patient_id, {
+      resourceType: 'booking_request',
+      resourceId: result.id,
+      ipAddress: req.ip,
+      metadata: {
+        organizationId: organization_id,
+        preferredDate: req.body.preferredDate,
+        preferredTime: req.body.preferredTime,
+      },
+    });
+
     res.status(201).json(result);
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -198,6 +225,17 @@ export const rescheduleAppointment = async (req, res) => {
     if (result.error === 'NOT_FOUND') {
       return res.status(404).json({ error: 'Appointment not found' });
     }
+
+    await logAction('portal.appointment.reschedule', patient_id, {
+      resourceType: 'appointment',
+      resourceId: id,
+      ipAddress: req.ip,
+      metadata: {
+        organizationId: organization_id,
+        preferredDate: req.body.preferredDate,
+        preferredTime: req.body.preferredTime,
+      },
+    });
 
     res.json(result);
   } catch (error) {
@@ -235,6 +273,13 @@ export const cancelAppointment = async (req, res) => {
       return res.status(400).json({ error: 'Appointment is already cancelled' });
     }
 
+    await logAction('portal.appointment.cancel', patient_id, {
+      resourceType: 'appointment',
+      resourceId: id,
+      ipAddress: req.ip,
+      metadata: { organizationId: organization_id, reason },
+    });
+
     res.json(result);
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -256,6 +301,14 @@ export const getMessages = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20;
 
     const result = await patientPortalService.getMessages(patient_id, organization_id, page, limit);
+
+    await logAction('portal.messages.read', patient_id, {
+      resourceType: 'portal_messages',
+      resourceId: patient_id,
+      ipAddress: req.ip,
+      metadata: { organizationId: organization_id, page, limit },
+    });
+
     res.json(result);
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -286,6 +339,13 @@ export const sendMessage = async (req, res) => {
       req.body
     );
 
+    await logAction('portal.message.create', patient_id, {
+      resourceType: 'portal_message',
+      resourceId: message.id,
+      ipAddress: req.ip,
+      metadata: { organizationId: organization_id, subject: req.body.subject },
+    });
+
     res.status(201).json(message);
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -306,6 +366,14 @@ export const markMessageRead = async (req, res) => {
     const { patient_id, organization_id } = req.portalPatient;
 
     await patientPortalService.markMessageRead(id, patient_id, organization_id);
+
+    await logAction('portal.message.read', patient_id, {
+      resourceType: 'portal_message',
+      resourceId: id,
+      ipAddress: req.ip,
+      metadata: { organizationId: organization_id },
+    });
+
     res.json({ success: true });
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -324,6 +392,14 @@ export const getDocuments = async (req, res) => {
   try {
     const { patient_id, organization_id } = req.portalPatient;
     const documents = await patientPortalService.getDocuments(patient_id, organization_id);
+
+    await logAction('portal.documents.read', patient_id, {
+      resourceType: 'portal_documents',
+      resourceId: patient_id,
+      ipAddress: req.ip,
+      metadata: { organizationId: organization_id, count: documents.length },
+    });
+
     res.json({ documents });
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -372,8 +448,16 @@ export const downloadDocument = async (req, res) => {
  */
 export const getCommPreferences = async (req, res) => {
   try {
-    const { patient_id } = req.portalPatient;
+    const { patient_id, organization_id } = req.portalPatient;
     const prefs = await patientPortalService.getCommPreferences(patient_id);
+
+    await logAction('portal.comm_preferences.read', patient_id, {
+      resourceType: 'comm_preferences',
+      resourceId: patient_id,
+      ipAddress: req.ip,
+      metadata: { organizationId: organization_id },
+    });
+
     res.json(prefs);
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -396,6 +480,14 @@ export const updateCommPreferences = async (req, res) => {
       organization_id,
       req.body
     );
+
+    await logAction('portal.comm_preferences.update', patient_id, {
+      resourceType: 'comm_preferences',
+      resourceId: patient_id,
+      ipAddress: req.ip,
+      metadata: { organizationId: organization_id },
+    });
+
     res.json(prefs);
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {

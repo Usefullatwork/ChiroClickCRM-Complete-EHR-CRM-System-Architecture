@@ -6,6 +6,7 @@
 
 import * as portalService from '../services/portal.js';
 import { logAudit } from '../utils/audit.js';
+import { logAction, ACTION_TYPES } from '../services/auditLog.js';
 import logger from '../utils/logger.js';
 
 /**
@@ -20,6 +21,14 @@ export const getPatientDashboard = async (req, res) => {
     if (!result) {
       return res.status(404).json({ error: 'Patient not found' });
     }
+
+    await logAction(ACTION_TYPES.PATIENT_READ, req.user?.id, {
+      resourceType: 'patient',
+      resourceId: patientId,
+      metadata: { endpoint: 'portal_dashboard', organizationId: req.organizationId },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
 
     res.json(result);
   } catch (error) {
@@ -42,6 +51,18 @@ export const getPatientAppointments = async (req, res) => {
       patientId,
       upcomingOnly
     );
+
+    await logAction(ACTION_TYPES.PATIENT_READ, req.user?.id, {
+      resourceType: 'patient',
+      resourceId: patientId,
+      metadata: {
+        endpoint: 'portal_appointments',
+        upcomingOnly,
+        organizationId: req.organizationId,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
 
     res.json({ appointments });
   } catch (error) {
@@ -99,6 +120,15 @@ export const getPatientExercises = async (req, res) => {
     const { patientId } = req.params;
 
     const exercises = await portalService.getPatientExercises(req.organizationId, patientId);
+
+    await logAction(ACTION_TYPES.PATIENT_READ, req.user?.id, {
+      resourceType: 'patient',
+      resourceId: patientId,
+      metadata: { endpoint: 'portal_exercises', organizationId: req.organizationId },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+
     res.json({ exercises });
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -118,6 +148,15 @@ export const getPatientOutcomes = async (req, res) => {
     const { patientId } = req.params;
 
     const outcomes = await portalService.getPatientOutcomes(req.organizationId, patientId);
+
+    await logAction(ACTION_TYPES.PATIENT_READ, req.user?.id, {
+      resourceType: 'patient',
+      resourceId: patientId,
+      metadata: { endpoint: 'portal_outcomes', organizationId: req.organizationId },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+
     res.json({ outcomes });
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -207,6 +246,19 @@ export const setPortalAccess = async (req, res) => {
 export const listBookingRequests = async (req, res) => {
   try {
     const result = await portalService.listBookingRequests(req.organizationId, req.query);
+
+    await logAction(ACTION_TYPES.PATIENT_READ, req.user?.id, {
+      resourceType: 'booking_request',
+      resourceId: null,
+      metadata: {
+        endpoint: 'portal_booking_requests',
+        organizationId: req.organizationId,
+        filters: req.query,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
+
     res.json(result);
   } catch (error) {
     if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
@@ -287,6 +339,14 @@ export const getPatientMessages = async (req, res) => {
     if (!result) {
       return res.status(404).json({ error: 'Patient not found' });
     }
+
+    await logAction(ACTION_TYPES.PATIENT_READ, req.user?.id, {
+      resourceType: 'patient',
+      resourceId: patientId,
+      metadata: { endpoint: 'portal_messages', organizationId: req.organizationId },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+    });
 
     res.json(result);
   } catch (error) {
