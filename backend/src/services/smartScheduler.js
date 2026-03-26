@@ -80,7 +80,14 @@ async function scheduleFollowUpAfterVisit(appointmentId, organizationId) {
   // Get active rules for this organization
   const rulesResult = await query(
     `
-    SELECT * FROM communication_rules
+    SELECT
+      id, organization_id, name, description,
+      trigger_type, trigger_days,
+      condition_no_appointment_scheduled, condition_patient_status, condition_visit_types,
+      communication_type, template_id, default_message,
+      on_new_appointment, extend_days, is_active,
+      created_at, updated_at
+    FROM communication_rules
     WHERE organization_id = $1
     AND is_active = true
     AND trigger_type = 'after_visit'
@@ -500,7 +507,14 @@ async function importAppointments(organizationId, appointments, source = 'solvit
 async function getCommunicationRules(organizationId) {
   const result = await query(
     `
-    SELECT * FROM communication_rules
+    SELECT
+      id, organization_id, name, description,
+      trigger_type, trigger_days,
+      condition_no_appointment_scheduled, condition_patient_status, condition_visit_types,
+      communication_type, template_id, default_message,
+      on_new_appointment, extend_days, is_active,
+      created_at, updated_at
+    FROM communication_rules
     WHERE organization_id = $1
     ORDER BY trigger_type, trigger_days
   `,

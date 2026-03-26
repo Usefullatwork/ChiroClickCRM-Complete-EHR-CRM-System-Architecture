@@ -308,7 +308,9 @@ export const handleBookingRequest = async (organizationId, requestId, action, da
   const { appointment_date, appointment_time, duration, visit_type, userId } = data;
 
   const reqResult = await query(
-    `SELECT * FROM portal_booking_requests WHERE id = $1 AND organization_id = $2`,
+    `SELECT id, organization_id, patient_id, preferred_date, preferred_time_slot,
+            reason, status, handled_by, appointment_id, created_at, updated_at
+     FROM portal_booking_requests WHERE id = $1 AND organization_id = $2`,
     [requestId, organizationId]
   );
 

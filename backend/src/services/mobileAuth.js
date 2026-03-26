@@ -167,7 +167,9 @@ async function verifyOTP(phoneNumber, code) {
   // Find or create mobile user
   const userResult = await dbQuery(
     `
-    SELECT * FROM mobile_users WHERE phone_number = $1
+    SELECT id, phone_number, phone_verified, display_name, avatar_url,
+           preferred_language, notification_time, notification_enabled, created_at
+    FROM mobile_users WHERE phone_number = $1
   `,
     [normalizedPhone]
   );
@@ -181,7 +183,8 @@ async function verifyOTP(phoneNumber, code) {
       `
       INSERT INTO mobile_users (phone_number, phone_verified)
       VALUES ($1, TRUE)
-      RETURNING *
+      RETURNING id, phone_number, phone_verified, display_name, avatar_url,
+                preferred_language, notification_time, notification_enabled, created_at
     `,
       [normalizedPhone]
     );
@@ -241,7 +244,9 @@ async function verifyGoogleToken(idToken) {
     // Find or create user
     const userResult = await dbQuery(
       `
-      SELECT * FROM mobile_users WHERE google_id = $1
+      SELECT id, phone_number, phone_verified, display_name, avatar_url,
+             preferred_language, notification_time, notification_enabled, created_at
+      FROM mobile_users WHERE google_id = $1
     `,
       [googleId]
     );
@@ -255,7 +260,8 @@ async function verifyGoogleToken(idToken) {
         `
         INSERT INTO mobile_users (google_id, display_name, avatar_url, phone_number, phone_verified)
         VALUES ($1, $2, $3, $4, FALSE)
-        RETURNING *
+        RETURNING id, phone_number, phone_verified, display_name, avatar_url,
+                  preferred_language, notification_time, notification_enabled, created_at
       `,
         [googleId, name, picture, `google_${googleId}`]
       );
@@ -331,7 +337,9 @@ async function verifyAppleToken(identityToken, appleUser) {
     // Find or create user
     const userResult = await dbQuery(
       `
-      SELECT * FROM mobile_users WHERE apple_id = $1
+      SELECT id, phone_number, phone_verified, display_name, avatar_url,
+             preferred_language, notification_time, notification_enabled, created_at
+      FROM mobile_users WHERE apple_id = $1
     `,
       [appleId]
     );
@@ -344,7 +352,8 @@ async function verifyAppleToken(identityToken, appleUser) {
         `
         INSERT INTO mobile_users (apple_id, display_name, phone_number, phone_verified)
         VALUES ($1, $2, $3, FALSE)
-        RETURNING *
+        RETURNING id, phone_number, phone_verified, display_name, avatar_url,
+                  preferred_language, notification_time, notification_enabled, created_at
       `,
         [appleId, name, `apple_${appleId}`]
       );
@@ -595,7 +604,9 @@ function sanitizeUser(user) {
 async function getUserById(userId) {
   const result = await dbQuery(
     `
-    SELECT * FROM mobile_users WHERE id = $1
+    SELECT id, phone_number, phone_verified, display_name, avatar_url,
+           preferred_language, notification_time, notification_enabled, created_at
+    FROM mobile_users WHERE id = $1
   `,
     [userId]
   );
@@ -641,7 +652,8 @@ async function updateProfile(userId, updates) {
     UPDATE mobile_users
     SET ${setClauses.join(', ')}
     WHERE id = $1
-    RETURNING *
+    RETURNING id, phone_number, phone_verified, display_name, avatar_url,
+              preferred_language, notification_time, notification_enabled, created_at
   `,
     values
   );

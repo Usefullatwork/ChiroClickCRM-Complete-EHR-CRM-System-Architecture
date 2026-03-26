@@ -46,9 +46,11 @@ router.get('/me', authenticateMobile, async (req, res) => {
     }
 
     // Get streak info
-    const streakResult = await query(`SELECT * FROM user_streaks WHERE mobile_user_id = $1`, [
-      req.mobileUser.id,
-    ]);
+    const streakResult = await query(
+      `SELECT id, mobile_user_id, current_streak, longest_streak, last_workout_date, streak_start_date, updated_at
+       FROM user_streaks WHERE mobile_user_id = $1`,
+      [req.mobileUser.id]
+    );
 
     const streak = streakResult.rows[0] || { current_streak: 0, longest_streak: 0 };
 

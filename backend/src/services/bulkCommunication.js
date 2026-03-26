@@ -91,7 +91,7 @@ export const queueBulkCommunications = async (
     let template = null;
     if (templateId) {
       const templateResult = await query(
-        `SELECT * FROM message_templates WHERE id = $1 AND organization_id = $2 AND is_active = true`,
+        `SELECT id, subject, body, type FROM message_templates WHERE id = $1 AND organization_id = $2 AND is_active = true`,
         [templateId, organizationId]
       );
       if (templateResult.rows.length === 0) {
@@ -437,7 +437,8 @@ export const getQueueStatus = async (organizationId, batchId) => {
   try {
     // Get batch info
     const batchResult = await query(
-      `SELECT * FROM bulk_communication_batches WHERE id = $1 AND organization_id = $2`,
+      `SELECT id, status, type, priority, created_at, scheduled_at, started_at, completed_at, total_count
+       FROM bulk_communication_batches WHERE id = $1 AND organization_id = $2`,
       [batchId, organizationId]
     );
 
@@ -536,7 +537,7 @@ export const cancelBatch = async (organizationId, batchId) => {
   try {
     // Verify batch belongs to organization
     const batchResult = await query(
-      `SELECT * FROM bulk_communication_batches WHERE id = $1 AND organization_id = $2`,
+      `SELECT id, status FROM bulk_communication_batches WHERE id = $1 AND organization_id = $2`,
       [batchId, organizationId]
     );
 
@@ -768,7 +769,8 @@ export const previewMessage = async (
 ) => {
   try {
     const patientResult = await query(
-      `SELECT * FROM patients WHERE id = $1 AND organization_id = $2`,
+      `SELECT id, first_name, last_name, phone, email, date_of_birth, last_visit_date
+       FROM patients WHERE id = $1 AND organization_id = $2`,
       [patientId, organizationId]
     );
 

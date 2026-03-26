@@ -415,7 +415,9 @@ export const signNote = async (organizationId, noteId, userId) => {
   try {
     // Generate signature hash
     const noteResult = await query(
-      'SELECT * FROM clinical_notes WHERE organization_id = $1 AND id = $2',
+      `SELECT id, organization_id, signed_at, subjective, objective, assessment, plan,
+              icd10_codes, icpc_codes
+       FROM clinical_notes WHERE organization_id = $1 AND id = $2`,
       [organizationId, noteId]
     );
 
@@ -668,7 +670,11 @@ export const getNoteTemplates = async (organizationId, options = {}) => {
     }
 
     const result = await query(
-      `SELECT * FROM clinical_note_templates
+      `SELECT id, organization_id, name, description, template_type, category,
+              subjective_template, objective_template, assessment_template, plan_template,
+              default_duration, default_codes, is_active, is_system_template, usage_count,
+              created_at, updated_at, created_by
+       FROM clinical_note_templates
        ${whereClause}
        ORDER BY is_system_template DESC, usage_count DESC, name ASC`,
       params

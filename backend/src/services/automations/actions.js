@@ -217,7 +217,7 @@ const executeNotifyStaff = async (organizationId, action, patient) => {
   const staffIds = action.staff_ids || [];
   const roles = action.roles || ['ADMIN', 'PRACTITIONER'];
 
-  let staffQuery = 'SELECT * FROM users WHERE organization_id = $1 AND is_active = true';
+  let staffQuery = 'SELECT id FROM users WHERE organization_id = $1 AND is_active = true';
   const params = [organizationId];
 
   if (staffIds.length > 0) {

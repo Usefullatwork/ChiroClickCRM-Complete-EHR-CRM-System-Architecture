@@ -19,7 +19,10 @@ export const detectAndTriggerWorkflows = async (organizationId, triggerType, dat
   try {
     // Find active workflows matching this trigger
     const workflowsResult = await query(
-      `SELECT * FROM workflows
+      `SELECT id, organization_id, name, trigger_type, trigger_config,
+              actions, conditions, is_active, max_runs_per_patient,
+              total_runs, successful_runs, failed_runs
+       FROM workflows
        WHERE organization_id = $1
          AND trigger_type = $2
          AND is_active = true`,
@@ -82,16 +85,27 @@ const checkConditions = async (organizationId, conditions, data) => {
   let entity = null;
 
   if (patientId) {
-    const result = await query(`SELECT * FROM patients WHERE id = $1 AND organization_id = $2`, [
-      patientId,
-      organizationId,
-    ]);
+    const result = await query(
+      `SELECT id, organization_id, first_name, last_name, date_of_birth, gender,
+              email, phone, status, category, referral_source, insurance_type,
+              has_nav_rights, consent_sms, consent_email, consent_marketing,
+              first_visit_date, last_visit_date, total_visits, lifetime_value,
+              should_be_followed_up, main_problem, preferred_contact_method,
+              needs_feedback, lifecycle_stage
+       FROM patients WHERE id = $1 AND organization_id = $2`,
+      [patientId, organizationId]
+    );
     entity = result.rows[0];
   } else if (leadId) {
-    const result = await query(`SELECT * FROM leads WHERE id = $1 AND organization_id = $2`, [
-      leadId,
-      organizationId,
-    ]);
+    const result = await query(
+      `SELECT id, clinic_id, first_name, last_name, email, phone,
+              source, source_detail, status, score, temperature,
+              assigned_to, primary_interest, chief_complaint, notes,
+              converted_patient_id, converted_at, lost_reason,
+              next_follow_up_date, follow_up_count, created_at, updated_at
+       FROM leads WHERE id = $1 AND organization_id = $2`,
+      [leadId, organizationId]
+    );
     entity = result.rows[0];
   }
 

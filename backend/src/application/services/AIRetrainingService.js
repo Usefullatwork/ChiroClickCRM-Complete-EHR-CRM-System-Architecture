@@ -487,7 +487,8 @@ ${
   async getLastTrainingRun() {
     try {
       const result = await query(`
-        SELECT * FROM ai_training_runs
+        SELECT id, status, metadata, created_at, completed_at
+        FROM ai_training_runs
         WHERE status = 'COMPLETED'
         ORDER BY completed_at DESC
         LIMIT 1

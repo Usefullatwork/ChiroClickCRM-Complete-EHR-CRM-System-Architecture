@@ -226,7 +226,9 @@ export const augmentTrainingData = async (options = {}) => {
   try {
     // Get stored preference pairs
     const pairsResult = await query(
-      `SELECT * FROM rlaif_preference_pairs
+      `SELECT id, chosen_text, rejected_text, chosen_score, rejected_score, suggestion_type,
+              reasoning, generated_by, used_for_training, created_at
+       FROM rlaif_preference_pairs
        WHERE used_for_training = false
        ${suggestionType ? 'AND suggestion_type = $1' : ''}
        ORDER BY created_at DESC

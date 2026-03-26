@@ -75,9 +75,26 @@ export async function listExercises(filters) {
  * @returns {object|null} Exercise record or null
  */
 export async function getExerciseById(id) {
-  const result = await query(`SELECT * FROM exercise_library WHERE id = $1 AND is_active = TRUE`, [
-    id,
-  ]);
+  const result = await query(
+    `SELECT
+    id, organization_id, code,
+    name, name_norwegian, name_no, name_en,
+    description, description_norwegian,
+    category, subcategory, body_region,
+    difficulty_level, difficulty,
+    instructions, instructions_norwegian, instructions_no, instructions_en,
+    sets_default, reps_default, hold_seconds,
+    default_sets, default_reps, default_hold_seconds, default_rest_seconds, default_frequency,
+    frequency_per_day, frequency_per_week, duration_weeks,
+    image_url, video_url, thumbnail_url,
+    contraindications, precautions, common_errors,
+    equipment_needed, requires_supervision,
+    source, is_active, is_system, is_global,
+    usage_count, display_order, tags,
+    created_by, created_at, updated_at
+  FROM exercise_library WHERE id = $1 AND is_active = TRUE`,
+    [id]
+  );
   return result.rows[0] || null;
 }
 

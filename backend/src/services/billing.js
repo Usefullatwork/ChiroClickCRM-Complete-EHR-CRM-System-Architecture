@@ -501,7 +501,8 @@ export const recordPayment = async (organizationId, invoiceId, paymentData) => {
  */
 export const getInvoicePayments = async (organizationId, invoiceId) => {
   const result = await query(
-    `SELECT * FROM invoice_payments
+    `SELECT id, organization_id, invoice_id, amount, payment_method, payment_reference, payment_date, notes, created_at
+     FROM invoice_payments
      WHERE organization_id = $1 AND invoice_id = $2
      ORDER BY payment_date DESC`,
     [organizationId, invoiceId]

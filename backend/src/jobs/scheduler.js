@@ -228,7 +228,9 @@ const processCommunicationQueue = async () => {
       try {
         // Check patient communication preferences
         const prefsResult = await query(
-          `SELECT * FROM patient_communication_preferences
+          `SELECT patient_id, sms_enabled, email_enabled, reminder_enabled,
+                  exercise_reminder_enabled, recall_enabled, marketing_enabled
+           FROM patient_communication_preferences
            WHERE patient_id = $1`,
           [item.patient_id]
         );

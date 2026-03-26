@@ -529,7 +529,11 @@ export const saveLetter = async (organizationId, patientId, letterData) => {
 export const getLetterHistory = async (organizationId, patientId) => {
   try {
     const result = await query(
-      `SELECT * FROM generated_letters
+      `SELECT id, organization_id, patient_id, encounter_id, letter_type, letter_title,
+              content, template_id, metadata, recipient_name, recipient_institution,
+              recipient_address, status, sent_at, sent_method, signed_at, signed_by,
+              signature_data, created_at, updated_at, created_by
+       FROM generated_letters
        WHERE organization_id = $1 AND patient_id = $2
        ORDER BY created_at DESC
        LIMIT 50`,

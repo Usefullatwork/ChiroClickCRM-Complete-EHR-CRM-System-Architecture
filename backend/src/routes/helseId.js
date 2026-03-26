@@ -397,7 +397,10 @@ async function findOrCreateUser(helseIdUser) {
   const { query } = await import('../config/database.js');
 
   // Try to find existing user by HelseID subject
-  const existing = await query('SELECT * FROM users WHERE helseid_sub = $1', [helseIdUser.sub]);
+  const existing = await query(
+    'SELECT id, helseid_sub, name, email, hpr_number, security_level, created_at, last_login FROM users WHERE helseid_sub = $1',
+    [helseIdUser.sub]
+  );
 
   if (existing.rows.length > 0) {
     // Update last login
@@ -423,7 +426,7 @@ async function findOrCreateUser(helseIdUser) {
             created_at,
             last_login
         ) VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-        RETURNING *`,
+        RETURNING id, helseid_sub, name, email, hpr_number, security_level, created_at, last_login`,
     [
       helseIdUser.sub,
       helseIdUser.name,

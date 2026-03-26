@@ -189,7 +189,8 @@ export const getUserAuditLogs = async (userId, options = {}) => {
 
   try {
     let queryText = `
-      SELECT *
+      SELECT id, organization_id, user_id, user_email, user_role, action, resource_type,
+             resource_id, changes, reason, ip_address, user_agent, created_at
       FROM audit_logs
       WHERE user_id = $1
     `;

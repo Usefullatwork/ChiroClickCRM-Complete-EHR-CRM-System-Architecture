@@ -154,7 +154,12 @@ export const getTemplatesByCategory = async (organizationId, language = 'NO') =>
  */
 export const getTemplateById = async (organizationId, templateId) => {
   const result = await query(
-    `SELECT * FROM clinical_templates
+    `SELECT
+       id, organization_id, category, subcategory,
+       template_name, template_text,
+       language, soap_section, is_system, is_favorite,
+       usage_count, created_by, created_at, updated_at
+     FROM clinical_templates
      WHERE id = $1
        AND (organization_id = $2 OR is_system = true)`,
     [templateId, organizationId]

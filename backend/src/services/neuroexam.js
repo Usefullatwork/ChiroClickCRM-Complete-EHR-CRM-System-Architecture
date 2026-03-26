@@ -197,7 +197,12 @@ export const getExamById = async (organizationId, examId) => {
 
   const testResults = await dbQuery(
     `
-    SELECT * FROM neuro_exam_test_results
+    SELECT
+      id, examination_id, cluster_id, test_id,
+      is_positive, positive_criteria, measured_value,
+      side, is_red_flag, requires_referral,
+      clinician_notes, created_at
+    FROM neuro_exam_test_results
     WHERE examination_id = $1
     ORDER BY cluster_id, test_id
   `,
@@ -206,7 +211,18 @@ export const getExamById = async (organizationId, examId) => {
 
   const vestibularFindings = await dbQuery(
     `
-    SELECT * FROM vestibular_findings
+    SELECT
+      id, examination_id,
+      spontaneous_nystagmus_present, spontaneous_nystagmus_direction,
+      spontaneous_nystagmus_velocity, fixation_suppression,
+      gaze_evoked_horizontal, gaze_evoked_vertical, rebound_nystagmus,
+      saccade_accuracy_horizontal, saccade_accuracy_vertical, saccade_latency_ms,
+      pursuit_gain_horizontal, pursuit_gain_vertical, saccadic_pursuit,
+      hit_right_positive, hit_left_positive, catch_up_saccades,
+      caloric_performed, caloric_unilateral_weakness, caloric_affected_side,
+      caloric_directional_preponderance, dva_lines_lost, dva_affected_side,
+      hints_result, hints_hearing_loss_ipsilateral, created_at
+    FROM vestibular_findings
     WHERE examination_id = $1
   `,
     [examId]
@@ -287,7 +303,7 @@ export const updateExam = async (organizationId, examId, updateData) => {
     // Check exam exists and belongs to organization
     const existing = await client.query(
       `
-      SELECT * FROM neurological_examinations
+      SELECT id FROM neurological_examinations
       WHERE id = $1 AND organization_id = $2
     `,
       [examId, organizationId]
@@ -444,7 +460,11 @@ export const logBPPVTreatment = async (practitionerId, treatmentData) => {
 export const getRedFlagAlerts = async (organizationId) => {
   const result = await dbQuery(
     `
-    SELECT * FROM neuro_red_flag_alerts
+    SELECT
+      exam_id, organization_id, patient_id, patient_name,
+      exam_date, red_flags, referral_urgency,
+      referral_pending, examiner_name
+    FROM neuro_red_flag_alerts
     WHERE organization_id = $1
     ORDER BY
       CASE referral_urgency WHEN 'EMERGENT' THEN 1 WHEN 'URGENT' THEN 2 ELSE 3 END,
@@ -483,7 +503,12 @@ export const getPatientHistory = async (organizationId, patientId) => {
 
   const bppvHistory = await dbQuery(
     `
-    SELECT * FROM bppv_treatment_outcomes
+    SELECT
+      patient_id, patient_name, canal_affected, side_affected,
+      treatment_maneuver, treatment_date, immediate_resolution,
+      pre_treatment_vertigo_vas, post_treatment_vertigo_vas,
+      vas_improvement, follow_up_required, follow_up_date
+    FROM bppv_treatment_outcomes
     WHERE patient_id = $1
     ORDER BY treatment_date DESC
     LIMIT 10

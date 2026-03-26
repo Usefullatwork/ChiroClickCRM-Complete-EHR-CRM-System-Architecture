@@ -105,7 +105,9 @@ export async function getProgramDetails(programId, mobileUserId) {
   );
 
   const enrollmentResult = await query(
-    `SELECT * FROM user_program_enrollments
+    `SELECT id, mobile_user_id, program_id, assigned_by, started_at, current_week, current_day,
+            status, paused_at, completed_at, notes, created_at
+     FROM user_program_enrollments
      WHERE mobile_user_id = $1 AND program_id = $2 AND status = 'active'`,
     [mobileUserId, programId]
   );
@@ -127,7 +129,9 @@ export async function getProgramDetails(programId, mobileUserId) {
  */
 export async function enrollInProgram(programId, mobileUserId) {
   const existingResult = await query(
-    `SELECT * FROM user_program_enrollments
+    `SELECT id, mobile_user_id, program_id, assigned_by, started_at, current_week, current_day,
+            status, paused_at, completed_at, notes, created_at
+     FROM user_program_enrollments
      WHERE mobile_user_id = $1 AND program_id = $2 AND status = 'active'`,
     [mobileUserId, programId]
   );

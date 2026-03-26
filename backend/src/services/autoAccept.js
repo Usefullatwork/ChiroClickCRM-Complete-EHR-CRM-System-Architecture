@@ -18,9 +18,15 @@ import { sendEmail } from './email.js';
  */
 export const getSettings = async (organizationId) => {
   try {
-    const result = await query(`SELECT * FROM auto_accept_settings WHERE organization_id = $1`, [
-      organizationId,
-    ]);
+    const result = await query(
+      `SELECT organization_id, auto_accept_appointments, appointment_accept_delay_minutes,
+              appointment_types_included, appointment_types_excluded, appointment_max_daily_limit,
+              appointment_business_hours_only, auto_accept_referrals, referral_accept_delay_minutes,
+              referral_sources_included, referral_sources_excluded, referral_require_complete_info,
+              notify_on_auto_accept, notification_email, notification_sms, created_at, updated_at
+       FROM auto_accept_settings WHERE organization_id = $1`,
+      [organizationId]
+    );
     return result.rows[0] || null;
   } catch (error) {
     logger.error('Error getting auto-accept settings:', error);
@@ -184,7 +190,8 @@ export const autoAcceptAppointment = async (organizationId, appointmentId) => {
   try {
     // Get the appointment
     const appointmentResult = await client.query(
-      `SELECT * FROM appointments WHERE organization_id = $1 AND id = $2`,
+      `SELECT id, organization_id, appointment_type, start_time, status, patient_name, created_at
+       FROM appointments WHERE organization_id = $1 AND id = $2`,
       [organizationId, appointmentId]
     );
 
@@ -330,7 +337,9 @@ export const autoAcceptReferral = async (organizationId, referralId) => {
   try {
     // Get the referral
     const referralResult = await client.query(
-      `SELECT * FROM referrals WHERE organization_id = $1 AND id = $2`,
+      `SELECT id, organization_id, status, source, patient_name, patient_id,
+              referring_provider, reason, created_at
+       FROM referrals WHERE organization_id = $1 AND id = $2`,
       [organizationId, referralId]
     );
 
@@ -503,7 +512,8 @@ export const getAutoAcceptLog = async (organizationId, filters = {}) => {
     const { resourceType, action, limit = 50, offset = 0 } = filters;
 
     let sql = `
-      SELECT * FROM auto_accept_log
+      SELECT id, organization_id, resource_type, resource_id, action, reason, processed_at, created_at
+      FROM auto_accept_log
       WHERE organization_id = $1
     `;
     const params = [organizationId];

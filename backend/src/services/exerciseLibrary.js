@@ -5,8 +5,8 @@
  * @module services/exerciseLibrary
  */
 
-import { query, transaction } from '../config/database.js'
-import logger from '../utils/logger.js'
+import { query, transaction } from '../config/database.js';
+import logger from '../utils/logger.js';
 
 // ============================================================================
 // EXERCISE LIBRARY CRUD
@@ -25,8 +25,8 @@ export const getExercises = async (organizationId, filters = {}) => {
       search,
       isActive = true,
       limit = 100,
-      offset = 0
-    } = filters
+      offset = 0,
+    } = filters;
 
     let sql = `
       SELECT
@@ -41,38 +41,38 @@ export const getExercises = async (organizationId, filters = {}) => {
         created_at, updated_at
       FROM exercise_library
       WHERE organization_id = $1
-    `
-    const params = [organizationId]
-    let paramIndex = 2
+    `;
+    const params = [organizationId];
+    let paramIndex = 2;
 
     if (isActive !== null) {
-      sql += ` AND is_active = $${paramIndex}`
-      params.push(isActive)
-      paramIndex++
+      sql += ` AND is_active = $${paramIndex}`;
+      params.push(isActive);
+      paramIndex++;
     }
 
     if (category) {
-      sql += ` AND category = $${paramIndex}`
-      params.push(category)
-      paramIndex++
+      sql += ` AND category = $${paramIndex}`;
+      params.push(category);
+      paramIndex++;
     }
 
     if (subcategory) {
-      sql += ` AND subcategory = $${paramIndex}`
-      params.push(subcategory)
-      paramIndex++
+      sql += ` AND subcategory = $${paramIndex}`;
+      params.push(subcategory);
+      paramIndex++;
     }
 
     if (bodyRegion) {
-      sql += ` AND body_region = $${paramIndex}`
-      params.push(bodyRegion)
-      paramIndex++
+      sql += ` AND body_region = $${paramIndex}`;
+      params.push(bodyRegion);
+      paramIndex++;
     }
 
     if (difficultyLevel) {
-      sql += ` AND difficulty_level = $${paramIndex}`
-      params.push(difficultyLevel)
-      paramIndex++
+      sql += ` AND difficulty_level = $${paramIndex}`;
+      params.push(difficultyLevel);
+      paramIndex++;
     }
 
     if (search) {
@@ -81,22 +81,22 @@ export const getExercises = async (organizationId, filters = {}) => {
         @@ plainto_tsquery('norwegian', $${paramIndex})
         OR name ILIKE $${paramIndex + 1}
         OR name_norwegian ILIKE $${paramIndex + 1}
-      )`
-      params.push(search, `%${search}%`)
-      paramIndex += 2
+      )`;
+      params.push(search, `%${search}%`);
+      paramIndex += 2;
     }
 
-    sql += ` ORDER BY display_order, name`
-    sql += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`
-    params.push(limit, offset)
+    sql += ` ORDER BY display_order, name`;
+    sql += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
+    params.push(limit, offset);
 
-    const result = await query(sql, params)
-    return result.rows
+    const result = await query(sql, params);
+    return result.rows;
   } catch (error) {
-    logger.error('Error getting exercises:', error)
-    throw error
+    logger.error('Error getting exercises:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get exercise by ID
@@ -104,15 +104,31 @@ export const getExercises = async (organizationId, filters = {}) => {
 export const getExerciseById = async (organizationId, exerciseId) => {
   try {
     const result = await query(
-      `SELECT * FROM exercise_library WHERE organization_id = $1 AND id = $2`,
+      `SELECT
+         id, organization_id, code,
+         name, name_norwegian, name_no, name_en,
+         description, description_norwegian,
+         category, subcategory, body_region,
+         difficulty_level, difficulty,
+         instructions, instructions_norwegian, instructions_no, instructions_en,
+         sets_default, reps_default, hold_seconds,
+         default_sets, default_reps, default_hold_seconds, default_rest_seconds, default_frequency,
+         frequency_per_day, frequency_per_week, duration_weeks,
+         image_url, video_url, thumbnail_url,
+         contraindications, precautions, common_errors,
+         equipment_needed, requires_supervision,
+         source, is_active, is_system, is_global,
+         usage_count, display_order, tags,
+         created_by, created_at, updated_at
+       FROM exercise_library WHERE organization_id = $1 AND id = $2`,
       [organizationId, exerciseId]
-    )
-    return result.rows[0] || null
+    );
+    return result.rows[0] || null;
   } catch (error) {
-    logger.error('Error getting exercise by ID:', error)
-    throw error
+    logger.error('Error getting exercise by ID:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Create a new exercise
@@ -120,14 +136,29 @@ export const getExerciseById = async (organizationId, exerciseId) => {
 export const createExercise = async (organizationId, userId, exerciseData) => {
   try {
     const {
-      name, nameNorwegian, description, descriptionNorwegian,
-      category, subcategory, bodyRegion, difficultyLevel,
-      instructions, instructionsNorwegian,
-      setsDefault, repsDefault, holdSeconds,
-      frequencyPerDay, frequencyPerWeek, durationWeeks,
-      imageUrl, videoUrl, thumbnailUrl,
-      contraindications, precautions, tags
-    } = exerciseData
+      name,
+      nameNorwegian,
+      description,
+      descriptionNorwegian,
+      category,
+      subcategory,
+      bodyRegion,
+      difficultyLevel,
+      instructions,
+      instructionsNorwegian,
+      setsDefault,
+      repsDefault,
+      holdSeconds,
+      frequencyPerDay,
+      frequencyPerWeek,
+      durationWeeks,
+      imageUrl,
+      videoUrl,
+      thumbnailUrl,
+      contraindications,
+      precautions,
+      tags,
+    } = exerciseData;
 
     const result = await query(
       `INSERT INTO exercise_library (
@@ -142,60 +173,92 @@ export const createExercise = async (organizationId, userId, exerciseData) => {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24)
       RETURNING *`,
       [
-        organizationId, name, nameNorwegian, description, descriptionNorwegian,
-        category, subcategory, bodyRegion, difficultyLevel || 'beginner',
-        instructions, instructionsNorwegian,
-        setsDefault || 3, repsDefault || 10, holdSeconds,
-        frequencyPerDay || 1, frequencyPerWeek || 7, durationWeeks || 4,
-        imageUrl, videoUrl, thumbnailUrl,
-        contraindications || [], precautions || [], tags || [],
-        userId
+        organizationId,
+        name,
+        nameNorwegian,
+        description,
+        descriptionNorwegian,
+        category,
+        subcategory,
+        bodyRegion,
+        difficultyLevel || 'beginner',
+        instructions,
+        instructionsNorwegian,
+        setsDefault || 3,
+        repsDefault || 10,
+        holdSeconds,
+        frequencyPerDay || 1,
+        frequencyPerWeek || 7,
+        durationWeeks || 4,
+        imageUrl,
+        videoUrl,
+        thumbnailUrl,
+        contraindications || [],
+        precautions || [],
+        tags || [],
+        userId,
       ]
-    )
+    );
 
-    logger.info('Exercise created:', { organizationId, exerciseId: result.rows[0].id })
-    return result.rows[0]
+    logger.info('Exercise created:', { organizationId, exerciseId: result.rows[0].id });
+    return result.rows[0];
   } catch (error) {
-    logger.error('Error creating exercise:', error)
-    throw error
+    logger.error('Error creating exercise:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Update an exercise
  */
 export const updateExercise = async (organizationId, exerciseId, exerciseData) => {
   try {
-    const fields = []
-    const values = []
-    let paramIndex = 1
+    const fields = [];
+    const values = [];
+    let paramIndex = 1;
 
     const allowedFields = [
-      'name', 'name_norwegian', 'description', 'description_norwegian',
-      'category', 'subcategory', 'body_region', 'difficulty_level',
-      'instructions', 'instructions_norwegian',
-      'sets_default', 'reps_default', 'hold_seconds',
-      'frequency_per_day', 'frequency_per_week', 'duration_weeks',
-      'image_url', 'video_url', 'thumbnail_url',
-      'contraindications', 'precautions', 'tags',
-      'is_active', 'display_order'
-    ]
+      'name',
+      'name_norwegian',
+      'description',
+      'description_norwegian',
+      'category',
+      'subcategory',
+      'body_region',
+      'difficulty_level',
+      'instructions',
+      'instructions_norwegian',
+      'sets_default',
+      'reps_default',
+      'hold_seconds',
+      'frequency_per_day',
+      'frequency_per_week',
+      'duration_weeks',
+      'image_url',
+      'video_url',
+      'thumbnail_url',
+      'contraindications',
+      'precautions',
+      'tags',
+      'is_active',
+      'display_order',
+    ];
 
     // Convert camelCase to snake_case and build update query
     for (const [key, value] of Object.entries(exerciseData)) {
-      const snakeKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`)
+      const snakeKey = key.replace(/[A-Z]/g, (letter) => `_${letter.toLowerCase()}`);
       if (allowedFields.includes(snakeKey)) {
-        fields.push(`${snakeKey} = $${paramIndex}`)
-        values.push(value)
-        paramIndex++
+        fields.push(`${snakeKey} = $${paramIndex}`);
+        values.push(value);
+        paramIndex++;
       }
     }
 
     if (fields.length === 0) {
-      throw new Error('No valid fields to update')
+      throw new Error('No valid fields to update');
     }
 
-    values.push(organizationId, exerciseId)
+    values.push(organizationId, exerciseId);
 
     const result = await query(
       `UPDATE exercise_library
@@ -203,19 +266,19 @@ export const updateExercise = async (organizationId, exerciseId, exerciseData) =
        WHERE organization_id = $${paramIndex} AND id = $${paramIndex + 1}
        RETURNING *`,
       values
-    )
+    );
 
     if (result.rows.length === 0) {
-      return null
+      return null;
     }
 
-    logger.info('Exercise updated:', { organizationId, exerciseId })
-    return result.rows[0]
+    logger.info('Exercise updated:', { organizationId, exerciseId });
+    return result.rows[0];
   } catch (error) {
-    logger.error('Error updating exercise:', error)
-    throw error
+    logger.error('Error updating exercise:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Delete an exercise (soft delete by setting is_active = false)
@@ -225,13 +288,13 @@ export const deleteExercise = async (organizationId, exerciseId) => {
     const result = await query(
       `UPDATE exercise_library SET is_active = false WHERE organization_id = $1 AND id = $2 RETURNING id`,
       [organizationId, exerciseId]
-    )
-    return result.rows.length > 0
+    );
+    return result.rows.length > 0;
   } catch (error) {
-    logger.error('Error deleting exercise:', error)
-    throw error
+    logger.error('Error deleting exercise:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get exercise categories
@@ -247,13 +310,13 @@ export const getCategories = async (organizationId) => {
        GROUP BY category
        ORDER BY category`,
       [organizationId]
-    )
-    return result.rows
+    );
+    return result.rows;
   } catch (error) {
-    logger.error('Error getting exercise categories:', error)
-    throw error
+    logger.error('Error getting exercise categories:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Seed default exercises for an organization
@@ -261,36 +324,36 @@ export const getCategories = async (organizationId) => {
  */
 export const seedDefaultExercises = async (organizationId) => {
   try {
-    const fs = await import('fs')
-    const path = await import('path')
-    const { fileURLToPath } = await import('url')
+    const fs = await import('fs');
+    const path = await import('path');
+    const { fileURLToPath } = await import('url');
 
-    const __filename = fileURLToPath(import.meta.url)
-    const __dirname = path.dirname(__filename)
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
 
     // Load seed data
-    const seedDataPath = path.join(__dirname, '../data/vestibular-exercises-seed.json')
-    const seedData = JSON.parse(fs.readFileSync(seedDataPath, 'utf8'))
+    const seedDataPath = path.join(__dirname, '../data/vestibular-exercises-seed.json');
+    const seedData = JSON.parse(fs.readFileSync(seedDataPath, 'utf8'));
 
-    let inserted = 0
-    let skipped = 0
+    let inserted = 0;
+    let skipped = 0;
 
     for (const exercise of seedData.exercises) {
       // Check if exercise already exists (by name)
       const existing = await query(
         `SELECT id FROM exercise_library WHERE organization_id = $1 AND name = $2`,
         [organizationId, exercise.name]
-      )
+      );
 
       if (existing.rows.length > 0) {
-        skipped++
-        continue
+        skipped++;
+        continue;
       }
 
       // Build Vimeo embed URL
       const videoUrl = exercise.vimeoId
         ? `https://player.vimeo.com/video/${exercise.vimeoId}`
-        : null
+        : null;
 
       // Insert exercise
       await query(
@@ -312,20 +375,20 @@ export const seedDefaultExercises = async (organizationId) => {
           videoUrl,
           true,
           true,
-          JSON.stringify(['vestibular', 'BPPV', 'VRT', 'neurological'])
+          JSON.stringify(['vestibular', 'BPPV', 'VRT', 'neurological']),
         ]
-      )
+      );
 
-      inserted++
+      inserted++;
     }
 
-    logger.info('Default exercises seeded:', { organizationId, inserted, skipped })
-    return { inserted, skipped, total: seedData.exercises.length }
+    logger.info('Default exercises seeded:', { organizationId, inserted, skipped });
+    return { inserted, skipped, total: seedData.exercises.length };
   } catch (error) {
-    logger.error('Error seeding default exercises:', error)
-    throw error
+    logger.error('Error seeding default exercises:', error);
+    throw error;
   }
-}
+};
 
 // ============================================================================
 // EXERCISE PRESCRIPTIONS
@@ -335,7 +398,7 @@ export const seedDefaultExercises = async (organizationId) => {
  * Create a new exercise prescription
  */
 export const createPrescription = async (organizationId, prescriptionData) => {
-  const client = await transaction.start()
+  const client = await transaction.start();
 
   try {
     const {
@@ -347,8 +410,8 @@ export const createPrescription = async (organizationId, prescriptionData) => {
       clinicalNotes,
       patientInstructions,
       deliveryMethod,
-      exercises // Array of { exerciseId, sets, reps, holdSeconds, customInstructions }
-    } = prescriptionData
+      exercises, // Array of { exerciseId, sets, reps, holdSeconds, customInstructions }
+    } = prescriptionData;
 
     // Create prescription
     const prescriptionResult = await client.query(
@@ -359,53 +422,66 @@ export const createPrescription = async (organizationId, prescriptionData) => {
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
       RETURNING *`,
       [
-        organizationId, patientId, encounterId, prescribedBy,
-        startDate || new Date(), endDate, clinicalNotes, patientInstructions,
-        deliveryMethod || 'portal'
+        organizationId,
+        patientId,
+        encounterId,
+        prescribedBy,
+        startDate || new Date(),
+        endDate,
+        clinicalNotes,
+        patientInstructions,
+        deliveryMethod || 'portal',
       ]
-    )
+    );
 
-    const prescription = prescriptionResult.rows[0]
+    const prescription = prescriptionResult.rows[0];
 
     // Add exercises to prescription
     if (exercises && exercises.length > 0) {
       for (let i = 0; i < exercises.length; i++) {
-        const ex = exercises[i]
+        const ex = exercises[i];
         await client.query(
           `INSERT INTO prescribed_exercises (
             prescription_id, exercise_id, sets, reps, hold_seconds,
             frequency_per_day, frequency_per_week, custom_instructions, display_order
           ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
           [
-            prescription.id, ex.exerciseId, ex.sets, ex.reps, ex.holdSeconds,
-            ex.frequencyPerDay, ex.frequencyPerWeek, ex.customInstructions, i
+            prescription.id,
+            ex.exerciseId,
+            ex.sets,
+            ex.reps,
+            ex.holdSeconds,
+            ex.frequencyPerDay,
+            ex.frequencyPerWeek,
+            ex.customInstructions,
+            i,
           ]
-        )
+        );
 
         // Increment usage count
         await client.query(
           `UPDATE exercise_library SET usage_count = usage_count + 1 WHERE id = $1`,
           [ex.exerciseId]
-        )
+        );
       }
     }
 
-    await transaction.commit(client)
+    await transaction.commit(client);
 
     logger.info('Exercise prescription created:', {
       organizationId,
       prescriptionId: prescription.id,
       patientId,
-      exerciseCount: exercises?.length || 0
-    })
+      exerciseCount: exercises?.length || 0,
+    });
 
-    return prescription
+    return prescription;
   } catch (error) {
-    await transaction.rollback(client)
-    logger.error('Error creating prescription:', error)
-    throw error
+    await transaction.rollback(client);
+    logger.error('Error creating prescription:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get prescriptions for a patient
@@ -445,23 +521,23 @@ export const getPatientPrescriptions = async (organizationId, patientId, status 
       FROM exercise_prescriptions p
       LEFT JOIN users u ON u.id = p.prescribed_by
       WHERE p.organization_id = $1 AND p.patient_id = $2
-    `
-    const params = [organizationId, patientId]
+    `;
+    const params = [organizationId, patientId];
 
     if (status) {
-      sql += ` AND p.status = $3`
-      params.push(status)
+      sql += ` AND p.status = $3`;
+      params.push(status);
     }
 
-    sql += ` ORDER BY p.prescribed_at DESC`
+    sql += ` ORDER BY p.prescribed_at DESC`;
 
-    const result = await query(sql, params)
-    return result.rows
+    const result = await query(sql, params);
+    return result.rows;
   } catch (error) {
-    logger.error('Error getting patient prescriptions:', error)
-    throw error
+    logger.error('Error getting patient prescriptions:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get prescription by ID
@@ -512,22 +588,22 @@ export const getPrescriptionById = async (organizationId, prescriptionId) => {
       LEFT JOIN patients pt ON pt.id = p.patient_id
       WHERE p.organization_id = $1 AND p.id = $2`,
       [organizationId, prescriptionId]
-    )
-    return result.rows[0] || null
+    );
+    return result.rows[0] || null;
   } catch (error) {
-    logger.error('Error getting prescription by ID:', error)
-    throw error
+    logger.error('Error getting prescription by ID:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Update prescription status
  */
 export const updatePrescriptionStatus = async (organizationId, prescriptionId, status) => {
   try {
-    const validStatuses = ['active', 'completed', 'cancelled', 'paused']
+    const validStatuses = ['active', 'completed', 'cancelled', 'paused'];
     if (!validStatuses.includes(status)) {
-      throw new Error(`Invalid status: ${status}`)
+      throw new Error(`Invalid status: ${status}`);
     }
 
     const result = await query(
@@ -536,14 +612,14 @@ export const updatePrescriptionStatus = async (organizationId, prescriptionId, s
        WHERE organization_id = $2 AND id = $3
        RETURNING *`,
       [status, organizationId, prescriptionId]
-    )
+    );
 
-    return result.rows[0] || null
+    return result.rows[0] || null;
   } catch (error) {
-    logger.error('Error updating prescription status:', error)
-    throw error
+    logger.error('Error updating prescription status:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Update prescription email delivery status
@@ -555,13 +631,13 @@ export const updatePrescriptionEmailStatus = async (prescriptionId, delivered) =
        SET email_sent_at = CURRENT_TIMESTAMP, email_delivered = $1
        WHERE id = $2`,
       [delivered, prescriptionId]
-    )
-    return true
+    );
+    return true;
   } catch (error) {
-    logger.error('Error updating prescription email status:', error)
-    throw error
+    logger.error('Error updating prescription email status:', error);
+    throw error;
   }
-}
+};
 
 // ============================================================================
 // PATIENT PORTAL
@@ -617,7 +693,7 @@ export const getPrescriptionByPortalToken = async (token) => {
         AND p.portal_expires_at > CURRENT_TIMESTAMP
         AND p.status = 'active'`,
       [token]
-    )
+    );
 
     if (result.rows.length > 0) {
       // Update view count and last accessed
@@ -627,15 +703,15 @@ export const getPrescriptionByPortalToken = async (token) => {
              portal_last_accessed = CURRENT_TIMESTAMP
          WHERE portal_access_token = $1`,
         [token]
-      )
+      );
     }
 
-    return result.rows[0] || null
+    return result.rows[0] || null;
   } catch (error) {
-    logger.error('Error getting prescription by portal token:', error)
-    throw error
+    logger.error('Error getting prescription by portal token:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Record exercise progress from patient portal
@@ -649,14 +725,15 @@ export const recordProgress = async (token, progressData) => {
          AND portal_expires_at > CURRENT_TIMESTAMP
          AND status = 'active'`,
       [token]
-    )
+    );
 
     if (prescription.rows.length === 0) {
-      throw new Error('Invalid or expired access token')
+      throw new Error('Invalid or expired access token');
     }
 
-    const { id: prescriptionId, patient_id: patientId } = prescription.rows[0]
-    const { exerciseId, setsCompleted, repsCompleted, difficultyRating, painRating, notes } = progressData
+    const { id: prescriptionId, patient_id: patientId } = prescription.rows[0];
+    const { exerciseId, setsCompleted, repsCompleted, difficultyRating, painRating, notes } =
+      progressData;
 
     const result = await query(
       `INSERT INTO exercise_progress (
@@ -665,15 +742,24 @@ export const recordProgress = async (token, progressData) => {
         source
       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'portal')
       RETURNING *`,
-      [prescriptionId, patientId, exerciseId, setsCompleted, repsCompleted, difficultyRating, painRating, notes]
-    )
+      [
+        prescriptionId,
+        patientId,
+        exerciseId,
+        setsCompleted,
+        repsCompleted,
+        difficultyRating,
+        painRating,
+        notes,
+      ]
+    );
 
-    return result.rows[0]
+    return result.rows[0];
   } catch (error) {
-    logger.error('Error recording exercise progress:', error)
-    throw error
+    logger.error('Error recording exercise progress:', error);
+    throw error;
   }
-}
+};
 
 /**
  * Get progress history for a prescription
@@ -691,13 +777,13 @@ export const getProgressHistory = async (organizationId, prescriptionId) => {
        WHERE p.organization_id = $1 AND ep.prescription_id = $2
        ORDER BY ep.completed_at DESC`,
       [organizationId, prescriptionId]
-    )
-    return result.rows
+    );
+    return result.rows;
   } catch (error) {
-    logger.error('Error getting progress history:', error)
-    throw error
+    logger.error('Error getting progress history:', error);
+    throw error;
   }
-}
+};
 
 // Export default for service
 export default {
@@ -720,5 +806,5 @@ export default {
   // Patient portal
   getPrescriptionByPortalToken,
   recordProgress,
-  getProgressHistory
-}
+  getProgressHistory,
+};

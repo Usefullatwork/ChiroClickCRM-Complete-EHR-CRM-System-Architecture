@@ -395,9 +395,12 @@ const processScheduledActions = async (organizationId = null) => {
         ]);
 
         // Get patient data
-        const patientResult = await query('SELECT * FROM patients WHERE id = $1', [
-          scheduledAction.patient_id,
-        ]);
+        const patientResult = await query(
+          `SELECT id, organization_id, first_name, last_name, email, phone,
+            date_of_birth, status, lifecycle_stage, last_visit_date, total_visits, tags
+          FROM patients WHERE id = $1`,
+          [scheduledAction.patient_id]
+        );
         const patient = patientResult.rows[0];
 
         // Execute the action
@@ -474,7 +477,9 @@ export const triggerWorkflow = async (organizationId, triggerType, eventData) =>
       let patient = null;
       if (eventData.patient_id) {
         const patientResult = await query(
-          'SELECT * FROM patients WHERE id = $1 AND organization_id = $2',
+          `SELECT id, organization_id, first_name, last_name, email, phone,
+            date_of_birth, status, lifecycle_stage, last_visit_date, total_visits, tags
+          FROM patients WHERE id = $1 AND organization_id = $2`,
           [eventData.patient_id, organizationId]
         );
         patient = patientResult.rows[0];
@@ -662,7 +667,9 @@ export const testWorkflow = async (organizationId, workflowData, testPatientId) 
   try {
     // Get test patient
     const patientResult = await query(
-      'SELECT * FROM patients WHERE id = $1 AND organization_id = $2',
+      `SELECT id, organization_id, first_name, last_name, email, phone,
+        date_of_birth, status, lifecycle_stage, last_visit_date, total_visits, tags
+      FROM patients WHERE id = $1 AND organization_id = $2`,
       [testPatientId, organizationId]
     );
 

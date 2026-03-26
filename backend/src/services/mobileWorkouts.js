@@ -169,9 +169,11 @@ export async function getProgress(mobileUserId, days = 30) {
     [mobileUserId, parseInt(days)]
   );
 
-  const streakResult = await query(`SELECT * FROM user_streaks WHERE mobile_user_id = $1`, [
-    mobileUserId,
-  ]);
+  const streakResult = await query(
+    `SELECT id, mobile_user_id, current_streak, longest_streak, last_workout_date, streak_start_date, updated_at
+     FROM user_streaks WHERE mobile_user_id = $1`,
+    [mobileUserId]
+  );
 
   const totalStats = await query(
     `SELECT
@@ -197,7 +199,8 @@ export async function getProgress(mobileUserId, days = 30) {
  */
 export async function getAchievements(mobileUserId) {
   const result = await query(
-    `SELECT * FROM user_achievements
+    `SELECT id, mobile_user_id, achievement_type, achievement_name, description, earned_at, metadata, notified
+     FROM user_achievements
      WHERE mobile_user_id = $1
      ORDER BY earned_at DESC`,
     [mobileUserId]
@@ -213,9 +216,11 @@ export async function getAchievements(mobileUserId) {
 async function updateStreak(client, userId) {
   const today = new Date().toISOString().split('T')[0];
 
-  const streakResult = await client.query(`SELECT * FROM user_streaks WHERE mobile_user_id = $1`, [
-    userId,
-  ]);
+  const streakResult = await client.query(
+    `SELECT id, mobile_user_id, current_streak, longest_streak, last_workout_date, streak_start_date, updated_at
+     FROM user_streaks WHERE mobile_user_id = $1`,
+    [userId]
+  );
 
   if (streakResult.rows.length === 0) {
     await client.query(

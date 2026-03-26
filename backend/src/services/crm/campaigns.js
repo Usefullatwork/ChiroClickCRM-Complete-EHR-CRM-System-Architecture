@@ -36,7 +36,11 @@ export const getCampaigns = async (clinicId, options = {}) => {
 
   params.push(limit, offset);
   const result = await query(
-    `SELECT * FROM campaigns
+    `SELECT id, organization_id, name, description, campaign_type, channels, target_segment, target_count,
+            sms_template, email_subject, email_template, status, scheduled_at, started_at, completed_at,
+            is_ab_test, ab_variant, ab_parent_id, stats, cost_per_message, total_cost,
+            created_by, created_at, updated_at
+     FROM campaigns
      ${whereClause}
      ORDER BY created_at DESC
      LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`,
@@ -58,10 +62,14 @@ export const getCampaigns = async (clinicId, options = {}) => {
  * Get campaign by ID
  */
 export const getCampaignById = async (clinicId, campaignId) => {
-  const result = await query(`SELECT * FROM campaigns WHERE organization_id = $1 AND id = $2`, [
-    clinicId,
-    campaignId,
-  ]);
+  const result = await query(
+    `SELECT id, organization_id, name, description, campaign_type, channels, target_segment, target_count,
+            sms_template, email_subject, email_template, status, scheduled_at, started_at, completed_at,
+            is_ab_test, ab_variant, ab_parent_id, stats, cost_per_message, total_cost,
+            created_by, created_at, updated_at
+     FROM campaigns WHERE organization_id = $1 AND id = $2`,
+    [clinicId, campaignId]
+  );
   return result.rows[0] || null;
 };
 
@@ -225,10 +233,13 @@ export const getWorkflows = async (clinicId) => {
  * Get workflow by ID
  */
 export const getWorkflowById = async (clinicId, workflowId) => {
-  const result = await query(`SELECT * FROM workflows WHERE organization_id = $1 AND id = $2`, [
-    clinicId,
-    workflowId,
-  ]);
+  const result = await query(
+    `SELECT id, organization_id, name, description, trigger_type, trigger_config, actions, conditions,
+            is_active, max_runs_per_patient, total_runs, successful_runs, failed_runs,
+            created_by, created_at, updated_at
+     FROM workflows WHERE organization_id = $1 AND id = $2`,
+    [clinicId, workflowId]
+  );
   return result.rows[0] || null;
 };
 
