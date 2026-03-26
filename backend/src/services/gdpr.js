@@ -472,9 +472,10 @@ export const getConsentAuditTrail = async (organizationId, patientId) => {
  * Update GDPR request status
  */
 export const updateGDPRRequestStatus = async (organizationId, requestId, status, response = '') => {
+  const completedAt = ['COMPLETED', 'REJECTED'].includes(status) ? 'NOW()' : 'NULL';
   const result = await query(
     `UPDATE gdpr_requests
-     SET status = $1, response = $2, completed_at = CASE WHEN $1 IN ('COMPLETED', 'REJECTED') THEN NOW() ELSE NULL END, updated_at = NOW()
+     SET status = $1, response = $2, completed_at = ${completedAt}, updated_at = NOW()
      WHERE id = $3 AND organization_id = $4
      RETURNING *`,
     [status, response, requestId, organizationId]

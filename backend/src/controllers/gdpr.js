@@ -55,6 +55,10 @@ export const createGDPRRequest = async (req, res) => {
 
     res.status(201).json(request);
   } catch (error) {
+    // FK violation: referenced patient does not exist
+    if (error.code === '23503') {
+      return res.status(400).json({ error: 'Referenced patient not found' });
+    }
     logger.error('Error in createGDPRRequest controller:', error);
     res.status(500).json({ error: 'Failed to create GDPR request' });
   }
@@ -82,6 +86,9 @@ export const processDataAccess = async (req, res) => {
 
     res.json(data);
   } catch (error) {
+    if (error.message === 'Patient not found') {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
     logger.error('Error in processDataAccess controller:', error);
     res.status(500).json({ error: 'Failed to process data access request' });
   }
@@ -112,6 +119,9 @@ export const processDataPortability = async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename="patient_data_${patientId}.json"`);
     res.json(data);
   } catch (error) {
+    if (error.message === 'Patient not found') {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
     logger.error('Error in processDataPortability controller:', error);
     res.status(500).json({ error: 'Failed to process data portability request' });
   }
@@ -179,6 +189,12 @@ export const updateConsent = async (req, res) => {
 
     res.json(patient);
   } catch (error) {
+    if (error.message === 'Patient not found') {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+    if (error.message === 'No consent fields to update') {
+      return res.status(400).json({ error: error.message });
+    }
     logger.error('Error in updateConsent controller:', error);
     res.status(500).json({ error: 'Failed to update consent' });
   }
@@ -238,6 +254,9 @@ export const updateGDPRRequestStatus = async (req, res) => {
 
     res.json(request);
   } catch (error) {
+    if (error.message === 'GDPR request not found') {
+      return res.status(404).json({ error: 'GDPR request not found' });
+    }
     logger.error('Error in updateGDPRRequestStatus controller:', error);
     res.status(500).json({ error: 'Failed to update GDPR request status' });
   }

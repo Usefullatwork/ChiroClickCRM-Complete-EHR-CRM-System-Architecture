@@ -438,6 +438,70 @@ export async function initializeDatabase(db) {
   }
   logger.info('CRM tables created');
 
+  // 4c. Billing enrichment + GDPR schema alignment
+  const billingEnrichments = [
+    // GDPR schema alignment: add columns the service expects but schema.sql lacks
+    `ALTER TABLE gdpr_requests ADD COLUMN IF NOT EXISTS request_details TEXT`,
+    `ALTER TABLE gdpr_requests ADD COLUMN IF NOT EXISTS requester_email VARCHAR(255)`,
+    `ALTER TABLE gdpr_requests ADD COLUMN IF NOT EXISTS requester_phone VARCHAR(50)`,
+    `ALTER TABLE gdpr_requests ADD COLUMN IF NOT EXISTS response TEXT`,
+    // Make request_date nullable to allow service to omit it
+    `ALTER TABLE gdpr_requests ALTER COLUMN request_date SET DEFAULT CURRENT_DATE`,
+    // Billing: episode_id column for encounter-episode link
+    `ALTER TABLE clinical_encounters ADD COLUMN IF NOT EXISTS episode_id UUID`,
+    `CREATE INDEX IF NOT EXISTS idx_encounters_episode ON clinical_encounters (episode_id)`,
+    `CREATE OR REPLACE FUNCTION determine_billing_modifier(p_episode_id UUID, p_patient_id UUID)
+     RETURNS VARCHAR(2) AS $$
+     DECLARE v_status VARCHAR(20); v_abn BOOLEAN;
+     BEGIN
+       SELECT status, abn_on_file INTO v_status, v_abn FROM care_episodes WHERE id = p_episode_id;
+       IF v_status IS NULL THEN
+         SELECT status, abn_on_file INTO v_status, v_abn FROM care_episodes WHERE patient_id = p_patient_id ORDER BY start_date DESC LIMIT 1;
+       END IF;
+       IF v_status IS NULL THEN RETURN 'AT'; END IF;
+       CASE v_status
+         WHEN 'ACTIVE' THEN RETURN 'AT';
+         WHEN 'MAINTENANCE' THEN IF v_abn THEN RETURN 'GA'; ELSE RETURN 'GZ'; END IF;
+         ELSE RETURN 'AT';
+       END CASE;
+     END;
+     $$ LANGUAGE plpgsql`,
+    `CREATE OR REPLACE FUNCTION suggest_cmt_code(p_regions_count INTEGER)
+     RETURNS VARCHAR(5) AS $$
+     BEGIN
+       CASE WHEN p_regions_count <= 2 THEN RETURN '98940';
+            WHEN p_regions_count <= 4 THEN RETURN '98941';
+            WHEN p_regions_count >= 5 THEN RETURN '98942';
+            ELSE RETURN '98940';
+       END CASE;
+     END;
+     $$ LANGUAGE plpgsql`,
+    `CREATE OR REPLACE VIEW claims_summary AS
+     SELECT organization_id, status, COUNT(*) as claim_count,
+       SUM(total_charge) as total_charges, SUM(total_paid) as total_paid,
+       SUM(total_adjustment) as total_adjustments, SUM(patient_responsibility) as total_patient_responsibility
+     FROM claims GROUP BY organization_id, status`,
+    `CREATE OR REPLACE VIEW outstanding_claims AS
+     SELECT c.*, p.first_name || ' ' || p.last_name as patient_name,
+       EXTRACT(DAY FROM NOW() - c.submitted_at) as days_outstanding
+     FROM claims c JOIN patients p ON p.id = c.patient_id
+     WHERE c.status IN ('SUBMITTED', 'PENDING', 'PARTIAL') AND c.submitted_at < NOW() - INTERVAL '30 days'`,
+    `CREATE OR REPLACE VIEW episodes_needing_reeval AS
+     SELECT e.*, p.first_name || ' ' || p.last_name as patient_name, p.phone as patient_phone
+     FROM care_episodes e JOIN patients p ON p.id = e.patient_id
+     WHERE e.status = 'ACTIVE' AND (e.next_reeval_due <= CURRENT_DATE OR e.visits_since_last_reeval >= 12)`,
+  ];
+  for (const sql of billingEnrichments) {
+    try {
+      await db.query(sql);
+    } catch (err) {
+      if (!err.message.includes('already exists')) {
+        logger.debug(`Billing enrichment skipped: ${err.message.substring(0, 80)}`);
+      }
+    }
+  }
+  logger.info('Billing enrichments applied');
+
   // 5. Seed demo organization and users
   try {
     const seedPath = path.resolve(__dirname, '../../../database/seeds/demo-users.sql');

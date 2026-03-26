@@ -1,11 +1,15 @@
 /**
  * Audit Logs API Integration Tests
- * Tests for audit log listing and export
+ * Tests for audit log listing and single-entry lookup.
  *
- * Note: There is no dedicated /api/v1/audit-logs route mounted in server.js.
- * Audit logging is done via middleware and the GDPR module provides consent
- * audit trails at /api/v1/gdpr/consent-audit-trail/:patientId.
- * These tests verify the expected endpoints return appropriate responses.
+ * The /api/v1/audit-logs route IS mounted in server.js and requires ADMIN role.
+ * In DESKTOP_MODE the user is auto-authenticated as ADMIN, so all list/get
+ * requests should succeed.
+ *
+ * There is no dedicated /export sub-route — GET /audit-logs/export hits the
+ * GET /:id handler with id="export" which returns 404 (entry not found).
+ *
+ * The GDPR consent audit trail lives at /api/v1/gdpr/patient/:patientId/consent-audit.
  */
 
 import request from 'supertest';
@@ -20,23 +24,22 @@ describe('Audit Logs API Integration Tests', () => {
   // =============================================================================
 
   describe('GET /api/v1/audit-logs', () => {
-    it('should return 404 if route not mounted', async () => {
+    it('should return paginated audit logs', async () => {
       const res = await agent.get('/api/v1/audit-logs');
-      // Route may not exist yet — 404 confirms no route, 200 confirms it does
-      expect([200, 404, 500]).toContain(res.status);
+      expect(res.status).toBe(200);
     });
 
     it('should handle action filter param', async () => {
       const res = await agent.get('/api/v1/audit-logs').query({ action: 'LOGIN' });
-      expect([200, 404, 500]).toContain(res.status);
+      expect(res.status).toBe(200);
     });
 
     it('should handle date range filter', async () => {
       const res = await agent.get('/api/v1/audit-logs').query({
-        start_date: '2026-01-01',
-        end_date: '2026-03-31',
+        startDate: '2026-01-01',
+        endDate: '2026-03-31',
       });
-      expect([200, 404, 500]).toContain(res.status);
+      expect(res.status).toBe(200);
     });
 
     it('should handle pagination params', async () => {
@@ -44,29 +47,29 @@ describe('Audit Logs API Integration Tests', () => {
         page: 1,
         limit: 20,
       });
-      expect([200, 404, 500]).toContain(res.status);
+      expect(res.status).toBe(200);
     });
   });
 
   // =============================================================================
-  // AUDIT LOGS EXPORT
+  // AUDIT LOG SINGLE ENTRY
   // =============================================================================
 
-  describe('GET /api/v1/audit-logs/export', () => {
-    it('should return export data or 404 if not mounted', async () => {
-      const res = await agent.get('/api/v1/audit-logs/export');
-      expect([200, 404, 500]).toContain(res.status);
+  describe('GET /api/v1/audit-logs/:id', () => {
+    it('should return 404 for non-existent audit log entry', async () => {
+      const res = await agent.get(`/api/v1/audit-logs/${randomUUID()}`);
+      expect(res.status).toBe(404);
     });
   });
 
   // =============================================================================
-  // GDPR CONSENT AUDIT TRAIL (existing route)
+  // GDPR CONSENT AUDIT (route: /gdpr/patient/:patientId/consent-audit)
   // =============================================================================
 
-  describe('GET /api/v1/gdpr/consent-audit-trail/:patientId', () => {
+  describe('GET /api/v1/gdpr/patient/:patientId/consent-audit', () => {
     it('should return consent audit trail for a patient', async () => {
-      const res = await agent.get(`/api/v1/gdpr/consent-audit-trail/${randomUUID()}`);
-      expect([200, 404, 500]).toContain(res.status);
+      const res = await agent.get(`/api/v1/gdpr/patient/${randomUUID()}/consent-audit`);
+      expect(res.status).toBe(200);
     });
   });
 });
