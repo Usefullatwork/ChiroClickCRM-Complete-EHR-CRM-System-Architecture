@@ -3,6 +3,7 @@
  * Extracted from InitialConsultTemplate.jsx
  */
 import { Stethoscope } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 export default function ExaminationSection({
   consultData,
@@ -13,6 +14,7 @@ export default function ExaminationSection({
   TextField,
   InputField,
 }) {
+  const { t } = useTranslation('clinical');
   return (
     <Section
       id="objective"
@@ -67,40 +69,40 @@ export default function ExaminationSection({
         label="Generelt inntrykk"
         value={consultData.objective.generalAppearance}
         onChange={(v) => updateField('objective', 'generalAppearance', v)}
-        placeholder="Pasientens generelle tilstand..."
+        placeholder={t('generalConditionPlaceholder', 'Pasientens generelle tilstand...')}
       />
       <div className="grid grid-cols-2 gap-4">
         <TextField
           label="Gange"
           value={consultData.objective.gait}
           onChange={(v) => updateField('objective', 'gait', v)}
-          placeholder="Gangmonster og observasjoner..."
+          placeholder={t('gaitPatternPlaceholder', 'Gangmonster og observasjoner...')}
         />
         <TextField
           label="Holdning"
           value={consultData.objective.posture}
           onChange={(v) => updateField('objective', 'posture', v)}
-          placeholder="Holdningsavvik..."
+          placeholder={t('posturalDeviationsPlaceholder', 'Holdningsavvik...')}
         />
       </div>
       <TextField
         label="Inspeksjon"
         value={consultData.objective.inspection}
         onChange={(v) => updateField('objective', 'inspection', v)}
-        placeholder="Visuell undersokelse..."
+        placeholder={t('visualExamPlaceholder', 'Visuell undersokelse...')}
       />
       <TextField
         label="Palpasjon"
         value={consultData.objective.palpation}
         onChange={(v) => updateField('objective', 'palpation', v)}
-        placeholder="Funn ved palpasjon..."
+        placeholder={t('palpationFindingsPlaceholder', 'Funn ved palpasjon...')}
       />
       <TextField
         label="Bevegelsesutslag (ROM)"
         value={consultData.objective.rangeOfMotion}
         onChange={(v) => updateField('objective', 'rangeOfMotion', v)}
         rows={3}
-        placeholder="Aktiv og passiv ROM for relevante ledd..."
+        placeholder={t('romFindingsPlaceholder', 'Aktiv og passiv ROM for relevante ledd...')}
       />
 
       {/* Neurological Exam / Nevrologisk undersokelse */}
@@ -111,7 +113,7 @@ export default function ExaminationSection({
             label="Motorisk testing"
             value={consultData.objective.neurologicalExam?.motorTesting}
             onChange={(v) => updateNestedField('objective', 'neurologicalExam', 'motorTesting', v)}
-            placeholder="Muskelstyrke..."
+            placeholder={t('muscleStrengthPlaceholder', 'Muskelstyrke...')}
           />
           <TextField
             label="Sensorisk testing"
@@ -119,19 +121,19 @@ export default function ExaminationSection({
             onChange={(v) =>
               updateNestedField('objective', 'neurologicalExam', 'sensoryTesting', v)
             }
-            placeholder="Sensibilitet..."
+            placeholder={t('sensoryPlaceholder', 'Sensibilitet...')}
           />
           <TextField
             label="Reflekser"
             value={consultData.objective.neurologicalExam?.reflexes}
             onChange={(v) => updateNestedField('objective', 'neurologicalExam', 'reflexes', v)}
-            placeholder="Dype senereflekser..."
+            placeholder={t('deepTendonReflexesPlaceholder', 'Dype senereflekser...')}
           />
           <TextField
             label="Hjernenerver"
             value={consultData.objective.neurologicalExam?.cranialNerves}
             onChange={(v) => updateNestedField('objective', 'neurologicalExam', 'cranialNerves', v)}
-            placeholder="Relevante hjernenerver..."
+            placeholder={t('cranialNervesPlaceholder', 'Relevante hjernenerver...')}
           />
         </div>
       </div>
@@ -141,19 +143,19 @@ export default function ExaminationSection({
         value={consultData.objective.orthopedicTests}
         onChange={(v) => updateField('objective', 'orthopedicTests', v)}
         rows={3}
-        placeholder="Utforte tester og resultater..."
+        placeholder={t('orthoTestsPlaceholder', 'Utforte tester og resultater...')}
       />
       <TextField
         label="Spesialtester"
         value={consultData.objective.specialTests}
         onChange={(v) => updateField('objective', 'specialTests', v)}
-        placeholder="Andre relevante tester..."
+        placeholder={t('otherTestsPlaceholder', 'Andre relevante tester...')}
       />
       <TextField
         label="Bildediagnostikk"
         value={consultData.objective.imaging}
         onChange={(v) => updateField('objective', 'imaging', v)}
-        placeholder="Roentgen, MR, etc..."
+        placeholder={t('imagingPlaceholder', 'Roentgen, MR, etc...')}
       />
     </Section>
   );

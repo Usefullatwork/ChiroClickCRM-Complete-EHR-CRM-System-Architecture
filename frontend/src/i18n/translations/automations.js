@@ -48,6 +48,8 @@ export const automations = {
     trigger_BIRTHDAY: 'Birthday',
     trigger_LIFECYCLE_CHANGE: 'Lifecycle',
     trigger_CUSTOM: 'Custom',
+    loadingExecutionHistory: 'Loading execution history...',
+    loadingStatistics: 'Loading statistics...',
   },
   no: {
     title: 'Automatiserte Arbeidsflyter',
@@ -98,5 +100,7 @@ export const automations = {
     trigger_BIRTHDAY: 'Bursdag',
     trigger_LIFECYCLE_CHANGE: 'Livssyklus',
     trigger_CUSTOM: 'Egendefinert',
+    loadingExecutionHistory: 'Laster utførelseshistorikk...',
+    loadingStatistics: 'Laster statistikk...',
   },
 };

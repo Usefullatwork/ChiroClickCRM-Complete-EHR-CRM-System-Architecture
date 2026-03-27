@@ -19,7 +19,9 @@ import {
 import { crmAPI } from '../../services/api';
 
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 const CRMSettings = () => {
+  const { t } = useTranslation('crm');
   const [activeSection, setActiveSection] = useState('checkin');
   const [hasChanges, setHasChanges] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -762,7 +764,7 @@ const CRMSettings = () => {
                           onChange={(e) =>
                             setNewSchedule((prev) => ({ ...prev, name: e.target.value }))
                           }
-                          placeholder="F.eks. 'Nyhetsbrev Februar'"
+                          placeholder={t('campaignNamePlaceholder', "F.eks. 'Nyhetsbrev Februar'")}
                           className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                         />
                       </div>

@@ -572,7 +572,10 @@ export default function ExercisePrescription() {
                       onChange={(e) =>
                         setPrescription((p) => ({ ...p, patientInstructions: e.target.value }))
                       }
-                      placeholder="F.eks. 'Gjor ovelsene morgen og kveld. Stopp hvis du opplever okt smerte.'"
+                      placeholder={t(
+                        'patientInstructionsPlaceholder',
+                        "F.eks. 'Gjor ovelsene morgen og kveld. Stopp hvis du opplever okt smerte.'"
+                      )}
                       rows={3}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     />
@@ -617,7 +620,10 @@ export default function ExercisePrescription() {
                       onChange={(e) =>
                         setPrescription((p) => ({ ...p, clinicalNotes: e.target.value }))
                       }
-                      placeholder="Interne notater som ikke sendes til pasient..."
+                      placeholder={t(
+                        'internalNotesPlaceholder',
+                        'Interne notater som ikke sendes til pasient...'
+                      )}
                       rows={2}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     />

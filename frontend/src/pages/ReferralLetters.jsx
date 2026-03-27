@@ -46,46 +46,27 @@ export default function ReferralLetters() {
     : null;
 
   const referralTypeLabels = {
-    no: {
-      gp: 'Fastlege',
-      orthopedic: 'Ortoped',
-      neurology: 'Nevrolog',
-      radiology: 'Bildediagnostikk',
-      physio: 'Fysioterapi',
-      vestibular: 'Vestibulær',
-    },
-    en: {
-      gp: 'GP',
-      orthopedic: 'Orthopedic',
-      neurology: 'Neurology',
-      radiology: 'Radiology',
-      physio: 'Physiotherapy',
-      vestibular: 'Vestibular',
-    },
+    gp: t('referralTypeGP', 'Fastlege'),
+    orthopedic: t('referralTypeOrthopedic', 'Ortoped'),
+    neurology: t('referralTypeNeurology', 'Nevrolog'),
+    radiology: t('referralTypeRadiology', 'Bildediagnostikk'),
+    physio: t('referralTypePhysio', 'Fysioterapi'),
+    vestibular: t('referralTypeVestibular', 'Vestibulær'),
   };
 
   const priorityLabels = {
-    no: { routine: 'Rutinemessig', soon: 'Snart', urgent: 'Haster' },
-    en: { routine: 'Routine', soon: 'Soon', urgent: 'Urgent' },
+    routine: t('priorityRoutine', 'Rutinemessig'),
+    soon: t('prioritySoon', 'Snart'),
+    urgent: t('priorityUrgent', 'Haster'),
   };
 
   const statusLabels = {
-    no: {
-      pending: 'Venter',
-      sent: 'Sendt',
-      completed: 'Fullført',
-      DRAFT: 'Utkast',
-      FINALIZED: 'Ferdig',
-      SENT: 'Sendt',
-    },
-    en: {
-      pending: 'Pending',
-      sent: 'Sent',
-      completed: 'Completed',
-      DRAFT: 'Draft',
-      FINALIZED: 'Finalized',
-      SENT: 'Sent',
-    },
+    pending: t('statusPending', 'Venter'),
+    sent: t('statusSent', 'Sendt'),
+    completed: t('statusCompleted', 'Fullført'),
+    DRAFT: t('statusDraft', 'Utkast'),
+    FINALIZED: t('statusFinalized', 'Ferdig'),
+    SENT: t('statusSent', 'Sendt'),
   };
 
   // Fetch referrals from API
@@ -415,7 +396,7 @@ export default function ReferralLetters() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {referralTypeLabels[language][ref.referral_type || ref.referralType] ||
+                      {referralTypeLabels[ref.referral_type || ref.referralType] ||
                         ref.referral_type ||
                         ref.referralType ||
                         '-'}
@@ -438,7 +419,7 @@ export default function ReferralLetters() {
                               : 'bg-gray-100 text-gray-800'
                         }`}
                       >
-                        {priorityLabels[language][ref.priority] || ref.priority || '-'}
+                        {priorityLabels[ref.priority] || ref.priority || '-'}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -453,7 +434,7 @@ export default function ReferralLetters() {
                                 : 'bg-gray-100 text-gray-800'
                         }`}
                       >
-                        {statusLabels[language][ref.status] || ref.status || '-'}
+                        {statusLabels[ref.status] || ref.status || '-'}
                       </span>
                     </td>
                   </tr>

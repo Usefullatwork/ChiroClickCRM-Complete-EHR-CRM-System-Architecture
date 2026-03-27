@@ -18,6 +18,7 @@ import {
   AreaChart,
 } from 'recharts';
 import { TrendingUp, TrendingDown, Minus, Activity } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 // Pain level emoji faces (1-10 scale)
 const painEmojis = {
@@ -54,6 +55,7 @@ const getPainInfo = (level) => {
  * @returns {JSX.Element} Pain tracker component
  */
 export default function PainTracker({ data = [], trend = 'stable', currentAvg = null, onLogPain }) {
+  const { t } = useTranslation('clinical');
   const [selectedPainLevel, setSelectedPainLevel] = useState(null);
   const [showLogModal, setShowLogModal] = useState(false);
   const [notes, setNotes] = useState('');
@@ -341,7 +343,10 @@ export default function PainTracker({ data = [], trend = 'stable', currentAvg = 
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Beskriv smerten eller omstendigheter..."
+                placeholder={t(
+                  'describePainPlaceholder',
+                  'Beskriv smerten eller omstendigheter...'
+                )}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 rows={3}
               />

@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Settings, Grid, List, Star, Search, Loader2 } from 'lucide-react';
 import { macrosAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 
 /**
  * MacroMatrix - ChiroTouch-style "Hot Button" Macro System
@@ -478,6 +479,7 @@ export default function MacroMatrix({
   viewMode: initialViewMode = 'grid',
   className = '',
 }) {
+  const { t } = useTranslation('assessment');
   const [activeCategory, setActiveCategory] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [viewMode, setViewMode] = useState(initialViewMode);
@@ -650,7 +652,7 @@ export default function MacroMatrix({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Sok i makroer..."
+                placeholder={t('searchMacrosPlaceholder', 'Søk i makroer...')}
                 className="pl-8 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg w-40 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

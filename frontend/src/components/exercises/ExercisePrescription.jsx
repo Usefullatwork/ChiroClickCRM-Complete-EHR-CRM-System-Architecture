@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslation } from '../../i18n';
 import {
   GripVertical,
   Trash2,
@@ -34,6 +35,7 @@ const ExercisePrescription = ({
   saving = false,
   sending = false,
 }) => {
+  const { t } = useTranslation('exercises');
   const [patientInstructions, setPatientInstructions] = useState('');
   const [clinicalNotes, setClinicalNotes] = useState('');
   const [expandedExercise, setExpandedExercise] = useState(null);
@@ -298,7 +300,10 @@ const ExercisePrescription = ({
                         onChange={(e) =>
                           updateExerciseParams(index, 'customInstructions', e.target.value)
                         }
-                        placeholder="Legg til spesielle instruksjoner..."
+                        placeholder={t(
+                          'specialInstructionsPlaceholder',
+                          'Legg til spesielle instruksjoner...'
+                        )}
                         className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         rows={2}
                       />
@@ -338,7 +343,10 @@ const ExercisePrescription = ({
             <textarea
               value={patientInstructions}
               onChange={(e) => setPatientInstructions(e.target.value)}
-              placeholder="F.eks. 'Gjør øvelsene morgen og kveld. Stopp hvis du opplever økt smerte.'"
+              placeholder={t(
+                'patientInstructionsPlaceholder',
+                "F.eks. 'Gjør øvelsene morgen og kveld. Stopp hvis du opplever økt smerte.'"
+              )}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={2}
             />
@@ -351,7 +359,10 @@ const ExercisePrescription = ({
             <textarea
               value={clinicalNotes}
               onChange={(e) => setClinicalNotes(e.target.value)}
-              placeholder="Interne notater som ikke sendes til pasient..."
+              placeholder={t(
+                'internalNotesPlaceholder',
+                'Interne notater som ikke sendes til pasient...'
+              )}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={2}
             />

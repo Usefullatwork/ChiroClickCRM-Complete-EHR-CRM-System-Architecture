@@ -8,6 +8,7 @@
  * - PainAndTissue: pain assessment, headache, tissue markers
  */
 import { useEncounter } from '../../../context/EncounterContext';
+import { useTranslation } from '../../../i18n';
 import PosturalAssessment from './PosturalAssessment';
 import SpecialTests from './SpecialTests';
 import NeurologicalFindings from './NeurologicalFindings';
@@ -18,6 +19,7 @@ export default function ObjectiveSection({
   onSetActiveField,
   quickPhrases,
 }) {
+  const { t } = useTranslation('clinical');
   const {
     encounterData,
     isSigned,
@@ -104,8 +106,8 @@ export default function ObjectiveSection({
         )}
 
         <textarea
-          aria-label="Ytterligere objektive funn"
-          placeholder="Ytterligere objektive funn..."
+          aria-label={t('additionalObjectiveFindings', 'Ytterligere objektive funn')}
+          placeholder={t('additionalObjectiveFindingsPlaceholder', 'Ytterligere objektive funn...')}
           value={encounterData.objective.neuro_tests}
           onChange={(e) => {
             if (!onTextInputWithMacros(e, 'objective', 'neuro_tests')) {

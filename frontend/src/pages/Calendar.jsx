@@ -21,6 +21,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { useTranslation } from '../i18n';
+import { usePrompt } from '../components/ui/PromptDialog';
 import { AppointmentsListSkeleton } from '../components/ui/Skeleton';
 import {
   startOfMonth,
@@ -40,6 +41,7 @@ export default function Calendar() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t, lang } = useTranslation('appointments');
+  const prompt = usePrompt();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState('month'); // 'month' or 'week' or 'day'
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -510,8 +512,11 @@ export default function Calendar() {
                               {t('confirm')}
                             </button>
                             <button
-                              onClick={() => {
-                                const reason = prompt(t('cancellationReasonPrompt'));
+                              onClick={async () => {
+                                const reason = await prompt({
+                                  title: t('cancellationReasonTitle', 'Avbestillingsgrunn'),
+                                  placeholder: t('cancellationReasonPrompt'),
+                                });
                                 if (reason) {
                                   cancelMutation.mutate({ id: apt.id, reason });
                                 }

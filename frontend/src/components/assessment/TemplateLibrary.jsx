@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { X, Search, Star, Clock } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 /**
  * TemplateLibrary - Jane App-style chart template library
@@ -390,6 +391,7 @@ export default function TemplateLibrary({
   showHeader = true,
   embedded = false,
 }) {
+  const { t } = useTranslation('clinical');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDiscipline, setSelectedDiscipline] = useState('chiropractic');
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -537,7 +539,7 @@ export default function TemplateLibrary({
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search for a template..."
+            placeholder={t('searchForTemplatePlaceholder', 'Search for a template...')}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
         </div>
@@ -752,7 +754,7 @@ export function TemplateLibraryCompact({ onSelectTemplate, discipline = 'chiropr
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search templates..."
+          placeholder={t('searchTemplatesPlaceholder2', 'Search templates...')}
           className="flex-1 text-sm border-none focus:outline-none"
         />
       </div>

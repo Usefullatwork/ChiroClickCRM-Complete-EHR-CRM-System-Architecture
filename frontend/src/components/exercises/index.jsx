@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { exercisesAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 import {
   Search,
   Filter,
@@ -264,6 +265,7 @@ export const ExercisePanel = ({
   className = '',
   ...props
 }) => {
+  const { t } = useTranslation('exercises');
   const queryClient = useQueryClient();
 
   // State
@@ -467,7 +469,7 @@ export const ExercisePanel = ({
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-300" />
               <input
                 type="text"
-                placeholder="Søk øvelser..."
+                placeholder={t('searchExercisesPlaceholder', 'Søk øvelser...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-8 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"

@@ -17,6 +17,7 @@ export default function AssessmentTab({
   _outcomeType,
   setOutcomeType,
 }) {
+  const { t } = useTranslation('clinical');
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div className="lg:col-span-2 space-y-4">
@@ -60,7 +61,7 @@ export default function AssessmentTab({
             label="Clinical Reasoning"
             value={encounterData.assessment.clinical_reasoning}
             onChange={(val) => updateField('assessment', 'clinical_reasoning', val)}
-            placeholder="Your clinical reasoning..."
+            placeholder={t('yourClinicalReasoningPlaceholder', 'Your clinical reasoning...')}
             quickPhrases={CLINICAL_REASONING_PHRASES}
             rows={4}
             aiEnabled={true}
@@ -77,7 +78,10 @@ export default function AssessmentTab({
               label="Differential Diagnosis"
               value={encounterData.assessment.differential_diagnosis}
               onChange={(val) => updateField('assessment', 'differential_diagnosis', val)}
-              placeholder="Other diagnoses considered..."
+              placeholder={t(
+                'otherDiagnosesConsideredPlaceholder',
+                'Other diagnoses considered...'
+              )}
               rows={2}
               aiEnabled={true}
               aiFieldType="differential_diagnosis"
@@ -91,7 +95,7 @@ export default function AssessmentTab({
               label="Prognosis"
               value={encounterData.assessment.prognosis}
               onChange={(val) => updateField('assessment', 'prognosis', val)}
-              placeholder="Expected recovery..."
+              placeholder={t('expectedRecoveryPlaceholder', 'Expected recovery...')}
               rows={2}
               aiEnabled={true}
               aiFieldType="prognosis"

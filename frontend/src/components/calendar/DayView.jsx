@@ -339,7 +339,7 @@ export default function DayView({
             <button
               onClick={() => onSlotClick(date, 9, 0)}
               className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-              title="Ny avtale"
+              title={t('newAppointment', 'Ny avtale')}
             >
               <Plus className="w-5 h-5" />
             </button>
@@ -350,13 +350,15 @@ export default function DayView({
           {appointments.length === 0 ? (
             <div className="text-center py-12">
               <CalendarIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 dark:text-gray-400 mb-4">Ingen avtaler denne dagen</p>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">
+                {t('noAppointmentsThisDay', 'Ingen avtaler denne dagen')}
+              </p>
               <button
                 onClick={() => onSlotClick(date, 9, 0)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                Ny avtale
+                {t('newAppointment', 'Ny avtale')}
               </button>
             </div>
           ) : (

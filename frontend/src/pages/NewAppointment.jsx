@@ -147,7 +147,7 @@ export default function NewAppointment() {
           <button
             onClick={() => navigate('/appointments')}
             className="p-2 hover:bg-gray-100 rounded-lg"
-            aria-label="Tilbake til avtaler"
+            aria-label={t('backToAppointments', 'Tilbake til avtaler')}
           >
             <ArrowLeft className="w-5 h-5" />
           </button>

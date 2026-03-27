@@ -127,7 +127,12 @@ export default function Billing() {
       // Create CSV from report data
       const invoices = response.data.invoices || [];
       const csvContent = [
-        ['Fakturanummer', 'Dato', 'Pasient', 'HELFO-refusjon'].join(';'),
+        [
+          t('invoiceNumber', 'Fakturanummer'),
+          t('date', 'Dato'),
+          t('patient', 'Pasient'),
+          t('helfoRefund', 'HELFO-refusjon'),
+        ].join(';'),
         ...invoices.map((inv) =>
           [
             inv.invoice_number,

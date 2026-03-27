@@ -139,7 +139,7 @@ export default function PatientDetail() {
               {patient.first_name} {patient.last_name}
             </h1>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              {calculateAge(patient.date_of_birth)} {lang === 'no' ? 'år' : 'years'} • ID:{' '}
+              {calculateAge(patient.date_of_birth)} {t('sidebar.years', 'år')} • ID:{' '}
               {patient.solvit_id}
             </p>
           </div>
@@ -185,9 +185,7 @@ export default function PatientDetail() {
                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-purple-600 rounded-lg hover:bg-purple-700"
               >
                 <FileText className="w-4 h-4" />
-                <span className="hidden sm:inline">
-                  {lang === 'no' ? 'Hurtigvurdering' : 'Quick Assessment'}
-                </span>
+                <span className="hidden sm:inline">{t('quickAssessment', 'Hurtigvurdering')}</span>
               </button>
               <button
                 onClick={() => navigate(`/patients/${id}/encounter`)}
@@ -217,7 +215,7 @@ export default function PatientDetail() {
           </div>
           <span className="text-xs text-amber-800 dark:text-amber-300">
             {patientViewers.map((v) => v.name).join(', ')}{' '}
-            {lang === 'no' ? 'ser også på denne pasienten' : 'also viewing'}
+            {t('alsoViewing', 'ser også på denne pasienten')}
           </span>
           <div className="ml-auto flex items-center gap-1">
             <span className="relative flex h-2 w-2">
@@ -333,13 +331,11 @@ export default function PatientDetail() {
                             }
                             className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
                           >
-                            <option value="">{lang === 'no' ? 'Ikke satt' : 'Not set'}</option>
+                            <option value="">{t('notSet', 'Ikke satt')}</option>
                             <option value="SMS">SMS</option>
                             <option value="EMAIL">{t('email')}</option>
                             <option value="PHONE">{t('phone')}</option>
-                            <option value="NO_CONTACT">
-                              {lang === 'no' ? 'Ikke kontakt' : 'Do not contact'}
-                            </option>
+                            <option value="NO_CONTACT">{t('noContact', 'Ikke kontakt')}</option>
                           </select>
                         ) : (
                           <p className="font-medium text-gray-900 dark:text-white">
@@ -353,7 +349,7 @@ export default function PatientDetail() {
                       <Globe className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
                       <div className="flex-1">
                         <p className="text-sm text-gray-600 dark:text-gray-400">
-                          {lang === 'no' ? 'Språk' : 'Language'}
+                          {t('language', 'Språk')}
                         </p>
                         {isEditing ? (
                           <select
@@ -363,7 +359,7 @@ export default function PatientDetail() {
                           >
                             <option value="NO">Norsk</option>
                             <option value="EN">English</option>
-                            <option value="OTHER">{lang === 'no' ? 'Annet' : 'Other'}</option>
+                            <option value="OTHER">{t('other', 'Annet')}</option>
                           </select>
                         ) : (
                           <p className="font-medium text-gray-900 dark:text-white">
@@ -410,11 +406,10 @@ export default function PatientDetail() {
                           onChange={(e) =>
                             setFormData({ ...formData, main_problem: e.target.value })
                           }
-                          placeholder={
-                            lang === 'no'
-                              ? 'F.eks. nakkesmerter, ryggproblemer'
-                              : 'e.g., Neck pain, Back problems'
-                          }
+                          placeholder={t(
+                            'mainProblemPlaceholder',
+                            'F.eks. nakkesmerter, ryggproblemer'
+                          )}
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
                         />
                       ) : (
@@ -426,7 +421,7 @@ export default function PatientDetail() {
 
                     <div>
                       <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
-                        {lang === 'no' ? 'Behandlingstype' : 'Treatment Type'}
+                        {t('treatmentType', 'Behandlingstype')}
                       </label>
                       {isEditing ? (
                         <select
@@ -436,11 +431,11 @@ export default function PatientDetail() {
                           }
                           className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
                         >
-                          <option value="">{lang === 'no' ? 'Ikke satt' : 'Not set'}</option>
+                          <option value="">{t('notSet', 'Ikke satt')}</option>
                           <option value="KIROPRAKTOR">Kiropraktor</option>
                           <option value="NEVROBEHANDLING">Nevrobehandling</option>
                           <option value="MUSKELBEHANDLING">Muskelbehandling</option>
-                          <option value="OTHER">{lang === 'no' ? 'Annet' : 'Other'}</option>
+                          <option value="OTHER">{t('other', 'Annet')}</option>
                         </select>
                       ) : (
                         <p className="font-medium text-gray-900 dark:text-white">
@@ -665,7 +660,7 @@ export default function PatientDetail() {
                           <div className="flex items-center gap-2">
                             {encounter.signed_at && (
                               <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                                {lang === 'no' ? 'Signert' : 'Signed'}
+                                {t('signed', 'Signert')}
                               </span>
                             )}
                             <FileText className="w-5 h-5 text-gray-400 dark:text-gray-300" />
@@ -705,11 +700,10 @@ export default function PatientDetail() {
                       <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
                       <div>
                         <p className="font-semibold text-yellow-900 dark:text-yellow-200">
-                          {lang === 'no' ? 'Oppfølging nødvendig' : 'Follow-up Needed'}
+                          {t('followUpNeeded', 'Oppfølging nødvendig')}
                         </p>
                         <p className="text-sm text-yellow-800 dark:text-yellow-300 mt-1">
-                          {lang === 'no' ? 'Frist' : 'Due'}:{' '}
-                          {formatDate(patient.should_be_followed_up)}
+                          {t('dueLabel', 'Frist')}: {formatDate(patient.should_be_followed_up)}
                         </p>
                       </div>
                     </div>

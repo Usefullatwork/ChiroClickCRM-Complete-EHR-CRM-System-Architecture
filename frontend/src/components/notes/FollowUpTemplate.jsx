@@ -26,6 +26,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import ICD10CodePicker from './ICD10CodePicker';
+import { usePrompt } from '../ui/PromptDialog';
 
 import logger from '../../utils/logger';
 /**
@@ -48,6 +49,7 @@ export default function FollowUpTemplate({
   readOnly = false,
 }) {
   const { t } = useTranslation('clinical');
+  const prompt = usePrompt();
   // Auto-save timer ref
   const autoSaveTimerRef = useRef(null);
   const [lastAutoSave, setLastAutoSave] = useState(null);
@@ -747,8 +749,8 @@ export default function FollowUpTemplate({
             ))}
             {!readOnly && (
               <button
-                onClick={() => {
-                  const flag = prompt(t('addRedFlagPrompt'));
+                onClick={async () => {
+                  const flag = await prompt({ title: t('addRedFlagTitle', 'Legg til rodt flagg') });
                   if (flag) {
                     addRedFlag(flag);
                   }

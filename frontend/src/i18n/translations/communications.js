@@ -127,6 +127,8 @@ export const communications = {
     approveAndSend: 'Approve & Send',
     // NoShowImporter
     notFound: 'Not found',
+    // Placeholder & aria-label i18n keys
+    typeMessagePlaceholder: 'Type your message here...',
   },
   no: {
     title: 'Kommunikasjon',
@@ -255,5 +257,7 @@ export const communications = {
     approveAndSend: 'Godkjenn & Send',
     // NoShowImporter
     notFound: 'Ikke funnet',
+    // Placeholder & aria-label i18n keys
+    typeMessagePlaceholder: 'Skriv meldingen din her...',
   },
 };

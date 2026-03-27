@@ -121,7 +121,7 @@ export default function Appointments() {
               }`}
             >
               <List className="w-4 h-4" />
-              {t('list') || 'Liste'}
+              {t('list', 'Liste')}
             </button>
             <button
               onClick={() => setViewMode('board')}
@@ -132,7 +132,7 @@ export default function Appointments() {
               }`}
             >
               <LayoutGrid className="w-4 h-4" />
-              {t('board') || 'Tavle'}
+              {t('board', 'Tavle')}
             </button>
           </div>
           <button
@@ -285,7 +285,7 @@ export default function Appointments() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-2">
-              {t('cancellationReasonTitle') || 'Grunn for kansellering'}
+              {t('cancellationReasonTitle', 'Grunn for kansellering')}
             </h2>
             {cancelReasonModal.appointment && (
               <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
@@ -293,7 +293,7 @@ export default function Appointments() {
               </p>
             )}
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('cancellationReasonPrompt') || 'Angi grunn for kansellering:'}
+              {t('cancellationReasonPrompt', 'Angi grunn for kansellering:')}
             </label>
             <textarea
               value={cancelReasonModal.reason}
@@ -302,7 +302,7 @@ export default function Appointments() {
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               rows={3}
-              placeholder={t('cancellationReasonPlaceholder') || 'Skriv inn grunn...'}
+              placeholder={t('cancellationReasonPlaceholder', 'Skriv inn grunn...')}
               autoFocus
             />
             <div className="flex justify-end gap-3 mt-4">
@@ -310,14 +310,14 @@ export default function Appointments() {
                 onClick={() => setCancelReasonModal({ open: false, appointment: null, reason: '' })}
                 className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
               >
-                {t('cancel') || 'Avbryt'}
+                {t('cancel', 'Avbryt')}
               </button>
               <button
                 onClick={handleCancelReasonConfirm}
                 disabled={!cancelReasonModal.reason.trim() || cancelMutation.isPending}
                 className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
               >
-                {t('confirmCancellation') || 'Bekreft kansellering'}
+                {t('confirmCancellation', 'Bekreft kansellering')}
               </button>
             </div>
           </div>

@@ -195,6 +195,26 @@ export const patients = {
     to: 'to',
     exercisesUnit: 'exercises',
     daysThisWeek: 'days this week',
+    // PatientDetail
+    quickAssessment: 'Quick Assessment',
+    alsoViewing: 'also viewing this patient',
+    followUpNeeded: 'Follow-up Needed',
+    dueLabel: 'Due',
+    signed: 'Signed',
+    mainProblemPlaceholder: 'e.g., Neck pain, Back problems',
+    // NewPatient treatment preferences
+    treatmentPreferencesDesc:
+      'Specify what the patient is comfortable with. Leave blank if not discussed.',
+    acupuncture: 'acupuncture',
+    general: 'general',
+    specifically: 'specifically',
+    // Placeholder & aria-label i18n keys
+    firstNamePlaceholder: 'First name',
+    lastNamePlaceholder: 'Last name',
+    streetAddressPlaceholder: 'Street address',
+    cityPlaceholder: 'City',
+    preferredTherapistPlaceholder: 'Mads, Andre, Mikael, Edle...',
+    patientNotesPlaceholder: 'Any additional notes about the patient...',
   },
   no: {
     title: 'Pasienter',
@@ -392,5 +412,25 @@ export const patients = {
     to: 'til',
     exercisesUnit: 'øvelser',
     daysThisWeek: 'dager denne uken',
+    // PatientDetail
+    quickAssessment: 'Hurtigvurdering',
+    alsoViewing: 'ser også på denne pasienten',
+    followUpNeeded: 'Oppfølging nødvendig',
+    dueLabel: 'Frist',
+    signed: 'Signert',
+    mainProblemPlaceholder: 'F.eks. nakkesmerter, ryggproblemer',
+    // NewPatient treatment preferences
+    treatmentPreferencesDesc:
+      'Angi hva pasienten er komfortabel med. La stå tom hvis ikke avklart.',
+    acupuncture: 'akupunktur',
+    general: 'generelt',
+    specifically: 'spesifikt',
+    // Placeholder & aria-label i18n keys
+    firstNamePlaceholder: 'Fornavn',
+    lastNamePlaceholder: 'Etternavn',
+    streetAddressPlaceholder: 'Gateadresse',
+    cityPlaceholder: 'By',
+    preferredTherapistPlaceholder: 'Mads, Andre, Mikael, Edle...',
+    patientNotesPlaceholder: 'Eventuelle notater om pasienten...',
   },
 };

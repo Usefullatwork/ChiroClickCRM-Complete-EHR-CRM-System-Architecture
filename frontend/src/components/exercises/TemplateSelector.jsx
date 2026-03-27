@@ -7,6 +7,7 @@
 
 import { useState, useMemo } from 'react';
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 import {
   FileText,
   Search,
@@ -38,6 +39,7 @@ const TemplateSelector = ({
   currentExercises = [],
   loading = false,
 }) => {
+  const { t } = useTranslation('exercises');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -155,7 +157,7 @@ const TemplateSelector = ({
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Søk i maler..."
+            placeholder={t('searchInTemplatesPlaceholder', 'Søk i maler...')}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
           />
           {searchTerm && (
@@ -295,7 +297,7 @@ const TemplateSelector = ({
                   type="text"
                   value={newTemplateName}
                   onChange={(e) => setNewTemplateName(e.target.value)}
-                  placeholder="F.eks. Nakke- og skulderprogram"
+                  placeholder={t('templateNamePlaceholder', 'F.eks. Nakke- og skulderprogram')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
@@ -306,7 +308,7 @@ const TemplateSelector = ({
                   type="text"
                   value={newTemplateCategory}
                   onChange={(e) => setNewTemplateCategory(e.target.value)}
-                  placeholder="F.eks. Nakke, Rygg, Rehabilitering"
+                  placeholder={t('templateTagsPlaceholder', 'F.eks. Nakke, Rygg, Rehabilitering')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
@@ -316,7 +318,10 @@ const TemplateSelector = ({
                 <textarea
                   value={newTemplateDescription}
                   onChange={(e) => setNewTemplateDescription(e.target.value)}
-                  placeholder="Beskriv når denne malen skal brukes..."
+                  placeholder={t(
+                    'templateDescriptionPlaceholder',
+                    'Beskriv når denne malen skal brukes...'
+                  )}
                   rows={3}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                 />

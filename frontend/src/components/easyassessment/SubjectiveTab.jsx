@@ -23,6 +23,7 @@ export default function SubjectiveTab({
   buildAIContext,
   setShowBodyChart,
 }) {
+  const { t } = useTranslation('clinical');
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div className="lg:col-span-2 space-y-4">
@@ -57,7 +58,7 @@ export default function SubjectiveTab({
             label="Chief Complaint"
             value={encounterData.subjective.chief_complaint}
             onChange={(val) => updateField('subjective', 'chief_complaint', val)}
-            placeholder="What brings you in today?"
+            placeholder={t('whatBringsYouPlaceholder', 'What brings you in today?')}
             quickPhrases={CHIEF_COMPLAINT_PHRASES}
             rows={2}
             required
@@ -74,7 +75,7 @@ export default function SubjectiveTab({
             label="History"
             value={encounterData.subjective.history}
             onChange={(val) => updateField('subjective', 'history', val)}
-            placeholder="Describe how the problem developed..."
+            placeholder={t('problemDevelopedPlaceholder', 'Describe how the problem developed...')}
             quickPhrases={HISTORY_PHRASES}
             rows={3}
             aiEnabled={true}
@@ -90,7 +91,7 @@ export default function SubjectiveTab({
             label="Onset"
             value={encounterData.subjective.onset}
             onChange={(val) => updateField('subjective', 'onset', val)}
-            placeholder="When did it start?"
+            placeholder={t('whenStartedPlaceholder', 'When did it start?')}
             quickPhrases={ONSET_PHRASES}
             rows={1}
             aiEnabled={true}

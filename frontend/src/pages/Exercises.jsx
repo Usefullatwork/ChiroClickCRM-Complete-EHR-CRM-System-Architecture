@@ -261,11 +261,13 @@ export default function Exercises() {
 
   // Get status label
   const getStatusLabel = (status) => {
-    const labels = {
-      no: { active: 'Aktiv', completed: 'Fullført', paused: 'Pauset', cancelled: 'Avbrutt' },
-      en: { active: 'Active', completed: 'Completed', paused: 'Paused', cancelled: 'Cancelled' },
+    const statusKeys = {
+      active: t('statusActive', 'Aktiv'),
+      completed: t('statusCompleted', 'Fullført'),
+      paused: t('statusPaused', 'Pauset'),
+      cancelled: t('statusCancelled', 'Avbrutt'),
     };
-    return labels[language][status] || status;
+    return statusKeys[status] || status;
   };
 
   return (
@@ -629,7 +631,7 @@ export default function Exercises() {
                         <div className="flex items-center justify-between">
                           <span className="font-medium">{ex.name_norwegian || ex.name}</span>
                           <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {ex.sets} sett × {ex.reps} rep
+                            {ex.sets} {t('sets', 'sett')} × {ex.reps} {t('reps', 'rep')}
                           </span>
                         </div>
                         {ex.custom_instructions && (

@@ -251,6 +251,8 @@ export const analytics = {
     complianceModerate: 'Moderate',
     complianceLow: 'Low',
     compliancePrescriptionsLabel: 'Exercise prescriptions (90 days)',
+    // Placeholder & aria-label i18n keys
+    additionalNotesContextPlaceholder: 'Add any additional notes or context for the recipients...',
   },
   no: {
     title: 'AI-ytelse',
@@ -504,5 +506,8 @@ export const analytics = {
     complianceModerate: 'Moderat',
     complianceLow: 'Lav',
     compliancePrescriptionsLabel: 'Øvelsesforeskrivninger (90 dager)',
+    // Placeholder & aria-label i18n keys
+    additionalNotesContextPlaceholder:
+      'Legg til eventuelle notater eller kontekst for mottakerne...',
   },
 };

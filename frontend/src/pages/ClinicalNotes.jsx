@@ -284,8 +284,11 @@ export default function ClinicalNotes() {
    */
   const handleDeleteNote = async (noteId) => {
     const ok = await confirm({
-      title: 'Slett notat',
-      description: 'Er du sikker på at du vil slette dette notatet? Dette kan ikke angres.',
+      title: t('deleteNoteTitle', 'Slett notat'),
+      description: t(
+        'deleteNoteConfirm',
+        'Er du sikker på at du vil slette dette notatet? Dette kan ikke angres.'
+      ),
       variant: 'destructive',
     });
     if (ok) {
@@ -592,7 +595,9 @@ export default function ClinicalNotes() {
                   <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </button>
                 <h2 className="text-lg font-semibold text-gray-900">
-                  {selectedNoteId ? 'Rediger notat' : `Nytt ${getNoteTypeLabel(noteType)} notat`}
+                  {selectedNoteId
+                    ? t('editNote', 'Rediger notat')
+                    : `${t('newNote', 'Nytt')} ${getNoteTypeLabel(noteType)} ${t('noteWord', 'notat')}`}
                 </h2>
               </div>
             </div>
@@ -678,7 +683,7 @@ export default function ClinicalNotes() {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                     <input
                       type="text"
-                      placeholder="Sok i notater..."
+                      placeholder={t('searchNotesPlaceholder', 'Sok i notater...')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -701,14 +706,14 @@ export default function ClinicalNotes() {
                   value={dateRange.start}
                   onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Fra dato"
+                  placeholder={t('fromDatePlaceholder', 'Fra dato')}
                 />
                 <input
                   type="date"
                   value={dateRange.end}
                   onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Til dato"
+                  placeholder={t('toDatePlaceholder', 'Til dato')}
                 />
               </div>
             </div>
@@ -755,7 +760,7 @@ export default function ClinicalNotes() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="Sok etter pasient..."
+                  placeholder={t('searchPatientPlaceholder', 'Sok etter pasient...')}
                   value={patientSearchTerm}
                   onChange={(e) => setPatientSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -794,8 +799,8 @@ export default function ClinicalNotes() {
                 ) : (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     {patientSearchTerm
-                      ? 'Ingen pasienter funnet'
-                      : 'Skriv for a soke etter pasienter'}
+                      ? t('noPatientsFound', 'Ingen pasienter funnet')
+                      : t('typeToSearchPatients', 'Skriv for a soke etter pasienter')}
                   </div>
                 )}
               </div>

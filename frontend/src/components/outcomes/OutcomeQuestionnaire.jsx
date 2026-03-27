@@ -31,6 +31,7 @@ import {
 const TRANSLATIONS = {
   en: {
     startQuestionnaire: 'Start Questionnaire',
+    cancel: 'Cancel',
     continue: 'Continue',
     back: 'Back',
     next: 'Next',
@@ -53,6 +54,7 @@ const TRANSLATIONS = {
     skip: 'Skip this question',
   },
   no: {
+    cancel: 'Avbryt',
     startQuestionnaire: 'Start spørreskjema',
     continue: 'Fortsett',
     back: 'Tilbake',
@@ -604,7 +606,7 @@ export default function OutcomeQuestionnaire({
               onClick={currentSection === 0 ? onCancel : goBack}
               className="px-6 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
             >
-              {currentSection === 0 ? 'Cancel' : t.back}
+              {currentSection === 0 ? t.cancel : t.back}
             </button>
             <button
               onClick={goNext}

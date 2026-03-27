@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import { appointmentsAPI } from '../../services/api';
 import { useSocketEvent, useSocketStatus } from '../../services/socket';
+import { useTranslation } from '../../i18n';
 
 const TIME_SLOTS = [];
 for (let h = 8; h <= 17; h++) {
@@ -117,6 +118,7 @@ function getDurationSlots(durationMinutes) {
 }
 
 export default function LiveAppointmentBoard() {
+  const { t } = useTranslation('appointments');
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -256,7 +258,7 @@ export default function LiveAppointmentBoard() {
           <button
             onClick={() => goToDay(-1)}
             className="p-1.5 rounded hover:bg-gray-200 transition-colors"
-            aria-label="Forrige dag"
+            aria-label={t('previousDay', 'Forrige dag')}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -274,14 +276,14 @@ export default function LiveAppointmentBoard() {
           <button
             onClick={() => goToDay(1)}
             className="p-1.5 rounded hover:bg-gray-200 transition-colors"
-            aria-label="Neste dag"
+            aria-label={t('nextDay', 'Neste dag')}
           >
             <ChevronRight className="w-4 h-4" />
           </button>
           <button
             onClick={fetchAppointments}
             className="p-1.5 rounded hover:bg-gray-200 transition-colors ml-2"
-            aria-label="Oppdater"
+            aria-label={t('refresh', 'Oppdater')}
           >
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>

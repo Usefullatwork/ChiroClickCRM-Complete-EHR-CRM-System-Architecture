@@ -295,7 +295,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, diagnosisCode: e.target.value }))
                   }
-                  placeholder="L03, L83..."
+                  placeholder={t('diagnosisCodePlaceholder', 'L03, L83...')}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>

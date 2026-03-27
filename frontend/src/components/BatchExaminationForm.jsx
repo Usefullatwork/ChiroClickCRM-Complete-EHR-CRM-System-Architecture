@@ -3,8 +3,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { examinationsAPI } from '../services/api';
 import { X, Save, CheckCircle, AlertTriangle, Zap, ListChecks } from 'lucide-react';
 import toast from '../utils/toast';
+import { useTranslation } from '../i18n';
 
 export default function BatchExaminationForm({ encounterId, chiefComplaint, isOpen, onClose }) {
+  const { t } = useTranslation('clinical');
   const queryClient = useQueryClient();
   const [selectedTemplateSet, setSelectedTemplateSet] = useState(null);
   const [protocols, setProtocols] = useState([]);
@@ -360,7 +362,10 @@ export default function BatchExaminationForm({ encounterId, chiefComplaint, isOp
                                   handleResultChange(protocol.id, 'findings_text', e.target.value)
                                 }
                                 rows="2"
-                                placeholder="Beskriv positive funn..."
+                                placeholder={t(
+                                  'positiveFindingsPlaceholder',
+                                  'Beskriv positive funn...'
+                                )}
                                 className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                               />
                             </div>

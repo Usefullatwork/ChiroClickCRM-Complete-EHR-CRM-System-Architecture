@@ -338,20 +338,20 @@ export default function CRM() {
           <div className="space-y-3">
             <MessagePreview
               name="Kari Nordmann"
-              message="Takk for påminnelsen! Jeg booker time nå."
-              time="10 min"
+              message={t('demoMessage1', 'Takk for påminnelsen! Jeg booker time nå.')}
+              time={t('demoTime10min', '10 min')}
               type="inbound"
             />
             <MessagePreview
               name="Ole Hansen"
-              message="Hei! Det er en stund siden sist..."
-              time="2 timer"
+              message={t('demoMessage2', 'Hei! Det er en stund siden sist...')}
+              time={t('demoTime2hrs', '2 timer')}
               type="outbound"
             />
             <MessagePreview
               name="Anna Berg"
-              message="Ja, tirsdag kl 14:00 passer fint!"
-              time="3 timer"
+              message={t('demoMessage3', 'Ja, tirsdag kl 14:00 passer fint!')}
+              time={t('demoTime3hrs', '3 timer')}
               type="inbound"
             />
           </div>

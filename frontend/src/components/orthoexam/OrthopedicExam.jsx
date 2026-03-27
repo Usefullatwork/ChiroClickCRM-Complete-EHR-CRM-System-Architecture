@@ -4,6 +4,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from '../../i18n';
 import {
   _ORTHO_EXAM_CLUSTERS,
   calculateOrthoClusterScore,
@@ -26,24 +27,25 @@ import {
 
 // Body region icons and colors
 const REGION_CONFIG = {
-  CERVICAL: { icon: '🦴', color: 'rose', label: { no: 'Cervikal', en: 'Cervical' } },
-  SHOULDER: { icon: '🦾', color: 'blue', label: { no: 'Skulder', en: 'Shoulder' } },
-  ELBOW: { icon: '💪', color: 'indigo', label: { no: 'Albue', en: 'Elbow' } },
-  WRIST_HAND: { icon: '✋', color: 'violet', label: { no: 'Håndledd/Hånd', en: 'Wrist/Hand' } },
-  HIP: { icon: '🦵', color: 'emerald', label: { no: 'Hofte', en: 'Hip' } },
-  KNEE: { icon: '🦿', color: 'teal', label: { no: 'Kne', en: 'Knee' } },
-  ANKLE_FOOT: { icon: '🦶', color: 'cyan', label: { no: 'Ankel/Fot', en: 'Ankle/Foot' } },
-  LUMBAR: { icon: '🔙', color: 'amber', label: { no: 'Lumbal', en: 'Lumbar' } },
-  SACROILIAC: { icon: '🔘', color: 'orange', label: { no: 'SI-ledd', en: 'Sacroiliac' } },
-  FUNCTIONAL: { icon: '🏃', color: 'green', label: { no: 'Funksjonell', en: 'Functional' } },
-  NEUROLOGICAL: { icon: '🧠', color: 'purple', label: { no: 'Nevrologisk', en: 'Neurological' } },
+  CERVICAL: { icon: '🦴', color: 'rose', labelKey: 'orthoRegionCervical' },
+  SHOULDER: { icon: '🦾', color: 'blue', labelKey: 'orthoRegionShoulder' },
+  ELBOW: { icon: '💪', color: 'indigo', labelKey: 'orthoRegionElbow' },
+  WRIST_HAND: { icon: '✋', color: 'violet', labelKey: 'orthoRegionWristHand' },
+  HIP: { icon: '🦵', color: 'emerald', labelKey: 'orthoRegionHip' },
+  KNEE: { icon: '🦿', color: 'teal', labelKey: 'orthoRegionKnee' },
+  ANKLE_FOOT: { icon: '🦶', color: 'cyan', labelKey: 'orthoRegionAnkleFoot' },
+  LUMBAR: { icon: '🔙', color: 'amber', labelKey: 'orthoRegionLumbar' },
+  SACROILIAC: { icon: '🔘', color: 'orange', labelKey: 'orthoRegionSacroiliac' },
+  FUNCTIONAL: { icon: '🏃', color: 'green', labelKey: 'orthoRegionFunctional' },
+  NEUROLOGICAL: { icon: '🧠', color: 'purple', labelKey: 'orthoRegionNeurological' },
 };
 
 // ============================================================================
 // SUB-COMPONENTS
 // ============================================================================
 
-function RegionSelector({ selectedRegion, onSelectRegion, clusterResults, language }) {
+function RegionSelector({ selectedRegion, onSelectRegion, clusterResults }) {
+  const { t } = useTranslation('clinical');
   const regions = getAvailableRegions();
 
   return (
@@ -52,7 +54,7 @@ function RegionSelector({ selectedRegion, onSelectRegion, clusterResults, langua
         const config = REGION_CONFIG[region] || {
           icon: '📍',
           color: 'gray',
-          label: { no: region, en: region },
+          labelKey: null,
         };
         const clusters = getClustersByRegion(region);
         const testedCount = clusters.filter((c) => clusterResults[c.id]).length;
@@ -68,7 +70,7 @@ function RegionSelector({ selectedRegion, onSelectRegion, clusterResults, langua
             }`}
           >
             <span className="text-lg">{config.icon}</span>
-            <span>{config.label[language]}</span>
+            <span>{config.labelKey ? t(config.labelKey) : region}</span>
             {testedCount > 0 && (
               <span className={`text-xs px-1.5 py-0.5 rounded-full bg-${config.color}-200`}>
                 {testedCount}/{clusters.length}
@@ -81,7 +83,8 @@ function RegionSelector({ selectedRegion, onSelectRegion, clusterResults, langua
   );
 }
 
-function ClusterCard({ cluster, results, onTestResult, expanded, onToggle, language }) {
+function ClusterCard({ cluster, results, onTestResult, expanded, onToggle }) {
+  const { t, getBilingual } = useTranslation('clinical');
   const score = results ? calculateOrthoClusterScore(cluster.id, results) : null;
   const _hasResults = results && Object.keys(results).length > 0;
 
@@ -99,7 +102,7 @@ function ClusterCard({ cluster, results, onTestResult, expanded, onToggle, langu
         } transition-colors`}
       >
         <div className="flex items-center gap-3">
-          <span className="font-medium text-gray-900">{cluster.name[language]}</span>
+          <span className="font-medium text-gray-900">{getBilingual(cluster.name)}</span>
           {cluster.redFlagCluster && (
             <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded-full">RED FLAG</span>
           )}
@@ -125,7 +128,7 @@ function ClusterCard({ cluster, results, onTestResult, expanded, onToggle, langu
       {expanded && (
         <div className="p-4 space-y-3">
           <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
-            {cluster.description[language]}
+            {getBilingual(cluster.description)}
           </p>
 
           {cluster.tests.map((test) => (
@@ -134,7 +137,6 @@ function ClusterCard({ cluster, results, onTestResult, expanded, onToggle, langu
               test={test}
               result={results?.[test.id]}
               onResult={(result) => onTestResult(test.id, result)}
-              language={language}
             />
           ))}
 
@@ -149,14 +151,14 @@ function ClusterCard({ cluster, results, onTestResult, expanded, onToggle, langu
             }`}
           >
             <p className="text-sm font-medium">
-              {language === 'no' ? 'Diagnostiske kriterier: ' : 'Diagnostic criteria: '}
+              {t('orthoDiagnosticCriteria')}
               {cluster.diagnosticCriteria.threshold}/{cluster.diagnosticCriteria.total} positive
             </p>
             {score?.meetsThreshold && (
               <p
                 className={`text-sm mt-1 ${cluster.redFlagCluster ? 'text-red-700' : 'text-green-700'}`}
               >
-                ✓ {cluster.diagnosticCriteria.interpretation[language]}
+                ✓ {getBilingual(cluster.diagnosticCriteria.interpretation)}
               </p>
             )}
           </div>
@@ -166,7 +168,8 @@ function ClusterCard({ cluster, results, onTestResult, expanded, onToggle, langu
   );
 }
 
-function TestRow({ test, result, onResult, language }) {
+function TestRow({ test, result, onResult }) {
+  const { t, getBilingual } = useTranslation('clinical');
   const [showDetails, setShowDetails] = useState(false);
   const [notes, setNotes] = useState(result?.notes || '');
   const [side, setSide] = useState(result?.side || '');
@@ -188,7 +191,7 @@ function TestRow({ test, result, onResult, language }) {
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <span className="font-medium text-gray-900">{test.name[language]}</span>
+            <span className="font-medium text-gray-900">{getBilingual(test.name)}</span>
             {test.redFlag && <AlertTriangle size={16} className="text-red-500" />}
             {test.sensitivity && (
               <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -240,21 +243,21 @@ function TestRow({ test, result, onResult, language }) {
         <div className="mt-3 pt-3 border-t border-gray-200 space-y-2">
           <div>
             <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
-              {language === 'no' ? 'Prosedyre' : 'Procedure'}
+              {t('orthoProcedure')}
             </label>
-            <p className="text-sm text-gray-700">{test.procedure[language]}</p>
+            <p className="text-sm text-gray-700">{getBilingual(test.procedure)}</p>
           </div>
           <div>
             <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
-              {language === 'no' ? 'Positiv ved' : 'Positive finding'}
+              {t('orthoPositiveFinding')}
             </label>
-            <p className="text-sm text-gray-700">{test.positive[language]}</p>
+            <p className="text-sm text-gray-700">{getBilingual(test.positive)}</p>
           </div>
 
           {/* Side selector */}
           <div className="flex items-center gap-4">
             <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
-              {language === 'no' ? 'Side' : 'Side'}
+              {t('orthoSide')}
             </label>
             <div className="flex gap-2">
               {['left', 'right', 'bilateral'].map((s) => (
@@ -273,16 +276,10 @@ function TestRow({ test, result, onResult, language }) {
                   }`}
                 >
                   {s === 'left'
-                    ? language === 'no'
-                      ? 'Venstre'
-                      : 'Left'
+                    ? t('orthoLeft')
                     : s === 'right'
-                      ? language === 'no'
-                        ? 'Høyre'
-                        : 'Right'
-                      : language === 'no'
-                        ? 'Bilateral'
-                        : 'Bilateral'}
+                      ? t('orthoRight')
+                      : t('orthoBilateral')}
                 </button>
               ))}
             </div>
@@ -291,7 +288,7 @@ function TestRow({ test, result, onResult, language }) {
           {/* Notes */}
           <div>
             <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
-              {language === 'no' ? 'Notater' : 'Notes'}
+              {t('orthoNotes')}
             </label>
             <input
               type="text"
@@ -302,7 +299,7 @@ function TestRow({ test, result, onResult, language }) {
                   onResult({ ...result, notes });
                 }
               }}
-              placeholder={language === 'no' ? 'Legg til notater...' : 'Add notes...'}
+              placeholder={t('orthoAddNotes')}
               className="w-full mt-1 px-2 py-1 text-sm border border-gray-300 rounded"
             />
           </div>
@@ -311,7 +308,7 @@ function TestRow({ test, result, onResult, language }) {
           {test.grading && (
             <div>
               <label className="text-xs font-medium text-gray-600 dark:text-gray-300">
-                {language === 'no' ? 'Gradering' : 'Grading'}
+                {t('orthoGrading')}
               </label>
               <div className="flex gap-2 mt-1">
                 {Object.entries(test.grading).map(([grade, desc]) => (
@@ -335,7 +332,8 @@ function TestRow({ test, result, onResult, language }) {
   );
 }
 
-function RedFlagAlert({ redFlags, language }) {
+function RedFlagAlert({ redFlags }) {
+  const { t, getBilingual } = useTranslation('clinical');
   if (!redFlags || redFlags.length === 0) {
     return null;
   }
@@ -344,14 +342,13 @@ function RedFlagAlert({ redFlags, language }) {
     <div className="bg-red-100 border-2 border-red-400 rounded-lg p-4 mb-4">
       <div className="flex items-center gap-2 mb-2">
         <AlertTriangle className="text-red-600" size={24} />
-        <h3 className="font-bold text-red-800">
-          {language === 'no' ? 'RØDE FLAGG PÅVIST' : 'RED FLAGS DETECTED'}
-        </h3>
+        <h3 className="font-bold text-red-800">{t('orthoRedFlagsDetected')}</h3>
       </div>
       <ul className="space-y-2">
         {redFlags.map((rf, i) => (
           <li key={i} className="text-red-700">
-            <strong>{rf.testName?.[language] || rf.clusterName?.[language]}:</strong> {rf.action}
+            <strong>{getBilingual(rf.testName) || getBilingual(rf.clusterName)}:</strong>{' '}
+            {rf.action}
           </li>
         ))}
       </ul>
@@ -359,25 +356,25 @@ function RedFlagAlert({ redFlags, language }) {
   );
 }
 
-function NarrativePanel({ narrative, onCopy, language }) {
+function NarrativePanel({ narrative, onCopy }) {
+  const { t } = useTranslation('clinical');
   return (
     <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-medium text-gray-900 flex items-center gap-2">
           <FileText size={18} />
-          {language === 'no' ? 'Klinisk Narrativ' : 'Clinical Narrative'}
+          {t('orthoClinicalNarrative')}
         </h3>
         <button
           onClick={onCopy}
           className="flex items-center gap-1 px-3 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
         >
           <Clipboard size={14} />
-          {language === 'no' ? 'Kopier' : 'Copy'}
+          {t('orthoCopy')}
         </button>
       </div>
       <div className="prose prose-sm max-w-none whitespace-pre-wrap text-gray-700">
-        {narrative ||
-          (language === 'no' ? 'Ingen tester utført ennå...' : 'No tests performed yet...')}
+        {narrative || t('orthoNoTestsYet')}
       </div>
     </div>
   );
@@ -392,8 +389,9 @@ export default function OrthopedicExam({
   _encounterId,
   onExamChange,
   initialData,
-  language = 'no',
+  language: _language,
 }) {
+  const { t, lang: language } = useTranslation('clinical');
   const [selectedRegion, setSelectedRegion] = useState('SHOULDER');
   const [clusterResults, setClusterResults] = useState(initialData?.clusterResults || {});
   const [expandedClusters, setExpandedClusters] = useState({});
@@ -468,26 +466,25 @@ export default function OrthopedicExam({
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
           <Activity className="text-blue-600" size={24} />
-          {language === 'no' ? 'Ortopedisk Undersøkelse' : 'Orthopedic Examination'}
+          {t('orthoExamTitle')}
         </h2>
         <button
           onClick={resetExam}
           className="flex items-center gap-1 px-3 py-1 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800"
         >
           <RotateCcw size={14} />
-          {language === 'no' ? 'Nullstill' : 'Reset'}
+          {t('orthoReset')}
         </button>
       </div>
 
       {/* Red Flag Alerts */}
-      <RedFlagAlert redFlags={redFlags} language={language} />
+      <RedFlagAlert redFlags={redFlags} />
 
       {/* Region Selector */}
       <RegionSelector
         selectedRegion={selectedRegion}
         onSelectRegion={setSelectedRegion}
         clusterResults={clusterResults}
-        language={language}
       />
 
       {/* Clusters for Selected Region */}
@@ -500,13 +497,12 @@ export default function OrthopedicExam({
             onTestResult={(testId, result) => handleTestResult(cluster.id, testId, result)}
             expanded={expandedClusters[cluster.id]}
             onToggle={() => toggleCluster(cluster.id)}
-            language={language}
           />
         ))}
       </div>
 
       {/* Narrative Output */}
-      <NarrativePanel narrative={narrative} onCopy={copyNarrative} language={language} />
+      <NarrativePanel narrative={narrative} onCopy={copyNarrative} />
     </div>
   );
 }

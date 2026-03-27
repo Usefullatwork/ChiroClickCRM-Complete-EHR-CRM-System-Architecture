@@ -434,7 +434,7 @@ export default function MacroManager() {
                             <button
                               onClick={() => setDeleteTarget(macro)}
                               className="p-1.5 rounded hover:bg-gray-100 text-gray-400 dark:text-gray-300 hover:text-red-600 transition-colors"
-                              title="Slett"
+                              title={t('delete', 'Slett')}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>

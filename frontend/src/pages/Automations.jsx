@@ -433,7 +433,9 @@ export default function Automations() {
       {activeTab === 'executions' && (
         <Suspense
           fallback={
-            <div className="text-gray-500 dark:text-gray-400 p-4">Loading execution history...</div>
+            <div className="text-gray-500 dark:text-gray-400 p-4">
+              {t('loadingExecutionHistory')}
+            </div>
           }
         >
           <ExecutionHistoryTab
@@ -452,7 +454,7 @@ export default function Automations() {
       {activeTab === 'stats' && (
         <Suspense
           fallback={
-            <div className="text-gray-500 dark:text-gray-400 p-4">Loading statistics...</div>
+            <div className="text-gray-500 dark:text-gray-400 p-4">{t('loadingStatistics')}</div>
           }
         >
           <AutomationStatsTab

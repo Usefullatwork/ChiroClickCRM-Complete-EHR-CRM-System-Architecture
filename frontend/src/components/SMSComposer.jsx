@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Copy, Check, Send, Smartphone } from 'lucide-react';
 import toast from '../utils/toast';
+import { useTranslation } from '../i18n';
 
 /**
  * SMS Composer Component
  * Supports manual copy-to-clipboard workflow and Windows Phone Link integration
  */
 export default function SMSComposer({ recipientPhone, recipientName, onSend, onCancel }) {
+  const { t } = useTranslation('communications');
   const [message, setMessage] = useState('');
   const [copied, setCopied] = useState(false);
   const [charCount, setCharCount] = useState(0);
@@ -104,7 +106,7 @@ export default function SMSComposer({ recipientPhone, recipientName, onSend, onC
         <textarea
           value={message}
           onChange={handleMessageChange}
-          placeholder="Type your message here..."
+          placeholder={t('typeMessagePlaceholder', 'Type your message here...')}
           className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           rows={6}
           maxLength={MAX_SMS_EXTENDED}

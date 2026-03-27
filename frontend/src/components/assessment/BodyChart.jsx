@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { useTranslation } from '../../i18n';
 
 // =============================================================================
 // BODY CHART WITH DRAWING TOOLS
@@ -145,6 +146,7 @@ export default function BodyChart({
   height = 500,
   className = '',
 }) {
+  const { t } = useTranslation('clinical');
   const [currentView, setCurrentView] = useState(initialView);
   const [currentTool, setCurrentTool] = useState('pointer');
   const [currentColor, setCurrentColor] = useState('#FF0000');
@@ -569,7 +571,7 @@ export default function BodyChart({
               value={textInput.value}
               onChange={(e) => setTextInput((prev) => ({ ...prev, value: e.target.value }))}
               onKeyDown={(e) => e.key === 'Enter' && handleTextSubmit()}
-              placeholder="Enter text..."
+              placeholder={t('enterTextPlaceholder', 'Enter text...')}
               className="px-2 py-1 border rounded text-sm"
               autoFocus
             />

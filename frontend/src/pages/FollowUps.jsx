@@ -19,11 +19,13 @@ import {
 import { followUpsAPI, patientsAPI } from '../services/api';
 import { formatPhone } from '../lib/utils';
 import { useTranslation, formatDate } from '../i18n';
+import { usePrompt } from '../components/ui/PromptDialog';
 import toast from '../utils/toast';
 import RecallDashboard from '../components/recall/RecallDashboard';
 
 export default function FollowUps() {
   const { t, lang } = useTranslation('appointments');
+  const prompt = usePrompt();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [filters, setFilters] = useState({
@@ -86,16 +88,22 @@ export default function FollowUps() {
     },
   });
 
-  const handleComplete = (followUp) => {
-    const notes = prompt('Add completion notes (optional):');
+  const handleComplete = async (followUp) => {
+    const notes = await prompt({
+      title: t('completionNotesTitle', 'Fullforingsnotater'),
+      placeholder: t('completionNotesPlaceholder', 'Legg til notater (valgfritt)'),
+    });
     if (notes !== null) {
       // User didn't cancel
       completeMutation.mutate({ id: followUp.id, notes: notes || '' });
     }
   };
 
-  const handleSkip = (followUp) => {
-    const reason = prompt('Reason for skipping this follow-up:');
+  const handleSkip = async (followUp) => {
+    const reason = await prompt({
+      title: t('skipReasonTitle', 'Hopp over oppfolging'),
+      placeholder: t('skipReasonPlaceholder', 'Grunn for a hoppe over denne oppfolgingen'),
+    });
     if (reason) {
       skipMutation.mutate({ id: followUp.id, reason });
     }

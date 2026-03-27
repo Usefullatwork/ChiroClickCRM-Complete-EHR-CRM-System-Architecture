@@ -44,7 +44,7 @@ function TimelineEntry({ entry, patientId, onNavigate }) {
             {entry.signed && (
               <CheckCircle
                 className="w-4 h-4 text-green-500 dark:text-green-400"
-                aria-label="Signert"
+                aria-label={t('signed', 'Signert')}
               />
             )}
             <span className="text-xs text-gray-500 dark:text-gray-400">

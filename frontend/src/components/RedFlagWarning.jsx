@@ -5,6 +5,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useTranslation } from '../i18n';
 
 // Severity level configurations
 const SEVERITY_CONFIG = {
@@ -144,6 +145,7 @@ export const RedFlagModal = ({
   onAcknowledge,
   onReferral,
 }) => {
+  const { t } = useTranslation('clinical');
   const [acknowledgedFlags, setAcknowledgedFlags] = useState(new Set());
   const [referralNotes, setReferralNotes] = useState('');
 
@@ -244,7 +246,7 @@ export const RedFlagModal = ({
               <textarea
                 value={referralNotes}
                 onChange={(e) => setReferralNotes(e.target.value)}
-                placeholder="Notat til henvisning..."
+                placeholder={t('referralNotesPlaceholder', 'Notat til henvisning...')}
                 className="w-full p-3 border rounded-lg text-sm resize-y min-h-[80px]"
               />
               <button

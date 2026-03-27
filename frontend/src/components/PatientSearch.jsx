@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from '../i18n';
 
 export default function PatientSearch({
   onSearch,
@@ -6,6 +7,7 @@ export default function PatientSearch({
   results = [],
   searchPerformed = false,
 }) {
+  const { t } = useTranslation('patients');
   const [query, setQuery] = useState('');
   const debounceRef = useRef(null);
 
@@ -35,7 +37,7 @@ export default function PatientSearch({
     <div>
       <input
         type="text"
-        placeholder="Sok etter pasienter..."
+        placeholder={t('searchPatients', 'Søk etter pasienter...')}
         value={query}
         onChange={handleChange}
       />
@@ -50,7 +52,9 @@ export default function PatientSearch({
           ))}
         </ul>
       )}
-      {searchPerformed && results.length === 0 && <p>Ingen pasienter funnet</p>}
+      {searchPerformed && results.length === 0 && (
+        <p>{t('noPatients', 'Ingen pasienter funnet')}</p>
+      )}
     </div>
   );
 }

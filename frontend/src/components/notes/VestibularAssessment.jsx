@@ -290,7 +290,7 @@ export default function VestibularAssessment({
           value={data?.notes || ''}
           onChange={(e) => updateNestedField(section, testName, 'notes', e.target.value)}
           disabled={readOnly}
-          placeholder="Ytterligere observasjoner..."
+          placeholder={t('additionalObservationsPlaceholder', 'Ytterligere observasjoner...')}
           className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
@@ -381,7 +381,7 @@ export default function VestibularAssessment({
               value={assessment.symptoms.onset}
               onChange={(e) => updateField('symptoms', 'onset', e.target.value)}
               disabled={readOnly}
-              placeholder="Na r startet symptomene?"
+              placeholder={t('symptomOnsetPlaceholder', 'Na r startet symptomene?')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -396,7 +396,7 @@ export default function VestibularAssessment({
               value={assessment.symptoms.duration}
               onChange={(e) => updateField('symptoms', 'duration', e.target.value)}
               disabled={readOnly}
-              placeholder="Sekunder, minutter, timer..."
+              placeholder={t('durationPlaceholder', 'Sekunder, minutter, timer...')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -407,7 +407,7 @@ export default function VestibularAssessment({
               value={assessment.symptoms.frequency}
               onChange={(e) => updateField('symptoms', 'frequency', e.target.value)}
               disabled={readOnly}
-              placeholder="Hvor ofte?"
+              placeholder={t('frequencyPlaceholder', 'Hvor ofte?')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -518,7 +518,7 @@ export default function VestibularAssessment({
                 updateNestedField('oculomotor', 'convergence', 'nearPoint', e.target.value)
               }
               disabled={readOnly}
-              placeholder="Normal: 6-10 cm"
+              placeholder={t('normalRangePlaceholder', 'Normal: 6-10 cm')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -564,7 +564,7 @@ export default function VestibularAssessment({
                     )
                   }
                   disabled={readOnly}
-                  placeholder="Venstre, hoyre, vertikal..."
+                  placeholder={t('directionPlaceholder', 'Venstre, hoyre, vertikal...')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -632,7 +632,7 @@ export default function VestibularAssessment({
                   )
                 }
                 disabled={readOnly}
-                placeholder="Linjetap eller observasjoner..."
+                placeholder={t('lineLossPlaceholder', 'Linjetap eller observasjoner...')}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -688,7 +688,10 @@ export default function VestibularAssessment({
             value={assessment.balance.functionalgaitAssessment || ''}
             onChange={(e) => updateField('balance', 'functionalgaitAssessment', e.target.value)}
             disabled={readOnly}
-            placeholder="Observasjoner under gange, snuing, tandemgange..."
+            placeholder={t(
+              'gaitObservationsPlaceholder',
+              'Observasjoner under gange, snuing, tandemgange...'
+            )}
             rows={3}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
@@ -704,7 +707,7 @@ export default function VestibularAssessment({
             value={assessment.clinicalAssessment.diagnosis || ''}
             onChange={(e) => updateField('clinicalAssessment', 'diagnosis', e.target.value)}
             disabled={readOnly}
-            placeholder="Prim r diagnose..."
+            placeholder={t('primaryDiagnosisVestPlaceholder', 'Prim r diagnose...')}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -718,7 +721,7 @@ export default function VestibularAssessment({
               updateField('clinicalAssessment', 'differentialDiagnosis', e.target.value)
             }
             disabled={readOnly}
-            placeholder="Andre mulige diagnoser..."
+            placeholder={t('otherDiagnosesPlaceholder', 'Andre mulige diagnoser...')}
             rows={2}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
@@ -729,7 +732,7 @@ export default function VestibularAssessment({
             value={assessment.clinicalAssessment.prognosis || ''}
             onChange={(e) => updateField('clinicalAssessment', 'prognosis', e.target.value)}
             disabled={readOnly}
-            placeholder="Forventet forlop..."
+            placeholder={t('expectedCoursePlaceholder', 'Forventet forlop...')}
             rows={2}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
@@ -744,7 +747,10 @@ export default function VestibularAssessment({
             value={assessment.plan.treatment || ''}
             onChange={(e) => updateField('plan', 'treatment', e.target.value)}
             disabled={readOnly}
-            placeholder="Behandling/manovre utfort i dag..."
+            placeholder={t(
+              'treatmentPerformedTodayPlaceholder',
+              'Behandling/manovre utfort i dag...'
+            )}
             rows={3}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
@@ -757,7 +763,10 @@ export default function VestibularAssessment({
             value={assessment.plan.vestibularRehabilitation || ''}
             onChange={(e) => updateField('plan', 'vestibularRehabilitation', e.target.value)}
             disabled={readOnly}
-            placeholder="VRT-protokoll, habituation, gaze stabilization..."
+            placeholder={t(
+              'vrtProtocolPlaceholder',
+              'VRT-protokoll, habituation, gaze stabilization...'
+            )}
             rows={2}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
@@ -768,7 +777,10 @@ export default function VestibularAssessment({
             value={assessment.plan.homeExercises || ''}
             onChange={(e) => updateField('plan', 'homeExercises', e.target.value)}
             disabled={readOnly}
-            placeholder="Ovelser foreskrevet for hjemmebruk..."
+            placeholder={t(
+              'homeExercisesPrescribedPlaceholder',
+              'Ovelser foreskrevet for hjemmebruk...'
+            )}
             rows={2}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
           />
@@ -781,7 +793,7 @@ export default function VestibularAssessment({
               value={assessment.plan.followUp || ''}
               onChange={(e) => updateField('plan', 'followUp', e.target.value)}
               disabled={readOnly}
-              placeholder="Neste time..."
+              placeholder={t('nextAppointmentPlaceholder', 'Neste time...')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -792,7 +804,7 @@ export default function VestibularAssessment({
               value={assessment.plan.referrals || ''}
               onChange={(e) => updateField('plan', 'referrals', e.target.value)}
               disabled={readOnly}
-              placeholder="ONH, fysioterapeut, etc..."
+              placeholder={t('referralSpecialistPlaceholder', 'ONH, fysioterapeut, etc...')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>

@@ -449,6 +449,8 @@ export const assessment = {
     referralDocSpecificQuestions: 'Specific Questions',
     referralDocDuration: 'Duration',
     referralDocDate: 'Date',
+    // MacroMatrix
+    searchMacrosPlaceholder: 'Search macros...',
   },
 
   no: {
@@ -893,5 +895,7 @@ export const assessment = {
     referralDocSpecificQuestions: 'Spesifikke sp\u00f8rsm\u00e5l',
     referralDocDuration: 'Varighet',
     referralDocDate: 'Dato',
+    // MacroMatrix
+    searchMacrosPlaceholder: 'Søk i makroer...',
   },
 };

@@ -1,7 +1,9 @@
 import { X } from 'lucide-react';
 import { SHORTCUTS } from '../../hooks/useGlobalKeyboardShortcuts';
+import { useTranslation } from '../../i18n';
 
 export default function KeyboardShortcutsModal({ open, onClose }) {
+  const { t } = useTranslation('common');
   if (!open) {
     return null;
   }
@@ -22,7 +24,7 @@ export default function KeyboardShortcutsModal({ open, onClose }) {
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-400"
-            aria-label="Lukk hurtigtaster-dialog"
+            aria-label={t('closeShortcutsDialog', 'Lukk hurtigtaster-dialog')}
           >
             <X className="w-5 h-5" />
           </button>

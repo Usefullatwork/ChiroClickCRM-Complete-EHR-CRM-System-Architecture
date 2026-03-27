@@ -15,6 +15,7 @@ export function AssessmentSection({
   suggestedCodes,
   patientId,
 }) {
+  const { t } = useTranslation('clinical');
   return (
     <section
       key="assessment"
@@ -77,7 +78,7 @@ export function AssessmentSection({
         <EnhancedClinicalTextarea
           value={encounterData.assessment.clinical_reasoning}
           onChange={(val) => updateField('assessment', 'clinical_reasoning', val)}
-          placeholder="Klinisk resonnering og vurdering..."
+          placeholder={t('clinicalReasoningPlaceholder', 'Klinisk resonnering og vurdering...')}
           label="Klinisk vurdering"
           section="assessment"
           field="clinical_reasoning"
@@ -90,7 +91,7 @@ export function AssessmentSection({
 
         <input
           type="text"
-          placeholder="Differensialdiagnoser..."
+          placeholder={t('differentialDiagnosesPlaceholder2', 'Differensialdiagnoser...')}
           value={encounterData.assessment.differential_diagnosis}
           onChange={(e) => updateField('assessment', 'differential_diagnosis', e.target.value)}
           disabled={isSigned}

@@ -243,6 +243,9 @@ export const financial = {
     cashDescription: 'Cash payment',
     vippsDescription: 'Vipps mobile payment',
     bankTransferDescription: 'Transfer to bank account',
+    // Placeholder & aria-label i18n keys
+    fromDatePlaceholder: 'From date',
+    toDatePlaceholder: 'To date',
   },
   no: {
     title: 'Økonomi',
@@ -488,5 +491,8 @@ export const financial = {
     cashDescription: 'Kontant betaling',
     vippsDescription: 'Vipps mobilbetaling',
     bankTransferDescription: 'Overføring til bankkonto',
+    // Placeholder & aria-label i18n keys
+    fromDatePlaceholder: 'Fra dato',
+    toDatePlaceholder: 'Til dato',
   },
 };

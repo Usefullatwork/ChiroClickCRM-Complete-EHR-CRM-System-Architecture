@@ -92,6 +92,22 @@ export const portal = {
     contactClinic: 'Contact your clinic to receive a new link.',
     securityNotice:
       'This is a secure login page. Your access code is personal and should not be shared with others.',
+    // MyExercises
+    couldNotLoadExercises: 'Could not load exercises',
+    tryAgain: 'Try again',
+    greeting: 'Hi',
+    refresh: 'Refresh',
+    yourExercisePrograms: 'Your exercise programs',
+    prescribedByShort: 'By',
+    today: 'today',
+    backToOverview: 'Back to overview',
+    noExercisesFound: 'No exercises found',
+    noExercisePrograms: 'No exercise programs',
+    noActiveProgramsDesc: 'You have no active exercise programs at the moment.',
+    allExercisesCompleted: 'Great job! You have completed all exercises for today.',
+    scrollToTop: 'Scroll to top',
+    // Placeholder & aria-label i18n keys
+    scrollToTop: 'Scroll to top',
   },
   no: {
     greeting: 'Hei, {name}!',
@@ -185,5 +201,21 @@ export const portal = {
     contactClinic: 'Kontakt klinikken din for å få en ny lenke.',
     securityNotice:
       'Dette er en sikker innloggingsside. Din tilgangskode er personlig og bør ikke deles med andre.',
+    // MyExercises
+    couldNotLoadExercises: 'Kunne ikke laste øvelsene',
+    tryAgain: 'Prøv igjen',
+    greeting: 'Hei',
+    refresh: 'Oppdater',
+    yourExercisePrograms: 'Dine øvelsesprogrammer',
+    prescribedByShort: 'Av',
+    today: 'i dag',
+    backToOverview: 'Tilbake til oversikt',
+    noExercisesFound: 'Ingen øvelser funnet',
+    noExercisePrograms: 'Ingen øvelsesprogrammer',
+    noActiveProgramsDesc: 'Du har ingen aktive øvelsesprogrammer for øyeblikket.',
+    allExercisesCompleted: 'Bra jobbet! Du har fullført alle øvelsene for i dag.',
+    scrollToTop: 'Scroll til toppen',
+    // Placeholder & aria-label i18n keys
+    scrollToTop: 'Scroll til toppen',
   },
 };

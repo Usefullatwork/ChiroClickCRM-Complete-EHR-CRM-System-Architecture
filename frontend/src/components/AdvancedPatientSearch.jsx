@@ -7,10 +7,12 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { patientsAPI } from '../services/api';
+import { useTranslation } from '../i18n';
 import { X, Search, Calendar, User, Phone, Mail, MapPin, AlertCircle } from 'lucide-react';
 
 export default function AdvancedPatientSearch({ onClose, onSelect }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [filters, setFilters] = useState({
     search: '',
     ageMin: '',
@@ -86,7 +88,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
       role="dialog"
       aria-modal="true"
-      aria-label="Avansert pasientsok"
+      aria-label={t('advancedPatientSearchLabel', 'Avansert pasientsok')}
     >
       <div className="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] flex flex-col">
         {/* Header */}
@@ -94,16 +96,16 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
           <div className="flex items-center gap-3">
             <Search className="w-6 h-6 text-blue-600" />
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Advanced Patient Search</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{t('advancedPatientSearch')}</h2>
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                Search patients using multiple criteria
+                {t('searchMultipleCriteria')}
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="p-2 hover:bg-gray-100 rounded-lg"
-            aria-label="Lukk sok"
+            aria-label={t('closeSearch', 'Lukk sok')}
           >
             <X className="w-5 h-5" />
           </button>
@@ -115,13 +117,13 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
             {/* Basic Search */}
             <div className="lg:col-span-3">
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Name, Email, or Phone
+                {t('nameEmailPhone')}
               </label>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="Search by name, email, or phone..."
+                  placeholder={t('searchByNameEmailPhone')}
                   value={filters.search}
                   onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
                   className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -131,7 +133,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
 
             {/* Age Range */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Min Age</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('minAge')}</label>
               <input
                 type="number"
                 placeholder="e.g., 18"
@@ -142,7 +144,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Max Age</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('maxAge')}</label>
               <input
                 type="number"
                 placeholder="e.g., 65"
@@ -154,22 +156,22 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
 
             {/* Gender */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('gender')}</label>
               <select
                 value={filters.gender}
                 onChange={(e) => setFilters((prev) => ({ ...prev, gender: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">All</option>
-                <option value="MALE">Male</option>
-                <option value="FEMALE">Female</option>
-                <option value="OTHER">Other</option>
+                <option value="">{t('all')}</option>
+                <option value="MALE">{t('male')}</option>
+                <option value="FEMALE">{t('female')}</option>
+                <option value="OTHER">{t('other')}</option>
               </select>
             </div>
 
             {/* City */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">{t('city')}</label>
               <div className="relative">
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                 <input
@@ -185,7 +187,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
             {/* Last Visit Date Range */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Last Visit From
+                {t('lastVisitFrom')}
               </label>
               <input
                 type="date"
@@ -198,7 +200,9 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Last Visit To</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('lastVisitTo')}
+              </label>
               <input
                 type="date"
                 value={filters.last_visit_to}
@@ -210,7 +214,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
             {/* Consent Filters */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Treatment Consent
+                {t('treatmentConsent')}
               </label>
               <select
                 value={filters.consent_treatment}
@@ -219,15 +223,15 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">All</option>
-                <option value="true">Consented</option>
-                <option value="false">Not Consented</option>
+                <option value="">{t('all')}</option>
+                <option value="true">{t('consented')}</option>
+                <option value="false">{t('notConsented')}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Marketing Consent
+                {t('marketingConsent')}
               </label>
               <select
                 value={filters.consent_marketing}
@@ -236,15 +240,15 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">All</option>
-                <option value="true">Consented</option>
-                <option value="false">Not Consented</option>
+                <option value="">{t('all')}</option>
+                <option value="true">{t('consented')}</option>
+                <option value="false">{t('notConsented')}</option>
               </select>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Follow-up Required
+                {t('followUpRequired')}
               </label>
               <select
                 value={filters.should_be_followed_up}
@@ -253,9 +257,9 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
                 }
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value="">All</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
+                <option value="">{t('all')}</option>
+                <option value="true">{t('yes')}</option>
+                <option value="false">{t('no')}</option>
               </select>
             </div>
           </div>
@@ -268,13 +272,13 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
               className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
             >
               <Search className="w-4 h-4" />
-              {isLoading ? 'Searching...' : 'Search'}
+              {isLoading ? t('searching') : t('search')}
             </button>
             <button
               onClick={handleClearFilters}
               className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
             >
-              Clear Filters
+              {t('clearFilters')}
             </button>
           </div>
         </div>
@@ -337,18 +341,18 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
                             </div>
                             <div className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
-                              Age: {patient.age || 'N/A'}
+                              {patient.age || 'N/A'}
                             </div>
                           </div>
                           <div className="flex items-center gap-2 mt-2">
                             {patient.consent_treatment && (
                               <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded">
-                                Treatment Consent
+                                {t('treatmentConsent')}
                               </span>
                             )}
                             {patient.should_be_followed_up && (
                               <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded">
-                                Follow-up Required
+                                {t('followUpRequired')}
                               </span>
                             )}
                           </div>
@@ -368,7 +372,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
             onClick={onClose}
             className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
-            Close
+            {t('close')}
           </button>
         </div>
       </div>

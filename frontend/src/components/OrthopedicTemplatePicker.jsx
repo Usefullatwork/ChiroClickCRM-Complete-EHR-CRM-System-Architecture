@@ -21,6 +21,7 @@ import {
   Brain,
   Bone,
 } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 const SOAP_SECTIONS = [
   { value: 'SUBJECTIVE', label: 'Subjektiv (S)', icon: <BookOpen size={16} /> },
@@ -49,6 +50,7 @@ export default function OrthopedicTemplatePicker({
   onClose,
   _currentField = null,
 }) {
+  const { t } = useTranslation('clinical');
   const [activeTab, setActiveTab] = useState('templates'); // 'templates', 'tests', 'phrases', 'favorites'
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [expandedCategories, setExpandedCategories] = useState(new Set());
@@ -382,7 +384,7 @@ export default function OrthopedicTemplatePicker({
                 />
                 <input
                   type="text"
-                  placeholder="Søk maler, tester, fraser..."
+                  placeholder={t('searchTemplatesTestsPlaceholder', 'Søk maler, tester, fraser...')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"

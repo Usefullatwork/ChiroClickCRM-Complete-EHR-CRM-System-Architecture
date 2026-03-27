@@ -280,7 +280,7 @@ const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSa
         className="relative ml-auto w-full max-w-6xl bg-white shadow-xl flex flex-col"
         role="dialog"
         aria-modal="true"
-        aria-label="Øvelsesprogram"
+        aria-label={t('exerciseProgram', 'Øvelsesprogram')}
         onKeyDown={handleKeyDown}
       >
         {/* Header */}

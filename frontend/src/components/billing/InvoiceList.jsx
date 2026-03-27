@@ -266,7 +266,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
               setPage(1);
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Fra dato"
+            placeholder={t('fromDatePlaceholder', 'Fra dato')}
           />
           <input
             type="date"
@@ -276,7 +276,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
               setPage(1);
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Til dato"
+            placeholder={t('toDatePlaceholder', 'Til dato')}
           />
         </div>
       </div>

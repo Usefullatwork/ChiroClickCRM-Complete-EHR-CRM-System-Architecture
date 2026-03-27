@@ -5,6 +5,7 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Alert } from '../ui/Alert';
 import { useSendKPIReport } from '../../hooks/useAnalytics';
+import { useTranslation } from '../../i18n';
 
 /**
  * Email Report Modal Component
@@ -13,6 +14,7 @@ import { useSendKPIReport } from '../../hooks/useAnalytics';
  * Generates formatted HTML email with KPI metrics
  */
 export const EmailReportModal = ({ isOpen, onClose, kpiData, dateRange, timeRange }) => {
+  const { t } = useTranslation('analytics');
   const [recipients, setRecipients] = useState('');
   const [subject, setSubject] = useState(`ChiroClick EHR KPI Report - ${dateRange}`);
   const [message, setMessage] = useState('');
@@ -151,7 +153,10 @@ ${message ? `\nAdditional Notes:\n${message}` : ''}
               rows={4}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Add any additional notes or context for the recipients..."
+              placeholder={t(
+                'additionalNotesContextPlaceholder',
+                'Add any additional notes or context for the recipients...'
+              )}
             />
           </div>
 

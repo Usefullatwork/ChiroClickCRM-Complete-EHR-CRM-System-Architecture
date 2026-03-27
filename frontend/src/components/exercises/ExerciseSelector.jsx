@@ -6,6 +6,7 @@
  */
 
 import { useState, useMemo } from 'react';
+import { useTranslation } from '../../i18n';
 import {
   Search,
   Filter,
@@ -40,6 +41,7 @@ const ExerciseSelector = ({
   onSelectExercise,
   loading = false,
 }) => {
+  const { t } = useTranslation('exercises');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
@@ -137,7 +139,7 @@ const ExerciseSelector = ({
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Sok etter ovelser..."
+            placeholder={t('searchExercisesPlaceholder', 'Søk etter øvelser...')}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
           />
           {searchTerm && (

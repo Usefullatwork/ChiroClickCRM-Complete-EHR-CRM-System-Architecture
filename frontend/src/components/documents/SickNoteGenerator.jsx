@@ -693,7 +693,7 @@ ${'='.repeat(60)}
                   label={t('sickNoteLicenseNumber', 'HPR-nummer')}
                   value={data.practitioner.hprNumber}
                   onChange={(v) => updateSection('practitioner', 'hprNumber', v)}
-                  placeholder="HPR-nummer"
+                  placeholder={t('hprNumberPlaceholder', 'HPR-nummer')}
                   required
                 />
                 <InputField
