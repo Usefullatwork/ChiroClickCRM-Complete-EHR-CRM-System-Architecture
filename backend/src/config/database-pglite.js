@@ -377,6 +377,26 @@ export const closePool = async () => {
 };
 
 /**
+ * Close PGlite for backup (safe shutdown without full cleanup).
+ * Used by backup service to get exclusive file access.
+ */
+export const closePGlite = async () => {
+  if (db) {
+    await db.close();
+    db = null;
+    initialized = false;
+    connectionHealthy = false;
+  }
+};
+
+/**
+ * Reopen PGlite after backup completes.
+ */
+export const reopenPGlite = async () => {
+  await initPGlite();
+};
+
+/**
  * Set tenant context for RLS
  * Uses set_config just like the pg version
  */
@@ -427,6 +447,8 @@ export default {
   savepoint,
   healthCheck,
   closePool,
+  closePGlite,
+  reopenPGlite,
   setTenantContext,
   clearTenantContext,
   queryWithTenant,

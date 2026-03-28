@@ -1079,6 +1079,15 @@ export const auditLogsAPI = {
   getById: (id) => apiClient.get(`/audit-logs/${id}`),
 };
 
+// Backup
+export const backupAPI = {
+  list: () => apiClient.get('/backup'),
+  create: () => apiClient.post('/backup'),
+  restore: (filename) => apiClient.post('/backup/restore', { filename }),
+  status: () => apiClient.get('/backup/status'),
+  updateSettings: (settings) => apiClient.put('/backup/settings', settings),
+};
+
 // Export API URL for streaming endpoints
 export { API_URL };
 

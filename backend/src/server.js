@@ -29,6 +29,8 @@ import { scheduleKeyRotation, createKeyRotationTable } from './utils/keyRotation
 import { initializeScheduler, shutdownScheduler } from './jobs/scheduler.js';
 import { initializeWebSocket, getIO } from './services/websocket.js';
 import { correlationId } from './middleware/correlationId.js';
+import { auditLogger } from './middleware/auditLogger.js';
+import backupGuard from './middleware/backupGuard.js';
 
 // Load environment variables
 const _result = dotenv.config();
@@ -56,6 +58,9 @@ const API_VERSION = process.env.API_VERSION || 'v1';
 
 // Request correlation IDs for distributed tracing
 app.use(correlationId);
+
+// Backup guard — 503 all API requests while backup is in progress
+app.use(backupGuard);
 
 // Security headers
 app.use(securityHeaders);
@@ -302,9 +307,13 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       errors: `/api/${API_VERSION}/errors`,
       mobile: `/api/${API_VERSION}/mobile`,
       auditLogs: `/api/${API_VERSION}/audit-logs`,
+      backup: `/api/${API_VERSION}/backup`,
     },
   });
 });
+
+// Audit logging (passthrough — calls next() immediately for non-auditable requests)
+app.use(auditLogger);
 
 // Import and mount API routes
 import authRoutes from './routes/auth.js';
@@ -354,6 +363,7 @@ import mobileRoutes from './routes/mobile/index.js';
 import auditLogRoutes from './routes/auditLogs.js';
 import slashCommandRoutes from './routes/slashCommands.js';
 import complianceRulesRoutes from './routes/complianceRules.js';
+import backupRoutes from './routes/backup.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
@@ -400,6 +410,7 @@ app.use(`/api/${API_VERSION}/mobile`, mobileRoutes);
 app.use(`/api/${API_VERSION}/audit-logs`, auditLogRoutes);
 app.use(`/api/${API_VERSION}/slash-commands`, slashCommandRoutes);
 app.use(`/api/${API_VERSION}/compliance-rules`, complianceRulesRoutes);
+app.use(`/api/${API_VERSION}/backup`, backupRoutes);
 
 // Portal routes (public - no auth required for patient access)
 app.use(`/api/${API_VERSION}/portal`, portalRoutes);
@@ -542,6 +553,17 @@ if (process.env.NODE_ENV !== 'test') {
       } catch (error) {
         logger.warn('WebSocket initialization skipped:', error.message);
       }
+
+      // Initialize backup scheduler (desktop mode only)
+      if (process.env.DESKTOP_MODE === 'true') {
+        try {
+          const { scheduleBackup } = await import('./services/backupService.js');
+          await scheduleBackup();
+          logger.info('Backup scheduler initialized');
+        } catch (error) {
+          logger.warn('Backup scheduler initialization skipped:', error.message);
+        }
+      }
     });
     server.on('error', (e) => {
       if (e.code === 'EADDRINUSE') {
@@ -568,6 +590,14 @@ const gracefulShutdown = async (signal) => {
     logger.info('Job scheduler stopped');
   } catch (error) {
     logger.warn('Error stopping scheduler:', error.message);
+  }
+
+  // Stop backup scheduler
+  try {
+    const { stopScheduler } = await import('./services/backupService.js');
+    stopScheduler();
+  } catch (error) {
+    logger.warn('Error stopping backup scheduler:', error.message);
   }
 
   // Close WebSocket connections

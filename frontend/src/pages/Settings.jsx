@@ -13,6 +13,7 @@ import {
   ToggleLeft,
   Package,
   Timer,
+  HardDrive,
 } from 'lucide-react';
 import { organizationAPI, usersAPI, clinicalSettingsAPI } from '../services/api';
 import { useTranslation } from '../i18n';
@@ -35,6 +36,7 @@ const ModuleManager = lazy(() => import('../components/settings/ModuleManager'))
 const AutomatedRemindersSettings = lazy(
   () => import('../components/settings/AutomatedRemindersSettings')
 );
+const BackupManager = lazy(() => import('../components/settings/BackupManager'));
 
 // Default clinical preferences
 const DEFAULT_CLINICAL_PREFS = {
@@ -264,6 +266,12 @@ export default function Settings() {
       label: t('moduleManagement', 'Modules'),
       activeClass: 'border-teal-600 text-teal-600',
     },
+    {
+      id: 'backup',
+      icon: HardDrive,
+      label: t('tabs.backup', 'Sikkerhetskopi'),
+      activeClass: 'border-teal-600 text-teal-600',
+    },
   ];
 
   return (
@@ -375,6 +383,8 @@ export default function Settings() {
         {activeTab === 'reminders' && <AutomatedRemindersSettings />}
 
         {activeTab === 'modules' && <ModuleManager />}
+
+        {activeTab === 'backup' && <BackupManager />}
       </Suspense>
 
       {/* Invite User Modal */}
