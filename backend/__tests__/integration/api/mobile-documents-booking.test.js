@@ -14,7 +14,7 @@ import { randomUUID } from '../../helpers/testUtils.js';
 
 // Audit log mock — verifies logAction is not called for unauthenticated requests
 const mockLogAction = jest.fn().mockResolvedValue(null);
-jest.unstable_mockModule('../../../src/services/auditLog.js', () => ({
+jest.unstable_mockModule('../../../src/services/practice/auditLog.js', () => ({
   logAction: mockLogAction,
 }));
 

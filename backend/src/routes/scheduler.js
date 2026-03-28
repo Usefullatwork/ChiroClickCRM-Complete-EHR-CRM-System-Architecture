@@ -5,7 +5,7 @@
 
 import express from 'express';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
-import * as schedulerService from '../services/smartScheduler.js';
+import * as schedulerService from '../services/practice/smartScheduler.js';
 import validate from '../middleware/validation.js';
 import {
   scheduleCommunicationSchema,

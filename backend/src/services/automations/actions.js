@@ -5,8 +5,8 @@
 
 import { query } from '../../config/database.js';
 import logger from '../../utils/logger.js';
-import * as communicationService from '../communications.js';
-import { createNotification, NOTIFICATION_TYPES } from '../notifications.js';
+import * as communicationService from '../communication/communications.js';
+import { createNotification, NOTIFICATION_TYPES } from '../communication/notifications.js';
 
 // =============================================================================
 // ACTION TYPES

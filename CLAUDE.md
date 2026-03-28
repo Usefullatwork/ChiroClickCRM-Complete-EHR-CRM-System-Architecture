@@ -44,7 +44,7 @@ cd frontend && npx playwright test              # E2E tests
 **Key directories:**
 
 - `frontend/src/components/` — 39 subdirs, ~300 components
-- `backend/src/services/` — 97 service files (ai/, providers/, crm, exercises, pdf, etc.)
+- `backend/src/services/` — 8 domain dirs: clinical/ (36), communication/ (14), practice/ (34), training/ (13), ai/ (9), automations/ (5), crm/ (6), providers/ (8)
 - `backend/src/routes/` — 49 route files (47 registered + 2 regulatory stubs). Swagger at `/api-docs` (109 endpoints)
 - `database/migrations/` — 078 migrations (PGlite auto-applies on startup via `db-init.js`). Gap at 025 is intentional (removed in commit 201f79b)
 
@@ -89,10 +89,9 @@ Budget enforcement: `canSpend()` pre-flight. Auto-resets daily/monthly.
 
 ## Tech Debt
 
-- `pdf.js` + `pdfGenerator.js` split by domain — both via `controllers/pdf.js`
-- `assessment/` BodyChart + SpineDiagram not consolidated with `anatomy/`
+- `pdf.js` + `pdfGenerator.js` split by domain — both in `services/clinical/`, accessed via `controllers/pdf.js`
 - `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (future)
-- `services/ai.js` is a shim re-exporting from `services/ai/` (5 modules)
+- `services/ai/` — runtime inference (9 modules). `services/training/` — model training pipeline (13 modules)
 - i18n: ~50 bilingual `{en,no}` strings remain by design
 
 ## System Basics V2 (v1.3.0, medical preset)

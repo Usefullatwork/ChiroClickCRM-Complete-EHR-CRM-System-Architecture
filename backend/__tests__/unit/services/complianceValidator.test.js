@@ -1,5 +1,5 @@
 /**
- * Unit Tests for Compliance Validator (src/services/complianceValidator.js)
+ * Unit Tests for Compliance Validator (src/services/clinical/complianceValidator.js)
  * Tests Norwegian GDPR PII redaction, cloud API validation, disclaimer injection,
  * and the full compliance pipeline.
  */
@@ -24,7 +24,7 @@ const {
   ensureCompliance,
   PII_PATTERNS,
   CLINICAL_DISCLAIMER,
-} = await import('../../../src/services/complianceValidator.js');
+} = await import('../../../src/services/clinical/complianceValidator.js');
 
 const logger = (await import('../../../src/utils/logger.js')).default;
 

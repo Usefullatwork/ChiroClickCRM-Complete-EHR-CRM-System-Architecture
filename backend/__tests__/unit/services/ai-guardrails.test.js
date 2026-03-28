@@ -24,7 +24,7 @@ const mockGuardrailsService = {
   resetStats: jest.fn(),
 };
 
-jest.unstable_mockModule('../../../src/services/guardrails.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/guardrails.js', () => ({
   guardrailsService: mockGuardrailsService,
   GuardrailsService: jest.fn(),
   InputValidator: { validate: jest.fn(), validateContext: jest.fn() },

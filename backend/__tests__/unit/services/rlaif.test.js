@@ -81,18 +81,18 @@ jest.unstable_mockModule('../../../src/services/providers/claudeProvider.js', ()
 
 // ─── ComplianceValidator mock (for generateTargetedData) ─────────────────────
 const mockEnsureCompliance = jest.fn();
-jest.unstable_mockModule('../../../src/services/complianceValidator.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/complianceValidator.js', () => ({
   ensureCompliance: mockEnsureCompliance,
 }));
 
 // ---------------------------------------------------------------------------
 // Import AFTER mocking
 // ---------------------------------------------------------------------------
-const rlaifModule = await import('../../../src/services/rlaif.js');
+const rlaifModule = await import('../../../src/services/training/rlaif.js');
 const { generatePreferencePairs, augmentTrainingData, evaluateSuggestionQuality, getRLAIFStats } =
   rlaifModule;
 
-const trainingModule = await import('../../../src/services/training.js');
+const trainingModule = await import('../../../src/services/training/training.js');
 const {
   getStatus,
   getTrainingData,

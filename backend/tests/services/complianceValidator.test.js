@@ -10,7 +10,7 @@ jest.unstable_mockModule('../../src/utils/logger.js', () => ({
 }));
 
 const { redactPII, validateForCloudAPI, addDisclaimer, ensureCompliance, PII_PATTERNS } =
-  await import('../../src/services/complianceValidator.js');
+  await import('../../src/services/clinical/complianceValidator.js');
 
 describe('ComplianceValidator', () => {
   describe('redactPII()', () => {

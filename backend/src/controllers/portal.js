@@ -4,9 +4,9 @@
  * Extracts request data, delegates to portalService, returns responses.
  */
 
-import * as portalService from '../services/portal.js';
+import * as portalService from '../services/practice/portal.js';
 import { logAudit } from '../utils/audit.js';
-import { logAction, ACTION_TYPES } from '../services/auditLog.js';
+import { logAction, ACTION_TYPES } from '../services/practice/auditLog.js';
 import logger from '../utils/logger.js';
 
 /**

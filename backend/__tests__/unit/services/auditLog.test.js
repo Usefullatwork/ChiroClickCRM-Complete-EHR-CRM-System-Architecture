@@ -28,12 +28,12 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
   },
 }));
 
-jest.unstable_mockModule('../../../src/services/notifications.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/notifications.js', () => ({
   notifyByRole: jest.fn().mockResolvedValue(undefined),
   NOTIFICATION_TYPES: { SECURITY_ALERT: 'SECURITY_ALERT' },
 }));
 
-const auditLogModule = await import('../../../src/services/auditLog.js');
+const auditLogModule = await import('../../../src/services/practice/auditLog.js');
 const {
   logAction,
   logEncounterAction,

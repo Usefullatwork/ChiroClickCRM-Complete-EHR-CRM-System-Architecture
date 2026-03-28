@@ -3,8 +3,8 @@
  * HTTP request handling for patient self-service portal endpoints
  */
 
-import * as patientPortalService from '../services/patientPortal.js';
-import { logAction } from '../services/auditLog.js';
+import * as patientPortalService from '../services/practice/patientPortal.js';
+import { logAction } from '../services/practice/auditLog.js';
 import logger from '../utils/logger.js';
 
 /**

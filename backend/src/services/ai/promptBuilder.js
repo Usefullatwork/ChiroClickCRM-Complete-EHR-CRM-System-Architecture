@@ -10,7 +10,7 @@ import {
   validateClinicalContent,
   checkRedFlagsInContent,
   checkMedicationWarnings,
-} from '../clinicalValidation.js';
+} from '../clinical/clinicalValidation.js';
 import { getAIProvider } from '../providers/aiProviderFactory.js';
 import circuitBreakerRegistry from '../../infrastructure/resilience/CircuitBreakerRegistry.js';
 

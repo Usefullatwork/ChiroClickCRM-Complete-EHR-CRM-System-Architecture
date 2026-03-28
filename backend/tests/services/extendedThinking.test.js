@@ -35,7 +35,7 @@ describe('Extended Thinking Service', () => {
     mockCreate.mockReset();
 
     // Re-import to get fresh module
-    const mod = await import('../../src/services/extendedThinking.js');
+    const mod = await import('../../src/services/training/extendedThinking.js');
     analyzeWithThinking = mod.analyzeWithThinking;
     differentialDiagnosis = mod.differentialDiagnosis;
     analyzeRedFlagsWithThinking = mod.analyzeRedFlagsWithThinking;

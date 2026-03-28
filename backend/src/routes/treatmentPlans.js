@@ -4,7 +4,7 @@
  */
 
 import express from 'express';
-import * as treatmentPlanService from '../services/treatmentPlans.js';
+import * as treatmentPlanService from '../services/clinical/treatmentPlans.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import validate from '../middleware/validation.js';
 import {

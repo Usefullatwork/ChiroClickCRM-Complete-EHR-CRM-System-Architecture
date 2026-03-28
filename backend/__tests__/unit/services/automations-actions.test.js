@@ -61,7 +61,7 @@ jest.unstable_mockModule('../../../src/config/constants.js', () => ({
 }));
 
 // Mock websocket used by notifications.js
-jest.unstable_mockModule('../../../src/services/websocket.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/websocket.js', () => ({
   sendToUser: jest.fn(),
   default: { sendToUser: jest.fn() },
 }));
@@ -69,7 +69,7 @@ jest.unstable_mockModule('../../../src/services/websocket.js', () => ({
 // Mock notifications service
 const mockCreateNotification = jest.fn().mockResolvedValue({ id: 'notif-1' });
 
-jest.unstable_mockModule('../../../src/services/notifications.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/notifications.js', () => ({
   createNotification: mockCreateNotification,
   NOTIFICATION_TYPES: {
     STAFF_NOTIFICATION: 'STAFF_NOTIFICATION',

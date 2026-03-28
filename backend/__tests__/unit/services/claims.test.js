@@ -33,7 +33,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 // Mock episodes service (getBillingModifier)
 const mockGetBillingModifier = jest.fn();
 
-jest.unstable_mockModule('../../../src/services/episodes.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/episodes.js', () => ({
   getBillingModifier: mockGetBillingModifier,
   default: {
     getBillingModifier: mockGetBillingModifier,
@@ -41,7 +41,7 @@ jest.unstable_mockModule('../../../src/services/episodes.js', () => ({
 }));
 
 // Import after mocking
-const claimsService = await import('../../../src/services/claims.js');
+const claimsService = await import('../../../src/services/practice/claims.js');
 
 describe('Claims Service', () => {
   const testOrgId = 'org-test-001';

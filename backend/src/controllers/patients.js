@@ -3,7 +3,7 @@
  * Handles HTTP requests for patient management
  */
 
-import * as patientService from '../services/patients.js';
+import * as patientService from '../services/practice/patients.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 

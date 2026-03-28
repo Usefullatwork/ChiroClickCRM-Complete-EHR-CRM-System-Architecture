@@ -100,7 +100,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 }));
 
 // Import after mocking
-const backupService = await import('../../../src/services/backupService.js');
+const backupService = await import('../../../src/services/practice/backupService.js');
 
 describe('Backup Service', () => {
   beforeEach(() => {

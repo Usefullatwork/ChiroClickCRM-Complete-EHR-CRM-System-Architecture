@@ -7,7 +7,7 @@ import { jest } from '@jest/globals';
 
 const mockGetIsBackingUp = jest.fn().mockReturnValue(false);
 
-jest.unstable_mockModule('../../../src/services/backupService.js', () => ({
+jest.unstable_mockModule('../../../src/services/practice/backupService.js', () => ({
   getIsBackingUp: mockGetIsBackingUp,
   default: { getIsBackingUp: mockGetIsBackingUp },
 }));

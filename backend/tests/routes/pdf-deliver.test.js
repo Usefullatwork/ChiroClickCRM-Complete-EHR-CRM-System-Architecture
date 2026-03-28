@@ -12,7 +12,7 @@ import request from 'supertest';
 const mockDeliverDocument = jest.fn();
 const mockLogAudit = jest.fn().mockResolvedValue(true);
 
-jest.unstable_mockModule('../../src/services/documentDelivery.js', () => ({
+jest.unstable_mockModule('../../src/services/communication/documentDelivery.js', () => ({
   deliverDocument: mockDeliverDocument,
 }));
 
@@ -30,14 +30,14 @@ jest.unstable_mockModule('../../src/utils/logger.js', () => ({
 }));
 
 // Mock PDF service dependencies so controller import succeeds
-jest.unstable_mockModule('../../src/services/pdf.js', () => ({
+jest.unstable_mockModule('../../src/services/clinical/pdf.js', () => ({
   default: {},
   generatePatientLetter: jest.fn(),
   generateInvoice: jest.fn(),
   generateExerciseHandout: jest.fn(),
 }));
 
-jest.unstable_mockModule('../../src/services/pdfGenerator.js', () => ({
+jest.unstable_mockModule('../../src/services/clinical/pdfGenerator.js', () => ({
   generateTreatmentSummary: jest.fn(),
   generateReferralLetter: jest.fn(),
   generateSickNote: jest.fn(),

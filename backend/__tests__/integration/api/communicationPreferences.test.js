@@ -15,17 +15,17 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
   default: { info: jest.fn(), warn: jest.fn(), error: jest.fn(), debug: jest.fn() },
 }));
 
-jest.unstable_mockModule('../../../src/services/documentDelivery.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/documentDelivery.js', () => ({
   generatePdf: jest.fn(),
   default: { generatePdf: jest.fn() },
 }));
 
-jest.unstable_mockModule('../../../src/services/websocket.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/websocket.js', () => ({
   broadcastToOrg: jest.fn(),
   default: { broadcastToOrg: jest.fn() },
 }));
 
-jest.unstable_mockModule('../../../src/services/notifications.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/notifications.js', () => ({
   createNotification: jest.fn(),
   notifyByRole: jest.fn(),
   NOTIFICATION_TYPES: {},

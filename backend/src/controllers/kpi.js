@@ -2,8 +2,8 @@
  * KPI Controller
  */
 
-import * as kpiService from '../services/kpi.js';
-import * as kpiTrackingService from '../services/kpiTracking.js';
+import * as kpiService from '../services/practice/kpi.js';
+import * as kpiTrackingService from '../services/practice/kpiTracking.js';
 import logger from '../utils/logger.js';
 
 export const getDashboard = async (req, res) => {
@@ -75,7 +75,7 @@ export const getDetailedKPIs = async (req, res) => {
 
     res.json({
       success: true,
-      data: kpis
+      data: kpis,
     });
   } catch (error) {
     logger.error('Error in getDetailedKPIs controller:', error);
@@ -94,11 +94,15 @@ export const getCategoryBreakdown = async (req, res) => {
     const start = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     const end = endDate || new Date().toISOString();
 
-    const breakdown = await kpiTrackingService.getPatientCategoryBreakdown(organizationId, start, end);
+    const breakdown = await kpiTrackingService.getPatientCategoryBreakdown(
+      organizationId,
+      start,
+      end
+    );
 
     res.json({
       success: true,
-      data: breakdown
+      data: breakdown,
     });
   } catch (error) {
     logger.error('Error in getCategoryBreakdown controller:', error);
@@ -117,11 +121,15 @@ export const getGeographicDistribution = async (req, res) => {
     const start = startDate || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
     const end = endDate || new Date().toISOString();
 
-    const distribution = await kpiTrackingService.getGeographicDistribution(organizationId, start, end);
+    const distribution = await kpiTrackingService.getGeographicDistribution(
+      organizationId,
+      start,
+      end
+    );
 
     res.json({
       success: true,
-      data: distribution
+      data: distribution,
     });
   } catch (error) {
     logger.error('Error in getGeographicDistribution controller:', error);
@@ -146,7 +154,7 @@ export const getDailyKPIs = async (req, res) => {
     res.json({
       success: true,
       date: startOfDay.toISOString().split('T')[0],
-      data: kpis
+      data: kpis,
     });
   } catch (error) {
     logger.error('Error in getDailyKPIs controller:', error);
@@ -171,7 +179,7 @@ export const getWeeklyKPIs = async (req, res) => {
       success: true,
       startDate: start.toISOString().split('T')[0],
       endDate: end.toISOString().split('T')[0],
-      data: kpis
+      data: kpis,
     });
   } catch (error) {
     logger.error('Error in getWeeklyKPIs controller:', error);
@@ -201,7 +209,7 @@ export const getMonthlyKPIs = async (req, res) => {
       month: targetMonth,
       startDate: start.toISOString().split('T')[0],
       endDate: end.toISOString().split('T')[0],
-      data: kpis
+      data: kpis,
     });
   } catch (error) {
     logger.error('Error in getMonthlyKPIs controller:', error);
@@ -220,7 +228,7 @@ export const importKPIData = async (req, res) => {
     if (!data || !Array.isArray(data)) {
       return res.status(400).json({
         success: false,
-        error: 'Invalid data format'
+        error: 'Invalid data format',
       });
     }
 
@@ -229,7 +237,7 @@ export const importKPIData = async (req, res) => {
     res.json({
       success: true,
       data: results,
-      message: `Imported ${results.imported} records with ${results.errors.length} errors`
+      message: `Imported ${results.imported} records with ${results.errors.length} errors`,
     });
   } catch (error) {
     logger.error('Error in importKPIData controller:', error);
@@ -248,5 +256,5 @@ export default {
   importKPIData,
   getDailyKPIs,
   getWeeklyKPIs,
-  getMonthlyKPIs
+  getMonthlyKPIs,
 };

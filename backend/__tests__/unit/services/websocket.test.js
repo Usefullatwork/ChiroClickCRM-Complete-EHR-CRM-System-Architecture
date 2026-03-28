@@ -42,7 +42,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 }));
 
 // Import after mocking
-const websocketService = await import('../../../src/services/websocket.js');
+const websocketService = await import('../../../src/services/communication/websocket.js');
 const { validateSession } = await import('../../../src/auth/sessions.js');
 
 describe('WebSocket Service', () => {

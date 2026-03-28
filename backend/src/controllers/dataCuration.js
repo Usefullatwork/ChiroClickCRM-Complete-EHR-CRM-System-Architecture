@@ -3,7 +3,7 @@
  * Route handlers for AI feedback curation endpoints
  */
 
-import * as dataCurationService from '../services/dataCuration.js';
+import * as dataCurationService from '../services/training/dataCuration.js';
 import logger from '../utils/logger.js';
 
 const log = logger;

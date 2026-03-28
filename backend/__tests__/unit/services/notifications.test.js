@@ -32,7 +32,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 // ── Mock websocket ────────────────────────────────────────────────────────────
 const mockSendToUser = jest.fn();
 
-jest.unstable_mockModule('../../../src/services/websocket.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/websocket.js', () => ({
   sendToUser: mockSendToUser,
   default: { sendToUser: mockSendToUser },
 }));
@@ -47,7 +47,7 @@ const {
   deleteNotification,
   notifyByRole,
   NOTIFICATION_TYPES,
-} = await import('../../../src/services/notifications.js');
+} = await import('../../../src/services/communication/notifications.js');
 
 // ── Test constants ────────────────────────────────────────────────────────────
 const ORG_ID = 'org-test-001';

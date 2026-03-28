@@ -38,7 +38,7 @@ const {
   logBPPVTreatment,
   getRedFlagAlerts,
   getPatientHistory,
-} = await import('../../../src/services/neuroexam.js');
+} = await import('../../../src/services/clinical/neuroexam.js');
 
 const {
   getAllQuestionnaires,
@@ -48,7 +48,7 @@ const {
   getQuestionnaireResponse,
   getOutcomesByDiagnosis,
   calculateTreatmentEffectiveness,
-} = await import('../../../src/services/questionnaires.js');
+} = await import('../../../src/services/clinical/questionnaires.js');
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */

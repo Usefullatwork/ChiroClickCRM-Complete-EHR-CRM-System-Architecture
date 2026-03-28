@@ -30,7 +30,7 @@ const {
   TREATMENT_ABBREVIATIONS,
   EXAMINATION_TESTS,
   COMMON_FINDINGS,
-} = await import('../../../src/services/sindreJournalParser.js');
+} = await import('../../../src/services/training/sindreJournalParser.js');
 
 describe('Sindre Journal Parser', () => {
   beforeEach(() => {

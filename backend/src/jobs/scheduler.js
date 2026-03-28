@@ -34,7 +34,7 @@ const scheduledJobs = new Map();
  */
 const loadServices = async () => {
   try {
-    aiLearningService = await import('../services/aiLearning.js');
+    aiLearningService = await import('../services/training/aiLearning.js');
     logger.info('AI Learning service loaded');
   } catch (e) {
     logger.warn('AI Learning service not available:', e.message);
@@ -56,42 +56,42 @@ const loadServices = async () => {
   }
 
   try {
-    bulkCommunicationService = await import('../services/bulkCommunication.js');
+    bulkCommunicationService = await import('../services/communication/bulkCommunication.js');
     logger.info('Bulk Communication service loaded');
   } catch (e) {
     logger.warn('Bulk Communication service not available:', e.message);
   }
 
   try {
-    communicationsService = await import('../services/communications.js');
+    communicationsService = await import('../services/communication/communications.js');
     logger.info('Communications service loaded');
   } catch (e) {
     logger.warn('Communications service not available:', e.message);
   }
 
   try {
-    smartSchedulerService = await import('../services/smartScheduler.js');
+    smartSchedulerService = await import('../services/practice/smartScheduler.js');
     logger.info('Smart Scheduler service loaded');
   } catch (e) {
     logger.warn('Smart Scheduler service not available:', e.message);
   }
 
   try {
-    recallEngine = await import('../services/recallEngine.js');
+    recallEngine = await import('../services/practice/recallEngine.js');
     logger.info('Recall Engine service loaded');
   } catch (e) {
     logger.warn('Recall Engine service not available:', e.message);
   }
 
   try {
-    appointmentRemindersService = await import('../services/appointmentReminders.js');
+    appointmentRemindersService = await import('../services/communication/appointmentReminders.js');
     logger.info('Appointment Reminders service loaded');
   } catch (e) {
     logger.warn('Appointment Reminders service not available:', e.message);
   }
 
   try {
-    reportService = await import('../services/reportService.js');
+    reportService = await import('../services/clinical/reportService.js');
     logger.info('Report service loaded');
   } catch (e) {
     logger.warn('Report service not available:', e.message);

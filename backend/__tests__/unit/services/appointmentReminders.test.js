@@ -25,14 +25,14 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 const mockSendSMS = jest.fn();
 const mockSendEmail = jest.fn();
 
-jest.unstable_mockModule('../../../src/services/communications.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/communications.js', () => ({
   sendSMS: mockSendSMS,
   sendEmail: mockSendEmail,
 }));
 
 // Import after mocking
 const { scheduleReminder, processReminders, cancelReminders } =
-  await import('../../../src/services/appointmentReminders.js');
+  await import('../../../src/services/communication/appointmentReminders.js');
 
 describe('Appointment Reminders Service', () => {
   beforeEach(() => {

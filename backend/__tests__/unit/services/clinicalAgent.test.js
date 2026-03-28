@@ -8,13 +8,13 @@ import { jest } from '@jest/globals';
 // ─── Mock dependencies BEFORE importing module under test ────────────────────
 
 const mockOrchestrate = jest.fn();
-jest.unstable_mockModule('../../../src/services/clinicalOrchestrator.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/clinicalOrchestrator.js', () => ({
   orchestrate: mockOrchestrate,
 }));
 
 const mockGenerateCompletion = jest.fn();
 const mockExtractCompletionText = jest.fn();
-jest.unstable_mockModule('../../../src/services/ai.js', () => ({
+jest.unstable_mockModule('../../../src/services/ai/index.js', () => ({
   generateCompletion: mockGenerateCompletion,
   extractCompletionText: mockExtractCompletionText,
 }));
@@ -31,7 +31,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 // ─── Import AFTER mocks are registered ───────────────────────────────────────
 
 const { runClinicalPipeline, quickSuggestion } =
-  await import('../../../src/services/clinicalAgent.js');
+  await import('../../../src/services/clinical/clinicalAgent.js');
 
 const logger = (await import('../../../src/utils/logger.js')).default;
 

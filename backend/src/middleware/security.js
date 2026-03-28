@@ -333,7 +333,7 @@ export const secureSession = {
  * Log security events
  */
 export const logSecurityEvent = async (req, eventType, details = {}) => {
-  const { logAction, _ACTION_TYPES } = await import('../services/auditLog.js');
+  const { logAction, _ACTION_TYPES } = await import('../services/practice/auditLog.js');
 
   await logAction(eventType, req.user?.id, {
     resourceType: 'security_event',

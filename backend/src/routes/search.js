@@ -5,7 +5,7 @@
 
 import express from 'express';
 import { requireAuth, requireOrganization } from '../middleware/auth.js';
-import * as searchService from '../services/search.js';
+import * as searchService from '../services/practice/search.js';
 import logger from '../utils/logger.js';
 import validate from '../middleware/validation.js';
 import {

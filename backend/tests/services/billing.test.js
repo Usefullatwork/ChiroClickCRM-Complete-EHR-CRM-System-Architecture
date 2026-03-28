@@ -39,7 +39,7 @@ let billing;
 
 beforeEach(async () => {
   jest.clearAllMocks();
-  billing = await import('../../src/services/billing.js');
+  billing = await import('../../src/services/practice/billing.js');
 });
 
 describe('Billing Service', () => {

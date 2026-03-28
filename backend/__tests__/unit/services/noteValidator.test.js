@@ -34,7 +34,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 let mockScanForRedFlags;
 let mockCalculateRiskScore;
 
-jest.unstable_mockModule('../../../src/services/redFlagEngine.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/redFlagEngine.js', () => ({
   scanForRedFlags: (...args) => mockScanForRedFlags(...args),
   calculateRiskScore: (...args) => mockCalculateRiskScore(...args),
   RED_FLAG_CATEGORIES: {},
@@ -51,7 +51,7 @@ jest.unstable_mockModule('../../../src/services/redFlagEngine.js', () => ({
 let mockCheckRedFlagsInContent;
 let mockCheckMedicationWarnings;
 
-jest.unstable_mockModule('../../../src/services/clinicalValidation.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/clinicalValidation.js', () => ({
   checkRedFlagsInContent: (...args) => mockCheckRedFlagsInContent(...args),
   checkMedicationWarnings: (...args) => mockCheckMedicationWarnings(...args),
   validateClinicalContent: jest.fn(),
@@ -66,7 +66,7 @@ jest.unstable_mockModule('../../../src/services/clinicalValidation.js', () => ({
 // ------------------------------------------------------------------
 // Import service under test AFTER mocks are registered
 // ------------------------------------------------------------------
-const { validate } = await import('../../../src/services/noteValidator.js');
+const { validate } = await import('../../../src/services/clinical/noteValidator.js');
 
 // ------------------------------------------------------------------
 // Helpers

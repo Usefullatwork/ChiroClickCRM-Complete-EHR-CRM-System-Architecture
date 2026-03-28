@@ -38,7 +38,7 @@ jest.unstable_mockModule('../../../src/services/ai/contextManager.js', () => ({
   clearContextCache: jest.fn(),
 }));
 
-jest.unstable_mockModule('../../../src/services/rag.js', () => ({
+jest.unstable_mockModule('../../../src/services/training/rag.js', () => ({
   ragService: {
     augmentPrompt: mockRagAugmentPrompt,
   },

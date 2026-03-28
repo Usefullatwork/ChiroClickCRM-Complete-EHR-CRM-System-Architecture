@@ -2,8 +2,8 @@
  * Follow-ups Controller
  */
 
-import * as followUpService from '../services/followups.js';
-import * as recallEngine from '../services/recallEngine.js';
+import * as followUpService from '../services/practice/followups.js';
+import * as recallEngine from '../services/practice/recallEngine.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 

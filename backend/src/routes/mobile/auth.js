@@ -4,8 +4,8 @@
  */
 
 import express from 'express';
-import * as mobileAuth from '../../services/mobileAuth.js';
-import { logAction } from '../../services/auditLog.js';
+import * as mobileAuth from '../../services/practice/mobileAuth.js';
+import { logAction } from '../../services/practice/auditLog.js';
 
 const router = express.Router();
 

@@ -4,11 +4,11 @@
  */
 
 import express from 'express';
-import * as claimsService from '../services/claims.js';
-import * as episodesService from '../services/episodes.js';
+import * as claimsService from '../services/practice/claims.js';
+import * as episodesService from '../services/clinical/episodes.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import validate from '../middleware/validation.js';
-import { logAction } from '../services/auditLog.js';
+import { logAction } from '../services/practice/auditLog.js';
 import {
   createEpisodeSchema,
   getPatientEpisodesSchema,

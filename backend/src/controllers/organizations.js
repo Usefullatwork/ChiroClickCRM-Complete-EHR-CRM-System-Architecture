@@ -2,7 +2,7 @@
  * Organizations Controller
  */
 
-import * as organizationService from '../services/organizations.js';
+import * as organizationService from '../services/practice/organizations.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
@@ -43,7 +43,7 @@ export const updateCurrentOrganization = async (req, res) => {
       resourceId: organizationId,
       changes: req.body,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(organization);
@@ -74,7 +74,7 @@ export const inviteUser = async (req, res) => {
       role: role || 'ASSISTANT',
       first_name,
       last_name,
-      invited_by: user.id
+      invited_by: user.id,
     });
 
     await logAudit({
@@ -87,7 +87,7 @@ export const inviteUser = async (req, res) => {
       resourceId: invitation.id,
       details: { invited_email: email, role },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.status(201).json({ success: true, data: invitation, message: 'Invitation sent' });
@@ -103,7 +103,7 @@ export const getOrganizations = async (req, res) => {
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 50,
       search: req.query.search,
-      status: req.query.status
+      status: req.query.status,
     };
 
     const result = await organizationService.getAllOrganizations(options);
@@ -144,7 +144,7 @@ export const createOrganization = async (req, res) => {
       resourceType: 'ORGANIZATION',
       resourceId: organization.id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.status(201).json(organization);
@@ -171,7 +171,7 @@ export const updateOrganization = async (req, res) => {
       resourceId: id,
       changes: req.body,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(organization);
@@ -209,7 +209,7 @@ export const updateOrganizationSettings = async (req, res) => {
       resourceId: id,
       changes: req.body,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(settings);
@@ -253,5 +253,5 @@ export default {
   getOrganizationSettings,
   updateOrganizationSettings,
   getOrganizationStats,
-  checkOrganizationLimits
+  checkOrganizationLimits,
 };

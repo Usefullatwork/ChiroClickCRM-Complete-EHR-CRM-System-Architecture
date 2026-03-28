@@ -24,7 +24,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 
 // Import after mocking
 const { sendPush, sendPushToPatient, sendPushToMobileUser } =
-  await import('../../../src/services/pushNotification.js');
+  await import('../../../src/services/communication/pushNotification.js');
 
 describe('Push Notification Service', () => {
   const originalDesktopMode = process.env.DESKTOP_MODE;

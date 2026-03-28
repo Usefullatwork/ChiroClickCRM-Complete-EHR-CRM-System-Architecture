@@ -113,7 +113,7 @@ function resetPDFMock() {
 // ── Mock email service ────────────────────────────────────────────────────────
 const mockSendEmail = jest.fn();
 
-jest.unstable_mockModule('../../../src/services/emailService.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/emailService.js', () => ({
   sendEmail: mockSendEmail,
   default: { sendEmail: mockSendEmail },
 }));
@@ -122,7 +122,7 @@ jest.unstable_mockModule('../../../src/services/emailService.js', () => ({
 const mockGetPrescriptionById = jest.fn();
 const mockUpdatePrescriptionEmailStatus = jest.fn();
 
-jest.unstable_mockModule('../../../src/services/exerciseLibrary.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/exerciseLibrary.js', () => ({
   default: {
     getPrescriptionById: mockGetPrescriptionById,
     updatePrescriptionEmailStatus: mockUpdatePrescriptionEmailStatus,
@@ -134,14 +134,14 @@ jest.unstable_mockModule('../../../src/services/exerciseLibrary.js', () => ({
 // ── Mock SMS service (dynamically imported in source) ─────────────────────────
 const mockSendSMS = jest.fn();
 
-jest.unstable_mockModule('../../../src/services/smsService.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/smsService.js', () => ({
   sendSMS: mockSendSMS,
   default: { sendSMS: mockSendSMS },
 }));
 
 // ── Import after all mocks are set up ─────────────────────────────────────────
 const { generatePrescriptionPDF, sendPrescriptionEmail, sendExerciseReminder, sendPortalSMS } =
-  await import('../../../src/services/exerciseDelivery.js');
+  await import('../../../src/services/clinical/exerciseDelivery.js');
 
 // ── Test constants ────────────────────────────────────────────────────────────
 const ORG_ID = 'org-test-001';

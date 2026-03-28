@@ -5,7 +5,7 @@
  * @module controllers/macros
  */
 
-import { macroService } from '../services/macros.js';
+import { macroService } from '../services/clinical/macros.js';
 import logger from '../utils/logger.js';
 
 /**

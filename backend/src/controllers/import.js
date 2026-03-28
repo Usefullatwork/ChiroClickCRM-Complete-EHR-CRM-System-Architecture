@@ -3,9 +3,9 @@
  * Handle Excel imports, text parsing, and data imports
  */
 
-import * as excelImportService from '../services/excelImport.js';
-import * as textParserService from '../services/textParser.js';
-import * as patientService from '../services/patients.js';
+import * as excelImportService from '../services/practice/excelImport.js';
+import * as textParserService from '../services/training/textParser.js';
+import * as patientService from '../services/practice/patients.js';
 import { query } from '../config/database.js';
 import { validateFodselsnummerDetailed } from '../utils/encryption.js';
 import logger from '../utils/logger.js';

@@ -26,7 +26,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 
 const mockSendSMS = jest.fn();
 
-jest.unstable_mockModule('../../../src/services/communications.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/communications.js', () => ({
   sendSMS: mockSendSMS,
   default: { sendSMS: mockSendSMS },
 }));
@@ -46,7 +46,7 @@ const {
   getTodaysMessages,
   cancelScheduledMessage,
   sendApprovedMessages,
-} = await import('../../../src/services/smartScheduler.js');
+} = await import('../../../src/services/practice/smartScheduler.js');
 
 const ORG_ID = 'org-1';
 const PATIENT_ID = 'pat-1';

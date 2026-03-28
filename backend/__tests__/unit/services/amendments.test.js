@@ -27,7 +27,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
   },
 }));
 
-const amendmentsModule = await import('../../../src/services/amendments.js');
+const amendmentsModule = await import('../../../src/services/clinical/amendments.js');
 const { createAmendment, getEncounterAmendments, signAmendment, deleteAmendment } =
   amendmentsModule;
 

@@ -4,7 +4,7 @@
  */
 
 import { query } from '../config/database.js';
-import { scoreQuestionnaire } from '../services/outcomeScoring.js';
+import { scoreQuestionnaire } from '../services/clinical/outcomeScoring.js';
 import logger from '../utils/logger.js';
 
 const VALID_TYPES = ['ODI', 'NDI', 'VAS', 'DASH', 'NPRS'];

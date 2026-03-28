@@ -9,7 +9,7 @@ import { Router } from 'express';
 import { requireAuth, requireRole } from '../middleware/auth.js';
 import validate from '../middleware/validation.js';
 import { listAuditLogsSchema } from '../validators/auditLog.validators.js';
-import * as auditLogService from '../services/auditLogs.js';
+import * as auditLogService from '../services/practice/auditLogs.js';
 
 const router = Router();
 

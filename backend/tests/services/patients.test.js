@@ -29,7 +29,7 @@ jest.unstable_mockModule('../../src/utils/logger.js', () => ({
 process.env.ENCRYPTION_KEY = 'abcdefghijklmnopqrstuvwxyz123456';
 
 // Import the service after mocks are set up
-const patientService = await import('../../src/services/patients.js');
+const patientService = await import('../../src/services/practice/patients.js');
 
 describe('Patient Service', () => {
   const testOrgId = 'test-org-id-456';

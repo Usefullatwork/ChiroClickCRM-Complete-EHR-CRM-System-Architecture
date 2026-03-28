@@ -2,13 +2,13 @@
  * PDF Controller
  */
 
-import * as pdfService from '../services/pdf.js';
+import * as pdfService from '../services/clinical/pdf.js';
 import {
   generateTreatmentSummary as genTreatmentSummary,
   generateReferralLetter as genReferralLetter,
   generateSickNote as genSickNote,
   generateInvoice as genInvoicePdf,
-} from '../services/pdfGenerator.js';
+} from '../services/clinical/pdfGenerator.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
@@ -351,7 +351,8 @@ export const deliverDocument = async (req, res) => {
       return res.status(400).json({ error: 'method must be email, sms, or both' });
     }
 
-    const { deliverDocument: deliver } = await import('../services/documentDelivery.js');
+    const { deliverDocument: deliver } =
+      await import('../services/communication/documentDelivery.js');
     const result = await deliver(organizationId, type, id, patientId, method, {
       userId: user.id,
     });

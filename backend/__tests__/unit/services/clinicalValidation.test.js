@@ -1,5 +1,5 @@
 /**
- * Unit Tests for Clinical Validation Service (src/services/clinicalValidation.js)
+ * Unit Tests for Clinical Validation Service (src/services/clinical/clinicalValidation.js)
  * Tests red flag detection, contraindication checks, SOAP completeness, confidence scoring,
  * medication warnings, age-related risks, and medical logic validation.
  */
@@ -31,7 +31,7 @@ const {
   checkMedicationWarnings,
   checkAgeRelatedRisks,
   validateMedicalLogic,
-} = await import('../../../src/services/clinicalValidation.js');
+} = await import('../../../src/services/clinical/clinicalValidation.js');
 
 describe('clinicalValidation service', () => {
   beforeEach(() => {

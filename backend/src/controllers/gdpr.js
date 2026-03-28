@@ -2,7 +2,7 @@
  * GDPR Controller
  */
 
-import * as gdprService from '../services/gdpr.js';
+import * as gdprService from '../services/practice/gdpr.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 

@@ -3,7 +3,7 @@
  * Handles HTTP requests for neurological exams, BPPV treatment, and referrals
  */
 
-import * as neuroexamService from '../services/neuroexam.js';
+import * as neuroexamService from '../services/clinical/neuroexam.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 

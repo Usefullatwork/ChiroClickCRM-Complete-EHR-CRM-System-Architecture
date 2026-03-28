@@ -1,5 +1,5 @@
 /**
- * Unit Tests for Red Flag Engine (src/services/redFlagEngine.js)
+ * Unit Tests for Red Flag Engine (src/services/clinical/redFlagEngine.js)
  * Tests red flag detection, severity scoring, screening questions,
  * clinical alert generation, and audit logging.
  */
@@ -32,7 +32,7 @@ const {
   getScreeningQuestions,
   generateAlert,
   logRedFlagDetection,
-} = await import('../../../src/services/redFlagEngine.js');
+} = await import('../../../src/services/clinical/redFlagEngine.js');
 
 describe('redFlagEngine', () => {
   beforeEach(() => {

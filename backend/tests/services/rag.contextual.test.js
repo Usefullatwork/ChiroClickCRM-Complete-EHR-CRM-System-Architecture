@@ -21,7 +21,7 @@ jest.unstable_mockModule('../../src/db/index.js', () => ({
 }));
 
 // Mock embeddings service (needed by rag.js imports)
-jest.unstable_mockModule('../../src/services/embeddings.js', () => ({
+jest.unstable_mockModule('../../src/services/training/embeddings.js', () => ({
   embeddingsService: { embed: jest.fn(), healthCheck: jest.fn() },
   toPgVector: jest.fn(),
 }));
@@ -44,7 +44,7 @@ jest.unstable_mockModule('@anthropic-ai/sdk', () => {
   };
 });
 
-const { RAGService } = await import('../../src/services/rag.js');
+const { RAGService } = await import('../../src/services/training/rag.js');
 
 describe('RAGService.contextualizeChunk()', () => {
   let rag;

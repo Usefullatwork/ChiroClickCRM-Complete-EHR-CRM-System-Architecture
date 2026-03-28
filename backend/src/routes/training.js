@@ -16,8 +16,8 @@ import {
   combinedJournalsSchema,
   analyticsQuerySchema,
 } from '../validators/training.validators.js';
-import { exportTrainingData, getExportStats } from '../services/trainingExport.js';
-import { generateWeeklyAIDigest } from '../services/reportService.js';
+import { exportTrainingData, getExportStats } from '../services/training/trainingExport.js';
+import { generateWeeklyAIDigest } from '../services/clinical/reportService.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();

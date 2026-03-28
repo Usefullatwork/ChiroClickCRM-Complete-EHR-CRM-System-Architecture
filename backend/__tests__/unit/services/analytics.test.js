@@ -49,7 +49,7 @@ const {
   getPatientVolumeTrends,
   getDashboardAnalytics,
   exportAnalyticsCSV,
-} = await import('../../../src/services/analytics.js');
+} = await import('../../../src/services/practice/analytics.js');
 
 describe('Analytics Service', () => {
   const testOrgId = 'org-test-001';

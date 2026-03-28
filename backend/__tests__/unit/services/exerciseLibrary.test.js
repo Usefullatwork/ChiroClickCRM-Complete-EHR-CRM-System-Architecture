@@ -57,7 +57,7 @@ const {
   getPrescriptionByPortalToken,
   recordProgress,
   getProgressHistory,
-} = await import('../../../src/services/exerciseLibrary.js');
+} = await import('../../../src/services/clinical/exerciseLibrary.js');
 
 const ORG_ID = 'org-test-001';
 const USER_ID = 'user-test-001';

@@ -3,7 +3,7 @@
  * Handles HTTP requests for amendments to signed clinical encounters
  */
 
-import * as amendmentService from '../services/amendments.js';
+import * as amendmentService from '../services/clinical/amendments.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
@@ -35,7 +35,7 @@ export const createAmendment = async (req, res) => {
       resourceId: amendment.id,
       changes: { new: amendmentData },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.status(201).json(amendment);
@@ -43,14 +43,14 @@ export const createAmendment = async (req, res) => {
     if (error.isOperational) {
       return res.status(400).json({
         error: 'Business Logic Error',
-        message: error.message
+        message: error.message,
       });
     }
 
     logger.error('Error in createAmendment controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to create amendment'
+      message: 'Failed to create amendment',
     });
   }
 };
@@ -64,10 +64,7 @@ export const getAmendments = async (req, res) => {
     const { organizationId, user } = req;
     const { encounterId } = req.params;
 
-    const amendments = await amendmentService.getEncounterAmendments(
-      organizationId,
-      encounterId
-    );
+    const amendments = await amendmentService.getEncounterAmendments(organizationId, encounterId);
 
     // Log audit
     await logAudit({
@@ -79,7 +76,7 @@ export const getAmendments = async (req, res) => {
       resourceType: 'AMENDMENT',
       resourceId: encounterId,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(amendments);
@@ -87,7 +84,7 @@ export const getAmendments = async (req, res) => {
     logger.error('Error in getAmendments controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to retrieve amendments'
+      message: 'Failed to retrieve amendments',
     });
   }
 };
@@ -118,7 +115,7 @@ export const signAmendment = async (req, res) => {
       resourceId: amendmentId,
       reason: 'Amendment signed',
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(signedAmendment);
@@ -126,14 +123,14 @@ export const signAmendment = async (req, res) => {
     if (error.isOperational) {
       return res.status(400).json({
         error: 'Business Logic Error',
-        message: error.message
+        message: error.message,
       });
     }
 
     logger.error('Error in signAmendment controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to sign amendment'
+      message: 'Failed to sign amendment',
     });
   }
 };
@@ -147,11 +144,7 @@ export const deleteAmendment = async (req, res) => {
     const { organizationId, user } = req;
     const { amendmentId } = req.params;
 
-    await amendmentService.deleteAmendment(
-      organizationId,
-      amendmentId,
-      user.id
-    );
+    await amendmentService.deleteAmendment(organizationId, amendmentId, user.id);
 
     // Log audit
     await logAudit({
@@ -163,7 +156,7 @@ export const deleteAmendment = async (req, res) => {
       resourceType: 'AMENDMENT',
       resourceId: amendmentId,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.status(204).send();
@@ -171,14 +164,14 @@ export const deleteAmendment = async (req, res) => {
     if (error.isOperational) {
       return res.status(400).json({
         error: 'Business Logic Error',
-        message: error.message
+        message: error.message,
       });
     }
 
     logger.error('Error in deleteAmendment controller:', error);
     res.status(500).json({
       error: 'Internal Server Error',
-      message: 'Failed to delete amendment'
+      message: 'Failed to delete amendment',
     });
   }
 };
@@ -187,5 +180,5 @@ export default {
   createAmendment,
   getAmendments,
   signAmendment,
-  deleteAmendment
+  deleteAmendment,
 };

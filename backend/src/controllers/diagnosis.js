@@ -2,7 +2,7 @@
  * Diagnosis Codes Controller
  */
 
-import * as diagnosisService from '../services/diagnosis.js';
+import * as diagnosisService from '../services/clinical/diagnosis.js';
 import logger from '../utils/logger.js';
 
 export const searchDiagnosisCodes = async (req, res) => {
@@ -12,7 +12,7 @@ export const searchDiagnosisCodes = async (req, res) => {
     const codes = await diagnosisService.searchDiagnosisCodes(q, {
       system,
       chapter,
-      limit: parseInt(limit) || 20
+      limit: parseInt(limit) || 20,
     });
 
     res.json(codes);
@@ -67,7 +67,7 @@ export const getDiagnosisStatistics = async (req, res) => {
     const stats = await diagnosisService.getDiagnosisStatistics(organizationId, {
       startDate,
       endDate,
-      limit: parseInt(limit) || 10
+      limit: parseInt(limit) || 10,
     });
 
     res.json(stats);
@@ -82,5 +82,5 @@ export default {
   getCommonDiagnosisCodes,
   getDiagnosisCode,
   getChiropracticCodes,
-  getDiagnosisStatistics
+  getDiagnosisStatistics,
 };

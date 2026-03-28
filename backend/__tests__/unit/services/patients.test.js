@@ -54,7 +54,7 @@ jest.unstable_mockModule('../../../src/utils/encryption.js', () => ({
   },
 }));
 
-const patientsService = await import('../../../src/services/patients.js');
+const patientsService = await import('../../../src/services/practice/patients.js');
 
 describe('Patients Service', () => {
   const testOrgId = 'org-test-123';

@@ -9,7 +9,7 @@ import { jest } from '@jest/globals';
 // --- Mock auditLog service ---
 const mockLogAction = jest.fn().mockResolvedValue(null);
 
-jest.unstable_mockModule('../../../src/services/auditLog.js', () => ({
+jest.unstable_mockModule('../../../src/services/practice/auditLog.js', () => ({
   logAction: mockLogAction,
   default: { logAction: mockLogAction },
 }));
@@ -35,7 +35,7 @@ const mockService = {
   DEFAULT_COMM_PREFERENCES: { email: true, sms: true, push: true },
 };
 
-jest.unstable_mockModule('../../../src/services/patientPortal.js', () => mockService);
+jest.unstable_mockModule('../../../src/services/practice/patientPortal.js', () => mockService);
 
 // --- Mock logger ---
 jest.unstable_mockModule('../../../src/utils/logger.js', () => ({

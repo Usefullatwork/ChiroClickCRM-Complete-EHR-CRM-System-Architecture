@@ -27,7 +27,7 @@ jest.unstable_mockModule('../../src/config/database.js', () => ({
 }));
 
 // Import after mocking
-const exerciseLibraryService = await import('../../src/services/exerciseLibrary.js');
+const exerciseLibraryService = await import('../../src/services/clinical/exerciseLibrary.js');
 
 describe('Exercise Library Service', () => {
   const organizationId = 'test-org-id-456';
@@ -143,9 +143,9 @@ describe('Exercise Library Service', () => {
     it('should throw error on database failure', async () => {
       mockQuery.mockRejectedValueOnce(new Error('Database connection failed'));
 
-      await expect(
-        exerciseLibraryService.getExercises(organizationId)
-      ).rejects.toThrow('Database connection failed');
+      await expect(exerciseLibraryService.getExercises(organizationId)).rejects.toThrow(
+        'Database connection failed'
+      );
     });
   });
 
@@ -158,10 +158,7 @@ describe('Exercise Library Service', () => {
       const mockExercise = createTestExercise();
       mockQuery.mockResolvedValueOnce({ rows: [mockExercise] });
 
-      const result = await exerciseLibraryService.getExerciseById(
-        organizationId,
-        mockExercise.id
-      );
+      const result = await exerciseLibraryService.getExerciseById(organizationId, mockExercise.id);
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('WHERE organization_id = $1 AND id = $2'),
@@ -304,11 +301,7 @@ describe('Exercise Library Service', () => {
       });
       mockQuery.mockResolvedValueOnce({ rows: [updatedExercise] });
 
-      await exerciseLibraryService.updateExercise(
-        organizationId,
-        'test-id',
-        updateData
-      );
+      await exerciseLibraryService.updateExercise(organizationId, 'test-id', updateData);
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('difficulty_level'),
@@ -325,10 +318,7 @@ describe('Exercise Library Service', () => {
     it('should soft delete exercise by setting is_active to false', async () => {
       mockQuery.mockResolvedValueOnce({ rows: [{ id: 'test-id' }] });
 
-      const result = await exerciseLibraryService.deleteExercise(
-        organizationId,
-        'test-id'
-      );
+      const result = await exerciseLibraryService.deleteExercise(organizationId, 'test-id');
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('UPDATE exercise_library SET is_active = false'),
@@ -340,10 +330,7 @@ describe('Exercise Library Service', () => {
     it('should return false when exercise not found', async () => {
       mockQuery.mockResolvedValueOnce({ rows: [] });
 
-      const result = await exerciseLibraryService.deleteExercise(
-        organizationId,
-        'non-existent-id'
-      );
+      const result = await exerciseLibraryService.deleteExercise(organizationId, 'non-existent-id');
 
       expect(result).toBe(false);
     });
@@ -363,10 +350,9 @@ describe('Exercise Library Service', () => {
 
       const result = await exerciseLibraryService.getCategories(organizationId);
 
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('SELECT DISTINCT category'),
-        [organizationId]
-      );
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('SELECT DISTINCT category'), [
+        organizationId,
+      ]);
       expect(result).toHaveLength(2);
       expect(result[0]).toHaveProperty('category');
       expect(result[0]).toHaveProperty('subcategories');
@@ -446,10 +432,7 @@ describe('Exercise Library Service', () => {
         .mockResolvedValueOnce({ rows: [] })
         .mockResolvedValueOnce({ rows: [] });
 
-      await exerciseLibraryService.createPrescription(
-        organizationId,
-        prescriptionData
-      );
+      await exerciseLibraryService.createPrescription(organizationId, prescriptionData);
 
       expect(mockClient.query).toHaveBeenCalledWith(
         expect.stringContaining('usage_count = usage_count + 1'),
@@ -523,11 +506,7 @@ describe('Exercise Library Service', () => {
 
     it('should throw error for invalid status', async () => {
       await expect(
-        exerciseLibraryService.updatePrescriptionStatus(
-          organizationId,
-          'rx-123',
-          'invalid_status'
-        )
+        exerciseLibraryService.updatePrescriptionStatus(organizationId, 'rx-123', 'invalid_status')
       ).rejects.toThrow('Invalid status');
     });
 
@@ -564,23 +543,18 @@ describe('Exercise Library Service', () => {
         .mockResolvedValueOnce({ rows: [mockPrescription] })
         .mockResolvedValueOnce({ rows: [] }); // Update view count
 
-      const result = await exerciseLibraryService.getPrescriptionByPortalToken(
-        'valid-token'
-      );
+      const result = await exerciseLibraryService.getPrescriptionByPortalToken('valid-token');
 
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('portal_access_token = $1'),
-        ['valid-token']
-      );
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('portal_access_token = $1'), [
+        'valid-token',
+      ]);
       expect(result).toBeTruthy();
     });
 
     it('should return null for expired or invalid token', async () => {
       mockQuery.mockResolvedValueOnce({ rows: [] });
 
-      const result = await exerciseLibraryService.getPrescriptionByPortalToken(
-        'invalid-token'
-      );
+      const result = await exerciseLibraryService.getPrescriptionByPortalToken('invalid-token');
 
       expect(result).toBeNull();
     });
@@ -623,17 +597,11 @@ describe('Exercise Library Service', () => {
           rows: [{ id: 'progress-123', ...progressData }],
         });
 
-      const result = await exerciseLibraryService.recordProgress(
-        'valid-token',
-        progressData
-      );
+      const result = await exerciseLibraryService.recordProgress('valid-token', progressData);
 
       expect(mockQuery).toHaveBeenCalledWith(
         expect.stringContaining('INSERT INTO exercise_progress'),
-        expect.arrayContaining([
-          progressData.setsCompleted,
-          progressData.repsCompleted,
-        ])
+        expect.arrayContaining([progressData.setsCompleted, progressData.repsCompleted])
       );
       expect(result).toHaveProperty('id');
     });
@@ -641,9 +609,9 @@ describe('Exercise Library Service', () => {
     it('should throw error for invalid token', async () => {
       mockQuery.mockResolvedValueOnce({ rows: [] });
 
-      await expect(
-        exerciseLibraryService.recordProgress('invalid-token', {})
-      ).rejects.toThrow('Invalid or expired access token');
+      await expect(exerciseLibraryService.recordProgress('invalid-token', {})).rejects.toThrow(
+        'Invalid or expired access token'
+      );
     });
   });
 
@@ -667,15 +635,12 @@ describe('Exercise Library Service', () => {
       ];
       mockQuery.mockResolvedValueOnce({ rows: mockProgress });
 
-      const result = await exerciseLibraryService.getProgressHistory(
-        organizationId,
-        'rx-123'
-      );
+      const result = await exerciseLibraryService.getProgressHistory(organizationId, 'rx-123');
 
-      expect(mockQuery).toHaveBeenCalledWith(
-        expect.stringContaining('FROM exercise_progress'),
-        [organizationId, 'rx-123']
-      );
+      expect(mockQuery).toHaveBeenCalledWith(expect.stringContaining('FROM exercise_progress'), [
+        organizationId,
+        'rx-123',
+      ]);
       expect(result).toHaveLength(2);
     });
   });

@@ -10,7 +10,7 @@
 
 import express from 'express';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
-import * as progressService from '../services/progressTracking.js';
+import * as progressService from '../services/clinical/progressTracking.js';
 import validate from '../middleware/validation.js';
 import {
   getPatientStatsSchema,

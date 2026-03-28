@@ -30,7 +30,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 }));
 
 // Import after mocking
-const scheduling = await import('../../../src/services/scheduling.js');
+const scheduling = await import('../../../src/services/practice/scheduling.js');
 
 // ---------------------------------------------------------------------------
 // Helpers

@@ -3,7 +3,7 @@
  * Handles HTTP requests for clinical template management
  */
 
-import * as templateService from '../services/templates.js';
+import * as templateService from '../services/clinical/templates.js';
 
 /**
  * Get all templates

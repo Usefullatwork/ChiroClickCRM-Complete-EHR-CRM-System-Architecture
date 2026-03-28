@@ -29,7 +29,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 let sendSMSImpl = () => Promise.resolve({ id: 'sms-1', external_id: 'ext-sms-1' });
 let sendEmailImpl = () => Promise.resolve({ id: 'email-1', external_id: 'ext-email-1' });
 
-jest.unstable_mockModule('../../../src/services/communications.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/communications.js', () => ({
   sendSMS: (...args) => sendSMSImpl(...args),
   sendEmail: (...args) => sendEmailImpl(...args),
 }));
@@ -50,7 +50,7 @@ const {
   getBatches,
   previewMessage,
   getAvailableVariables,
-} = await import('../../../src/services/bulkCommunication.js');
+} = await import('../../../src/services/communication/bulkCommunication.js');
 
 // ---- Helpers ----
 const ORG_ID = 'org-test-001';

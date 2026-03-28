@@ -39,8 +39,8 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 }));
 
 // Import after mocking
-const dataCuration = await import('../../../src/services/dataCuration.js');
-const anonymization = await import('../../../src/services/trainingAnonymization.js');
+const dataCuration = await import('../../../src/services/training/dataCuration.js');
+const anonymization = await import('../../../src/services/training/trainingAnonymization.js');
 
 const {
   getFeedbackForCuration,

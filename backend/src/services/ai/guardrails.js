@@ -10,7 +10,7 @@ let guardrailsService = null;
 let guardrailsAvailable = false;
 let guardrailsLoadError = null;
 try {
-  const guardrails = await import('../guardrails.js');
+  const guardrails = await import('../clinical/guardrails.js');
   guardrailsService = guardrails.guardrailsService;
   guardrailsAvailable = true;
 } catch (e) {

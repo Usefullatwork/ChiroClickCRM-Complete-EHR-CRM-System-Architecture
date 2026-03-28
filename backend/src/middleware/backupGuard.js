@@ -4,7 +4,7 @@
  * Mount BEFORE other middleware so all routes are protected.
  */
 
-import { getIsBackingUp } from '../services/backupService.js';
+import { getIsBackingUp } from '../services/practice/backupService.js';
 
 const backupGuard = (req, res, next) => {
   if (getIsBackingUp()) {

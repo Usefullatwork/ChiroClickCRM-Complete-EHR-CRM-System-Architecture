@@ -4,7 +4,7 @@
  */
 
 import * as automationService from '../services/automations/index.js';
-import * as triggerService from '../services/automationTriggers.js';
+import * as triggerService from '../services/practice/automationTriggers.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 

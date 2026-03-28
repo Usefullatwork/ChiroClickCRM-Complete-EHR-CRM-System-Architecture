@@ -27,7 +27,7 @@ import {
 } from './middleware/security.js';
 import { scheduleKeyRotation, createKeyRotationTable } from './utils/keyRotation.js';
 import { initializeScheduler, shutdownScheduler } from './jobs/scheduler.js';
-import { initializeWebSocket, getIO } from './services/websocket.js';
+import { initializeWebSocket, getIO } from './services/communication/websocket.js';
 import { correlationId } from './middleware/correlationId.js';
 import { auditLogger } from './middleware/auditLogger.js';
 import backupGuard from './middleware/backupGuard.js';
@@ -557,7 +557,7 @@ if (process.env.NODE_ENV !== 'test') {
       // Initialize backup scheduler (desktop mode only)
       if (process.env.DESKTOP_MODE === 'true') {
         try {
-          const { scheduleBackup } = await import('./services/backupService.js');
+          const { scheduleBackup } = await import('./services/practice/backupService.js');
           await scheduleBackup();
           logger.info('Backup scheduler initialized');
         } catch (error) {
@@ -594,7 +594,7 @@ const gracefulShutdown = async (signal) => {
 
   // Stop backup scheduler
   try {
-    const { stopScheduler } = await import('./services/backupService.js');
+    const { stopScheduler } = await import('./services/practice/backupService.js');
     stopScheduler();
   } catch (error) {
     logger.warn('Error stopping backup scheduler:', error.message);

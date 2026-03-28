@@ -3,12 +3,12 @@
  * Handles HTTP requests for SOAP notes and clinical documentation
  */
 
-import * as encounterService from '../services/encounters.js';
-import { ragService } from '../services/rag.js';
+import * as encounterService from '../services/clinical/encounters.js';
+import { ragService } from '../services/training/rag.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 import { NotFoundError } from '../utils/errors.js';
-import { broadcastToOrg } from '../services/websocket.js';
+import { broadcastToOrg } from '../services/communication/websocket.js';
 import { eventBus, DOMAIN_EVENTS } from '../domain/events/index.js';
 
 /**

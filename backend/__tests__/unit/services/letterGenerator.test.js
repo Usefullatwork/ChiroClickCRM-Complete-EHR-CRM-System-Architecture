@@ -38,7 +38,7 @@ const {
   getLetterTypes,
   saveLetter,
   getLetterHistory,
-} = await import('../../../src/services/letterGenerator.js');
+} = await import('../../../src/services/clinical/letterGenerator.js');
 
 describe('Letter Generator Service', () => {
   beforeEach(() => {

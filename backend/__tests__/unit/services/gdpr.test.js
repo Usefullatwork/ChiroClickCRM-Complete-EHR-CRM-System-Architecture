@@ -52,7 +52,7 @@ jest.unstable_mockModule('../../../src/utils/encryption.js', () => ({
 }));
 
 // Import AFTER mocks
-const gdprService = await import('../../../src/services/gdpr.js');
+const gdprService = await import('../../../src/services/practice/gdpr.js');
 const encryptionModule = await import('../../../src/utils/encryption.js');
 
 // =============================================================================

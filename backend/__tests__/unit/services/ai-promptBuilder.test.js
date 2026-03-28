@@ -28,7 +28,7 @@ jest.unstable_mockModule('../../../src/config/database.js', () => ({
 const mockValidateClinicalContent = jest.fn();
 const mockCheckRedFlagsInContent = jest.fn();
 const mockCheckMedicationWarnings = jest.fn();
-jest.unstable_mockModule('../../../src/services/clinicalValidation.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/clinicalValidation.js', () => ({
   validateClinicalContent: mockValidateClinicalContent,
   checkRedFlagsInContent: mockCheckRedFlagsInContent,
   checkMedicationWarnings: mockCheckMedicationWarnings,

@@ -2,11 +2,14 @@
  * Appointments Controller
  */
 
-import * as appointmentService from '../services/appointments.js';
+import * as appointmentService from '../services/practice/appointments.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
-import { broadcastToOrg } from '../services/websocket.js';
-import { scheduleReminder, cancelReminders } from '../services/appointmentReminders.js';
+import { broadcastToOrg } from '../services/communication/websocket.js';
+import {
+  scheduleReminder,
+  cancelReminders,
+} from '../services/communication/appointmentReminders.js';
 
 export const getAppointmentById = async (req, res) => {
   try {

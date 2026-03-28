@@ -14,7 +14,8 @@
 import { useState, useCallback, lazy, Suspense } from 'react';
 import { Layers, Box, User, ChevronDown, ChevronUp, Settings } from 'lucide-react';
 import QuickPalpationSpine from './QuickPalpationSpine';
-import { EnhancedSpineDiagram, EnhancedBodyDiagram } from '../anatomy';
+import EnhancedSpineDiagram from '../anatomy/spine/EnhancedSpineDiagram';
+import EnhancedBodyDiagram from '../anatomy/body/EnhancedBodyDiagram';
 
 // Lazy-load Three.js 3D viewer (~300KB)
 const Spine3DViewer = lazy(() => import('../anatomy/spine/Spine3DViewer'));
