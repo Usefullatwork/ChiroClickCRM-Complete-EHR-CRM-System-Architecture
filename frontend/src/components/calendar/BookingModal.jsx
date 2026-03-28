@@ -18,6 +18,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { patientsAPI } from '../../services/api';
 import { format, parseISO, addMinutes } from 'date-fns';
+import { useTranslation } from '../../i18n';
 import { nb } from 'date-fns/locale';
 import {
   X,
@@ -61,6 +62,7 @@ const DEFAULT_DURATIONS_BY_TYPE = {
 // =============================================================================
 
 function PatientSearch({ _value, _onChange, selectedPatient, onSelect, onClear }) {
+  const { t } = useTranslation('appointments');
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -118,7 +120,7 @@ function PatientSearch({ _value, _onChange, selectedPatient, onSelect, onClear }
           type="text"
           value={searchTerm}
           onChange={handleSearch}
-          placeholder="Sok etter pasient (navn, telefon, e-post)..."
+          placeholder={t('searchPatientBooking', 'Søk etter pasient (navn, telefon, e-post)...')}
           className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
         />
         {isLoading && (
@@ -131,7 +133,9 @@ function PatientSearch({ _value, _onChange, selectedPatient, onSelect, onClear }
         <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
           {patients.length === 0 ? (
             <div className="p-4 text-center text-gray-500 dark:text-gray-400">
-              {searchTerm.length < 2 ? 'Skriv minst 2 tegn for a soke' : 'Ingen pasienter funnet'}
+              {searchTerm.length < 2
+                ? t('minCharsToSearch', 'Skriv minst 2 tegn for å søke')
+                : t('noPatientsFound', 'Ingen pasienter funnet')}
             </div>
           ) : (
             <ul className="py-1">
@@ -181,8 +185,11 @@ function ConflictWarning({ conflicts }) {
             Denne tiden overlapper med eksisterende avtaler:
           </p>
           <ul className="mt-2 space-y-1">
-            {conflicts.map((conflict, index) => (
-              <li key={index} className="text-sm text-red-700">
+            {conflicts.map((conflict) => (
+              <li
+                key={`${conflict.start_time}-${conflict.patient_name}`}
+                className="text-sm text-red-700"
+              >
                 {format(parseISO(conflict.start_time), 'HH:mm')} -{' '}
                 {format(parseISO(conflict.end_time), 'HH:mm')}: {conflict.patient_name}
               </li>
@@ -212,6 +219,7 @@ export default function BookingModal({
   typeOptions,
 }) {
   const confirm = useConfirm();
+  const { t } = useTranslation('appointments');
 
   // Form state
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -518,7 +526,7 @@ export default function BookingModal({
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
-                placeholder="Eventuell informasjon om avtalen..."
+                placeholder={t('appointmentInfoPlaceholder', 'Eventuell informasjon om avtalen...')}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
               />
             </div>
@@ -533,7 +541,7 @@ export default function BookingModal({
                       <textarea
                         value={cancelReason}
                         onChange={(e) => setCancelReason(e.target.value)}
-                        placeholder="Arsak til avlysning..."
+                        placeholder={t('cancellationReasonPlaceholder', 'Arsak til avlysning...')}
                         rows={2}
                         className="w-full px-3 py-2 border border-red-300 rounded-lg focus:ring-2 focus:ring-red-500 mb-3 resize-none"
                       />

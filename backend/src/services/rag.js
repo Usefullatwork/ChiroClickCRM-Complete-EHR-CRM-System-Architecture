@@ -332,7 +332,9 @@ class RAGService {
 
     // Execute hybrid search
     const result = await pool.query(
-      `SELECT * FROM hybrid_search_chunks($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+      `SELECT chunk_id, patient_id, visit_date, soap_section, chunk_text,
+              vector_score, keyword_score, hybrid_score, metadata
+       FROM hybrid_search_chunks($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
       [
         toPgVector(queryEmbedding),
         query,

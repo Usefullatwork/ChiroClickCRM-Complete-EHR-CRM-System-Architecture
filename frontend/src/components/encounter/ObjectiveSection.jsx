@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import EnhancedClinicalTextarea from '../clinical/EnhancedClinicalTextarea';
 import AITextarea from '../clinical/AITextarea';
+import { useTranslation } from '../../i18n';
 
 const ExamPanelManager = lazy(() =>
   import('./ExamPanelManager').then((m) => ({ default: m.ExamPanelManager }))
@@ -19,6 +20,7 @@ export function ObjectiveSection({
   handleNeuroExamChange,
   onAnatomyInsertText,
 }) {
+  const { t } = useTranslation('clinical');
   return (
     <section
       key="objective"
@@ -39,7 +41,7 @@ export function ObjectiveSection({
           <EnhancedClinicalTextarea
             value={encounterData.objective.observation}
             onChange={(val) => updateField('objective', 'observation', val)}
-            placeholder="Observasjon (holdning, gange)..."
+            placeholder={t('observationPlaceholder', 'Observasjon (holdning, gange)...')}
             label="Observasjon"
             section="objective"
             field="observation"
@@ -66,7 +68,7 @@ export function ObjectiveSection({
         <AITextarea
           value={encounterData.objective.rom}
           onChange={(val) => updateField('objective', 'rom', val)}
-          placeholder="Range of Motion (ROM)..."
+          placeholder={t('romPlaceholder', 'Range of Motion (ROM)...')}
           fieldType="rom"
           context={{ chiefComplaint: encounterData.subjective?.chief_complaint }}
           disabled={isSigned}
@@ -90,7 +92,7 @@ export function ObjectiveSection({
         <AITextarea
           value={encounterData.objective.ortho_tests}
           onChange={(val) => updateField('objective', 'ortho_tests', val)}
-          placeholder="Ortopediske tester (sammendrag)..."
+          placeholder={t('orthoTestsSummaryPlaceholder', 'Ortopediske tester (sammendrag)...')}
           fieldType="ortho_tests"
           context={{ chiefComplaint: encounterData.subjective?.chief_complaint }}
           disabled={isSigned}
@@ -101,7 +103,7 @@ export function ObjectiveSection({
         <AITextarea
           value={encounterData.objective.neuro_tests}
           onChange={(val) => updateField('objective', 'neuro_tests', val)}
-          placeholder="Nevrologiske tester (sammendrag)..."
+          placeholder={t('neuroTestsSummaryPlaceholder', 'Nevrologiske tester (sammendrag)...')}
           fieldType="neuro_tests"
           context={{ chiefComplaint: encounterData.subjective?.chief_complaint }}
           disabled={isSigned}

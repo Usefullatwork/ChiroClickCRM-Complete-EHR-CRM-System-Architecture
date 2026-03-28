@@ -9,6 +9,7 @@ export const LoadingSpinner = ({
   className = '',
   label = 'Laster...',
 }) => {
+  const { t } = useTranslation('common');
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-8 h-8',
@@ -95,7 +96,7 @@ export const Skeleton = ({ className = '', variant = 'text', width, height }) =>
       className={`animate-pulse bg-gray-200 ${variantClasses[variant]} ${className}`}
       style={style}
       role="status"
-      aria-label="Laster..."
+      aria-label={t('loading', 'Laster...')}
     />
   );
 };

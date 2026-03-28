@@ -184,7 +184,7 @@ const ExerciseLibrary = ({
                     ? 'bg-blue-50 text-blue-600'
                     : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50'
                 }`}
-                aria-label="Rutenettvisning"
+                aria-label={t('gridView', 'Rutenettvisning')}
               >
                 <Grid className="w-4 h-4" />
               </button>
@@ -195,7 +195,7 @@ const ExerciseLibrary = ({
                     ? 'bg-blue-50 text-blue-600'
                     : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50'
                 }`}
-                aria-label="Listevisning"
+                aria-label={t('listView', 'Listevisning')}
               >
                 <List className="w-4 h-4" />
               </button>
@@ -481,7 +481,7 @@ const ExerciseLibrary = ({
                           onEditExercise(exercise);
                         }}
                         className="p-2 bg-white rounded-full shadow hover:bg-gray-50 active:bg-gray-100 min-w-[36px] min-h-[36px] flex items-center justify-center touch-manipulation"
-                        aria-label="Rediger"
+                        aria-label={t('edit', 'Rediger')}
                       >
                         <Edit className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                       </button>
@@ -493,7 +493,7 @@ const ExerciseLibrary = ({
                           onDeleteExercise(exercise);
                         }}
                         className="p-2 bg-white rounded-full shadow hover:bg-red-50 active:bg-red-100 min-w-[36px] min-h-[36px] flex items-center justify-center touch-manipulation"
-                        aria-label="Slett"
+                        aria-label={t('deleteBtn', 'Slett')}
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </button>
@@ -575,7 +575,7 @@ const ExerciseLibrary = ({
                         setVideoExercise(exercise);
                       }}
                       className="p-2 text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 active:bg-blue-200 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center touch-manipulation"
-                      aria-label="Se video"
+                      aria-label={t('watchVideo', 'Se video')}
                     >
                       <Play className="w-4 h-4" />
                     </button>
@@ -587,7 +587,7 @@ const ExerciseLibrary = ({
                         setDetailExercise(exercise);
                       }}
                       className="p-2 text-gray-600 dark:text-gray-300 bg-gray-50 rounded-lg hover:bg-gray-100 active:bg-gray-200 transition-colors min-w-[40px] min-h-[40px] flex items-center justify-center touch-manipulation"
-                      aria-label="Vis detaljer"
+                      aria-label={t('showDetails', 'Vis detaljer')}
                     >
                       <Info className="w-4 h-4" />
                     </button>
@@ -604,7 +604,7 @@ const ExerciseLibrary = ({
                           onEditExercise(exercise);
                         }}
                         className="p-2 hover:bg-gray-100 active:bg-gray-200 rounded-lg min-w-[40px] min-h-[40px] flex items-center justify-center touch-manipulation"
-                        aria-label="Rediger"
+                        aria-label={t('edit', 'Rediger')}
                       >
                         <Edit className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                       </button>
@@ -616,7 +616,7 @@ const ExerciseLibrary = ({
                           onDeleteExercise(exercise);
                         }}
                         className="p-2 hover:bg-red-50 active:bg-red-100 rounded-lg min-w-[40px] min-h-[40px] flex items-center justify-center touch-manipulation"
-                        aria-label="Slett"
+                        aria-label={t('deleteBtn', 'Slett')}
                       >
                         <Trash2 className="w-4 h-4 text-red-500" />
                       </button>
@@ -669,7 +669,7 @@ const ExerciseLibrary = ({
               <button
                 onClick={() => setDetailExercise(null)}
                 className="p-2 hover:bg-gray-100 active:bg-gray-200 rounded-lg min-w-[44px] min-h-[44px] flex items-center justify-center flex-shrink-0 touch-manipulation"
-                aria-label="Lukk"
+                aria-label={t('close', 'Lukk')}
               >
                 <X className="w-5 h-5" />
               </button>

@@ -15,7 +15,7 @@ import {
   ChevronDown,
   ChevronUp,
   Bell,
-  Brain,
+  Brain as _Brain,
   AlertCircle,
   AlertTriangle,
   Mail,
@@ -364,7 +364,7 @@ export default function Dashboard() {
                     {t('rebookingRate', 'Gjenbookingsrate')}
                   </p>
                   <p className="text-lg font-bold text-gray-900 dark:text-white">
-                    {stats?.rebooking_rate != null ? `${stats.rebooking_rate}%` : '—'}
+                    {stats?.rebooking_rate !== null ? `${stats.rebooking_rate}%` : '—'}
                   </p>
                 </div>
               </div>
@@ -379,7 +379,7 @@ export default function Dashboard() {
                     {t('availableCapacity', 'Ledig kapasitet')}
                   </p>
                   <p className="text-lg font-bold text-gray-900 dark:text-white">
-                    {stats?.available_slots != null ? stats.available_slots : '—'}
+                    {stats?.available_slots !== null ? stats.available_slots : '—'}
                   </p>
                   <p className="text-xs text-gray-400 dark:text-gray-300">
                     {t('slotsToday', 'ledige timer i dag')}

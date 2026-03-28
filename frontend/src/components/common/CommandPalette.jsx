@@ -39,14 +39,20 @@ function fuzzyMatch(text, query) {
   const lower = text.toLowerCase();
   const q = query.toLowerCase();
   const idx = lower.indexOf(q);
-  if (idx === -1) return null;
+  if (idx === -1) {
+    return null;
+  }
   return { start: idx, end: idx + q.length };
 }
 
 function HighlightText({ text, query }) {
-  if (!query) return text;
+  if (!query) {
+    return text;
+  }
   const match = fuzzyMatch(text, query);
-  if (!match) return text;
+  if (!match) {
+    return text;
+  }
   return (
     <>
       {text.slice(0, match.start)}
@@ -105,12 +111,16 @@ export default function CommandPalette({ isOpen, onClose }) {
 
   // Filter nav and action items
   const filteredNav = useMemo(() => {
-    if (!query) return NAV_ITEMS;
+    if (!query) {
+      return NAV_ITEMS;
+    }
     return NAV_ITEMS.filter((item) => fuzzyMatch(item.label, query));
   }, [query]);
 
   const filteredActions = useMemo(() => {
-    if (!query) return ACTION_ITEMS;
+    if (!query) {
+      return ACTION_ITEMS;
+    }
     return ACTION_ITEMS.filter((item) => fuzzyMatch(item.label, query));
   }, [query]);
 
@@ -184,7 +194,9 @@ export default function CommandPalette({ isOpen, onClose }) {
     el?.scrollIntoView({ block: 'nearest' });
   }, [activeIndex]);
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   let flatIndex = 0;
   const getIdx = () => flatIndex++;
@@ -263,7 +275,7 @@ export default function CommandPalette({ isOpen, onClose }) {
                         <HighlightText text={name} query={query} />
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">
-                        {age != null && (
+                        {age !== null && (
                           <span>
                             {age} {t('years', 'ar')}
                           </span>

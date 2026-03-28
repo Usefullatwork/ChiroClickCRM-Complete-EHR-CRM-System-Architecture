@@ -243,7 +243,7 @@ export default function Settings() {
     {
       id: 'exercises',
       icon: Dumbbell,
-      label: lang === 'no' ? 'Øvelser' : 'Exercises',
+      label: t('exercises', 'Øvelser'),
       activeClass: 'border-green-600 text-green-600',
     },
     {

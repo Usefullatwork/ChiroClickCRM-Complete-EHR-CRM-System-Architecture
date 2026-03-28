@@ -7,7 +7,7 @@ import axios from 'axios';
 import logger from '../../utils/logger.js';
 
 const OLLAMA_BASE_URL = process.env.OLLAMA_BASE_URL || 'http://localhost:11434';
-const AI_MODEL = process.env.AI_MODEL || 'chiro-no-sft-dpo-v5';
+const AI_MODEL = process.env.AI_MODEL || 'chiro-no-sft-dpo-v6';
 const AI_ENABLED = process.env.AI_ENABLED !== 'false';
 
 // Per-task model env var overrides
@@ -28,7 +28,19 @@ const _currentLoadedModel = null;
  * Base models are vanilla Qwen2.5; LoRA variants are fine-tuned on clinical data
  */
 export const MODEL_CONFIG = {
-  // === Primary model: SFT+DPO merged (best quality, 77% eval) ===
+  // === Primary model: SFT+DPO v6 (best quality, 96% eval) ===
+  'chiro-no-sft-dpo-v6': {
+    name: 'chiro-no-sft-dpo-v6',
+    base: 'Qwen2.5-7B-Instruct + SFT + DPO v6',
+    description: 'SFT+DPO merged clinical model (96% eval, Q8_0 GGUF)',
+    size: '~8.1GB',
+    maxTokens: 4096,
+    temperature: 0.3,
+    evalScore: '96%',
+    fallbackModel: 'chiro-no-sft-dpo-v5',
+  },
+
+  // === Fallback: SFT+DPO v5 (previous generation) ===
   'chiro-no-sft-dpo-v5': {
     name: 'chiro-no-sft-dpo-v5',
     base: 'Qwen2.5-7B-Instruct + SFT + DPO',
@@ -40,7 +52,7 @@ export const MODEL_CONFIG = {
     fallbackModel: 'chiro-no-lora-v5',
   },
 
-  // === SFT-only fallback (for A/B testing) ===
+  // === SFT-only fallback (legacy) ===
   'chiro-no-lora-v5': {
     name: 'chiro-no-lora-v5',
     base: 'Qwen2.5-7B-Instruct + LoRA v5',
@@ -78,11 +90,11 @@ export const MODEL_CONFIG = {
  */
 export const MODEL_ROUTING = {
   // SOAP & clinical documentation
-  soap_notes: 'chiro-no-sft-dpo-v5',
-  clinical_summary: 'chiro-no-sft-dpo-v5',
-  journal_organization: 'chiro-no-sft-dpo-v5',
-  diagnosis_suggestion: 'chiro-no-sft-dpo-v5',
-  sick_leave: 'chiro-no-sft-dpo-v5',
+  soap_notes: 'chiro-no-sft-dpo-v6',
+  clinical_summary: 'chiro-no-sft-dpo-v6',
+  journal_organization: 'chiro-no-sft-dpo-v6',
+  diagnosis_suggestion: 'chiro-no-sft-dpo-v6',
+  sick_leave: 'chiro-no-sft-dpo-v6',
 
   // Fast autocomplete
   autocomplete: 'chiro-fast',
@@ -91,39 +103,46 @@ export const MODEL_ROUTING = {
   quick_suggestion: 'chiro-fast',
 
   // Letters & reports
-  referral_letter: 'chiro-no-sft-dpo-v5',
-  report_writing: 'chiro-no-sft-dpo-v5',
+  referral_letter: 'chiro-no-sft-dpo-v6',
+  report_writing: 'chiro-no-sft-dpo-v6',
 
   // Communication
-  patient_communication: 'chiro-no-sft-dpo-v5',
-  patient_education: 'chiro-no-sft-dpo-v5',
-  consent_form: 'chiro-no-sft-dpo-v5',
+  patient_communication: 'chiro-no-sft-dpo-v6',
+  patient_education: 'chiro-no-sft-dpo-v6',
+  consent_form: 'chiro-no-sft-dpo-v6',
 
   // Norwegian
-  norwegian_text: 'chiro-no-sft-dpo-v5',
+  norwegian_text: 'chiro-no-sft-dpo-v6',
 
   // Safety & red flags
-  red_flag_analysis: 'chiro-no-sft-dpo-v5',
+  red_flag_analysis: 'chiro-no-sft-dpo-v6',
   differential_diagnosis: 'chiro-medical',
-  treatment_safety: 'chiro-no-sft-dpo-v5',
+  treatment_safety: 'chiro-no-sft-dpo-v6',
   clinical_reasoning: 'chiro-medical',
   medication_interaction: 'chiro-medical',
-  contraindication_check: 'chiro-no-sft-dpo-v5',
+  contraindication_check: 'chiro-no-sft-dpo-v6',
+
+  // v2.1 patient connectivity tasks
+  message_draft: 'chiro-no-sft-dpo-v6',
+  message_categorize: 'chiro-no-sft-dpo-v6',
+  document_summary: 'chiro-no-sft-dpo-v6',
+  exercise_instruction: 'chiro-no-sft-dpo-v6',
+  booking_intelligence: 'chiro-no-sft-dpo-v6',
 };
 
 /**
  * A/B Testing Configuration
  */
 export const AB_SPLIT_CONFIG = {
+  'chiro-no-sft-dpo-v7': {
+    loraModel: 'chiro-no-sft-dpo-v6',
+    loraPercent: parseInt(process.env.AB_SPLIT_V7 || '0', 10),
+    enabled: process.env.AB_SPLIT_V7 !== undefined,
+  },
   'chiro-no-sft-dpo-v6': {
     loraModel: 'chiro-no-sft-dpo-v5',
     loraPercent: parseInt(process.env.AB_SPLIT_V6 || '0', 10),
     enabled: process.env.AB_SPLIT_V6 !== undefined,
-  },
-  'chiro-no-sft-dpo-v5': {
-    loraModel: 'chiro-no-lora-v5',
-    loraPercent: parseInt(process.env.AB_SPLIT_NO || '0', 10),
-    enabled: process.env.AB_SPLIT_NO !== undefined,
   },
 };
 
@@ -146,8 +165,13 @@ const TASK_ENV_OVERRIDES = {
   medication_interaction: AI_MODEL_MEDICAL,
   patient_communication: AI_MODEL_COMMS,
   patient_education: AI_MODEL_COMMS,
+  message_draft: AI_MODEL_COMMS,
+  message_categorize: AI_MODEL_COMMS,
   referral_letter: AI_MODEL_LETTERS,
   report_writing: AI_MODEL_LETTERS,
+  document_summary: AI_MODEL_LETTERS,
+  exercise_instruction: AI_MODEL_COMMS,
+  booking_intelligence: AI_MODEL_COMMS,
 };
 
 // Model availability cache — refreshed every 5 minutes
@@ -297,6 +321,11 @@ export const calculateConfidence = (response, taskType, modelName) => {
       'patient_communication',
       'patient_education',
       'consent_form',
+      'message_draft',
+      'message_categorize',
+      'document_summary',
+      'exercise_instruction',
+      'booking_intelligence',
       'general',
     ],
   };
@@ -354,7 +383,7 @@ export const getModelForField = async (fieldType) => {
     const result = await getModelForTask(taskType);
     return result.model;
   }
-  return AI_MODEL || 'chiro-no-sft-dpo-v5';
+  return AI_MODEL || 'chiro-no-sft-dpo-v6';
 };
 
 /**

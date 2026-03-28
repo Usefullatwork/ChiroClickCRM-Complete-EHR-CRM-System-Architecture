@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { authAPI, setOrganizationId } from '../services/api';
+import { useTranslation } from '../i18n';
 
 import logger from '../utils/logger';
 export default function Login() {
+  const { t } = useTranslation('common');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -69,7 +71,7 @@ export default function Login() {
                 required
                 data-testid="login-email-input"
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                placeholder={t('emailAddressPlaceholder', 'Email address')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -86,7 +88,7 @@ export default function Login() {
                 required
                 data-testid="login-password-input"
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+                placeholder={t('passwordPlaceholder', 'Password')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />

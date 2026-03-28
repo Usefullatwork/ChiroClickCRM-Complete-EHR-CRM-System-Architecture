@@ -3,7 +3,7 @@
  * Admin endpoints for managing AI model retraining
  */
 
-import * as aiRetrainingService from '../services/aiRetraining.js';
+import { aiRetrainingService } from '../application/services/AIRetrainingService.js';
 import * as rlaifService from '../services/rlaif.js';
 import * as schedulerService from '../jobs/scheduler.js';
 import logger from '../utils/logger.js';
@@ -18,7 +18,7 @@ export const triggerRetraining = async (req, res) => {
 
     logger.info('Manual retraining triggered by admin', {
       userId: req.user?.id,
-      dryRun
+      dryRun,
     });
 
     // Check if retraining is already in progress
@@ -27,7 +27,7 @@ export const triggerRetraining = async (req, res) => {
       return res.status(409).json({
         success: false,
         error: 'Retraining already in progress',
-        currentEvent: status.currentEvent
+        currentEvent: status.currentEvent,
       });
     }
 
@@ -36,13 +36,13 @@ export const triggerRetraining = async (req, res) => {
       const result = await aiRetrainingService.runRetrainingPipeline({
         trigger: 'manual',
         dryRun: true,
-        ...options
+        ...options,
       });
 
       return res.json({
         success: true,
         message: 'Dry run completed',
-        data: result
+        data: result,
       });
     }
 
@@ -52,7 +52,7 @@ export const triggerRetraining = async (req, res) => {
         await aiRetrainingService.runRetrainingPipeline({
           trigger: 'manual',
           dryRun: false,
-          ...options
+          ...options,
         });
       } catch (error) {
         logger.error('Background retraining failed:', error);
@@ -62,14 +62,14 @@ export const triggerRetraining = async (req, res) => {
     res.json({
       success: true,
       message: 'Retraining pipeline started in background',
-      note: 'Check /retraining/status for progress'
+      note: 'Check /retraining/status for progress',
     });
   } catch (error) {
     logger.error('Error triggering retraining:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to trigger retraining',
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -103,18 +103,20 @@ export const getRetrainingStatus = async (req, res) => {
       data: {
         retraining: status,
         rlaif: rlaifStats,
-        scheduler: schedulerStatus ? {
-          timezone: schedulerStatus.timezone,
-          retrainingJob: schedulerStatus.jobs?.find(j => j.name === 'checkRetrainingNeeded')
-        } : null
-      }
+        scheduler: schedulerStatus
+          ? {
+              timezone: schedulerStatus.timezone,
+              retrainingJob: schedulerStatus.jobs?.find((j) => j.name === 'checkRetrainingNeeded'),
+            }
+          : null,
+      },
     });
   } catch (error) {
     logger.error('Error getting retraining status:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to get retraining status',
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -133,15 +135,15 @@ export const getRetrainingHistory = async (req, res) => {
       success: true,
       data: {
         count: history.length,
-        events: history
-      }
+        events: history,
+      },
     });
   } catch (error) {
     logger.error('Error getting retraining history:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to get retraining history',
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -156,7 +158,7 @@ export const rollbackModel = async (req, res) => {
 
     logger.info('Model rollback requested', {
       userId: req.user?.id,
-      targetVersion
+      targetVersion,
     });
 
     const result = await aiRetrainingService.rollbackModel(targetVersion);
@@ -164,14 +166,14 @@ export const rollbackModel = async (req, res) => {
     res.json({
       success: true,
       message: 'Model rolled back successfully',
-      data: result
+      data: result,
     });
   } catch (error) {
     logger.error('Error rolling back model:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to rollback model',
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -186,21 +188,21 @@ export const testModel = async (req, res) => {
 
     logger.info('Model test requested', {
       userId: req.user?.id,
-      modelName
+      modelName,
     });
 
     const result = await aiRetrainingService.testNewModel(modelName);
 
     res.json({
       success: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     logger.error('Error testing model:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to test model',
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -216,19 +218,19 @@ export const exportFeedback = async (req, res) => {
     const result = await aiRetrainingService.exportFeedbackToTrainingFormat({
       minRating,
       days,
-      includeRejected
+      includeRejected,
     });
 
     res.json({
       success: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     logger.error('Error exporting feedback:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to export feedback',
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -244,25 +246,25 @@ export const generatePreferencePairs = async (req, res) => {
     if (!suggestions || !Array.isArray(suggestions) || suggestions.length < 2) {
       return res.status(400).json({
         success: false,
-        error: 'At least 2 suggestions required to generate preference pairs'
+        error: 'At least 2 suggestions required to generate preference pairs',
       });
     }
 
     const result = await rlaifService.generatePreferencePairs(suggestions, {
       suggestionType,
-      maxPairs
+      maxPairs,
     });
 
     res.json({
       success: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     logger.error('Error generating preference pairs:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to generate preference pairs',
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -278,25 +280,25 @@ export const evaluateSuggestion = async (req, res) => {
     if (!suggestion) {
       return res.status(400).json({
         success: false,
-        error: 'Suggestion text required'
+        error: 'Suggestion text required',
       });
     }
 
     const result = await rlaifService.evaluateSuggestionQuality(suggestion, {
       suggestionType,
-      contextData
+      contextData,
     });
 
     res.json({
       success: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     logger.error('Error evaluating suggestion:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to evaluate suggestion',
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -311,14 +313,14 @@ export const getRLAIFStats = async (req, res) => {
 
     res.json({
       success: true,
-      data: stats
+      data: stats,
     });
   } catch (error) {
     logger.error('Error getting RLAIF stats:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to get RLAIF stats',
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -334,13 +336,13 @@ export const triggerScheduledJob = async (req, res) => {
     if (!jobName) {
       return res.status(400).json({
         success: false,
-        error: 'Job name required'
+        error: 'Job name required',
       });
     }
 
     logger.info('Scheduled job manually triggered', {
       userId: req.user?.id,
-      jobName
+      jobName,
     });
 
     const result = await schedulerService.triggerJob(jobName);
@@ -348,14 +350,14 @@ export const triggerScheduledJob = async (req, res) => {
     res.json({
       success: true,
       message: `Job ${jobName} triggered`,
-      data: result
+      data: result,
     });
   } catch (error) {
     logger.error('Error triggering scheduled job:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to trigger scheduled job',
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -370,14 +372,14 @@ export const getSchedulerStatus = async (req, res) => {
 
     res.json({
       success: true,
-      data: status
+      data: status,
     });
   } catch (error) {
     logger.error('Error getting scheduler status:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to get scheduler status',
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -390,13 +392,13 @@ export const getQualityCriteria = async (req, res) => {
   try {
     res.json({
       success: true,
-      data: rlaifService.QUALITY_CRITERIA
+      data: rlaifService.QUALITY_CRITERIA,
     });
   } catch (error) {
     logger.error('Error getting quality criteria:', error);
     res.status(500).json({
       success: false,
-      error: 'Failed to get quality criteria'
+      error: 'Failed to get quality criteria',
     });
   }
 };
@@ -412,19 +414,19 @@ export const augmentTrainingData = async (req, res) => {
     const result = await rlaifService.augmentTrainingData({
       baseExamples,
       targetCount,
-      suggestionType
+      suggestionType,
     });
 
     res.json({
       success: true,
-      data: result
+      data: result,
     });
   } catch (error) {
     logger.error('Error augmenting training data:', error);
     res.status(500).json({
       success: false,
       error: 'Failed to augment training data',
-      details: error.message
+      details: error.message,
     });
   }
 };
@@ -442,5 +444,5 @@ export default {
   triggerScheduledJob,
   getSchedulerStatus,
   getQualityCriteria,
-  augmentTrainingData
+  augmentTrainingData,
 };

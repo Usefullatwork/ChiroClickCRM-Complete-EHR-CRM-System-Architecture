@@ -2,10 +2,19 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import PatientSearch from '../../components/PatientSearch';
 
+// Mock i18n
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({
+    t: (key, fallback) => fallback || key,
+    lang: 'no',
+    setLang: vi.fn(),
+  }),
+}));
+
 describe('PatientSearch Component', () => {
   it('should render search input', () => {
     render(<PatientSearch onSelect={vi.fn()} />);
-    expect(screen.getByPlaceholderText(/sok etter pasienter/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/s.k etter pasienter/i)).toBeInTheDocument();
   });
 
   it('should debounce search input', async () => {
@@ -14,7 +23,7 @@ describe('PatientSearch Component', () => {
 
     render(<PatientSearch onSearch={onSearch} onSelect={vi.fn()} />);
 
-    const input = screen.getByPlaceholderText(/sok etter pasienter/i);
+    const input = screen.getByPlaceholderText(/s.k etter pasienter/i);
     fireEvent.change(input, { target: { value: 'Ola' } });
 
     // Should not call immediately

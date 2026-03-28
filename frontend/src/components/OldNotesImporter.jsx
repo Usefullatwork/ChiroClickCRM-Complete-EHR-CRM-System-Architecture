@@ -359,7 +359,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                 <div className="space-y-3">
                   <div className="max-h-96 overflow-y-auto space-y-3">
                     {multipleNotes.map((note, index) => (
-                      <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                      <div key={`note-${index}`} className="border rounded-lg p-3 bg-gray-50">
                         <div className="flex justify-between items-center mb-2">
                           <span className="font-medium text-sm">
                             {t('noteNumber', 'Notat {num}').replace('{num}', index + 1)}

@@ -5,10 +5,11 @@
  * Clinical notes and SOAP documentation management
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { useConfirm } from '../components/ui/ConfirmDialog';
+import { useTranslation } from '../i18n';
 import {
   FileText,
   Plus,
@@ -44,6 +45,7 @@ export default function ClinicalNotes() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const confirm = useConfirm();
+  const { t } = useTranslation();
 
   // State management
   const [selectedPatientId, setSelectedPatientId] = useState(routePatientId || null);
@@ -58,6 +60,31 @@ export default function ClinicalNotes() {
   const [showPreview, setShowPreview] = useState(false);
   const [previewNoteId, setPreviewNoteId] = useState(null);
   const [showNewNoteMenu, setShowNewNoteMenu] = useState(false);
+
+  // Dismiss overlays on Escape key
+  const handleGlobalKeyDown = useCallback(
+    (e) => {
+      if (e.key === 'Escape') {
+        if (showPatientSelector) {
+          setShowPatientSelector(false);
+        } else if (showNewNoteMenu) {
+          setShowNewNoteMenu(false);
+        } else if (showPreview) {
+          setShowPreview(false);
+          setPreviewNoteId(null);
+        } else if (showNoteEditor) {
+          setShowNoteEditor(false);
+          setSelectedNoteId(null);
+        }
+      }
+    },
+    [showPatientSelector, showNewNoteMenu, showPreview, showNoteEditor]
+  );
+
+  useEffect(() => {
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [handleGlobalKeyDown]);
 
   // Get note type from URL if present
   useEffect(() => {
@@ -80,7 +107,11 @@ export default function ClinicalNotes() {
   });
 
   // Fetch selected patient details
-  const { data: selectedPatient, isLoading: _patientLoading } = useQuery({
+  const {
+    data: selectedPatient,
+    isLoading: patientLoading,
+    isError: patientError,
+  } = useQuery({
     queryKey: ['patient', selectedPatientId],
     queryFn: () => api.patients.getById(selectedPatientId),
     enabled: !!selectedPatientId,
@@ -253,8 +284,11 @@ export default function ClinicalNotes() {
    */
   const handleDeleteNote = async (noteId) => {
     const ok = await confirm({
-      title: 'Slett notat',
-      description: 'Er du sikker på at du vil slette dette notatet? Dette kan ikke angres.',
+      title: t('deleteNoteTitle', 'Slett notat'),
+      description: t(
+        'deleteNoteConfirm',
+        'Er du sikker på at du vil slette dette notatet? Dette kan ikke angres.'
+      ),
       variant: 'destructive',
     });
     if (ok) {
@@ -433,13 +467,23 @@ export default function ClinicalNotes() {
                 className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
               >
                 <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
-                {selectedPatient?.data?.first_name || selectedPatient?.first_name ? (
+                {patientLoading ? (
+                  <span className="text-sm text-gray-400 dark:text-gray-500">
+                    {t('clinical.loadingPatient', 'Laster...')}
+                  </span>
+                ) : patientError ? (
+                  <span className="text-sm text-red-600">
+                    {t('clinical.patientLoadError', 'Feil ved lasting')}
+                  </span>
+                ) : selectedPatient?.data?.first_name || selectedPatient?.first_name ? (
                   <span className="text-sm font-medium text-gray-900">
                     {selectedPatient?.data?.first_name || selectedPatient?.first_name}{' '}
                     {selectedPatient?.data?.last_name || selectedPatient?.last_name}
                   </span>
                 ) : (
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Velg pasient...</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {t('clinical.selectPatient', 'Velg pasient')}...
+                  </span>
                 )}
                 <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
               </button>
@@ -491,7 +535,9 @@ export default function ClinicalNotes() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">Forstegangskonsultasjon</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Ny pasient</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          {t('clinical.newPatient', 'Ny pasient')}
+                        </p>
                       </div>
                     </button>
                     <button
@@ -504,7 +550,7 @@ export default function ClinicalNotes() {
                       <div>
                         <p className="font-medium text-gray-900">Oppfolgingskonsultasjon</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
-                          Eksisterende pasient
+                          {t('clinical.existingPatient', 'Eksisterende pasient')}
                         </p>
                       </div>
                     </button>
@@ -516,7 +562,9 @@ export default function ClinicalNotes() {
                         <Activity className="w-4 h-4 text-teal-600" />
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">Vestibular vurdering</p>
+                        <p className="font-medium text-gray-900">
+                          {t('clinical.vestibularAssessment', 'Vestibulær vurdering')}
+                        </p>
                         <p className="text-xs text-gray-500 dark:text-gray-400">
                           Svimmelhet/balanse
                         </p>
@@ -547,7 +595,9 @@ export default function ClinicalNotes() {
                   <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </button>
                 <h2 className="text-lg font-semibold text-gray-900">
-                  {selectedNoteId ? 'Rediger notat' : `Nytt ${getNoteTypeLabel(noteType)} notat`}
+                  {selectedNoteId
+                    ? t('editNote', 'Rediger notat')
+                    : `${t('newNote', 'Nytt')} ${getNoteTypeLabel(noteType)} ${t('noteWord', 'notat')}`}
                 </h2>
               </div>
             </div>
@@ -589,7 +639,9 @@ export default function ClinicalNotes() {
                   </div>
                   <div className="text-left">
                     <p className="font-medium text-gray-900">Forstegangskonsultasjon</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Ny pasient</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('clinical.newPatient', 'Ny pasient')}
+                    </p>
                   </div>
                 </button>
                 <button
@@ -601,7 +653,9 @@ export default function ClinicalNotes() {
                   </div>
                   <div className="text-left">
                     <p className="font-medium text-gray-900">Oppfolgingskonsultasjon</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Eksisterende pasient</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('clinical.existingPatient', 'Eksisterende pasient')}
+                    </p>
                   </div>
                 </button>
                 <button
@@ -612,7 +666,9 @@ export default function ClinicalNotes() {
                     <Activity className="w-5 h-5 text-teal-600" />
                   </div>
                   <div className="text-left">
-                    <p className="font-medium text-gray-900">Vestibular vurdering</p>
+                    <p className="font-medium text-gray-900">
+                      {t('clinical.vestibularAssessment', 'Vestibulær vurdering')}
+                    </p>
                     <p className="text-xs text-gray-500 dark:text-gray-400">Svimmelhet/balanse</p>
                   </div>
                 </button>
@@ -627,7 +683,7 @@ export default function ClinicalNotes() {
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                     <input
                       type="text"
-                      placeholder="Sok i notater..."
+                      placeholder={t('searchNotesPlaceholder', 'Sok i notater...')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -639,7 +695,7 @@ export default function ClinicalNotes() {
                   onChange={(e) => setNoteTypeFilter(e.target.value)}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="all">Alle typer</option>
+                  <option value="all">{t('clinical.allTypes', 'Alle typer')}</option>
                   <option value="soap">SOAP</option>
                   <option value="initial">Forstegangskonsultasjon</option>
                   <option value="followup">Oppfolging</option>
@@ -650,14 +706,14 @@ export default function ClinicalNotes() {
                   value={dateRange.start}
                   onChange={(e) => setDateRange({ ...dateRange, start: e.target.value })}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Fra dato"
+                  placeholder={t('fromDatePlaceholder', 'Fra dato')}
                 />
                 <input
                   type="date"
                   value={dateRange.end}
                   onChange={(e) => setDateRange({ ...dateRange, end: e.target.value })}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Til dato"
+                  placeholder={t('toDatePlaceholder', 'Til dato')}
                 />
               </div>
             </div>
@@ -682,9 +738,16 @@ export default function ClinicalNotes() {
       {/* Patient Selector Modal / Pasientvelger-modal */}
       {showPatientSelector && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl max-w-lg w-full mx-4 overflow-hidden">
+          <div
+            className="bg-white rounded-xl max-w-lg w-full mx-4 overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-label={t('clinical.selectPatient', 'Velg pasient')}
+          >
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h3 className="font-semibold text-gray-900">Velg pasient</h3>
+              <h3 className="font-semibold text-gray-900">
+                {t('clinical.selectPatient', 'Velg pasient')}
+              </h3>
               <button
                 onClick={() => setShowPatientSelector(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg"
@@ -697,7 +760,7 @@ export default function ClinicalNotes() {
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="Sok etter pasient..."
+                  placeholder={t('searchPatientPlaceholder', 'Sok etter pasient...')}
                   value={patientSearchTerm}
                   onChange={(e) => setPatientSearchTerm(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -736,8 +799,8 @@ export default function ClinicalNotes() {
                 ) : (
                   <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                     {patientSearchTerm
-                      ? 'Ingen pasienter funnet'
-                      : 'Skriv for a soke etter pasienter'}
+                      ? t('noPatientsFound', 'Ingen pasienter funnet')
+                      : t('typeToSearchPatients', 'Skriv for a soke etter pasienter')}
                   </div>
                 )}
               </div>

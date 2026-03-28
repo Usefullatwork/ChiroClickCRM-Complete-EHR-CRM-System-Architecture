@@ -3,6 +3,7 @@ import { Activity, Target, Settings } from 'lucide-react';
 import EnhancedClinicalTextarea from '../clinical/EnhancedClinicalTextarea';
 import { TaksterPanel } from './TaksterPanel';
 import { useFeatureModule } from '../../context/FeatureModuleContext';
+import { useTranslation } from '../../i18n/useTranslation';
 
 const BodyChartPanel = lazy(() => import('../examination/BodyChartPanel'));
 const AnatomicalBodyChart = lazy(() => import('../examination/AnatomicalBodyChart'));
@@ -36,6 +37,7 @@ export function PlanSection({
   suggestedCMTCode,
 }) {
   const { isModuleEnabled } = useFeatureModule();
+  const { t } = useTranslation('clinical');
 
   return (
     <section
@@ -48,7 +50,7 @@ export function PlanSection({
           <span className="bg-purple-600 text-white h-6 w-6 rounded-md flex items-center justify-center text-sm font-bold">
             P
           </span>
-          Plan & Behandling
+          {t('planAndTreatment', 'Plan & Behandling')}
         </h3>
         <div className="flex items-center gap-3">
           <span className="text-xs text-slate-500 dark:text-slate-400">VAS Slutt:</span>
@@ -75,7 +77,9 @@ export function PlanSection({
         {/* Treatment Notation Method Indicator */}
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-slate-700">Behandlingsnotasjon:</span>
+            <span className="text-sm font-medium text-slate-700">
+              {t('treatmentNotation', 'Behandlingsnotasjon:')}
+            </span>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium">
               <Target className="h-3 w-3" />
               {getNotationName()}
@@ -86,7 +90,7 @@ export function PlanSection({
             className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 flex items-center gap-1"
           >
             <Settings className="h-3 w-3" />
-            Endre i innstillinger
+            {t('changeInSettings', 'Endre i innstillinger')}
           </button>
         </div>
 
@@ -94,7 +98,9 @@ export function PlanSection({
         {suggestedCMTCode && !isSigned && (
           <div className="p-3 bg-purple-50 border border-purple-100 rounded-lg flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-purple-700">Behandlingskode:</span>
+              <span className="text-xs font-medium text-purple-700">
+                {t('treatmentCode', 'Behandlingskode:')}
+              </span>
               <span className="inline-flex items-center gap-1 px-2 py-0.5 text-xs font-medium bg-purple-100 text-purple-800 rounded-full">
                 {suggestedCMTCode.code}
               </span>
@@ -176,7 +182,7 @@ export function PlanSection({
                       ? 'SOAP narrativ: beskriv behandlingen i detalj...'
                       : 'Utf\u00F8rt behandling...'
             }
-            label="Behandling"
+            label={t('treatment', 'Behandling')}
             section="plan"
             field="treatment"
             disabled={isSigned}
@@ -200,14 +206,18 @@ export function PlanSection({
         {isModuleEnabled('exercise_rx') && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-700">Hjemme{'\u00F8'}velser</span>
+              <span className="text-sm font-medium text-slate-700">
+                {t('homeExercises', 'Hjemmeøvelser')}
+              </span>
               <button
                 onClick={() => setShowExercisePanel(!showExercisePanel)}
                 disabled={isSigned}
                 className="px-3 py-1.5 text-xs font-medium rounded-lg bg-green-100 text-green-700 hover:bg-green-200 transition-colors disabled:opacity-50 flex items-center gap-1.5"
               >
                 <Activity className="w-3.5 h-3.5" />
-                {showExercisePanel ? 'Skjul \u00F8velsesbibliotek' : 'Velg fra bibliotek'}
+                {showExercisePanel
+                  ? t('hideExerciseLibrary', 'Skjul øvelsesbibliotek')
+                  : t('chooseFromLibrary', 'Velg fra bibliotek')}
               </button>
             </div>
             {showExercisePanel && (
@@ -237,8 +247,11 @@ export function PlanSection({
             <EnhancedClinicalTextarea
               value={encounterData.plan.exercises}
               onChange={(val) => updateField('plan', 'exercises', val)}
-              placeholder="Hjemme\u00F8velser og r\u00E5d... (eller velg fra biblioteket over)"
-              label="Hjemme\u00F8velser"
+              placeholder={t(
+                'homeExercisesPlaceholder',
+                'Hjemmeøvelser og råd... (eller velg fra biblioteket over)'
+              )}
+              label={t('homeExercises', 'Hjemmeøvelser')}
               section="plan"
               field="exercises"
               disabled={isSigned}
@@ -251,7 +264,7 @@ export function PlanSection({
 
         {/* Follow-up */}
         <div className="flex items-center gap-4 pt-3 border-t border-slate-100">
-          <span className="text-sm font-medium text-slate-700">Oppf{'\u00F8'}lging:</span>
+          <span className="text-sm font-medium text-slate-700">{t('followUp', 'Oppfølging:')}</span>
           <input
             type="text"
             placeholder="f.eks. 1 uke, 3 behandlinger"

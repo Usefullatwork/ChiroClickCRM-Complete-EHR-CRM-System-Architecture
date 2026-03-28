@@ -229,9 +229,9 @@ export const listPatientsSchema = {
   query: Joi.object({
     page: Joi.number().integer().min(1).default(1),
     limit: Joi.number().integer().min(1).max(100).default(20),
-    status: Joi.string().valid('ACTIVE', 'INACTIVE', 'FINISHED', 'DECEASED'),
-    category: Joi.string().valid('OSLO', 'OUTSIDE_OSLO', 'TRAVELING', 'REFERRED'),
-    search: Joi.string().max(200),
+    status: Joi.string().valid('ACTIVE', 'INACTIVE', 'FINISHED', 'DECEASED').allow(''),
+    category: Joi.string().valid('OSLO', 'OUTSIDE_OSLO', 'TRAVELING', 'REFERRED').allow(''),
+    search: Joi.string().max(200).allow(''),
     // Accept both camelCase (from frontend) and snake_case
     sort_by: Joi.string().valid(
       'name',

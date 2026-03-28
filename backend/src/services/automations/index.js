@@ -9,8 +9,24 @@ export * from './actions.js';
 export * from './engine.js';
 
 import { eventBus, DOMAIN_EVENTS } from '../../domain/events/index.js';
-import { triggerWorkflow as _triggerWorkflow } from './engine.js';
-import { TRIGGER_TYPES as _TRIGGER_TYPES } from './triggers.js';
+import {
+  triggerWorkflow,
+  getWorkflows,
+  getWorkflowById,
+  createWorkflow,
+  updateWorkflow,
+  deleteWorkflow,
+  toggleWorkflow,
+  getWorkflowExecutions,
+  processAutomations,
+  executeWorkflow,
+  testWorkflow,
+  checkAppointmentReminders,
+} from './engine.js';
+import { TRIGGER_TYPES, evaluateTrigger } from './triggers.js';
+import { OPERATORS, evaluateConditions } from './conditions.js';
+import { ACTION_TYPES, executeActions } from './actions.js';
+import { checkDaysSinceVisitTriggers, checkBirthdayTriggers } from '../automationTriggers.js';
 import logger from '../../utils/logger.js';
 
 // Wire encounter domain events to automation engine
@@ -18,9 +34,11 @@ eventBus.on(
   DOMAIN_EVENTS.ENCOUNTER_CREATED,
   async (event) => {
     const orgId = event.metadata?.organizationId;
-    if (!orgId) return;
+    if (!orgId) {
+      return;
+    }
     try {
-      await _triggerWorkflow(orgId, _TRIGGER_TYPES.ENCOUNTER_CREATED, event.payload);
+      await triggerWorkflow(orgId, TRIGGER_TYPES.ENCOUNTER_CREATED, event.payload);
     } catch (err) {
       logger.error('Automation trigger failed for ENCOUNTER_CREATED:', { error: err.message });
     }
@@ -32,34 +50,17 @@ eventBus.on(
   DOMAIN_EVENTS.ENCOUNTER_SIGNED,
   async (event) => {
     const orgId = event.metadata?.organizationId;
-    if (!orgId) return;
+    if (!orgId) {
+      return;
+    }
     try {
-      await _triggerWorkflow(orgId, _TRIGGER_TYPES.ENCOUNTER_SIGNED, event.payload);
+      await triggerWorkflow(orgId, TRIGGER_TYPES.ENCOUNTER_SIGNED, event.payload);
     } catch (err) {
       logger.error('Automation trigger failed for ENCOUNTER_SIGNED:', { error: err.message });
     }
   },
   { suppressErrors: true }
 );
-
-// Preserve default export for backward compatibility
-import { TRIGGER_TYPES, evaluateTrigger } from './triggers.js';
-import { OPERATORS, evaluateConditions } from './conditions.js';
-import { ACTION_TYPES, executeActions } from './actions.js';
-import {
-  getWorkflows,
-  getWorkflowById,
-  createWorkflow,
-  updateWorkflow,
-  deleteWorkflow,
-  toggleWorkflow,
-  getWorkflowExecutions,
-  processAutomations,
-  triggerWorkflow,
-  executeWorkflow,
-  testWorkflow,
-  checkAppointmentReminders,
-} from './engine.js';
 
 export default {
   TRIGGER_TYPES,
@@ -80,4 +81,6 @@ export default {
   executeActions,
   testWorkflow,
   checkAppointmentReminders,
+  checkDaysSinceVisitTriggers,
+  checkBirthdayTriggers,
 };

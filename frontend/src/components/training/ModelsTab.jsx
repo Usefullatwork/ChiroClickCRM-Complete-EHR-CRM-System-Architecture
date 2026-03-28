@@ -18,6 +18,7 @@ import {
   Plus,
   Server,
 } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 function ActionCard({
   icon,
@@ -94,6 +95,7 @@ export default function ModelsTab({
   setSelectedTestModel,
   testResult,
 }) {
+  const { t } = useTranslation('ai');
   return (
     <>
       {/* Model Status */}
@@ -336,7 +338,10 @@ export default function ModelsTab({
             type="text"
             value={testPrompt}
             onChange={(e) => setTestPrompt(e.target.value)}
-            placeholder="Skriv en test-prompt (eller la blank for standard)"
+            placeholder={t(
+              'testPromptPlaceholder',
+              'Skriv en test-prompt (eller la blank for standard)'
+            )}
             className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
           <button

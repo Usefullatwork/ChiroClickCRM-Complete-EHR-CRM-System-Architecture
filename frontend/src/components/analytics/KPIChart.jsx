@@ -38,8 +38,8 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
     return (
       <div className="space-y-4">
         <div className="flex items-end justify-between gap-2 h-64">
-          {chartData.map((item, index) => (
-            <div key={index} className="flex-1 flex flex-col items-center gap-2">
+          {chartData.map((item) => (
+            <div key={item.label} className="flex-1 flex flex-col items-center gap-2">
               <div
                 className="w-full flex items-end justify-center relative"
                 style={{ height: '200px' }}
@@ -123,7 +123,7 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
             const x = (index / (chartData.length - 1)) * svgWidth;
             const y = svgHeight - item.percentage;
             return (
-              <g key={index}>
+              <g key={item.label}>
                 <circle
                   cx={x}
                   cy={y}
@@ -142,9 +142,9 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
 
         {/* X-axis labels */}
         <div className="flex justify-between mt-2">
-          {chartData.map((item, index) => (
+          {chartData.map((item) => (
             <span
-              key={index}
+              key={item.label}
               className="text-xs text-slate-600 dark:text-slate-300 font-medium"
               style={{ width: `${100 / chartData.length}%`, textAlign: 'center' }}
             >

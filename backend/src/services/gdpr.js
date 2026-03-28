@@ -102,7 +102,28 @@ export const processDataAccessRequest = async (organizationId, patientId) => {
   try {
     // Get patient data
     const patientResult = await query(
-      `SELECT * FROM patients WHERE id = $1 AND organization_id = $2`,
+      `SELECT
+        id, organization_id, solvit_id,
+        encrypted_personal_number,
+        first_name, last_name, date_of_birth, gender,
+        email, phone, address, emergency_contact,
+        red_flags, contraindications, allergies, current_medications, medical_history,
+        status, category,
+        referral_source, referring_doctor,
+        insurance_type, insurance_number, has_nav_rights,
+        consent_sms, consent_email, consent_data_storage, consent_marketing,
+        consent_date, consent_withdrawn_at,
+        first_visit_date, last_visit_date, total_visits, lifetime_value,
+        should_be_followed_up, main_problem, preferred_contact_method,
+        needs_feedback, preferred_therapist_id,
+        internal_notes,
+        preferred_language,
+        lifecycle_stage, engagement_score, is_vip, tags,
+        last_contact_date, acquisition_source, acquisition_campaign,
+        total_revenue, avg_visit_value, visit_frequency_days,
+        treatment_completion_rate,
+        created_at, updated_at
+      FROM patients WHERE id = $1 AND organization_id = $2`,
       [patientId, organizationId]
     );
 
@@ -125,13 +146,30 @@ export const processDataAccessRequest = async (organizationId, patientId) => {
 
     // Get all encounters
     const encountersResult = await query(
-      `SELECT * FROM clinical_encounters WHERE patient_id = $1 AND organization_id = $2 ORDER BY encounter_date DESC`,
+      `SELECT
+        id, organization_id, patient_id, practitioner_id,
+        encounter_date, encounter_type, duration_minutes,
+        subjective, objective, assessment, plan,
+        icpc_codes, icd10_codes, treatments, generated_note,
+        vas_pain_start, vas_pain_end,
+        nav_series_number, nav_diagnosis_date,
+        version, is_current, signed_at, signed_by,
+        amended_from, amendment_reason,
+        created_at, updated_at
+      FROM clinical_encounters WHERE patient_id = $1 AND organization_id = $2 ORDER BY encounter_date DESC`,
       [patientId, organizationId]
     );
 
     // Get all measurements
     const measurementsResult = await query(
-      `SELECT cm.* FROM clinical_measurements cm
+      `SELECT
+        cm.id, cm.encounter_id, cm.patient_id,
+        cm.ortho_tests, cm.neuro_tests, cm.rom_measurements,
+        cm.pain_location, cm.pain_quality, cm.pain_intensity,
+        cm.outcome_measure_type, cm.outcome_score, cm.outcome_data,
+        cm.postural_findings, cm.gait_analysis,
+        cm.created_at
+      FROM clinical_measurements cm
        JOIN clinical_encounters ce ON ce.id = cm.encounter_id
        WHERE ce.patient_id = $1 AND ce.organization_id = $2`,
       [patientId, organizationId]
@@ -139,31 +177,76 @@ export const processDataAccessRequest = async (organizationId, patientId) => {
 
     // Get all appointments
     const appointmentsResult = await query(
-      `SELECT * FROM appointments WHERE patient_id = $1 AND organization_id = $2 ORDER BY start_time DESC`,
+      `SELECT
+        id, organization_id, patient_id, practitioner_id,
+        start_time, end_time, appointment_type,
+        status,
+        cancelled_at, cancelled_by, cancellation_reason, cancellation_notice_hours,
+        reminder_sent_at, reminder_method, confirmed_at, confirmation_method,
+        recurring_pattern, recurring_end_date, parent_appointment_id,
+        internal_notes, patient_notes,
+        created_at, updated_at
+      FROM appointments WHERE patient_id = $1 AND organization_id = $2 ORDER BY start_time DESC`,
       [patientId, organizationId]
     );
 
     // Get all communications
     const communicationsResult = await query(
-      `SELECT * FROM communications WHERE patient_id = $1 AND organization_id = $2 ORDER BY sent_at DESC`,
+      `SELECT
+        id, organization_id, patient_id,
+        type, direction, template_id,
+        subject, content,
+        sent_by, recipient_phone, recipient_email,
+        sent_at, delivered_at, opened_at, clicked_at, failed_at, failure_reason,
+        response_received, response_text, resulted_in_booking, days_to_response,
+        external_id, cost_amount,
+        created_at
+      FROM communications WHERE patient_id = $1 AND organization_id = $2 ORDER BY sent_at DESC`,
       [patientId, organizationId]
     );
 
     // Get all financial records
     const financialResult = await query(
-      `SELECT * FROM financial_metrics WHERE patient_id = $1 AND organization_id = $2 ORDER BY created_at DESC`,
+      `SELECT
+        id, organization_id, patient_id, encounter_id, appointment_id,
+        transaction_type, service_codes,
+        gross_amount, insurance_amount, patient_amount, tax_amount,
+        package_type, package_visits_total, package_visits_remaining, package_expires_at,
+        nav_series_number, helfo_claim_id, reimbursement_status,
+        reimbursement_amount, reimbursement_date,
+        payment_method, payment_status, paid_at,
+        invoice_number, invoice_sent_at,
+        notes,
+        created_at, updated_at
+      FROM financial_metrics WHERE patient_id = $1 AND organization_id = $2 ORDER BY created_at DESC`,
       [patientId, organizationId]
     );
 
     // Get all follow-ups
     const followUpsResult = await query(
-      `SELECT * FROM follow_ups WHERE patient_id = $1 AND organization_id = $2 ORDER BY due_date DESC`,
+      `SELECT
+        id, organization_id, patient_id, encounter_id,
+        follow_up_type, reason, priority, due_date,
+        auto_generated, trigger_rule,
+        assigned_to,
+        status, completed_at, completed_by,
+        communication_sent, communication_id,
+        notes, completion_notes,
+        created_at, updated_at
+      FROM follow_ups WHERE patient_id = $1 AND organization_id = $2 ORDER BY due_date DESC`,
       [patientId, organizationId]
     );
 
     // Get all audit logs related to this patient
     const auditResult = await query(
-      `SELECT * FROM audit_logs WHERE resource_type = 'PATIENT' AND resource_id = $1 AND organization_id = $2 ORDER BY created_at DESC`,
+      `SELECT
+        id, organization_id,
+        user_id, user_email, user_role,
+        action, resource_type, resource_id,
+        changes, reason,
+        ip_address, user_agent,
+        created_at
+      FROM audit_logs WHERE resource_type = 'PATIENT' AND resource_id = $1 AND organization_id = $2 ORDER BY created_at DESC`,
       [patientId, organizationId]
     );
 
@@ -389,9 +472,10 @@ export const getConsentAuditTrail = async (organizationId, patientId) => {
  * Update GDPR request status
  */
 export const updateGDPRRequestStatus = async (organizationId, requestId, status, response = '') => {
+  const completedAt = ['COMPLETED', 'REJECTED'].includes(status) ? 'NOW()' : 'NULL';
   const result = await query(
     `UPDATE gdpr_requests
-     SET status = $1, response = $2, completed_at = CASE WHEN $1 IN ('COMPLETED', 'REJECTED') THEN NOW() ELSE NULL END, updated_at = NOW()
+     SET status = $1, response = $2, completed_at = ${completedAt}, updated_at = NOW()
      WHERE id = $3 AND organization_id = $4
      RETURNING *`,
     [status, response, requestId, organizationId]

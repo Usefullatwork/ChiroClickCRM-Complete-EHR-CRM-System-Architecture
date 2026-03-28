@@ -415,7 +415,8 @@ export async function generateTreatmentSummary(patientId, orgId, options = {}) {
   let outcomeScores = [];
   try {
     const outRes = await query(
-      `SELECT * FROM outcome_scores
+      `SELECT assessed_at, questionnaire_type, score, severity
+       FROM outcome_scores
        WHERE patient_id = $1 AND organization_id = $2
        ORDER BY assessed_at DESC
        LIMIT 20`,

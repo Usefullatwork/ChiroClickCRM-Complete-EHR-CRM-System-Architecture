@@ -133,7 +133,12 @@ export const getTemplate = async (organizationId, templateType) => {
   try {
     // First try to get organization-specific template
     const result = await query(
-      `SELECT * FROM message_templates
+      `SELECT
+         id, organization_id, name, type, category, language,
+         subject, body, trigger_type, available_variables,
+         times_used, success_rate, last_used_at,
+         is_active, is_default, created_at, updated_at
+       FROM message_templates
        WHERE organization_id = $1
          AND trigger_type = $2
          AND is_active = true
@@ -419,7 +424,9 @@ export const checkExerciseInactivity = async (daysThreshold = 7) => {
           `SELECT exercise_reminder_enabled FROM patient_communication_preferences WHERE patient_id = $1`,
           [patient.patient_id]
         );
-        if (prefsResult.rows[0]?.exercise_reminder_enabled === false) continue;
+        if (prefsResult.rows[0]?.exercise_reminder_enabled === false) {
+          continue;
+        }
       } catch (_prefErr) {
         // Table may not exist — proceed
       }
@@ -430,7 +437,9 @@ export const checkExerciseInactivity = async (daysThreshold = 7) => {
           `SELECT settings->>'reminder_exercise_enabled' as enabled FROM organizations WHERE id = $1`,
           [patient.organization_id]
         );
-        if (orgSettings.rows[0]?.enabled === 'false') continue;
+        if (orgSettings.rows[0]?.enabled === 'false') {
+          continue;
+        }
       } catch (_orgErr) {
         // Org setting not available — proceed
       }

@@ -8,6 +8,7 @@ import * as claimsService from '../services/claims.js';
 import * as episodesService from '../services/episodes.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import validate from '../middleware/validation.js';
+import { logAction } from '../services/auditLog.js';
 import {
   createEpisodeSchema,
   getPatientEpisodesSchema,
@@ -67,15 +68,29 @@ router.use(requireOrganization);
  *       400:
  *         description: Validation error
  */
-router.post('/episodes', validate(createEpisodeSchema), async (req, res) => {
-  try {
-    const episode = await episodesService.createEpisode(req.organizationId, req.body);
-    res.status(201).json(episode);
-  } catch (error) {
-    logger.error('Create episode error:', error);
-    res.status(400).json({ error: 'Failed to create episode', message: error.message });
+router.post(
+  '/episodes',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(createEpisodeSchema),
+  async (req, res) => {
+    try {
+      const episode = await episodesService.createEpisode(req.organizationId, req.body);
+      res.status(201).json(episode);
+      await logAction('BILLING_EPISODE_CREATE', req.user.id, {
+        resourceType: 'billing_episode',
+        resourceId: episode?.id,
+        changes: { patient_id: req.body.patient_id, diagnosis_codes: req.body.diagnosis_codes },
+        metadata: { organization_id: req.user.organization_id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+    } catch (error) {
+      logger.error('Create episode error:', error);
+      res.status(400).json({ error: 'Failed to create episode', message: error.message });
+    }
   }
-});
+);
 
 /**
  * @swagger
@@ -96,18 +111,31 @@ router.post('/episodes', validate(createEpisodeSchema), async (req, res) => {
  *       500:
  *         description: Server error
  */
-router.get('/episodes/patient/:patientId', validate(getPatientEpisodesSchema), async (req, res) => {
-  try {
-    const episodes = await episodesService.getPatientEpisodes(
-      req.organizationId,
-      req.params.patientId
-    );
-    res.json(episodes);
-  } catch (error) {
-    logger.error('Get patient episodes error:', error);
-    res.status(500).json({ error: 'Failed to retrieve episodes', message: error.message });
+router.get(
+  '/episodes/patient/:patientId',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getPatientEpisodesSchema),
+  async (req, res) => {
+    try {
+      const episodes = await episodesService.getPatientEpisodes(
+        req.organizationId,
+        req.params.patientId
+      );
+      res.json(episodes);
+      await logAction('BILLING_EPISODE_LIST', req.user.id, {
+        resourceType: 'billing_episode',
+        resourceId: req.params.patientId,
+        metadata: { organization_id: req.user.organization_id, patient_id: req.params.patientId },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+    } catch (error) {
+      logger.error('Get patient episodes error:', error);
+      res.status(500).json({ error: 'Failed to retrieve episodes', message: error.message });
+    }
   }
-});
+);
 
 /**
  * @swagger
@@ -141,6 +169,18 @@ router.get(
         return res.status(404).json({ error: 'No active episode found' });
       }
       res.json(episode);
+      await logAction('BILLING_EPISODE_READ', req.user.id, {
+        resourceType: 'billing_episode',
+        resourceId: episode?.id,
+        metadata: {
+          organization_id: req.user.organization_id,
+          patient_id: req.params.patientId,
+          active: true,
+        },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
     } catch (error) {
       logger.error('Get active episode error:', error);
       res.status(500).json({ error: 'Failed to retrieve episode', message: error.message });
@@ -167,21 +207,34 @@ router.get(
  *       404:
  *         description: Episode not found
  */
-router.get('/episodes/:episodeId', validate(getEpisodeSchema), async (req, res) => {
-  try {
-    const summary = await episodesService.getEpisodeSummary(
-      req.organizationId,
-      req.params.episodeId
-    );
-    if (!summary) {
-      return res.status(404).json({ error: 'Episode not found' });
+router.get(
+  '/episodes/:episodeId',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getEpisodeSchema),
+  async (req, res) => {
+    try {
+      const summary = await episodesService.getEpisodeSummary(
+        req.organizationId,
+        req.params.episodeId
+      );
+      if (!summary) {
+        return res.status(404).json({ error: 'Episode not found' });
+      }
+      res.json(summary);
+      await logAction('BILLING_EPISODE_READ', req.user.id, {
+        resourceType: 'billing_episode',
+        resourceId: req.params.episodeId,
+        metadata: { organization_id: req.user.organization_id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+    } catch (error) {
+      logger.error('Get episode error:', error);
+      res.status(500).json({ error: 'Failed to retrieve episode', message: error.message });
     }
-    res.json(summary);
-  } catch (error) {
-    logger.error('Get episode error:', error);
-    res.status(500).json({ error: 'Failed to retrieve episode', message: error.message });
   }
-});
+);
 
 /**
  * @swagger
@@ -217,6 +270,7 @@ router.get('/episodes/:episodeId', validate(getEpisodeSchema), async (req, res) 
  */
 router.patch(
   '/episodes/:episodeId/progress',
+  requireRole(['ADMIN', 'PRACTITIONER']),
   validate(updateEpisodeProgressSchema),
   async (req, res) => {
     try {
@@ -226,6 +280,15 @@ router.patch(
         req.body
       );
       res.json(episode);
+      await logAction('BILLING_EPISODE_PROGRESS_UPDATE', req.user.id, {
+        resourceType: 'billing_episode',
+        resourceId: req.params.episodeId,
+        changes: req.body,
+        metadata: { organization_id: req.user.organization_id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
     } catch (error) {
       logger.error('Update episode progress error:', error);
       res.status(400).json({ error: 'Failed to update episode', message: error.message });
@@ -265,19 +328,33 @@ router.patch(
  *       400:
  *         description: Validation error
  */
-router.post('/episodes/:episodeId/reeval', validate(episodeReevalSchema), async (req, res) => {
-  try {
-    const episode = await episodesService.performReEvaluation(
-      req.organizationId,
-      req.params.episodeId,
-      req.body
-    );
-    res.json(episode);
-  } catch (error) {
-    logger.error('Re-evaluation error:', error);
-    res.status(400).json({ error: 'Failed to perform re-evaluation', message: error.message });
+router.post(
+  '/episodes/:episodeId/reeval',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(episodeReevalSchema),
+  async (req, res) => {
+    try {
+      const episode = await episodesService.performReEvaluation(
+        req.organizationId,
+        req.params.episodeId,
+        req.body
+      );
+      res.json(episode);
+      await logAction('BILLING_EPISODE_REEVAL', req.user.id, {
+        resourceType: 'billing_episode',
+        resourceId: req.params.episodeId,
+        changes: req.body,
+        metadata: { organization_id: req.user.organization_id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+    } catch (error) {
+      logger.error('Re-evaluation error:', error);
+      res.status(400).json({ error: 'Failed to perform re-evaluation', message: error.message });
+    }
   }
-});
+);
 
 /**
  * @swagger
@@ -321,6 +398,15 @@ router.post(
         { ...req.body, mmi_determined_by: req.user.id }
       );
       res.json(episode);
+      await logAction('BILLING_EPISODE_MAINTENANCE', req.user.id, {
+        resourceType: 'billing_episode',
+        resourceId: req.params.episodeId,
+        changes: req.body,
+        metadata: { organization_id: req.user.organization_id, mmi_determined_by: req.user.id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
     } catch (error) {
       logger.error('Transition to maintenance error:', error);
       res.status(400).json({ error: 'Failed to transition episode', message: error.message });
@@ -359,19 +445,33 @@ router.post(
  *       400:
  *         description: Validation error
  */
-router.post('/episodes/:episodeId/abn', validate(episodeABNSchema), async (req, res) => {
-  try {
-    const episode = await episodesService.recordABN(
-      req.organizationId,
-      req.params.episodeId,
-      req.body
-    );
-    res.json(episode);
-  } catch (error) {
-    logger.error('Record ABN error:', error);
-    res.status(400).json({ error: 'Failed to record ABN', message: error.message });
+router.post(
+  '/episodes/:episodeId/abn',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(episodeABNSchema),
+  async (req, res) => {
+    try {
+      const episode = await episodesService.recordABN(
+        req.organizationId,
+        req.params.episodeId,
+        req.body
+      );
+      res.json(episode);
+      await logAction('BILLING_EPISODE_ABN', req.user.id, {
+        resourceType: 'billing_episode',
+        resourceId: req.params.episodeId,
+        changes: req.body,
+        metadata: { organization_id: req.user.organization_id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+    } catch (error) {
+      logger.error('Record ABN error:', error);
+      res.status(400).json({ error: 'Failed to record ABN', message: error.message });
+    }
   }
-});
+);
 
 /**
  * @swagger
@@ -415,6 +515,15 @@ router.post(
         req.body
       );
       res.json(episode);
+      await logAction('BILLING_EPISODE_DISCHARGE', req.user.id, {
+        resourceType: 'billing_episode',
+        resourceId: req.params.episodeId,
+        changes: req.body,
+        metadata: { organization_id: req.user.organization_id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
     } catch (error) {
       logger.error('Discharge episode error:', error);
       res.status(400).json({ error: 'Failed to discharge episode', message: error.message });
@@ -438,6 +547,13 @@ router.get('/episodes-needing-reeval', async (req, res) => {
   try {
     const episodes = await episodesService.getEpisodesNeedingReeval(req.organizationId);
     res.json(episodes);
+    await logAction('BILLING_EPISODE_REEVAL_LIST', req.user.id, {
+      resourceType: 'billing_episode',
+      metadata: { organization_id: req.user.organization_id },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
   } catch (error) {
     logger.error('Get episodes needing reeval error:', error);
     res.status(500).json({ error: 'Failed to retrieve episodes', message: error.message });
@@ -481,6 +597,18 @@ router.get(
       res.json({
         modifier,
         description: getModifierDescription(modifier),
+      });
+      await logAction('BILLING_MODIFIER_READ', req.user.id, {
+        resourceType: 'billing_episode',
+        resourceId: req.params.episodeId,
+        metadata: {
+          organization_id: req.user.organization_id,
+          patient_id: req.params.patientId,
+          modifier,
+        },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
       });
     } catch (error) {
       logger.error('Get billing modifier error:', error);
@@ -543,23 +671,43 @@ const getModifierDescription = (modifier) => {
  *       401:
  *         description: Unauthorized
  */
-router.get('/claims', validate(listClaimsSchema), async (req, res) => {
-  try {
-    const result = await claimsService.getClaims(req.organizationId, {
-      page: parseInt(req.query.page) || 1,
-      limit: parseInt(req.query.limit) || 50,
-      status: req.query.status,
-      patient_id: req.query.patient_id,
-      payer_id: req.query.payer_id,
-      start_date: req.query.start_date,
-      end_date: req.query.end_date,
-    });
-    res.json(result);
-  } catch (error) {
-    logger.error('Get claims error:', error);
-    res.status(500).json({ error: 'Failed to retrieve claims', message: error.message });
+router.get(
+  '/claims',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(listClaimsSchema),
+  async (req, res) => {
+    try {
+      const result = await claimsService.getClaims(req.organizationId, {
+        page: parseInt(req.query.page) || 1,
+        limit: parseInt(req.query.limit) || 50,
+        status: req.query.status,
+        patient_id: req.query.patient_id,
+        payer_id: req.query.payer_id,
+        start_date: req.query.start_date,
+        end_date: req.query.end_date,
+      });
+      res.json(result);
+      await logAction('BILLING_CLAIM_LIST', req.user.id, {
+        resourceType: 'billing_claim',
+        metadata: {
+          organization_id: req.user.organization_id,
+          filters: {
+            status: req.query.status,
+            patient_id: req.query.patient_id,
+            start_date: req.query.start_date,
+            end_date: req.query.end_date,
+          },
+        },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+    } catch (error) {
+      logger.error('Get claims error:', error);
+      res.status(500).json({ error: 'Failed to retrieve claims', message: error.message });
+    }
   }
-});
+);
 
 /**
  * @swagger
@@ -598,15 +746,29 @@ router.get('/claims', validate(listClaimsSchema), async (req, res) => {
  *       400:
  *         description: Validation error
  */
-router.post('/claims', validate(createClaimSchema), async (req, res) => {
-  try {
-    const claim = await claimsService.createClaim(req.organizationId, req.body);
-    res.status(201).json(claim);
-  } catch (error) {
-    logger.error('Create claim error:', error);
-    res.status(400).json({ error: 'Failed to create claim', message: error.message });
+router.post(
+  '/claims',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(createClaimSchema),
+  async (req, res) => {
+    try {
+      const claim = await claimsService.createClaim(req.organizationId, req.body);
+      res.status(201).json(claim);
+      await logAction('BILLING_CLAIM_CREATE', req.user.id, {
+        resourceType: 'billing_claim',
+        resourceId: claim?.id,
+        changes: { patient_id: req.body.patient_id, encounter_id: req.body.encounter_id },
+        metadata: { organization_id: req.user.organization_id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+    } catch (error) {
+      logger.error('Create claim error:', error);
+      res.status(400).json({ error: 'Failed to create claim', message: error.message });
+    }
   }
-});
+);
 
 /**
  * @swagger
@@ -624,6 +786,13 @@ router.get('/claims/summary', async (req, res) => {
   try {
     const summary = await claimsService.getClaimsSummary(req.organizationId);
     res.json(summary);
+    await logAction('BILLING_CLAIM_SUMMARY_READ', req.user.id, {
+      resourceType: 'billing_claim',
+      metadata: { organization_id: req.user.organization_id },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
   } catch (error) {
     logger.error('Get claims summary error:', error);
     res.status(500).json({ error: 'Failed to retrieve summary', message: error.message });
@@ -646,6 +815,13 @@ router.get('/claims/outstanding', async (req, res) => {
   try {
     const claims = await claimsService.getOutstandingClaims(req.organizationId);
     res.json(claims);
+    await logAction('BILLING_CLAIM_OUTSTANDING_READ', req.user.id, {
+      resourceType: 'billing_claim',
+      metadata: { organization_id: req.user.organization_id },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
   } catch (error) {
     logger.error('Get outstanding claims error:', error);
     res.status(500).json({ error: 'Failed to retrieve claims', message: error.message });
@@ -671,18 +847,31 @@ router.get('/claims/outstanding', async (req, res) => {
  *       404:
  *         description: Claim not found
  */
-router.get('/claims/:claimId', validate(getClaimSchema), async (req, res) => {
-  try {
-    const claim = await claimsService.getClaimById(req.organizationId, req.params.claimId);
-    if (!claim) {
-      return res.status(404).json({ error: 'Claim not found' });
+router.get(
+  '/claims/:claimId',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  validate(getClaimSchema),
+  async (req, res) => {
+    try {
+      const claim = await claimsService.getClaimById(req.organizationId, req.params.claimId);
+      if (!claim) {
+        return res.status(404).json({ error: 'Claim not found' });
+      }
+      res.json(claim);
+      await logAction('BILLING_CLAIM_READ', req.user.id, {
+        resourceType: 'billing_claim',
+        resourceId: req.params.claimId,
+        metadata: { organization_id: req.user.organization_id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+    } catch (error) {
+      logger.error('Get claim error:', error);
+      res.status(500).json({ error: 'Failed to retrieve claim', message: error.message });
     }
-    res.json(claim);
-  } catch (error) {
-    logger.error('Get claim error:', error);
-    res.status(500).json({ error: 'Failed to retrieve claim', message: error.message });
   }
-});
+);
 
 /**
  * @swagger
@@ -733,6 +922,15 @@ router.put(
         req.body.line_items
       );
       res.json(claim);
+      await logAction('BILLING_CLAIM_LINE_ITEMS_UPDATE', req.user.id, {
+        resourceType: 'billing_claim',
+        resourceId: req.params.claimId,
+        changes: { line_items: req.body.line_items },
+        metadata: { organization_id: req.user.organization_id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
     } catch (error) {
       logger.error('Update line items error:', error);
       res.status(400).json({ error: 'Failed to update line items', message: error.message });
@@ -771,6 +969,14 @@ router.post(
         req.user.id
       );
       res.json(claim);
+      await logAction('BILLING_CLAIM_SUBMIT', req.user.id, {
+        resourceType: 'billing_claim',
+        resourceId: req.params.claimId,
+        metadata: { organization_id: req.user.organization_id, submitted_by: req.user.id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
     } catch (error) {
       logger.error('Submit claim error:', error);
       res.status(400).json({ error: 'Failed to submit claim', message: error.message });
@@ -823,6 +1029,15 @@ router.post(
         req.body
       );
       res.json(claim);
+      await logAction('BILLING_CLAIM_REMITTANCE', req.user.id, {
+        resourceType: 'billing_claim',
+        resourceId: req.params.claimId,
+        changes: { amount_paid: req.body.amount_paid, payment_date: req.body.payment_date },
+        metadata: { organization_id: req.user.organization_id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
     } catch (error) {
       logger.error('Process remittance error:', error);
       res.status(400).json({ error: 'Failed to process remittance', message: error.message });
@@ -875,6 +1090,15 @@ router.post(
         req.body
       );
       res.json(claim);
+      await logAction('BILLING_CLAIM_APPEAL', req.user.id, {
+        resourceType: 'billing_claim',
+        resourceId: req.params.claimId,
+        changes: { reason: req.body.reason },
+        metadata: { organization_id: req.user.organization_id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
     } catch (error) {
       logger.error('Appeal claim error:', error);
       res.status(400).json({ error: 'Failed to appeal claim', message: error.message });
@@ -923,6 +1147,15 @@ router.post(
         req.body.reason
       );
       res.json(claim);
+      await logAction('BILLING_CLAIM_WRITE_OFF', req.user.id, {
+        resourceType: 'billing_claim',
+        resourceId: req.params.claimId,
+        changes: { reason: req.body.reason },
+        metadata: { organization_id: req.user.organization_id },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
     } catch (error) {
       logger.error('Write off claim error:', error);
       res.status(400).json({ error: 'Failed to write off claim', message: error.message });

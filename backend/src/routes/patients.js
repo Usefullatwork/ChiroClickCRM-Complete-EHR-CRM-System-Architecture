@@ -10,6 +10,7 @@ import * as exercisesController from '../controllers/exercises.js';
 import * as pdfController from '../controllers/pdf.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
+import { readLimiter, searchLimiter } from '../middleware/rateLimiting.js';
 import {
   createPatientSchema,
   updatePatientSchema,
@@ -55,7 +56,7 @@ router.use(requireOrganization);
  *       401:
  *         description: Unauthorized
  */
-router.get('/', validate(listPatientsSchema), patientController.getPatients);
+router.get('/', readLimiter, validate(listPatientsSchema), patientController.getPatients);
 
 /**
  * @swagger
@@ -75,7 +76,12 @@ router.get('/', validate(listPatientsSchema), patientController.getPatients);
  *       401:
  *         description: Unauthorized
  */
-router.get('/search', validate(quickSearchPatientsSchema), patientController.searchPatients);
+router.get(
+  '/search',
+  searchLimiter,
+  validate(quickSearchPatientsSchema),
+  patientController.searchPatients
+);
 
 /**
  * @swagger
@@ -122,6 +128,7 @@ router.get('/search', validate(quickSearchPatientsSchema), patientController.sea
  */
 router.get(
   '/search/advanced',
+  searchLimiter,
   validate(searchPatientsSchema),
   patientController.advancedSearchPatients
 );

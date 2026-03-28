@@ -3,6 +3,7 @@ import { VisitCounter } from '../assessment/TreatmentPlanTracker';
 import SALTButton from '../assessment/SALTButton';
 import { ComplianceIndicator } from '../assessment/ComplianceEngine';
 import { AIStatusIndicator } from '../assessment/AISettings';
+import { useTranslation } from '../../i18n';
 
 export default function EasyAssessmentHeader({
   patient,
@@ -27,6 +28,7 @@ export default function EasyAssessmentHeader({
   saveMutation,
   encounterData,
 }) {
+  const { t } = useTranslation();
   return (
     <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
       <div className="max-w-full mx-auto px-4 py-2">
@@ -46,11 +48,11 @@ export default function EasyAssessmentHeader({
                 {patient?.data?.date_of_birth && (
                   <span className="text-sm text-gray-500 dark:text-gray-400">
                     {Math.floor((new Date() - new Date(patient.data.date_of_birth)) / 31557600000)}{' '}
-                    yrs old
+                    {t('yrsOld')}
                   </span>
                 )}
                 <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded">
-                  Active
+                  {t('active')}
                 </span>
               </div>
               {treatmentPlan && (
@@ -165,7 +167,7 @@ export default function EasyAssessmentHeader({
               className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
             >
               <Save className="w-4 h-4" />
-              {saveMutation.isLoading ? 'Saving...' : 'Save'}
+              {saveMutation.isLoading ? t('saving') : t('save')}
             </button>
           </div>
         </div>

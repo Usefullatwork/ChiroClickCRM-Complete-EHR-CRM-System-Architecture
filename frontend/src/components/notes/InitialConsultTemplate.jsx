@@ -10,6 +10,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { useTranslation } from '../../i18n/useTranslation';
 import { Save, Lock, AlertTriangle, ChevronDown, ChevronUp, CheckCircle } from 'lucide-react';
 import ICD10CodePicker from './ICD10CodePicker';
 import HistorySection from './HistorySection';
@@ -33,6 +34,8 @@ export default function InitialConsultTemplate({
   onLock,
   readOnly = false,
 }) {
+  const { t } = useTranslation('clinical');
+
   // Auto-save timer ref
   const autoSaveTimerRef = useRef(null);
   const [lastAutoSave, setLastAutoSave] = useState(null);
@@ -441,14 +444,14 @@ export default function InitialConsultTemplate({
                 className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50"
               >
                 <Save className="w-4 h-4" />
-                {saving ? 'Lagrer...' : 'Lagre'}
+                {saving ? t('saving', 'Lagrer...') : t('save', 'Lagre')}
               </button>
               <button
                 onClick={handleLock}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 <Lock className="w-4 h-4" />
-                Signer og las
+                {t('signAndLockNote', 'Signer og lås')}
               </button>
             </>
           )}

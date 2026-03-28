@@ -42,6 +42,21 @@ export const ai = {
     requiredAssessment: 'Required assessment:',
     saveChanges: 'Save changes',
     approve: 'Approve',
+    // Image Analysis
+    imageAnalysisTitle: 'Image Analysis',
+    imageAnalysisDropzone: 'Drag and drop image here, or click to select',
+    imageAnalysisAnalyze: 'Analyze image',
+    imageAnalysisAnalyzing: 'Analyzing...',
+    imageAnalysisType: 'Analysis type',
+    imageAnalysisRemove: 'Remove',
+    imageAnalysisDisclaimer:
+      'AI-assisted analysis -- must be confirmed by qualified healthcare professional',
+    analysisTypeXray: 'X-ray',
+    analysisTypeMri: 'MRI',
+    analysisTypePosture: 'Posture',
+    analysisTypeGeneral: 'General',
+    // Placeholder & aria-label i18n keys
+    testPromptPlaceholder: 'Write a test prompt (or leave blank for standard)',
   },
   no: {
     // Feedback categories - positive
@@ -86,5 +101,19 @@ export const ai = {
     requiredAssessment: 'Påkrevd vurdering:',
     saveChanges: 'Lagre endringer',
     approve: 'Godkjenn',
+    // Image Analysis
+    imageAnalysisTitle: 'Bildeanalyse',
+    imageAnalysisDropzone: 'Dra og slipp bilde her, eller klikk for a velge',
+    imageAnalysisAnalyze: 'Analyser bilde',
+    imageAnalysisAnalyzing: 'Analyserer...',
+    imageAnalysisType: 'Analysetype',
+    imageAnalysisRemove: 'Fjern',
+    imageAnalysisDisclaimer: 'AI-assistert analyse -- ma bekreftes av kvalifisert helsepersonell',
+    analysisTypeXray: 'Rontgen',
+    analysisTypeMri: 'MR',
+    analysisTypePosture: 'Holdning',
+    analysisTypeGeneral: 'Generell',
+    // Placeholder & aria-label i18n keys
+    testPromptPlaceholder: 'Skriv en test-prompt (eller la blank for standard)',
   },
 };

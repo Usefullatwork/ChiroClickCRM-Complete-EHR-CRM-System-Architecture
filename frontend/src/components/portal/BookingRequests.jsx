@@ -44,7 +44,9 @@ export default function BookingRequests() {
   });
 
   const handleApprove = (id) => {
-    if (!approveData.date || !approveData.time) return;
+    if (!approveData.date || !approveData.time) {
+      return;
+    }
     approveMutation.mutate({
       id,
       payload: {

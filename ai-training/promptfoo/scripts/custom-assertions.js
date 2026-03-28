@@ -87,6 +87,12 @@ const SYNONYMS = {
   'Th4': ['Th4', 'T4'],
   // Neck pain terms
   'nakke': ['nakke', 'cervikalgi', 'cervikalt', 'cervikale'],
+  // v2.1 communication terms
+  'velkommen': ['velkommen', 'velkomst', 'ny pasient', 'første gang'],
+  'kategori': ['kategori', 'prioritet', 'klassifisering', 'triage'],
+  'bedring': ['bedring', 'forbedring', 'fremgang', 'positiv utvikling'],
+  'forklaring': ['forklaring', 'forståelig', 'pasientvennlig', 'lettfattelig'],
+  'tilpas': ['tilpas', 'tilpasning', 'tilpasse', 'justere', 'modifisere', 'endre'],
 };
 
 // Negation words — if a forbidden keyword is preceded by one of these, skip it

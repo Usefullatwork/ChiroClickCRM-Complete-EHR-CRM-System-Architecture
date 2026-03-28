@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Search, X, ChevronDown, ChevronRight, Star, Clock, CheckCircle } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 /**
  * Common ICD-10 codes for chiropractic practice
@@ -252,6 +253,7 @@ const ICD10_CODES = {
  * @returns {JSX.Element} ICD-10 code picker modal
  */
 export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] }) {
+  const { t } = useTranslation('clinical');
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedCategories, setExpandedCategories] = useState(['spine']);
   const [recentCodes, setRecentCodes] = useState([]);
@@ -382,7 +384,9 @@ export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] 
         {/* Header / Overskrift */}
         <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Velg ICD-10 kode</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              {t('selectICD10Code', 'Velg ICD-10 kode')}
+            </h3>
             <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
               <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
@@ -393,7 +397,7 @@ export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] 
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
             <input
               type="text"
-              placeholder="Sok etter kode eller beskrivelse..."
+              placeholder={t('searchCodeOrDescription', 'Søk etter kode eller beskrivelse...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

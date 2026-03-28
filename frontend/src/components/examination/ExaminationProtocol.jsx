@@ -17,6 +17,7 @@ import {
   FileText,
 } from 'lucide-react';
 import { EXAMINATION_REGIONS } from '../../data/examinationProtocols';
+import { useTranslation } from '../../i18n';
 
 // Region icons mapping
 const REGION_ICONS = {
@@ -193,7 +194,7 @@ function ExaminationItem({ item, value, onChange, lang = 'no', readOnly = false 
               disabled={readOnly}
               className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded-md
                         focus:ring-1 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
-              placeholder="Beskriv..."
+              placeholder={t('describePlaceholder', 'Beskriv...')}
             />
           </div>
         );
@@ -289,6 +290,7 @@ export default function ExaminationProtocol({
   readOnly = false,
   onGenerateNarrative,
 }) {
+  const { t } = useTranslation('clinical');
   const [activeRegion, setActiveRegion] = useState(selectedRegion);
 
   const handleRegionSelect = (regionId) => {

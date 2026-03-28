@@ -8,10 +8,10 @@ import { useState, useRef, useCallback } from 'react';
 import { useTranslation } from '../../i18n';
 
 const ANALYSIS_TYPES = [
-  { value: 'xray', label: { no: 'Rontgen', en: 'X-ray' } },
-  { value: 'mri', label: { no: 'MR', en: 'MRI' } },
-  { value: 'posture', label: { no: 'Holdning', en: 'Posture' } },
-  { value: 'general', label: { no: 'Generell', en: 'General' } },
+  { value: 'xray', labelKey: 'analysisTypeXray' },
+  { value: 'mri', labelKey: 'analysisTypeMri' },
+  { value: 'posture', labelKey: 'analysisTypePosture' },
+  { value: 'general', labelKey: 'analysisTypeGeneral' },
 ];
 
 export default function AIImageAnalysis({ onAnalyze, isLoading, result }) {
@@ -19,29 +19,7 @@ export default function AIImageAnalysis({ onAnalyze, isLoading, result }) {
   const [preview, setPreview] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const fileInputRef = useRef(null);
-  const { language } = useTranslation();
-
-  const labels = {
-    no: {
-      title: 'Bildeanalyse',
-      dropzone: 'Dra og slipp bilde her, eller klikk for a velge',
-      analyze: 'Analyser bilde',
-      analyzing: 'Analyserer...',
-      type: 'Analysetype',
-      remove: 'Fjern',
-      disclaimer: 'AI-assistert analyse -- ma bekreftes av kvalifisert helsepersonell',
-    },
-    en: {
-      title: 'Image Analysis',
-      dropzone: 'Drag and drop image here, or click to select',
-      analyze: 'Analyze image',
-      analyzing: 'Analyzing...',
-      type: 'Analysis type',
-      remove: 'Remove',
-      disclaimer: 'AI-assisted analysis -- must be confirmed by qualified healthcare professional',
-    },
-  };
-  const l = labels[language] || labels.no;
+  const { t } = useTranslation('ai');
 
   const handleFile = useCallback((file) => {
     if (!file || !file.type.startsWith('image/')) {
@@ -82,11 +60,13 @@ export default function AIImageAnalysis({ onAnalyze, isLoading, result }) {
         padding: '16px',
       }}
     >
-      <h4 style={{ margin: '0 0 12px', fontSize: '14px', fontWeight: 600 }}>{l.title}</h4>
+      <h4 style={{ margin: '0 0 12px', fontSize: '14px', fontWeight: 600 }}>
+        {t('imageAnalysisTitle')}
+      </h4>
 
       <div style={{ marginBottom: '12px' }}>
         <label style={{ fontSize: '13px', fontWeight: 500, marginBottom: '4px', display: 'block' }}>
-          {l.type}
+          {t('imageAnalysisType')}
         </label>
         <select
           value={selectedType}
@@ -99,9 +79,9 @@ export default function AIImageAnalysis({ onAnalyze, isLoading, result }) {
             width: '100%',
           }}
         >
-          {ANALYSIS_TYPES.map((t) => (
-            <option key={t.value} value={t.value}>
-              {t.label[language] || t.label.no}
+          {ANALYSIS_TYPES.map((at) => (
+            <option key={at.value} value={at.value}>
+              {t(at.labelKey)}
             </option>
           ))}
         </select>
@@ -127,7 +107,7 @@ export default function AIImageAnalysis({ onAnalyze, isLoading, result }) {
           }}
         >
           <p style={{ margin: 0, color: 'var(--text-secondary, #64748b)', fontSize: '13px' }}>
-            {l.dropzone}
+            {t('imageAnalysisDropzone')}
           </p>
           <input
             ref={fileInputRef}
@@ -151,7 +131,7 @@ export default function AIImageAnalysis({ onAnalyze, isLoading, result }) {
           />
           <button
             onClick={() => setPreview(null)}
-            aria-label={l.remove}
+            aria-label={t('imageAnalysisRemove')}
             style={{
               position: 'absolute',
               top: 4,
@@ -189,7 +169,7 @@ export default function AIImageAnalysis({ onAnalyze, isLoading, result }) {
             cursor: isLoading ? 'not-allowed' : 'pointer',
           }}
         >
-          {isLoading ? l.analyzing : l.analyze}
+          {isLoading ? t('imageAnalysisAnalyzing') : t('imageAnalysisAnalyze')}
         </button>
       )}
 
@@ -214,7 +194,7 @@ export default function AIImageAnalysis({ onAnalyze, isLoading, result }) {
               fontStyle: 'italic',
             }}
           >
-            {l.disclaimer}
+            {t('imageAnalysisDisclaimer')}
           </p>
         </div>
       )}

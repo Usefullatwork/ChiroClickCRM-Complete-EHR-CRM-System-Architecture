@@ -28,8 +28,10 @@ const estimateTokens = (text) => Math.ceil((text || '').length / 4);
  */
 const truncateToTokens = (text, maxTokens) => {
   const maxChars = maxTokens * 4;
-  if (text.length <= maxChars) return text;
-  return text.slice(0, maxChars) + '...';
+  if (text.length <= maxChars) {
+    return text;
+  }
+  return `${text.slice(0, maxChars)}...`;
 };
 
 /**
@@ -42,8 +44,12 @@ const cacheKey = (patientId, tier) => `${patientId}:${tier}`;
  */
 const isCacheValid = (key, ttl) => {
   const entry = contextCache.get(key);
-  if (!entry) return false;
-  if (ttl === 0) return false; // L0 always refetched
+  if (!entry) {
+    return false;
+  }
+  if (ttl === 0) {
+    return false;
+  } // L0 always refetched
   return Date.now() - entry.timestamp < ttl;
 };
 
@@ -62,7 +68,9 @@ const loadL0 = async (patientId, organizationId) => {
       [patientId, organizationId]
     );
 
-    if (!result.rows[0]) return '';
+    if (!result.rows[0]) {
+      return '';
+    }
 
     const p = result.rows[0];
     const age = p.date_of_birth
@@ -70,7 +78,7 @@ const loadL0 = async (patientId, organizationId) => {
       : null;
 
     const parts = [];
-    parts.push(`Pasient: ${age ? age + ' år' : 'alder ukjent'}, ${p.gender || 'ukjent kjønn'}`);
+    parts.push(`Pasient: ${age ? `${age} år` : 'alder ukjent'}, ${p.gender || 'ukjent kjønn'}`);
 
     if (p.current_medications?.length) {
       parts.push(
@@ -204,7 +212,9 @@ export const buildTieredContext = async (taskType, options = {}) => {
 
   for (const tierName of requiredTiers) {
     const tier = CONTEXT_TIERS[tierName];
-    if (!tier) continue;
+    if (!tier) {
+      continue;
+    }
 
     let tierText = '';
     switch (tierName) {

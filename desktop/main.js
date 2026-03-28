@@ -128,6 +128,7 @@ function startBackend() {
     DATA_DIR: dataDir,
     FRONTEND_DIST: getResourcePath('frontend/dist'),
     ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || defaultKey,
+    DEV_SKIP_AUTH: 'false',
   };
 
   console.log('[desktop] FRONTEND_DIST:', env.FRONTEND_DIST);
@@ -434,6 +435,18 @@ app.whenReady().then(async () => {
 
   // Start the backend server
   startBackend();
+
+  // Auto-detect and start Ollama (non-blocking, AI is optional)
+  try {
+    const { checkOllama, startOllama } = require('./ollama-manager');
+    checkOllama().then(status => {
+      if (!status.running) {
+        startOllama().catch(() => {});
+      }
+    }).catch(() => {});
+  } catch (e) {
+    // ollama-manager not available
+  }
 
   // Wait for the backend to become healthy
   const healthy = await waitForBackendHealth(BACKEND_PORT);

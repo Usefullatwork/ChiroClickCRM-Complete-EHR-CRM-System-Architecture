@@ -16,8 +16,10 @@ import {
 } from 'lucide-react';
 import StructuredExaminationForm from './StructuredExaminationForm';
 import toast from '../utils/toast';
+import { useTranslation } from '../i18n';
 
 export default function ExaminationFindingsList({ encounterId }) {
+  const { t } = useTranslation('clinical');
   const queryClient = useQueryClient();
   const confirm = useConfirm();
   const [editingFinding, setEditingFinding] = useState(null);
@@ -401,7 +403,7 @@ export default function ExaminationFindingsList({ encounterId }) {
                           <button
                             onClick={() => handleDelete(finding.id)}
                             className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                            title="Slett"
+                            title={t('delete', 'Slett')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

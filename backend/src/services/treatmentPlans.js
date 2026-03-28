@@ -65,7 +65,10 @@ export async function createPlan(planData) {
  */
 export async function getPlan(id, orgId) {
   const planResult = await query(
-    `SELECT * FROM treatment_plans WHERE id = $1 AND organization_id = $2`,
+    `SELECT id, patient_id, organization_id, practitioner_id, title, condition_description,
+            diagnosis_code, frequency, total_sessions, completed_sessions, start_date,
+            target_end_date, goals, status, notes, created_at, updated_at
+     FROM treatment_plans WHERE id = $1 AND organization_id = $2`,
     [id, orgId]
   );
 
@@ -77,12 +80,17 @@ export async function getPlan(id, orgId) {
 
   const [milestonesResult, sessionsResult] = await Promise.all([
     query(
-      `SELECT * FROM treatment_plan_milestones WHERE plan_id = $1 ORDER BY target_date ASC, created_at ASC`,
+      `SELECT id, plan_id, title, description, target_date, outcome_measure,
+              target_score, actual_score, status, completed_at, created_at
+       FROM treatment_plan_milestones WHERE plan_id = $1 ORDER BY target_date ASC, created_at ASC`,
       [id]
     ),
-    query(`SELECT * FROM treatment_plan_sessions WHERE plan_id = $1 ORDER BY session_number ASC`, [
-      id,
-    ]),
+    query(
+      `SELECT id, plan_id, encounter_id, session_number, scheduled_date,
+              completed_date, notes, status, created_at
+       FROM treatment_plan_sessions WHERE plan_id = $1 ORDER BY session_number ASC`,
+      [id]
+    ),
   ]);
 
   return {
@@ -96,7 +104,10 @@ export async function getPlan(id, orgId) {
  * Get all treatment plans for a patient
  */
 export async function getPatientPlans(patientId, orgId, statusFilter) {
-  let sql = `SELECT * FROM treatment_plans WHERE patient_id = $1 AND organization_id = $2`;
+  let sql = `SELECT id, patient_id, organization_id, practitioner_id, title, condition_description,
+            diagnosis_code, frequency, total_sessions, completed_sessions, start_date,
+            target_end_date, goals, status, notes, created_at, updated_at
+     FROM treatment_plans WHERE patient_id = $1 AND organization_id = $2`;
   const params = [patientId, orgId];
 
   if (statusFilter) {

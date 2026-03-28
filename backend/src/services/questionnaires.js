@@ -62,9 +62,15 @@ export const getAllQuestionnaires = async (organizationId, options = {}) => {
  * Get a specific questionnaire by code
  */
 export const getQuestionnaireByCode = async (code) => {
-  const result = await query(`SELECT * FROM questionnaires WHERE code = $1 AND is_active = true`, [
-    code,
-  ]);
+  const result = await query(
+    `SELECT id, organization_id, code, name, full_name, description, language, version,
+            questions, scoring_method, min_score, max_score, score_interpretation,
+            target_body_region, estimated_minutes, indicated_for, clinical_cutoff_scores,
+            psychometric_properties, reference_citation, educational_link,
+            is_system, is_active, created_at, updated_at
+     FROM questionnaires WHERE code = $1 AND is_active = true`,
+    [code]
+  );
 
   if (result.rows.length === 0) {
     throw new Error(`Questionnaire ${code} not found`);
@@ -80,9 +86,15 @@ export const submitQuestionnaireResponse = async (responseData) => {
   const { patientId, encounterId, questionnaireId, responses, administeredBy } = responseData;
 
   // Get questionnaire definition
-  const questionnaireResult = await query(`SELECT * FROM questionnaires WHERE id = $1`, [
-    questionnaireId,
-  ]);
+  const questionnaireResult = await query(
+    `SELECT id, organization_id, code, name, full_name, description, language, version,
+            questions, scoring_method, min_score, max_score, score_interpretation,
+            target_body_region, estimated_minutes, indicated_for, clinical_cutoff_scores,
+            psychometric_properties, reference_citation, educational_link,
+            is_system, is_active, created_at, updated_at
+     FROM questionnaires WHERE id = $1`,
+    [questionnaireId]
+  );
 
   if (questionnaireResult.rows.length === 0) {
     throw new Error('Questionnaire not found');
@@ -554,7 +566,10 @@ export const calculateTreatmentEffectiveness = async (patientId) => {
      FROM questionnaire_responses qr
      JOIN questionnaires q ON qr.questionnaire_id = q.id
      JOIN LATERAL (
-       SELECT * FROM questionnaire_responses
+       SELECT id, patient_id, questionnaire_id, total_score, percentage_score,
+              severity_level, score_change, clinically_significant_change,
+              administered_date, treatment_phase
+       FROM questionnaire_responses
        WHERE patient_id = qr.patient_id
          AND questionnaire_id = qr.questionnaire_id
          AND administered_date > qr.administered_date

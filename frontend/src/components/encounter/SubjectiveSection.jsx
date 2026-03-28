@@ -1,4 +1,5 @@
 import EnhancedClinicalTextarea from '../clinical/EnhancedClinicalTextarea';
+import { useTranslation } from '../../i18n';
 
 export function SubjectiveSection({
   encounterData,
@@ -7,6 +8,7 @@ export function SubjectiveSection({
   updateField,
   quickPhrases,
 }) {
+  const { t } = useTranslation('clinical');
   return (
     <section
       key="subjective"
@@ -44,7 +46,7 @@ export function SubjectiveSection({
       <div className="p-4 space-y-3">
         <input
           type="text"
-          placeholder="Hovedklage..."
+          placeholder={t('chiefComplaintPlaceholder', 'Hovedklage...')}
           value={encounterData.subjective.chief_complaint}
           onChange={(e) => updateField('subjective', 'chief_complaint', e.target.value)}
           disabled={isSigned}
@@ -53,7 +55,7 @@ export function SubjectiveSection({
         <EnhancedClinicalTextarea
           value={encounterData.subjective.history}
           onChange={(val) => updateField('subjective', 'history', val)}
-          placeholder="Anamnese og symptombeskrivelse..."
+          placeholder={t('historySymptomPlaceholder', 'Anamnese og symptombeskrivelse...')}
           label="Sykehistorie"
           section="subjective"
           field="history"
@@ -66,7 +68,7 @@ export function SubjectiveSection({
         <div className="grid grid-cols-2 gap-3">
           <input
             type="text"
-            placeholder="Debut (n&aring;r startet det?)"
+            placeholder={t('onsetPlaceholder', 'Debut (når startet det?)')}
             value={encounterData.subjective.onset}
             onChange={(e) => updateField('subjective', 'onset', e.target.value)}
             disabled={isSigned}
@@ -74,7 +76,7 @@ export function SubjectiveSection({
           />
           <input
             type="text"
-            placeholder="Smertebeskrivelse"
+            placeholder={t('painDescriptionPlaceholder', 'Smertebeskrivelse')}
             value={encounterData.subjective.pain_description}
             onChange={(e) => updateField('subjective', 'pain_description', e.target.value)}
             disabled={isSigned}

@@ -6,6 +6,7 @@ import { useState } from 'react';
  * Based on FMS and other validated functional assessment tools
  */
 const FunctionalMovementAssessment = ({ onSave }) => {
+  const { t } = useTranslation('clinical');
   const [scores, setScores] = useState({});
   const [notes, setNotes] = useState({});
   const [totalScore, setTotalScore] = useState(0);
@@ -594,7 +595,7 @@ const FunctionalMovementAssessment = ({ onSave }) => {
 
             <div className="test-notes">
               <textarea
-                placeholder="Clinical notes and observations..."
+                placeholder={t('clinicalNotesPlaceholder', 'Clinical notes and observations...')}
                 value={notes[test.id] || ''}
                 onChange={(e) => handleNoteChange(test.id, e.target.value)}
               />

@@ -1,6 +1,9 @@
 ---
 name: phi-check
 description: Detects Protected Health Information leaks in code. Auto-activates when reviewing code that handles patient data, fødselsnummer, diagnoses, medical records, journal entries, or health information.
+user-invocable: true
+model: opus
+effort: high
 ---
 
 # PHI Leak Detection for Norwegian Healthcare

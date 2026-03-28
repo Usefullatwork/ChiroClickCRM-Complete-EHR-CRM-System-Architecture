@@ -70,44 +70,44 @@ export default function ExerciseEditor({
     }
   }, [exercise]);
 
-  // Category and body region labels
-  const categoryLabels = {
-    stretching: { no: 'Tøyning', en: 'Stretching' },
-    strengthening: { no: 'Styrke', en: 'Strengthening' },
-    mobility: { no: 'Mobilitet', en: 'Mobility' },
-    balance: { no: 'Balanse', en: 'Balance' },
-    posture: { no: 'Holdning', en: 'Posture' },
-    breathing: { no: 'Pust', en: 'Breathing' },
-    nerve_glide: { no: 'Nervegliding', en: 'Nerve Glide' },
-    vestibular: { no: 'Vestibulær', en: 'Vestibular' },
+  // Category and body region translation key maps
+  const categoryKeys = {
+    stretching: 'catStretching',
+    strengthening: 'catStrengthening',
+    mobility: 'catMobility',
+    balance: 'catBalance',
+    posture: 'catPosture',
+    breathing: 'catBreathing',
+    nerve_glide: 'catNerveGlide',
+    vestibular: 'catVestibular',
   };
 
-  const bodyRegionLabels = {
-    cervical: { no: 'Nakke', en: 'Cervical' },
-    thoracic: { no: 'Brystsøyle', en: 'Thoracic' },
-    lumbar: { no: 'Korsrygg', en: 'Lumbar' },
-    shoulder: { no: 'Skulder', en: 'Shoulder' },
-    hip: { no: 'Hofte', en: 'Hip' },
-    knee: { no: 'Kne', en: 'Knee' },
-    ankle: { no: 'Ankel', en: 'Ankle' },
-    foot: { no: 'Fot', en: 'Foot' },
-    core: { no: 'Kjerne', en: 'Core' },
-    upper_extremity: { no: 'Overekstremitet', en: 'Upper Extremity' },
-    lower_extremity: { no: 'Underekstremitet', en: 'Lower Extremity' },
-    full_body: { no: 'Helkropp', en: 'Full Body' },
+  const bodyRegionKeys = {
+    cervical: 'regionCervical',
+    thoracic: 'regionThoracic',
+    lumbar: 'regionLumbar',
+    shoulder: 'regionShoulder',
+    hip: 'regionHip',
+    knee: 'regionKnee',
+    ankle: 'regionAnkle',
+    foot: 'regionFoot',
+    core: 'regionCore',
+    upper_extremity: 'regionUpperExtremity',
+    lower_extremity: 'regionLowerExtremity',
+    full_body: 'regionFullBody',
   };
 
   const equipmentOptions = [
-    { value: 'none', label: { no: 'Ingen', en: 'None' } },
-    { value: 'yoga_mat', label: { no: 'Yogamatte', en: 'Yoga Mat' } },
-    { value: 'resistance_band', label: { no: 'Elastikk', en: 'Resistance Band' } },
-    { value: 'foam_roller', label: { no: 'Skumrull', en: 'Foam Roller' } },
-    { value: 'chair', label: { no: 'Stol', en: 'Chair' } },
-    { value: 'towel', label: { no: 'Håndkle', en: 'Towel' } },
-    { value: 'doorway', label: { no: 'Døråpning', en: 'Doorway' } },
-    { value: 'marbles', label: { no: 'Kuler', en: 'Marbles' } },
-    { value: 'dumbbell', label: { no: 'Manualer', en: 'Dumbbells' } },
-    { value: 'balance_board', label: { no: 'Balansebrett', en: 'Balance Board' } },
+    { value: 'none', labelKey: 'equipNone' },
+    { value: 'yoga_mat', labelKey: 'equipYogaMat' },
+    { value: 'resistance_band', labelKey: 'equipResistanceBand' },
+    { value: 'foam_roller', labelKey: 'equipFoamRoller' },
+    { value: 'chair', labelKey: 'equipChair' },
+    { value: 'towel', labelKey: 'equipTowel' },
+    { value: 'doorway', labelKey: 'equipDoorway' },
+    { value: 'marbles', labelKey: 'equipMarbles' },
+    { value: 'dumbbell', labelKey: 'equipDumbbell' },
+    { value: 'balance_board', labelKey: 'equipBalanceBoard' },
   ];
 
   // Helper to extract YouTube video ID
@@ -222,9 +222,9 @@ export default function ExerciseEditor({
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
-                  {Object.entries(categoryLabels).map(([key, labels]) => (
+                  {Object.entries(categoryKeys).map(([key, tKey]) => (
                     <option key={key} value={key}>
-                      {labels[lang] || key}
+                      {t(tKey, key)}
                     </option>
                   ))}
                 </select>
@@ -238,9 +238,9 @@ export default function ExerciseEditor({
                   onChange={(e) => setFormData({ ...formData, body_region: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
-                  {Object.entries(bodyRegionLabels).map(([key, labels]) => (
+                  {Object.entries(bodyRegionKeys).map(([key, tKey]) => (
                     <option key={key} value={key}>
-                      {labels[lang] || key}
+                      {t(tKey, key)}
                     </option>
                   ))}
                 </select>
@@ -348,7 +348,10 @@ export default function ExerciseEditor({
                   onChange={(e) => setFormData({ ...formData, instructions_en: e.target.value })}
                   rows={5}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="Detailed step-by-step instructions..."
+                  placeholder={t(
+                    'detailedInstructionsPlaceholder',
+                    'Detailed step-by-step instructions...'
+                  )}
                 />
               </div>
             </div>
@@ -477,7 +480,7 @@ export default function ExerciseEditor({
                         : 'bg-gray-50 border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                     }`}
                   >
-                    {equip.label[lang] || equip.value}
+                    {t(equip.labelKey, equip.value)}
                   </button>
                 ))}
               </div>

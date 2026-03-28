@@ -3,6 +3,7 @@
  * Shows amendments/corrections for signed encounters
  */
 import { FileText, Save, Loader2, Lock } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 export function AmendmentSection({
   isSigned,
@@ -19,6 +20,7 @@ export function AmendmentSection({
   createAmendmentMutation,
   signAmendmentMutation,
 }) {
+  const { t } = useTranslation('clinical');
   if (!isSigned) {
     return null;
   }
@@ -68,7 +70,10 @@ export function AmendmentSection({
                   type="text"
                   value={amendmentReason}
                   onChange={(e) => setAmendmentReason(e.target.value)}
-                  placeholder="Begrunn hvorfor rettelsen er n\u00F8dvendig"
+                  placeholder={t(
+                    'amendmentReasonPlaceholder',
+                    'Begrunn hvorfor rettelsen er nødvendig'
+                  )}
                   className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-amber-500"
                 />
               </div>
@@ -81,7 +86,7 @@ export function AmendmentSection({
             <textarea
               value={amendmentContent}
               onChange={(e) => setAmendmentContent(e.target.value)}
-              placeholder="Skriv tillegget eller rettelsen her..."
+              placeholder={t('amendmentTextPlaceholder', 'Skriv tillegget eller rettelsen her...')}
               rows={4}
               className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-amber-500 resize-none"
             />

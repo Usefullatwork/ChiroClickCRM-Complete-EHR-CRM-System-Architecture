@@ -46,12 +46,24 @@ export default function AuditLogs() {
     queryKey: ['audit-logs', filters, page],
     queryFn: async () => {
       const params = { page, limit: 50 };
-      if (filters.action) params.action = filters.action;
-      if (filters.resourceType) params.resourceType = filters.resourceType;
-      if (filters.userRole) params.userRole = filters.userRole;
-      if (filters.startDate) params.startDate = filters.startDate;
-      if (filters.endDate) params.endDate = filters.endDate;
-      if (filters.search) params.search = filters.search;
+      if (filters.action) {
+        params.action = filters.action;
+      }
+      if (filters.resourceType) {
+        params.resourceType = filters.resourceType;
+      }
+      if (filters.userRole) {
+        params.userRole = filters.userRole;
+      }
+      if (filters.startDate) {
+        params.startDate = filters.startDate;
+      }
+      if (filters.endDate) {
+        params.endDate = filters.endDate;
+      }
+      if (filters.search) {
+        params.search = filters.search;
+      }
       const res = await auditLogsAPI.getAll(params);
       return res.data;
     },

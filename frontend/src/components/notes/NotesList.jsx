@@ -233,9 +233,9 @@ export default function NotesList({
                       {/* Diagnosis Codes / Diagnosekoder */}
                       {diagnosisCodes.length > 0 && (
                         <div className="flex items-center gap-1 mb-1">
-                          {diagnosisCodes.map((code, index) => (
+                          {diagnosisCodes.map((code) => (
                             <span
-                              key={index}
+                              key={code}
                               className="px-1.5 py-0.5 text-xs bg-gray-100 text-gray-600 dark:text-gray-300 rounded"
                             >
                               {code}

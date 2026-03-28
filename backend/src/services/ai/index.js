@@ -61,18 +61,19 @@ export {
 } from './promptBuilder.js';
 
 // Default export matching original ai.js default export
-import { spellCheckNorwegian } from './promptBuilder.js';
-import { generateSOAPSuggestions } from './promptBuilder.js';
-import { suggestDiagnosisCodes } from './promptBuilder.js';
-import { analyzeRedFlags } from './promptBuilder.js';
-import { generateClinicalSummary } from './promptBuilder.js';
-import { learnFromOutcome } from './promptBuilder.js';
-import { organizeOldJournalNotes } from './promptBuilder.js';
-import { organizeMultipleNotes } from './promptBuilder.js';
-import { mergeOrganizedNotes } from './promptBuilder.js';
-import { getAIStatus } from './promptBuilder.js';
-import { getModelForTask } from './modelRouter.js';
-import { MODEL_ROUTING } from './modelRouter.js';
+import {
+  spellCheckNorwegian,
+  generateSOAPSuggestions,
+  suggestDiagnosisCodes,
+  analyzeRedFlags,
+  generateClinicalSummary,
+  learnFromOutcome,
+  organizeOldJournalNotes,
+  organizeMultipleNotes,
+  mergeOrganizedNotes,
+  getAIStatus,
+} from './promptBuilder.js';
+import { getModelForTask, MODEL_ROUTING } from './modelRouter.js';
 
 export default {
   spellCheckNorwegian,

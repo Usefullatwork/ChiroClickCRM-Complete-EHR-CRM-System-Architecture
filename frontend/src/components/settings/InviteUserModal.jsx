@@ -8,12 +8,17 @@ export default function InviteUserModal({ isOpen, onClose, onSubmit, isLoading, 
   const [role, setRole] = useState('PRACTITIONER');
   const [emailError, setEmailError] = useState('');
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   const validateEmail = (value) => {
-    if (!value) return t('emailRequired') || 'E-post er paakrevd';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))
+    if (!value) {
+      return t('emailRequired') || 'E-post er paakrevd';
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
       return t('invalidEmail') || 'Ugyldig e-postadresse';
+    }
     return '';
   };
 

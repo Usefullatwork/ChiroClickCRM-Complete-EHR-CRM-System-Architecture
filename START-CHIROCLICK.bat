@@ -9,17 +9,18 @@ echo   ChiroClickEHR - Starting Application
 echo  ========================================
 echo.
 
-:: Ask user if they want to load AI models
-echo  AI Models require ~4-14GB RAM and slow startup.
-echo.
-echo  [A] Start with AI (full features)
-echo  [S] Skip AI (faster startup, no AI features)
-echo.
-choice /C AS /N /M "  Choose option [A/S]: "
-if errorlevel 2 goto SKIP_AI
-if errorlevel 1 goto WITH_AI
+:: Auto-detect Ollama
+where ollama >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    set AI_ENABLED=true
+    echo   Ollama detected - AI features enabled
+) else (
+    set AI_ENABLED=false
+    echo   Ollama not found - starting without AI
+)
 
-:WITH_AI
+if "%AI_ENABLED%"=="false" goto SKIP_AI
+
 set AI_MODE=enabled
 echo.
 echo  Starting with AI enabled...
@@ -145,7 +146,7 @@ if "%AI_MODE%"=="enabled" (
 ) else (
     echo [4/4] Opening Browser...
 )
-start msedge "http://localhost:5173"
+start "" "http://localhost:5173"
 
 echo.
 echo  ========================================

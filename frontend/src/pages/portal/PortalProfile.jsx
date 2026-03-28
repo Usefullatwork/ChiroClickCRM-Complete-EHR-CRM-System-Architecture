@@ -75,7 +75,7 @@ export default function PortalProfile() {
       setEditForm({ phone: data.phone || '', email: data.email || '' });
     } catch (err) {
       logger.error('Failed to load profile:', err);
-      setError('Kunne ikke laste profilen');
+      setError(t('couldNotLoadProfile', 'Kunne ikke laste profilen'));
     } finally {
       setLoading(false);
     }
@@ -92,7 +92,7 @@ export default function PortalProfile() {
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
       logger.error('Failed to update profile:', err);
-      setError('Kunne ikke lagre endringer');
+      setError(t('couldNotSaveChanges', 'Kunne ikke lagre endringer'));
     } finally {
       setSaving(false);
     }
@@ -122,7 +122,7 @@ export default function PortalProfile() {
           >
             <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
-          <h1 className="font-bold text-gray-900">Min profil</h1>
+          <h1 className="font-bold text-gray-900">{t('myProfileTitle', 'Min profil')}</h1>
         </div>
       </header>
 
@@ -137,7 +137,7 @@ export default function PortalProfile() {
         {saved && (
           <div className="flex items-center gap-2 p-3 bg-green-50 text-green-700 rounded-xl border border-green-200">
             <CheckCircle className="w-5 h-5 flex-shrink-0" />
-            <span className="text-sm">Endringer lagret!</span>
+            <span className="text-sm">{t('changesSaved', 'Endringer lagret!')}</span>
           </div>
         )}
 
@@ -151,7 +151,7 @@ export default function PortalProfile() {
           </h2>
           {profile?.dateOfBirth && (
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-              Fodt{' '}
+              {t('bornLabel', 'Født')}{' '}
               {new Date(profile.dateOfBirth).toLocaleDateString('nb-NO', {
                 day: 'numeric',
                 month: 'long',
@@ -164,14 +164,16 @@ export default function PortalProfile() {
         {/* Contact Info */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-900">Kontaktinformasjon</h3>
+            <h3 className="font-semibold text-gray-900">
+              {t('contactInformation', 'Kontaktinformasjon')}
+            </h3>
             {!editing && (
               <button
                 onClick={() => setEditing(true)}
                 className="flex items-center gap-1.5 text-sm text-orange-600 hover:text-orange-700"
               >
                 <Edit3 className="w-4 h-4" />
-                Rediger
+                {t('editLabel', 'Rediger')}
               </button>
             )}
           </div>
@@ -179,7 +181,9 @@ export default function PortalProfile() {
           {editing ? (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('phoneLabel', 'Telefon')}
+                </label>
                 <input
                   type="tel"
                   value={editForm.phone}
@@ -189,7 +193,9 @@ export default function PortalProfile() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">E-post</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('emailLabel', 'E-post')}
+                </label>
                 <input
                   type="email"
                   value={editForm.email}
@@ -209,33 +215,43 @@ export default function PortalProfile() {
                   ) : (
                     <Save className="w-4 h-4" />
                   )}
-                  Lagre
+                  {t('saveBtn', 'Lagre')}
                 </button>
                 <button
                   onClick={handleCancel}
                   className="px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors flex items-center gap-2"
                 >
                   <X className="w-4 h-4" />
-                  Avbryt
+                  {t('cancelBtn', 'Avbryt')}
                 </button>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Telefon</p>
-                <p className="text-gray-900">{profile?.phone || 'Ikke registrert'}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+                  {t('phoneLabel', 'Telefon')}
+                </p>
+                <p className="text-gray-900">
+                  {profile?.phone || t('notRegistered', 'Ikke registrert')}
+                </p>
               </div>
               <div className="border-t border-gray-100 pt-4">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">E-post</p>
-                <p className="text-gray-900">{profile?.email || 'Ikke registrert'}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+                  {t('emailLabel', 'E-post')}
+                </p>
+                <p className="text-gray-900">
+                  {profile?.email || t('notRegistered', 'Ikke registrert')}
+                </p>
               </div>
               <div className="border-t border-gray-100 pt-4">
-                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">Fodselsdato</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+                  {t('dateOfBirthLabel', 'Fødselsdato')}
+                </p>
                 <p className="text-gray-900">
                   {profile?.dateOfBirth
                     ? new Date(profile.dateOfBirth).toLocaleDateString('nb-NO')
-                    : 'Ikke registrert'}
+                    : t('notRegistered', 'Ikke registrert')}
                 </p>
               </div>
             </div>
@@ -305,15 +321,21 @@ export default function PortalProfile() {
         {/* Privacy note */}
         <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            Din personlige informasjon er trygt oppbevart i henhold til norsk lov om helsepersonell
-            og GDPR. Kun din behandler og autorisert helsepersonell har tilgang til dine
-            journaldata.
+            {t(
+              'privacyNote',
+              'Din personlige informasjon er trygt oppbevart i henhold til norsk lov om helsepersonell og GDPR. Kun din behandler og autorisert helsepersonell har tilgang til dine journaldata.'
+            )}
           </p>
         </div>
       </div>
 
       <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-300">
-        <p>Kontakt klinikken for a oppdatere navn eller fodselsdato</p>
+        <p>
+          {t(
+            'contactClinicToUpdateInfo',
+            'Kontakt klinikken for å oppdatere navn eller fødselsdato'
+          )}
+        </p>
       </footer>
     </div>
   );

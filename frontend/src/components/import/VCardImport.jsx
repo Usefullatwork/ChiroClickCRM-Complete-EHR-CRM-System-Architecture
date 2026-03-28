@@ -531,7 +531,7 @@ export default function VCardImport({
           <div className="grid gap-3">
             {validatedContacts.map((contact, index) => (
               <div
-                key={index}
+                key={contact.email || contact.phone || index}
                 className={`p-4 border rounded-lg transition-colors cursor-pointer
                   ${
                     selectedContacts.has(index)

@@ -18,7 +18,10 @@ export const getAllTreatmentCodes = async () => {
     async () => {
       try {
         const result = await query(
-          `SELECT *
+          `SELECT code, description, description_en, default_price,
+                  insurance_reimbursement, default_duration, requires_special_training,
+                  certification_required, max_per_day, max_per_series,
+                  usage_count, commonly_used, is_active, created_at
          FROM treatment_codes
          WHERE is_active = true
          ORDER BY commonly_used DESC, code ASC`,
@@ -46,7 +49,10 @@ export const getCommonTreatmentCodes = async () => {
     async () => {
       try {
         const result = await query(
-          `SELECT *
+          `SELECT code, description, description_en, default_price,
+                  insurance_reimbursement, default_duration, requires_special_training,
+                  certification_required, max_per_day, max_per_series,
+                  usage_count, commonly_used, is_active, created_at
          FROM treatment_codes
          WHERE commonly_used = true AND is_active = true
          ORDER BY usage_count DESC, code ASC`,
@@ -68,7 +74,14 @@ export const getCommonTreatmentCodes = async () => {
  */
 export const getTreatmentCode = async (code) => {
   try {
-    const result = await query('SELECT * FROM treatment_codes WHERE code = $1', [code]);
+    const result = await query(
+      `SELECT code, description, description_en, default_price,
+              insurance_reimbursement, default_duration, requires_special_training,
+              certification_required, max_per_day, max_per_series,
+              usage_count, commonly_used, is_active, created_at
+       FROM treatment_codes WHERE code = $1`,
+      [code]
+    );
 
     if (result.rows.length === 0) {
       return null;
@@ -87,7 +100,10 @@ export const getTreatmentCode = async (code) => {
 export const searchTreatmentCodes = async (searchTerm, limit = 10) => {
   try {
     const result = await query(
-      `SELECT *
+      `SELECT code, description, description_en, default_price,
+              insurance_reimbursement, default_duration, requires_special_training,
+              certification_required, max_per_day, max_per_series,
+              usage_count, commonly_used, is_active, created_at
        FROM treatment_codes
        WHERE (code ILIKE $1 OR description ILIKE $1 OR description_en ILIKE $1)
          AND is_active = true

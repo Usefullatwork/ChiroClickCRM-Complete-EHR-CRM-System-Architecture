@@ -19,31 +19,31 @@ import {
 import { exercisesAPI } from '../../services/api';
 import toast from '../../utils/toast';
 
-// Category and body region labels
-const categoryLabels = {
-  stretching: { no: 'Tøyning', en: 'Stretching' },
-  strengthening: { no: 'Styrke', en: 'Strengthening' },
-  mobility: { no: 'Mobilitet', en: 'Mobility' },
-  balance: { no: 'Balanse', en: 'Balance' },
-  posture: { no: 'Holdning', en: 'Posture' },
-  breathing: { no: 'Pust', en: 'Breathing' },
-  nerve_glide: { no: 'Nervegliding', en: 'Nerve Glide' },
-  vestibular: { no: 'Vestibulær', en: 'Vestibular' },
+// Category and body region translation key maps
+const categoryKeys = {
+  stretching: 'catStretching',
+  strengthening: 'catStrengthening',
+  mobility: 'catMobility',
+  balance: 'catBalance',
+  posture: 'catPosture',
+  breathing: 'catBreathing',
+  nerve_glide: 'catNerveGlide',
+  vestibular: 'catVestibular',
 };
 
-const bodyRegionLabels = {
-  cervical: { no: 'Nakke', en: 'Cervical' },
-  thoracic: { no: 'Brystsøyle', en: 'Thoracic' },
-  lumbar: { no: 'Korsrygg', en: 'Lumbar' },
-  shoulder: { no: 'Skulder', en: 'Shoulder' },
-  hip: { no: 'Hofte', en: 'Hip' },
-  knee: { no: 'Kne', en: 'Knee' },
-  ankle: { no: 'Ankel', en: 'Ankle' },
-  foot: { no: 'Fot', en: 'Foot' },
-  core: { no: 'Kjerne', en: 'Core' },
-  upper_extremity: { no: 'Overekstremitet', en: 'Upper Extremity' },
-  lower_extremity: { no: 'Underekstremitet', en: 'Lower Extremity' },
-  full_body: { no: 'Helkropp', en: 'Full Body' },
+const bodyRegionKeys = {
+  cervical: 'regionCervical',
+  thoracic: 'regionThoracic',
+  lumbar: 'regionLumbar',
+  shoulder: 'regionShoulder',
+  hip: 'regionHip',
+  knee: 'regionKnee',
+  ankle: 'regionAnkle',
+  foot: 'regionFoot',
+  core: 'regionCore',
+  upper_extremity: 'regionUpperExtremity',
+  lower_extremity: 'regionLowerExtremity',
+  full_body: 'regionFullBody',
 };
 
 // Helper to extract YouTube video ID
@@ -274,7 +274,7 @@ export default function ExerciseSettings({ lang }) {
                 <option value="">{t('allCategories', 'Alle kategorier')}</option>
                 {exerciseCategories.map((cat) => (
                   <option key={cat} value={cat}>
-                    {categoryLabels[cat]?.[lang] || cat}
+                    {t(categoryKeys[cat], cat)}
                   </option>
                 ))}
               </select>
@@ -291,7 +291,7 @@ export default function ExerciseSettings({ lang }) {
                 <option value="">{t('allRegions', 'Alle regioner')}</option>
                 {exerciseBodyRegions.map((region) => (
                   <option key={region} value={region}>
-                    {bodyRegionLabels[region]?.[lang] || region}
+                    {t(bodyRegionKeys[region], region)}
                   </option>
                 ))}
               </select>
@@ -340,10 +340,10 @@ export default function ExerciseSettings({ lang }) {
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded">
-                          {categoryLabels[exercise.category]?.[lang] || exercise.category}
+                          {t(categoryKeys[exercise.category], exercise.category)}
                         </span>
                         <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded">
-                          {bodyRegionLabels[exercise.body_region]?.[lang] || exercise.body_region}
+                          {t(bodyRegionKeys[exercise.body_region], exercise.body_region)}
                         </span>
                       </div>
                     </div>
@@ -500,9 +500,9 @@ export default function ExerciseSettings({ lang }) {
                       }
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      {Object.entries(categoryLabels).map(([key, labels]) => (
+                      {Object.entries(categoryKeys).map(([key, tKey]) => (
                         <option key={key} value={key}>
-                          {labels[lang] || key}
+                          {t(tKey, key)}
                         </option>
                       ))}
                     </select>
@@ -521,9 +521,9 @@ export default function ExerciseSettings({ lang }) {
                       }
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      {Object.entries(bodyRegionLabels).map(([key, labels]) => (
+                      {Object.entries(bodyRegionKeys).map(([key, tKey]) => (
                         <option key={key} value={key}>
-                          {labels[lang] || key}
+                          {t(tKey, key)}
                         </option>
                       ))}
                     </select>
@@ -636,7 +636,7 @@ export default function ExerciseSettings({ lang }) {
                       }
                       rows={4}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="Detailed instructions..."
+                      placeholder={t('detailedInstructionsPlaceholder', 'Detailed instructions...')}
                     />
                   </div>
                 </div>

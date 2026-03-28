@@ -41,7 +41,8 @@ const loadServices = async () => {
   }
 
   try {
-    aiRetrainingService = await import('../services/aiRetraining.js');
+    const mod = await import('../application/services/AIRetrainingService.js');
+    aiRetrainingService = mod.aiRetrainingService;
     logger.info('AI Retraining service loaded');
   } catch (e) {
     logger.warn('AI Retraining service not available:', e.message);
@@ -227,7 +228,9 @@ const processCommunicationQueue = async () => {
       try {
         // Check patient communication preferences
         const prefsResult = await query(
-          `SELECT * FROM patient_communication_preferences
+          `SELECT patient_id, sms_enabled, email_enabled, reminder_enabled,
+                  exercise_reminder_enabled, recall_enabled, marketing_enabled
+           FROM patient_communication_preferences
            WHERE patient_id = $1`,
           [item.patient_id]
         );
@@ -459,17 +462,13 @@ const generateFollowUpReminders = async () => {
 
     const result = { recalls: 0, birthdays: 0 };
 
-    // Check for patients needing 3-month recall
-    const recall3m = await automationsService.checkDaysSinceVisitTriggers(90, 'RECALL_3M');
-    result.recalls += recall3m?.count || 0;
-
-    // Check for patients needing 6-month recall
-    const recall6m = await automationsService.checkDaysSinceVisitTriggers(180, 'RECALL_6M');
-    result.recalls += recall6m?.count || 0;
+    // Check for patients needing recall (thresholds come from workflow trigger_config.days)
+    const recalls = await automationsService.checkDaysSinceVisitTriggers();
+    result.recalls = recalls?.processed || 0;
 
     // Check for upcoming birthdays
     const birthdays = await automationsService.checkBirthdayTriggers();
-    result.birthdays = birthdays?.count || 0;
+    result.birthdays = birthdays?.processed || 0;
 
     logger.info('Follow-up reminders generated:', result);
     return result;
@@ -491,7 +490,7 @@ const sendAppointmentReminders = async () => {
 
   try {
     logger.info('Checking for appointment reminders...');
-    const result = await automationsService.checkAppointmentReminders24h();
+    const result = await automationsService.checkAppointmentReminders();
     logger.info('Appointment reminders processed:', result);
     return result;
   } catch (error) {

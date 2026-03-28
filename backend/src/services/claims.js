@@ -483,9 +483,11 @@ export const processRemittance = async (organizationId, claimId, remittanceData)
  * Get claims summary by status
  */
 export const getClaimsSummary = async (organizationId) => {
-  const result = await query(`SELECT * FROM claims_summary WHERE organization_id = $1`, [
-    organizationId,
-  ]);
+  const result = await query(
+    `SELECT organization_id, status, claim_count, total_charges, total_paid, total_adjustments, total_patient_responsibility
+     FROM claims_summary WHERE organization_id = $1`,
+    [organizationId]
+  );
 
   return result.rows;
 };
@@ -494,9 +496,12 @@ export const getClaimsSummary = async (organizationId) => {
  * Get outstanding claims
  */
 export const getOutstandingClaims = async (organizationId) => {
-  const result = await query(`SELECT * FROM outstanding_claims WHERE organization_id = $1`, [
-    organizationId,
-  ]);
+  const result = await query(
+    `SELECT id, organization_id, patient_id, patient_name, status, total_charge, total_paid, total_adjustment,
+            patient_responsibility, submitted_at, days_outstanding
+     FROM outstanding_claims WHERE organization_id = $1`,
+    [organizationId]
+  );
 
   return result.rows;
 };

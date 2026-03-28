@@ -7,10 +7,10 @@
 import * as encounterService from './encounters.js';
 import * as examinationService from './examinations.js';
 import * as treatmentService from './treatments.js';
-import * as clinicalNotes from './clinicalNotes.js';
-import { query } from '../config/database.js';
+import { query, transaction } from '../config/database.js';
 import logger from '../utils/logger.js';
 import { BusinessLogicError, NotFoundError } from '../utils/errors.js';
+import { validate as validateNote } from './noteValidator.js';
 
 /**
  * Start a new clinical encounter.
@@ -228,7 +228,7 @@ export const recordTreatment = async (organizationId, encounterId, treatmentData
  * @returns {{ note, signed, followUpSuggested }}
  */
 export const finalizeEncounter = async (organizationId, encounterId, practitionerId) => {
-  // Verify encounter exists and is not already signed
+  // Verify encounter exists and is not already signed (read — outside transaction)
   const encounter = await encounterService.getEncounterById(organizationId, encounterId);
   if (!encounter) {
     throw new NotFoundError('Encounter', encounterId);
@@ -237,37 +237,91 @@ export const finalizeEncounter = async (organizationId, encounterId, practitione
     throw new BusinessLogicError('Encounter is already finalized');
   }
 
-  // Generate the formatted SOAP note
+  // Generate the formatted SOAP note (read — outside transaction)
   const note = await encounterService.generateFormattedNote(organizationId, encounterId);
 
-  // Also create a clinical note record linked to this encounter
-  await clinicalNotes.createNote(
-    organizationId,
-    {
-      patient_id: encounter.patient_id,
-      practitioner_id: practitionerId,
-      note_type: 'SOAP',
-      template_type: encounter.encounter_type || 'SOAP',
-      note_date: encounter.encounter_date,
-      subjective: encounter.subjective || {},
-      objective: encounter.objective || {},
-      assessment: encounter.assessment || {},
-      plan: encounter.plan || {},
-      icd10_codes: encounter.icd10_codes || [],
-      icpc_codes: encounter.icpc_codes || [],
-      duration_minutes: encounter.duration_minutes,
-      vas_pain_start: encounter.vas_pain_start,
-      vas_pain_end: encounter.vas_pain_end,
-      encounter_id: encounterId,
-      is_draft: false,
-    },
-    practitionerId
-  );
+  // Prepare note data for validation (pure function — outside transaction)
+  const noteData = {
+    patient_id: encounter.patient_id,
+    practitioner_id: practitionerId,
+    note_type: 'SOAP',
+    template_type: encounter.encounter_type || 'SOAP',
+    note_date: encounter.encounter_date,
+    subjective: encounter.subjective || {},
+    objective: encounter.objective || {},
+    assessment: encounter.assessment || {},
+    plan: encounter.plan || {},
+    icd10_codes: encounter.icd10_codes || [],
+    icpc_codes: encounter.icpc_codes || [],
+    duration_minutes: encounter.duration_minutes,
+    vas_pain_start: encounter.vas_pain_start,
+    vas_pain_end: encounter.vas_pain_end,
+    encounter_id: encounterId,
+    is_draft: false,
+  };
 
-  // Sign the encounter
-  const signed = await encounterService.signEncounter(organizationId, encounterId, practitionerId);
+  const validation = validateNote(noteData, noteData.note_type);
+  if (!validation.canSave) {
+    throw new BusinessLogicError(`Validation failed: ${validation.errors.join('; ')}`);
+  }
 
-  // Determine if follow-up is suggested
+  // Wrap both mutations in a single transaction
+  const signed = await transaction(async (client) => {
+    // Create clinical note (inlined from clinicalNotes.createNote)
+    await client.query(
+      `INSERT INTO clinical_notes (
+        organization_id, patient_id, practitioner_id, note_type, template_type,
+        note_date, status, subjective, objective, assessment, plan,
+        icd10_codes, icpc_codes, vestibular_data, duration_minutes,
+        vas_pain_start, vas_pain_end, prescribed_exercises, is_draft,
+        draft_saved_at, auto_save_data, encounter_id, created_by
+      ) VALUES (
+        $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23
+      ) RETURNING *`,
+      [
+        organizationId,
+        noteData.patient_id,
+        noteData.practitioner_id,
+        noteData.note_type,
+        noteData.template_type || 'standard',
+        noteData.note_date || new Date(),
+        noteData.status || 'draft',
+        JSON.stringify(noteData.subjective || {}),
+        JSON.stringify(noteData.objective || {}),
+        JSON.stringify(noteData.assessment || {}),
+        JSON.stringify(noteData.plan || {}),
+        noteData.icd10_codes || [],
+        noteData.icpc_codes || [],
+        null,
+        noteData.duration_minutes || 30,
+        noteData.vas_pain_start || null,
+        noteData.vas_pain_end || null,
+        JSON.stringify([]),
+        false,
+        null,
+        null,
+        noteData.encounter_id || null,
+        practitionerId,
+      ]
+    );
+
+    // Sign encounter (inlined from encounterService.signEncounter)
+    const signResult = await client.query(
+      `UPDATE clinical_encounters
+       SET signed_at = NOW(), signed_by = $3, is_current = true
+       WHERE organization_id = $1 AND id = $2 AND signed_at IS NULL
+       RETURNING *`,
+      [organizationId, encounterId, practitionerId]
+    );
+
+    if (signResult.rows.length === 0) {
+      throw new Error('Encounter not found or already signed');
+    }
+
+    return signResult.rows[0];
+  });
+
+  // Determine if follow-up is suggested (read — outside transaction)
   const followUpSuggested = suggestFollowUp(encounter);
 
   logger.info('Encounter finalized', {

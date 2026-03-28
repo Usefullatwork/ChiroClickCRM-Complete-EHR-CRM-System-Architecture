@@ -18,8 +18,10 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { crmAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 
 const ExerciseTemplates = () => {
+  const { t } = useTranslation('exercises');
   const [activeTab, setActiveTab] = useState('templates');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('ALL');
@@ -257,7 +259,7 @@ const ExerciseTemplates = () => {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
                   <input
                     type="text"
-                    placeholder="Søk etter mal..."
+                    placeholder={t('searchTemplatePlaceholder', 'Søk etter mal...')}
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
@@ -444,7 +446,10 @@ const ExerciseTemplates = () => {
                     type="text"
                     value={newTemplate.name}
                     onChange={(e) => setNewTemplate((prev) => ({ ...prev, name: e.target.value }))}
-                    placeholder="F.eks. 'Nakkeøvelser - Avansert'"
+                    placeholder={t(
+                      'templateNameExamplePlaceholder',
+                      "F.eks. 'Nakkeøvelser - Avansert'"
+                    )}
                     className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
@@ -476,7 +481,7 @@ const ExerciseTemplates = () => {
                   onChange={(e) =>
                     setNewTemplate((prev) => ({ ...prev, description: e.target.value }))
                   }
-                  placeholder="Kort beskrivelse av øvelsene..."
+                  placeholder={t('shortDescriptionPlaceholder', 'Kort beskrivelse av øvelsene...')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -487,7 +492,7 @@ const ExerciseTemplates = () => {
                   type="text"
                   value={newTemplate.subject}
                   onChange={(e) => setNewTemplate((prev) => ({ ...prev, subject: e.target.value }))}
-                  placeholder="Emne for e-posten..."
+                  placeholder={t('emailSubjectPlaceholder', 'Emne for e-posten...')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -500,7 +505,10 @@ const ExerciseTemplates = () => {
                   value={newTemplate.body}
                   onChange={(e) => setNewTemplate((prev) => ({ ...prev, body: e.target.value }))}
                   rows={6}
-                  placeholder="Skriv e-postinnholdet her... Bruk {name} for pasientnavn."
+                  placeholder={t(
+                    'emailBodyPlaceholder',
+                    'Skriv e-postinnholdet her... Bruk {name} for pasientnavn.'
+                  )}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
@@ -560,7 +568,7 @@ const ExerciseTemplates = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-1">Velg Pasient</label>
                 <input
                   type="text"
-                  placeholder="Skriv pasientnavn..."
+                  placeholder={t('patientNamePlaceholder', 'Skriv pasientnavn...')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -582,7 +590,7 @@ const ExerciseTemplates = () => {
                 </label>
                 <textarea
                   rows={3}
-                  placeholder="Legg til en personlig melding..."
+                  placeholder={t('personalMessagePlaceholder', 'Legg til en personlig melding...')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>

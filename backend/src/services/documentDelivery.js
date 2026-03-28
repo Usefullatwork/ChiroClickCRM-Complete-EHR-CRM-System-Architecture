@@ -94,10 +94,13 @@ export async function generatePdf(documentType, documentId, organizationId) {
       break;
     }
     case 'invoice': {
-      const invRes = await query(`SELECT * FROM invoices WHERE id = $1 AND organization_id = $2`, [
-        documentId,
-        organizationId,
-      ]);
+      const invRes = await query(
+        `SELECT id, organization_id, patient_id, encounter_id, practitioner_id, invoice_number,
+                invoice_date, due_date, items, gross_amount, helfo_refund, patient_amount,
+                amount_due, amount_paid, status, notes, is_child, has_exemption, created_at, updated_at, paid_at
+         FROM invoices WHERE id = $1 AND organization_id = $2`,
+        [documentId, organizationId]
+      );
       if (invRes.rows.length === 0) {
         throw new Error('Invoice not found');
       }
@@ -263,7 +266,7 @@ export async function deliverDocument(
     deliveryStatus.email = true;
     logger.info('Document delivered via email', {
       documentType,
-      patientId: patientId.slice(0, 8) + '...',
+      patientId: `${patientId.slice(0, 8)}...`,
     });
   }
 
@@ -292,7 +295,7 @@ export async function deliverDocument(
     deliveryStatus.sms = true;
     logger.info('Document delivered via SMS', {
       documentType,
-      patientId: patientId.slice(0, 8) + '...',
+      patientId: `${patientId.slice(0, 8)}...`,
     });
   }
 

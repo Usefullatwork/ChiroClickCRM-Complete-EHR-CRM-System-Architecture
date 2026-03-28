@@ -339,7 +339,17 @@ export const dischargeEpisode = async (organizationId, episodeId, dischargeData)
  */
 export const getEpisodesNeedingReeval = async (organizationId) => {
   const result = await query(
-    `SELECT * FROM episodes_needing_reeval
+    `SELECT id, organization_id, patient_id, chief_complaint, body_region,
+            start_date, end_date, status, mmi_date, mmi_determined_by,
+            primary_diagnosis_icpc, primary_diagnosis_icd10, secondary_diagnoses,
+            initial_visit_frequency, estimated_duration_weeks, total_visits_planned,
+            last_reeval_date, next_reeval_due, visits_since_last_reeval,
+            baseline_pain_level, baseline_function_score,
+            current_pain_level, current_function_score, improvement_percentage,
+            abn_on_file, abn_signed_date, abn_document_id,
+            clinical_notes, discharge_notes, created_at, updated_at,
+            patient_name, patient_phone
+     FROM episodes_needing_reeval
      WHERE organization_id = $1`,
     [organizationId]
   );

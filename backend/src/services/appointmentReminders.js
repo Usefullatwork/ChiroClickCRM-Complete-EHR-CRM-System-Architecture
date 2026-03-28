@@ -25,7 +25,9 @@ export const scheduleReminder = async (appointment, hoursBeforeArray = null) => 
       `SELECT settings->>'reminder_appointment_enabled' as enabled FROM organizations WHERE id = $1`,
       [appointment.organization_id]
     );
-    if (orgResult.rows[0]?.enabled === 'false') return [];
+    if (orgResult.rows[0]?.enabled === 'false') {
+      return [];
+    }
   } catch (_orgErr) {
     // Org setting not available — proceed with defaults
   }

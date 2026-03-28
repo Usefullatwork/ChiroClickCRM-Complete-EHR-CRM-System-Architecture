@@ -7,6 +7,7 @@ import { Alert } from '../ui/Alert';
 import { useCreateEncounter } from '../../hooks/useEncounters';
 import { useChiropracticCodes } from '../../hooks/useCodes';
 import toast from '../../utils/toast';
+import { useTranslation } from '../../i18n';
 
 const QUICK_TEXT_PRESETS = {
   subjective: [
@@ -38,6 +39,7 @@ const TREATMENT_CODES = [
 ];
 
 export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
+  const { t } = useTranslation('clinical');
   const [activeTab, setActiveTab] = useState('S');
   const [note, setNote] = useState({
     subjective: '',
@@ -255,7 +257,7 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                     onChange={(e) => setNote({ ...note, subjective: e.target.value })}
                     rows={12}
                     error={errors.subjective}
-                    placeholder="Type or use quick phrases..."
+                    placeholder={t('typeOrQuickPhrasesPlaceholder', 'Type or use quick phrases...')}
                     className="font-mono text-sm"
                     required
                   />
@@ -287,7 +289,10 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                     onChange={(e) => setNote({ ...note, objective: e.target.value })}
                     rows={12}
                     error={errors.objective}
-                    placeholder="Document objective findings..."
+                    placeholder={t(
+                      'documentObjectiveFindingsPlaceholder',
+                      'Document objective findings...'
+                    )}
                     className="font-mono text-sm"
                     required
                   />
@@ -334,7 +339,10 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                     value={note.assessment}
                     onChange={(e) => setNote({ ...note, assessment: e.target.value })}
                     rows={6}
-                    placeholder="Clinical assessment and reasoning..."
+                    placeholder={t(
+                      'clinicalAssessmentPlaceholder',
+                      'Clinical assessment and reasoning...'
+                    )}
                     className="font-mono text-sm"
                   />
                 </div>
@@ -348,24 +356,24 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                       {errors.treatmentCodes && <span className="text-red-500">*</span>}
                     </label>
                     <div className="grid grid-cols-2 gap-2 mb-4">
-                      {TREATMENT_CODES.map((t) => (
+                      {TREATMENT_CODES.map((tc) => (
                         <div
-                          key={t.code}
-                          onClick={() => toggleTreatment(t.code)}
+                          key={tc.code}
+                          onClick={() => toggleTreatment(tc.code)}
                           className={`p-3 border rounded-lg cursor-pointer transition-all ${
-                            note.treatmentCodes.includes(t.code)
+                            note.treatmentCodes.includes(tc.code)
                               ? 'border-teal-600 bg-teal-50 ring-1 ring-teal-600'
                               : 'border-slate-200 hover:bg-slate-50'
                           }`}
                         >
                           <div className="flex justify-between items-center">
-                            <span className="font-bold text-slate-900">{t.code}</span>
+                            <span className="font-bold text-slate-900">{tc.code}</span>
                             <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
-                              {t.price} kr
+                              {tc.price} kr
                             </span>
                           </div>
                           <div className="text-xs text-slate-500 dark:text-slate-400">
-                            {t.label}
+                            {tc.label}
                           </div>
                         </div>
                       ))}
@@ -380,7 +388,10 @@ export const SoapNoteBuilder = ({ patient, onCancel, onSave }) => {
                     value={note.plan}
                     onChange={(e) => setNote({ ...note, plan: e.target.value })}
                     rows={6}
-                    placeholder="Treatment plan and patient instructions..."
+                    placeholder={t(
+                      'treatmentPlanPlaceholder',
+                      'Treatment plan and patient instructions...'
+                    )}
                     className="font-mono text-sm"
                   />
                 </div>

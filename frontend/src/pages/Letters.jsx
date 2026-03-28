@@ -34,35 +34,32 @@ import logger from '../utils/logger';
 const LETTER_TYPES = {
   SICK_NOTE: {
     id: 'SICK_NOTE',
-    name: { no: 'Sykemelding', en: 'Sick Note' },
-    description: { no: 'NAV-kompatible sykemeldinger', en: 'NAV-compliant sick notes' },
+    nameKey: 'sickNoteName',
+    descKey: 'sickNoteDesc',
     icon: FileText,
     color: 'blue',
     route: '/sick-notes',
   },
   REFERRAL: {
     id: 'REFERRAL',
-    name: { no: 'Henvisning', en: 'Referral' },
-    description: { no: 'Henvisninger til spesialister', en: 'Referrals to specialists' },
+    nameKey: 'referralName',
+    descKey: 'referralDesc',
     icon: Send,
     color: 'green',
     route: '/referral-letters',
   },
   MEDICAL_CERTIFICATE: {
     id: 'MEDICAL_CERTIFICATE',
-    name: { no: 'Medisinsk erklæring', en: 'Medical Certificate' },
-    description: {
-      no: 'Erklæringer for arbeidsgiver, universitet, etc.',
-      en: 'Certificates for employer, university, etc.',
-    },
+    nameKey: 'medicalCertificateName',
+    descKey: 'medicalCertificateDesc',
     icon: Award,
     color: 'purple',
     route: '/certificates',
   },
   CLINICAL_NOTE: {
     id: 'CLINICAL_NOTE',
-    name: { no: 'Klinisk notat', en: 'Clinical Note' },
-    description: { no: 'Detaljerte kliniske notater', en: 'Detailed clinical notes' },
+    nameKey: 'clinicalNoteName',
+    descKey: 'clinicalNoteDesc',
     icon: ClipboardList,
     color: 'orange',
     route: '/clinical-notes',
@@ -199,10 +196,8 @@ export default function Letters() {
                 >
                   <Icon className={`w-6 h-6 text-${type.color}-600`} />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">{type.name[language]}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {type.description[language]}
-                </p>
+                <h3 className="font-semibold text-gray-900 mb-1">{t(type.nameKey)}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t(type.descKey)}</p>
               </button>
             );
           })}
@@ -323,7 +318,7 @@ export default function Letters() {
           <option value="all">{t('allTypes')}</option>
           {Object.values(LETTER_TYPES).map((type) => (
             <option key={type.id} value={type.id}>
-              {type.name[language]}
+              {t(type.nameKey)}
             </option>
           ))}
         </select>
@@ -382,7 +377,7 @@ export default function Letters() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                      {typeConfig.name[language]}
+                      {t(typeConfig.nameKey)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {letter.patientName}

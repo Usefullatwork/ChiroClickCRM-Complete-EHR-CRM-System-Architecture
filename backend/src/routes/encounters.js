@@ -9,6 +9,7 @@ import * as clinicalWorkflow from '../services/clinicalWorkflow.js';
 import * as encounterService from '../services/encounters.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
+import { readLimiter } from '../middleware/rateLimiting.js';
 import {
   createEncounterSchema,
   updateEncounterSchema,
@@ -18,6 +19,7 @@ import {
   generateNoteSchema,
 } from '../validators/encounter.validators.js';
 import { validate as validateNote } from '../services/noteValidator.js';
+import { logAction } from '../services/auditLog.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();
@@ -59,6 +61,17 @@ router.post('/validate', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res
   try {
     const { encounterType, ...soapData } = req.body;
     const validation = validateNote(soapData, encounterType || 'SOAP');
+
+    await logAction('ENCOUNTER_VALIDATE', req.user.id, {
+      resourceType: 'clinical_encounter',
+      metadata: {
+        encounterType: encounterType || 'SOAP',
+        organization_id: req.user.organization_id,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
 
     res.json({
       success: true,
@@ -102,6 +115,7 @@ router.post('/validate', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res
  */
 router.get(
   '/',
+  readLimiter,
   requireRole(['ADMIN', 'PRACTITIONER']),
   validate(getEncountersSchema),
   encounterController.getEncounters
@@ -347,6 +361,18 @@ router.get('/:id/context', requireRole(['ADMIN', 'PRACTITIONER']), async (req, r
       encounterService.checkRedFlags(encounter.patient_id, {}),
     ]);
 
+    await logAction('ENCOUNTER_CONTEXT_READ', req.user.id, {
+      resourceType: 'clinical_encounter',
+      resourceId: id,
+      metadata: {
+        organization_id: req.user.organization_id,
+        patientId: encounter.patient_id,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
+
     res.json({
       encounter,
       context: {
@@ -402,6 +428,17 @@ router.post('/:id/examination', requireRole(['ADMIN', 'PRACTITIONER']), async (r
 
     const result = await clinicalWorkflow.recordExamination(organizationId, id, req.body, user.id);
 
+    await logAction('ENCOUNTER_EXAMINATION_CREATE', req.user.id, {
+      resourceType: 'clinical_encounter',
+      resourceId: id,
+      metadata: {
+        organization_id: req.user.organization_id,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
+
     res.json({ success: true, data: result });
   } catch (error) {
     if (error.isOperational) {
@@ -453,6 +490,17 @@ router.post('/:id/treatment', requireRole(['ADMIN', 'PRACTITIONER']), async (req
 
     const result = await clinicalWorkflow.recordTreatment(organizationId, id, req.body);
 
+    await logAction('ENCOUNTER_TREATMENT_CREATE', req.user.id, {
+      resourceType: 'clinical_encounter',
+      resourceId: id,
+      metadata: {
+        organization_id: req.user.organization_id,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
+
     res.json({ success: true, data: result });
   } catch (error) {
     if (error.isOperational) {
@@ -490,6 +538,17 @@ router.post('/:id/finalize', requireRole(['ADMIN', 'PRACTITIONER']), async (req,
     const { id } = req.params;
 
     const result = await clinicalWorkflow.finalizeEncounter(organizationId, id, user.id);
+
+    await logAction('ENCOUNTER_FINALIZE', req.user.id, {
+      resourceType: 'clinical_encounter',
+      resourceId: id,
+      metadata: {
+        organization_id: req.user.organization_id,
+      },
+      ipAddress: req.ip,
+      userAgent: req.headers['user-agent'],
+      success: true,
+    });
 
     res.json({ success: true, data: result });
   } catch (error) {
@@ -641,6 +700,18 @@ router.get(
   async (req, res, next) => {
     try {
       const findings = await encounterService.getAnatomyFindings(req.params.encounterId);
+
+      await logAction('ENCOUNTER_ANATOMY_READ', req.user.id, {
+        resourceType: 'clinical_encounter',
+        resourceId: req.params.encounterId,
+        metadata: {
+          organization_id: req.user.organization_id,
+        },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+
       res.json({ data: findings });
     } catch (error) {
       next(error);
@@ -657,6 +728,18 @@ router.post(
         req.params.encounterId,
         req.body.findings
       );
+
+      await logAction('ENCOUNTER_ANATOMY_CREATE', req.user.id, {
+        resourceType: 'clinical_encounter',
+        resourceId: req.params.encounterId,
+        metadata: {
+          organization_id: req.user.organization_id,
+        },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+
       res.json({ data: result });
     } catch (error) {
       next(error);
@@ -670,6 +753,19 @@ router.get(
   async (req, res, next) => {
     try {
       const findings = await encounterService.getLatestAnatomyFindings(req.params.patientId);
+
+      await logAction('ENCOUNTER_ANATOMY_READ', req.user.id, {
+        resourceType: 'patient',
+        resourceId: req.params.patientId,
+        metadata: {
+          organization_id: req.user.organization_id,
+          context: 'latest-anatomy-findings',
+        },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+
       res.json({ data: findings });
     } catch (error) {
       next(error);
@@ -684,6 +780,19 @@ router.get(
   async (req, res, next) => {
     try {
       const findings = await encounterService.getDiagnosisFindings(req.params.diagnosisCode);
+
+      await logAction('ENCOUNTER_ANATOMY_READ', req.user.id, {
+        resourceType: 'clinical_encounter',
+        metadata: {
+          organization_id: req.user.organization_id,
+          diagnosisCode: req.params.diagnosisCode,
+          context: 'diagnosis-findings',
+        },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+
       res.json({ data: findings });
     } catch (error) {
       next(error);
@@ -699,6 +808,18 @@ router.post(
     try {
       const { bodyRegions } = req.body;
       const codes = await encounterService.getCodesFromFindings(bodyRegions);
+
+      await logAction('ENCOUNTER_ANATOMY_READ', req.user.id, {
+        resourceType: 'clinical_encounter',
+        metadata: {
+          organization_id: req.user.organization_id,
+          context: 'codes-from-findings',
+        },
+        ipAddress: req.ip,
+        userAgent: req.headers['user-agent'],
+        success: true,
+      });
+
       res.json({ data: codes });
     } catch (error) {
       next(error);

@@ -48,7 +48,7 @@ const RetentionDashboard = () => {
         setLoading(true);
         setError(null);
         const [dashboardRes, churnRes] = await Promise.all([
-          crmAPI.getRetentionDashboard({ period: timeRange }),
+          crmAPI.getRetentionDashboard(timeRange),
           crmAPI.getChurnAnalysis({ period: timeRange }),
         ]);
 

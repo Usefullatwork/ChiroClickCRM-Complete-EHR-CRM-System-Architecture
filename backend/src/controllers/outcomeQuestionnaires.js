@@ -86,7 +86,10 @@ export const getPatientQuestionnaires = async (req, res) => {
     const { type, limit, offset } = req.query;
 
     let sql = `
-      SELECT * FROM questionnaire_responses
+      SELECT id, patient_id, organization_id, encounter_id, practitioner_id,
+             questionnaire_type, raw_answers, calculated_score, max_possible_score,
+             percentage_score, severity_category, notes, completed_at, created_at
+      FROM questionnaire_responses
       WHERE patient_id = $1 AND organization_id = $2
     `;
     const params = [patientId, organizationId];
@@ -124,7 +127,10 @@ export const getQuestionnaireById = async (req, res) => {
     const { id } = req.params;
 
     const result = await query(
-      `SELECT * FROM questionnaire_responses
+      `SELECT id, patient_id, organization_id, encounter_id, practitioner_id,
+              questionnaire_type, raw_answers, calculated_score, max_possible_score,
+              percentage_score, severity_category, notes, completed_at, created_at
+       FROM questionnaire_responses
        WHERE id = $1 AND organization_id = $2`,
       [id, organizationId]
     );

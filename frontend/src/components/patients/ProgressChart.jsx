@@ -265,12 +265,12 @@ export default function ProgressChart({
       {/* Chart Area / Diagramomrade */}
       <div className="h-48 flex items-end gap-1">
         {data && data.length > 0 ? (
-          data.map((item, index) => {
+          data.map((item) => {
             const maxValue = Math.max(...data.map((d) => d.value || 0), 100);
             const height = ((item.value || 0) / maxValue) * 100;
 
             return (
-              <div key={index} className="flex-1 flex flex-col items-center">
+              <div key={item.date || item.label} className="flex-1 flex flex-col items-center">
                 <div
                   className={`w-full rounded-t transition-all hover:opacity-80 ${getBarColor(item.value, maxValue)}`}
                   style={{ height: `${Math.max(height, 4)}%` }}

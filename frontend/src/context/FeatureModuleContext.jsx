@@ -56,7 +56,9 @@ export function FeatureModuleProvider({ children }) {
 
   const isModuleEnabled = useCallback(
     (moduleName) => {
-      if (moduleName === 'core_ehr') return true;
+      if (moduleName === 'core_ehr') {
+        return true;
+      }
       return modules[moduleName] === true;
     },
     [modules]

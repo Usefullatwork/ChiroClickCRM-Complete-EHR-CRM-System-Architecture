@@ -13,6 +13,7 @@
  */
 
 import { useState, useCallback, useMemo } from 'react';
+import { useTranslation } from '../../i18n';
 import {
   AlertTriangle,
   CheckCircle,
@@ -38,74 +39,7 @@ import {
   diagnoseBPPV,
 } from './neurologicalExamDefinitions';
 
-// =============================================================================
-// TRANSLATIONS
-// =============================================================================
-
-const TRANSLATIONS = {
-  no: {
-    title: 'Nevrologisk Undersøkelse',
-    subtitle: 'Kluster-basert diagnostisk protokoll',
-    selectCluster: 'Velg undersøkelse',
-    allClusters: 'Alle klustere',
-    score: 'Score',
-    threshold: 'Terskel for diagnose',
-    interpretation: 'Tolkning',
-    redFlagAlert: 'RØDT FLAGG',
-    referralNeeded: 'Henvisning nødvendig',
-    action: 'Handling',
-    generateNarrative: 'Generer klinisk notat',
-    clearAll: 'Nullstill',
-    save: 'Lagre',
-    positive: 'Positiv',
-    negative: 'Negativ',
-    testResults: 'Testresultater',
-    clusterSummary: 'Kluster-oppsummering',
-    noTestsPerformed: 'Ingen tester utført',
-    criticalWarning: 'KRITISK ADVARSEL',
-    stopTreatment: 'STOPP BEHANDLING',
-    urgentReferral: 'AKUTT HENVISNING',
-    affectedSide: 'Affisert side',
-    treatment: 'Behandling',
-    bppvDiagnosis: 'BPPV Diagnose',
-    hintsProtocol: 'HINTS+ Protokoll',
-    centralSigns: 'Sentrale tegn (ekskluder hjerneslag)',
-    completed: 'Fullført',
-    inProgress: 'Pågår',
-    notStarted: 'Ikke startet',
-  },
-  en: {
-    title: 'Neurological Examination',
-    subtitle: 'Cluster-based diagnostic protocol',
-    selectCluster: 'Select examination',
-    allClusters: 'All clusters',
-    score: 'Score',
-    threshold: 'Diagnostic threshold',
-    interpretation: 'Interpretation',
-    redFlagAlert: 'RED FLAG',
-    referralNeeded: 'Referral needed',
-    action: 'Action',
-    generateNarrative: 'Generate clinical note',
-    clearAll: 'Clear all',
-    save: 'Save',
-    positive: 'Positive',
-    negative: 'Negative',
-    testResults: 'Test Results',
-    clusterSummary: 'Cluster Summary',
-    noTestsPerformed: 'No tests performed',
-    criticalWarning: 'CRITICAL WARNING',
-    stopTreatment: 'STOP TREATMENT',
-    urgentReferral: 'URGENT REFERRAL',
-    affectedSide: 'Affected side',
-    treatment: 'Treatment',
-    bppvDiagnosis: 'BPPV Diagnosis',
-    hintsProtocol: 'HINTS+ Protocol',
-    centralSigns: 'Central signs (exclude stroke)',
-    completed: 'Completed',
-    inProgress: 'In progress',
-    notStarted: 'Not started',
-  },
-};
+// Note: TRANSLATIONS removed — now served by i18n 'neuroexam' namespace.
 
 // Cluster icons mapping
 const CLUSTER_ICONS = {
@@ -128,7 +62,7 @@ const CLUSTER_ICONS = {
  * Cluster Selection Sidebar
  */
 function ClusterSelector({ clusters, selectedCluster, onSelect, testResults, lang }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('neuroexam');
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -182,7 +116,7 @@ function ClusterSelector({ clusters, selectedCluster, onSelect, testResults, lan
                         : 'text-gray-500 dark:text-gray-400'
                     }`}
                   >
-                    {t.score}: {score.score}/{score.total}
+                    {t('score', 'Score')}: {score.score}/{score.total}
                     {score.meetsThreshold && (
                       <span className="ml-1">{isCritical ? '⚠️' : '●'}</span>
                     )}
@@ -372,7 +306,7 @@ function TestCard({ test, results, onChange, lang }) {
  * Cluster Score Display
  */
 function ClusterScoreCard({ cluster, score, lang }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('neuroexam');
   const isCritical = cluster.isRedFlagCluster && score.meetsThreshold;
 
   return (
@@ -417,7 +351,7 @@ function ClusterScoreCard({ cluster, score, lang }) {
       </div>
 
       <div className="text-xs text-gray-600 dark:text-gray-300">
-        {t.threshold}: ≥{score.threshold}/{score.total}
+        {t('threshold', 'Terskel for diagnose')}: ≥{score.threshold}/{score.total}
       </div>
 
       {score.interpretation && (
@@ -433,14 +367,14 @@ function ClusterScoreCard({ cluster, score, lang }) {
       {/* Critical Action */}
       {isCritical && cluster.criticalAction && (
         <div className="mt-3 p-2 bg-red-200 rounded text-sm text-red-900">
-          <strong>{t.action}:</strong> {cluster.criticalAction[lang]}
+          <strong>{t('action', 'Handling')}:</strong> {cluster.criticalAction[lang]}
         </div>
       )}
 
       {/* Referral Action */}
       {!isCritical && score.meetsThreshold && cluster.referralAction && (
         <div className="mt-3 p-2 bg-orange-200 rounded text-sm text-orange-900">
-          <strong>{t.action}:</strong> {cluster.referralAction[lang]}
+          <strong>{t('action', 'Handling')}:</strong> {cluster.referralAction[lang]}
         </div>
       )}
     </div>
@@ -451,7 +385,7 @@ function ClusterScoreCard({ cluster, score, lang }) {
  * Red Flag Alert Banner
  */
 function RedFlagAlert({ redFlags, lang }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('neuroexam');
 
   if (redFlags.length === 0) {
     return null;
@@ -467,7 +401,9 @@ function RedFlagAlert({ redFlags, lang }) {
         <AlertTriangle className="w-6 h-6 text-white flex-shrink-0" />
         <div className="flex-1">
           <h3 className="text-lg font-bold text-white mb-2">
-            {hasCritical ? t.criticalWarning : t.redFlagAlert}
+            {hasCritical
+              ? t('criticalWarning', 'KRITISK ADVARSEL')
+              : t('redFlagAlert', 'RØDT FLAGG')}
           </h3>
           <ul className="space-y-2">
             {redFlags.map((flag, i) => (
@@ -479,7 +415,7 @@ function RedFlagAlert({ redFlags, lang }) {
           </ul>
           {hasCritical && (
             <div className="mt-3 p-2 bg-white/20 rounded text-white font-semibold">
-              {t.stopTreatment} - {t.urgentReferral}
+              {t('stopTreatment', 'STOPP BEHANDLING')} - {t('urgentReferral', 'AKUTT HENVISNING')}
             </div>
           )}
         </div>
@@ -492,7 +428,7 @@ function RedFlagAlert({ redFlags, lang }) {
  * BPPV Diagnosis Panel
  */
 function BPPVDiagnosisPanel({ testResults, lang }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('neuroexam');
   const diagnosis = diagnoseBPPV(testResults);
 
   if (!diagnosis.type) {
@@ -505,7 +441,7 @@ function BPPVDiagnosisPanel({ testResults, lang }) {
     <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-4">
       <h4 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
         <RotateCcw className="w-5 h-5" />
-        {t.bppvDiagnosis}
+        {t('bppvDiagnosis', 'BPPV Diagnose')}
       </h4>
       <div className="space-y-2 text-sm">
         <div>
@@ -513,7 +449,7 @@ function BPPVDiagnosisPanel({ testResults, lang }) {
         </div>
         {diagnosis.affectedSide && (
           <div>
-            <strong>{t.affectedSide}:</strong>{' '}
+            <strong>{t('affectedSide', 'Affisert side')}:</strong>{' '}
             {diagnosis.affectedSide === 'right' ? 'Høyre/Right' : 'Venstre/Left'}
           </div>
         )}
@@ -522,7 +458,7 @@ function BPPVDiagnosisPanel({ testResults, lang }) {
         </div>
         {diagnosis.treatment && (
           <div className="mt-2 p-2 bg-purple-100 rounded">
-            <strong>{t.treatment}:</strong> {diagnosis.treatment[lang]}
+            <strong>{t('treatment', 'Behandling')}:</strong> {diagnosis.treatment[lang]}
           </div>
         )}
       </div>
@@ -534,7 +470,7 @@ function BPPVDiagnosisPanel({ testResults, lang }) {
  * HINTS+ Protocol Panel
  */
 function HINTSPanel({ cluster, testResults, lang }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('neuroexam');
 
   if (!cluster.hintsPlus) {
     return null;
@@ -544,9 +480,11 @@ function HINTSPanel({ cluster, testResults, lang }) {
     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
       <h4 className="font-semibold text-yellow-900 mb-2 flex items-center gap-2">
         <Info className="w-5 h-5" />
-        {t.hintsProtocol}
+        {t('hintsProtocol', 'HINTS+ Protokoll')}
       </h4>
-      <p className="text-sm text-yellow-800 mb-3">{t.centralSigns}</p>
+      <p className="text-sm text-yellow-800 mb-3">
+        {t('centralSigns', 'Sentrale tegn (ekskluder hjerneslag)')}
+      </p>
       <div className="space-y-2">
         {cluster.hintsPlus.centralSigns.map((sign) => (
           <label key={sign.id} className="flex items-start gap-2 text-sm">
@@ -573,11 +511,13 @@ function HINTSPanel({ cluster, testResults, lang }) {
  * Generated Narrative Display
  */
 function NarrativeDisplay({ narratives, lang }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('neuroexam');
 
   if (narratives.length === 0) {
     return (
-      <div className="text-center py-8 text-gray-500 dark:text-gray-400">{t.noTestsPerformed}</div>
+      <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+        {t('noTestsPerformed', 'Ingen tester utført')}
+      </div>
     );
   }
 
@@ -588,13 +528,13 @@ function NarrativeDisplay({ narratives, lang }) {
           <div className="px-4 py-2 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
             <h4 className="font-medium text-gray-900">{cluster.clusterName}</h4>
             <span className="text-sm text-gray-600 dark:text-gray-300">
-              {t.score}: {cluster.score}
+              {t('score', 'Score')}: {cluster.score}
             </span>
           </div>
           <div className="p-4 space-y-2">
             {cluster.interpretation && (
               <div className="text-sm font-medium text-orange-700 mb-2">
-                {t.interpretation}: {cluster.interpretation}
+                {t('interpretation', 'Tolkning')}: {cluster.interpretation}
               </div>
             )}
             {cluster.tests.map((test, j) => (
@@ -629,7 +569,7 @@ export default function NeurologicalExam({
   encounterId,
   lang = 'no',
 }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('neuroexam');
 
   // State
   const [selectedCluster, setSelectedCluster] = useState('CEREBELLAR');
@@ -697,9 +637,11 @@ export default function NeurologicalExam({
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <Brain className="w-7 h-7 text-blue-600" />
-              {t.title}
+              {t('title', 'Nevrologisk Undersøkelse')}
             </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-300">{t.subtitle}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-300">
+              {t('subtitle', 'Kluster-basert diagnostisk protokoll')}
+            </p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -707,21 +649,21 @@ export default function NeurologicalExam({
               className="flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200"
             >
               <FileText className="w-4 h-4" />
-              {t.generateNarrative}
+              {t('generateNarrative', 'Generer klinisk notat')}
             </button>
             <button
               onClick={handleClearAll}
               className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
             >
               <RotateCcw className="w-4 h-4" />
-              {t.clearAll}
+              {t('clearAll', 'Nullstill')}
             </button>
             <button
               onClick={handleSave}
               className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Save className="w-4 h-4" />
-              {t.save}
+              {t('save', 'Lagre')}
             </button>
           </div>
         </div>
@@ -759,7 +701,7 @@ export default function NeurologicalExam({
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <FileText className="w-5 h-5 text-blue-600" />
-                  {t.testResults}
+                  {t('testResults', 'Testresultater')}
                 </h3>
                 <NarrativeDisplay narratives={narratives} lang={lang} />
               </div>
@@ -778,7 +720,7 @@ export default function NeurologicalExam({
                   {currentCluster.diagnosticCriteria && (
                     <div className="mt-3 flex items-center gap-4 text-sm">
                       <span className="text-gray-600 dark:text-gray-300">
-                        {t.threshold}:{' '}
+                        {t('threshold', 'Terskel for diagnose')}:{' '}
                         <strong>
                           ≥{currentCluster.diagnosticCriteria.threshold}/
                           {currentCluster.diagnosticCriteria.total}
@@ -858,7 +800,7 @@ export default function NeurologicalExam({
 // =============================================================================
 
 export function NeurologicalExamCompact({ testResults = {}, onChange, lang = 'no' }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('neuroexam');
   const [expandedCluster, setExpandedCluster] = useState(null);
 
   const scores = useMemo(() => {
@@ -875,10 +817,12 @@ export function NeurologicalExamCompact({ testResults = {}, onChange, lang = 'no
       <div className="px-4 py-3 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
         <h3 className="font-medium text-gray-900 flex items-center gap-2">
           <Brain className="w-5 h-5 text-blue-600" />
-          {t.title}
+          {t('title', 'Nevrologisk Undersøkelse')}
         </h3>
         {hasAnyResults && (
-          <span className="text-xs text-gray-500 dark:text-gray-400">{t.inProgress}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {t('inProgress', 'Pågår')}
+          </span>
         )}
       </div>
 

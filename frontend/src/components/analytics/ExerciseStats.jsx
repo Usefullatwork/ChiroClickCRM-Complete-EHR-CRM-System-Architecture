@@ -198,9 +198,9 @@ export const ExerciseStats = ({ data = [], loading = false, limit = 10 }) => {
             </ResponsiveContainer>
           ) : (
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {chartData.map((item, index) => (
+              {chartData.map((item) => (
                 <div
-                  key={index}
+                  key={item.name}
                   className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   <div
@@ -291,7 +291,10 @@ export const ExerciseStatsCompact = ({ data = [], loading = false }) => {
   return (
     <div className="space-y-2">
       {data.slice(0, 5).map((item, index) => (
-        <div key={index} className="flex items-center gap-2">
+        <div
+          key={item.nameNo || item.nameEn || item.name || index}
+          className="flex items-center gap-2"
+        >
           <div className="w-2 h-6 rounded-full" style={{ backgroundColor: COLORS[index] }} />
           <span className="flex-1 text-sm text-gray-700 truncate">
             {item.nameNo || item.nameEn || item.name}

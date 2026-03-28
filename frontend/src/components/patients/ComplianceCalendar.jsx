@@ -234,14 +234,14 @@ export default function ComplianceCalendar({ data = [], onDateSelect }) {
 
       {/* Calendar Grid */}
       <div className="grid grid-cols-7 gap-1">
-        {calendarDays.map((day, index) => {
+        {calendarDays.map((day) => {
           const status = getDayStatus(day);
           const cellColor = getCellColor(status);
           const isFutureDate = day.date > new Date();
 
           return (
             <button
-              key={index}
+              key={day.date.toISOString()}
               onClick={() => handleDateClick(day)}
               disabled={!day.isCurrentMonth || isFutureDate}
               className={`

@@ -47,7 +47,9 @@ export const searchDiagnosisCodes = async (searchTerm, options = {}) => {
     params.push(limit);
 
     const result = await query(
-      `SELECT *
+      `SELECT code, system, chapter, description_no, description_en,
+              icd10_mapping, icpc2_mapping, commonly_used, usage_count,
+              requires_specification, valid_from, valid_until, created_at
        FROM diagnosis_codes
        ${whereClause}
        ORDER BY commonly_used DESC, usage_count DESC, code ASC
@@ -81,7 +83,9 @@ export const getCommonDiagnosisCodes = async (system = null) => {
         }
 
         const result = await query(
-          `SELECT *
+          `SELECT code, system, chapter, description_no, description_en,
+                  icd10_mapping, icpc2_mapping, commonly_used, usage_count,
+                  requires_specification, valid_from, valid_until, created_at
          FROM diagnosis_codes
          ${whereClause}
          ORDER BY usage_count DESC, code ASC
@@ -104,7 +108,13 @@ export const getCommonDiagnosisCodes = async (system = null) => {
  */
 export const getDiagnosisCode = async (code) => {
   try {
-    const result = await query('SELECT * FROM diagnosis_codes WHERE code = $1', [code]);
+    const result = await query(
+      `SELECT code, system, chapter, description_no, description_en,
+              icd10_mapping, icpc2_mapping, commonly_used, usage_count,
+              requires_specification, valid_from, valid_until, created_at
+       FROM diagnosis_codes WHERE code = $1`,
+      [code]
+    );
 
     if (result.rows.length === 0) {
       return null;
@@ -123,7 +133,9 @@ export const getDiagnosisCode = async (code) => {
 export const getChiropracticCodes = async () => {
   try {
     const result = await query(
-      `SELECT *
+      `SELECT code, system, chapter, description_no, description_en,
+              icd10_mapping, icpc2_mapping, commonly_used, usage_count,
+              requires_specification, valid_from, valid_until, created_at
        FROM diagnosis_codes
        WHERE system = 'ICPC2' AND chapter IN ('L', 'N')
        ORDER BY commonly_used DESC, chapter, code`,
@@ -161,7 +173,10 @@ export const getICD10Mapping = async (icpc2Code) => {
 
     // Get full ICD-10 details
     const icd10Result = await query(
-      `SELECT * FROM diagnosis_codes WHERE code = $1 AND system = 'ICD10'`,
+      `SELECT code, system, chapter, description_no, description_en,
+              icd10_mapping, icpc2_mapping, commonly_used, usage_count,
+              requires_specification, valid_from, valid_until, created_at
+       FROM diagnosis_codes WHERE code = $1 AND system = 'ICD10'`,
       [icd10Code]
     );
 

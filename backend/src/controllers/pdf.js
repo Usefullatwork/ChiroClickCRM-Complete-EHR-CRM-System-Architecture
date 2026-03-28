@@ -363,7 +363,7 @@ export const deliverDocument = async (req, res) => {
       action: 'DOCUMENT_DELIVERED',
       resource: 'pdf',
       resourceId: id,
-      details: { documentType: type, method, patientId: patientId.slice(0, 8) + '...' },
+      details: { documentType: type, method, patientId: `${patientId.slice(0, 8)}...` },
     });
 
     return res.json(result);

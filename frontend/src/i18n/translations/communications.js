@@ -88,7 +88,6 @@ export const communications = {
     commLogTitle: 'Communication Log',
     commLogSubtitle: 'All patient communication in one place',
     export: 'Export',
-    newMessage: 'New Message',
     totalLabel: 'Total',
     emailsLabel: 'Emails',
     callsLabel: 'Calls',
@@ -126,6 +125,10 @@ export const communications = {
     reject: 'Reject',
     sending: 'Sending...',
     approveAndSend: 'Approve & Send',
+    // NoShowImporter
+    notFound: 'Not found',
+    // Placeholder & aria-label i18n keys
+    typeMessagePlaceholder: 'Type your message here...',
   },
   no: {
     title: 'Kommunikasjon',
@@ -215,7 +218,6 @@ export const communications = {
     commLogTitle: 'Kommunikasjonslogg',
     commLogSubtitle: 'All kommunikasjon med pasienter på ett sted',
     export: 'Eksporter',
-    newMessage: 'Ny Melding',
     totalLabel: 'Totalt',
     emailsLabel: 'E-poster',
     callsLabel: 'Samtaler',
@@ -253,5 +255,9 @@ export const communications = {
     reject: 'Avvis',
     sending: 'Sender...',
     approveAndSend: 'Godkjenn & Send',
+    // NoShowImporter
+    notFound: 'Ikke funnet',
+    // Placeholder & aria-label i18n keys
+    typeMessagePlaceholder: 'Skriv meldingen din her...',
   },
 };

@@ -59,6 +59,13 @@ vi.mock('../../components/patients/PainTracker', () => ({
   ),
 }));
 
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({
+    t: (key, fallback) => fallback || key,
+    lang: 'no',
+  }),
+}));
+
 vi.mock('lucide-react', () => ({
   Activity: () => <span data-testid="icon-activity">Activity</span>,
   Calendar: () => <span data-testid="icon-calendar">Calendar</span>,
@@ -268,7 +275,7 @@ describe('PatientProgress - Therapist View (no patientId)', () => {
     expect(screen.getByText('Aktive denne uken')).toBeInTheDocument();
     expect(screen.getByText('28')).toBeInTheDocument();
 
-    expect(screen.getByText('Totale ovelser utfort')).toBeInTheDocument();
+    expect(screen.getByText('Totale øvelser utført')).toBeInTheDocument();
     expect(screen.getByText('1350')).toBeInTheDocument();
 
     expect(screen.getByText('Gj.snitt smerte (30d)')).toBeInTheDocument();
@@ -313,7 +320,7 @@ describe('PatientProgress - Therapist View (no patientId)', () => {
     renderWithProviders(<PatientProgress />);
 
     await waitFor(() => {
-      expect(screen.getByPlaceholderText('Sok etter pasient...')).toBeInTheDocument();
+      expect(screen.getByPlaceholderText('Søk etter pasient...')).toBeInTheDocument();
     });
   });
 
@@ -330,7 +337,7 @@ describe('PatientProgress - Therapist View (no patientId)', () => {
     const optionTexts = Array.from(options).map((o) => o.textContent);
     expect(optionTexts).toContain('Utmerket (80%+)');
     expect(optionTexts).toContain('Bra (60-79%)');
-    expect(optionTexts).toContain('Trenger oppfolging (Under 60%)');
+    expect(optionTexts).toContain('Trenger oppfølging (Under 60%)');
   });
 
   it('should render sort select with Norwegian options', async () => {
@@ -376,8 +383,8 @@ describe('PatientProgress - Therapist View (no patientId)', () => {
       expect(screen.getByText('Ola Nordmann')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('5/7 dager denne uken')).toBeInTheDocument();
-    expect(screen.getByText('3/7 dager denne uken')).toBeInTheDocument();
+    expect(screen.getByText(/5\/7 dager denne uken/)).toBeInTheDocument();
+    expect(screen.getByText(/3\/7 dager denne uken/)).toBeInTheDocument();
   });
 
   it('should display pain level next to patient entry', async () => {
@@ -406,8 +413,8 @@ describe('PatientProgress - Therapist View (no patientId)', () => {
       expect(utmerketElements.length).toBeGreaterThanOrEqual(2);
     });
 
-    // "Trenger oppfolging" in patient row AND in filter option
-    const needsAttention = screen.getAllByText(/Trenger oppfolging/);
+    // "Trenger oppfølging" in patient row AND in filter option
+    const needsAttention = screen.getAllByText(/Trenger oppf/);
     expect(needsAttention.length).toBeGreaterThanOrEqual(1);
   });
 
@@ -430,7 +437,7 @@ describe('PatientProgress - Therapist View (no patientId)', () => {
       expect(screen.getByText('Ola Nordmann')).toBeInTheDocument();
     });
 
-    const searchInput = screen.getByPlaceholderText('Sok etter pasient...');
+    const searchInput = screen.getByPlaceholderText('Søk etter pasient...');
     fireEvent.change(searchInput, { target: { value: 'Kari' } });
 
     expect(screen.queryByText('Ola Nordmann')).not.toBeInTheDocument();
@@ -527,7 +534,7 @@ describe('PatientProgress - Therapist View (no patientId)', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Ingen pasienter funnet')).toBeInTheDocument();
-      expect(screen.getByText('Ingen pasienter matcher sokekriteriene')).toBeInTheDocument();
+      expect(screen.getByText('Ingen pasienter matcher søkekriteriene')).toBeInTheDocument();
     });
   });
 
@@ -538,11 +545,11 @@ describe('PatientProgress - Therapist View (no patientId)', () => {
       expect(screen.getByText('Ola Nordmann')).toBeInTheDocument();
     });
 
-    const searchInput = screen.getByPlaceholderText('Sok etter pasient...');
+    const searchInput = screen.getByPlaceholderText('Søk etter pasient...');
     fireEvent.change(searchInput, { target: { value: 'ZZZNONEXISTENT' } });
 
     expect(screen.getByText('Ingen pasienter funnet')).toBeInTheDocument();
-    expect(screen.getByText('Ingen pasienter matcher sokekriteriene')).toBeInTheDocument();
+    expect(screen.getByText('Ingen pasienter matcher søkekriteriene')).toBeInTheDocument();
   });
 
   it('should combine search and compliance filter', async () => {
@@ -562,7 +569,7 @@ describe('PatientProgress - Therapist View (no patientId)', () => {
     });
 
     // Now search for "Kari" within needs_attention
-    const searchInput = screen.getByPlaceholderText('Sok etter pasient...');
+    const searchInput = screen.getByPlaceholderText('Søk etter pasient...');
     fireEvent.change(searchInput, { target: { value: 'Kari' } });
 
     await waitFor(() => {
@@ -645,14 +652,14 @@ describe('PatientProgress - Patient View (with patientId)', () => {
     renderWithProviders(<PatientProgress />);
 
     await waitFor(() => {
-      expect(screen.getByText('Totale ovelser')).toBeInTheDocument();
+      expect(screen.getByText('Totale øvelser')).toBeInTheDocument();
       expect(screen.getByText('156')).toBeInTheDocument();
     });
 
     expect(screen.getByText('Aktive dager')).toBeInTheDocument();
     expect(screen.getByText('45')).toBeInTheDocument();
 
-    expect(screen.getByText('Navarende rekke')).toBeInTheDocument();
+    expect(screen.getByText('Nåværende rekke')).toBeInTheDocument();
     expect(screen.getByText('7')).toBeInTheDocument();
     expect(screen.getByText('dager')).toBeInTheDocument();
 
@@ -693,7 +700,7 @@ describe('PatientProgress - Patient View (with patientId)', () => {
       expect(screen.getByTestId('pain-tracker')).toBeInTheDocument();
     });
 
-    expect(screen.getByText('Smerteniva over tid')).toBeInTheDocument();
+    expect(screen.getByText('Smertenivå over tid')).toBeInTheDocument();
 
     const painTracker = screen.getByTestId('pain-tracker');
     expect(painTracker).toHaveAttribute('data-trend', 'improving');
@@ -732,7 +739,7 @@ describe('PatientProgress - Patient View (with patientId)', () => {
 
     // Active prescription badge
     expect(screen.getByText('Aktiv')).toBeInTheDocument();
-    expect(screen.getByText('5 ovelser')).toBeInTheDocument();
+    expect(screen.getByText(/5 øvelser/)).toBeInTheDocument();
     expect(screen.getByText('88%')).toBeInTheDocument();
 
     // Compliance label
@@ -749,7 +756,7 @@ describe('PatientProgress - Patient View (with patientId)', () => {
 
     // Check that dates are formatted with toLocaleDateString('no-NO')
     // 2026-01-15 in no-NO locale is "15.1.2026" or similar
-    const dateTexts = screen.getAllByText(/Fra \d/);
+    const dateTexts = screen.getAllByText(/Fra \d|From \d/);
     expect(dateTexts.length).toBeGreaterThan(0);
   });
 
@@ -802,7 +809,7 @@ describe('PatientProgress - Patient View (with patientId)', () => {
 
     renderWithProviders(<PatientProgress />);
 
-    expect(screen.getByText('Smerteniva over tid')).toBeInTheDocument();
+    expect(screen.getByText('Smertenivå over tid')).toBeInTheDocument();
     expect(screen.queryByTestId('pain-tracker')).not.toBeInTheDocument();
   });
 
@@ -824,9 +831,9 @@ describe('PatientProgress - Patient View (with patientId)', () => {
       expect(screen.getByText('Pasientfremgang')).toBeInTheDocument();
     });
 
-    expect(screen.queryByText('Totale ovelser')).not.toBeInTheDocument();
+    expect(screen.queryByText('Totale øvelser')).not.toBeInTheDocument();
     expect(screen.queryByText('Aktive dager')).not.toBeInTheDocument();
-    expect(screen.queryByText('Navarende rekke')).not.toBeInTheDocument();
+    expect(screen.queryByText('Nåværende rekke')).not.toBeInTheDocument();
   });
 
   it('should display 0 values for missing summary fields', async () => {
@@ -840,7 +847,7 @@ describe('PatientProgress - Patient View (with patientId)', () => {
     renderWithProviders(<PatientProgress />);
 
     await waitFor(() => {
-      expect(screen.getByText('Totale ovelser')).toBeInTheDocument();
+      expect(screen.getByText('Totale øvelser')).toBeInTheDocument();
     });
 
     // All numeric fields should default to 0

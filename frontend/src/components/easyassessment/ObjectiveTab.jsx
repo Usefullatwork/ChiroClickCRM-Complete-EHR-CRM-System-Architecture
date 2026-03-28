@@ -17,6 +17,7 @@ export default function ObjectiveTab({
   updateQuickSelect,
   buildAIContext,
 }) {
+  const { t } = useTranslation('clinical');
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
       <div className="lg:col-span-2 space-y-4">
@@ -71,7 +72,10 @@ export default function ObjectiveTab({
                 label="Observation"
                 value={encounterData.objective.observation}
                 onChange={(val) => updateField('objective', 'observation', val)}
-                placeholder="Visual observations, gait, posture..."
+                placeholder={t(
+                  'visualObservationsPlaceholder',
+                  'Visual observations, gait, posture...'
+                )}
                 rows={3}
                 aiEnabled={true}
                 aiFieldType="observation"
@@ -85,7 +89,7 @@ export default function ObjectiveTab({
                 label="Palpation"
                 value={encounterData.objective.palpation}
                 onChange={(val) => updateField('objective', 'palpation', val)}
-                placeholder="Tenderness, muscle tension..."
+                placeholder={t('tendernessTensionPlaceholder', 'Tenderness, muscle tension...')}
                 rows={3}
                 aiEnabled={true}
                 aiFieldType="palpation"
@@ -99,7 +103,7 @@ export default function ObjectiveTab({
                 label="Range of Motion"
                 value={encounterData.objective.rom}
                 onChange={(val) => updateField('objective', 'rom', val)}
-                placeholder="ROM findings..."
+                placeholder={t('romFindingsPlaceholder2', 'ROM findings...')}
                 rows={3}
                 aiEnabled={true}
                 aiFieldType="rom"
@@ -113,7 +117,7 @@ export default function ObjectiveTab({
                 label="Orthopedic Tests"
                 value={encounterData.objective.ortho_tests}
                 onChange={(val) => updateField('objective', 'ortho_tests', val)}
-                placeholder="Test results..."
+                placeholder={t('testResultsPlaceholder', 'Test results...')}
                 rows={3}
               />
             </div>

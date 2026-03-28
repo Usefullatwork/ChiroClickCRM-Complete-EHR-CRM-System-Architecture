@@ -14,6 +14,7 @@ import { Upload, X, Check, AlertCircle, Phone, Mail, ChevronRight, Loader2 } fro
 import { format } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { patientsAPI, communicationsAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 
 // Message templates for no-shows
 const NO_SHOW_TEMPLATES = {
@@ -110,6 +111,7 @@ export default function NoShowImporter({
   clinicName = 'Klinikken',
   clinicPhone = '12345678',
 }) {
+  const { t } = useTranslation('communications');
   const queryClient = useQueryClient();
   const fileInputRef = useRef(null);
 
@@ -413,7 +415,7 @@ export default function NoShowImporter({
                 <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 text-center">
                   <AlertCircle className="w-6 h-6 text-amber-500 mx-auto mb-1" />
                   <p className="text-2xl font-bold text-amber-700">{unmatchedCount}</p>
-                  <p className="text-xs text-amber-600">Ikke funnet</p>
+                  <p className="text-xs text-amber-600">{t('notFound', 'Ikke funnet')}</p>
                 </div>
                 <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
                   <X className="w-6 h-6 text-red-500 mx-auto mb-1" />

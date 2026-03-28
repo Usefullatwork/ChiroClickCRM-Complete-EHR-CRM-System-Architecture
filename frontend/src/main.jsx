@@ -7,6 +7,7 @@ import './index.css';
 import { initializeCSRF } from './services/api';
 import { LanguageProvider } from './i18n';
 import { ConfirmProvider } from './components/ui/ConfirmDialog';
+import { PromptProvider } from './components/ui/PromptDialog';
 import logger from './utils/logger';
 import { migrateLocalStorage } from './migrations/localStorage';
 
@@ -37,7 +38,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <LanguageProvider>
         <BrowserRouter>
           <ConfirmProvider>
-            <App />
+            <PromptProvider>
+              <App />
+            </PromptProvider>
           </ConfirmProvider>
         </BrowserRouter>
       </LanguageProvider>

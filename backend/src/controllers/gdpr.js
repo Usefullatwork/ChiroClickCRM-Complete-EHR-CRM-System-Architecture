@@ -8,15 +8,27 @@ import logger from '../utils/logger.js';
 
 export const getGDPRRequests = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const options = {
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 50,
       status: req.query.status,
-      requestType: req.query.requestType
+      requestType: req.query.requestType,
     };
 
     const result = await gdprService.getAllGDPRRequests(organizationId, options);
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'READ',
+      resourceType: 'gdpr',
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json(result);
   } catch (error) {
     logger.error('Error in getGDPRRequests controller:', error);
@@ -38,11 +50,15 @@ export const createGDPRRequest = async (req, res) => {
       resourceType: 'GDPR_REQUEST',
       resourceId: request.id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.status(201).json(request);
   } catch (error) {
+    // FK violation: referenced patient does not exist
+    if (error.code === '23503') {
+      return res.status(400).json({ error: 'Referenced patient not found' });
+    }
     logger.error('Error in createGDPRRequest controller:', error);
     res.status(500).json({ error: 'Failed to create GDPR request' });
   }
@@ -65,11 +81,14 @@ export const processDataAccess = async (req, res) => {
       resourceId: patientId,
       reason: 'GDPR Article 15 - Right to Access',
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(data);
   } catch (error) {
+    if (error.message === 'Patient not found') {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
     logger.error('Error in processDataAccess controller:', error);
     res.status(500).json({ error: 'Failed to process data access request' });
   }
@@ -92,7 +111,7 @@ export const processDataPortability = async (req, res) => {
       resourceId: patientId,
       reason: 'GDPR Article 20 - Right to Data Portability',
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     // Set headers for download
@@ -100,6 +119,9 @@ export const processDataPortability = async (req, res) => {
     res.setHeader('Content-Disposition', `attachment; filename="patient_data_${patientId}.json"`);
     res.json(data);
   } catch (error) {
+    if (error.message === 'Patient not found') {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
     logger.error('Error in processDataPortability controller:', error);
     res.status(500).json({ error: 'Failed to process data portability request' });
   }
@@ -112,7 +134,7 @@ export const processErasure = async (req, res) => {
 
     // Get request details
     const requests = await gdprService.getAllGDPRRequests(organizationId, {});
-    const request = requests.requests.find(r => r.id === requestId);
+    const request = requests.requests.find((r) => r.id === requestId);
 
     if (!request) {
       return res.status(404).json({ error: 'GDPR request not found' });
@@ -134,7 +156,7 @@ export const processErasure = async (req, res) => {
       resourceId: request.patient_id,
       reason: 'GDPR Article 17 - Right to Erasure',
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(result);
@@ -162,11 +184,17 @@ export const updateConsent = async (req, res) => {
       changes: req.body,
       reason: 'Consent preferences updated',
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(patient);
   } catch (error) {
+    if (error.message === 'Patient not found') {
+      return res.status(404).json({ error: 'Patient not found' });
+    }
+    if (error.message === 'No consent fields to update') {
+      return res.status(400).json({ error: error.message });
+    }
     logger.error('Error in updateConsent controller:', error);
     res.status(500).json({ error: 'Failed to update consent' });
   }
@@ -174,10 +202,23 @@ export const updateConsent = async (req, res) => {
 
 export const getConsentAuditTrail = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const { patientId } = req.params;
 
     const trail = await gdprService.getConsentAuditTrail(organizationId, patientId);
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'READ',
+      resourceType: 'gdpr',
+      resourceId: patientId,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json(trail);
   } catch (error) {
     logger.error('Error in getConsentAuditTrail controller:', error);
@@ -208,11 +249,14 @@ export const updateGDPRRequestStatus = async (req, res) => {
       resourceId: requestId,
       changes: { status, response },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(request);
   } catch (error) {
+    if (error.message === 'GDPR request not found') {
+      return res.status(404).json({ error: 'GDPR request not found' });
+    }
     logger.error('Error in updateGDPRRequestStatus controller:', error);
     res.status(500).json({ error: 'Failed to update GDPR request status' });
   }
@@ -226,5 +270,5 @@ export default {
   processErasure,
   updateConsent,
   getConsentAuditTrail,
-  updateGDPRRequestStatus
+  updateGDPRRequestStatus,
 };

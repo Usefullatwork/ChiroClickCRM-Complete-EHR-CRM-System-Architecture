@@ -2,6 +2,7 @@ import { useEffect, useRef, useId } from 'react';
 import { X } from 'lucide-react';
 
 export const Modal = ({ isOpen, onClose, title, description, children, size = 'md', footer }) => {
+  const { t } = useTranslation('common');
   const sizes = {
     sm: 'max-w-md',
     md: 'max-w-2xl',
@@ -92,7 +93,7 @@ export const Modal = ({ isOpen, onClose, title, description, children, size = 'm
             </h2>
             <button
               onClick={onClose}
-              aria-label="Lukk"
+              aria-label={t('close', 'Lukk')}
               className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-colors text-slate-500 dark:text-slate-400"
             >
               <X size={20} />

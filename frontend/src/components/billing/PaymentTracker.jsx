@@ -21,35 +21,21 @@ import {
   Receipt,
 } from 'lucide-react';
 import { billingAPI } from '../../services/api';
+import { useTranslation } from '../../i18n/useTranslation';
 
 import logger from '../../utils/logger';
 /**
- * Payment method configurations
+ * Payment method configurations — names/descriptions resolved via t() inside component
  */
-const PAYMENT_METHODS = [
-  {
-    id: 'card',
-    name: 'Kort',
-    icon: CreditCard,
-    description: 'Debet- eller kreditkort',
-  },
-  {
-    id: 'cash',
-    name: 'Kontant',
-    icon: Banknote,
-    description: 'Kontant betaling',
-  },
-  {
-    id: 'vipps',
-    name: 'Vipps',
-    icon: Smartphone,
-    description: 'Vipps mobilbetaling',
-  },
+const PAYMENT_METHOD_DEFS = [
+  { id: 'card', nameKey: 'card', descKey: 'cardDescription', icon: CreditCard },
+  { id: 'cash', nameKey: 'cash', descKey: 'cashDescription', icon: Banknote },
+  { id: 'vipps', nameKey: 'vipps', descKey: 'vippsDescription', icon: Smartphone },
   {
     id: 'bank_transfer',
-    name: 'Bankoverføring',
+    nameKey: 'bankTransfer',
+    descKey: 'bankTransferDescription',
     icon: Building2,
-    description: 'Overføring til bankkonto',
   },
 ];
 
@@ -61,7 +47,14 @@ const PAYMENT_METHODS = [
  * @param {Function} props.onPaymentRecorded - Callback when payment is recorded
  */
 export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) {
+  const { t } = useTranslation('financial');
   const queryClient = useQueryClient();
+
+  const PAYMENT_METHODS = PAYMENT_METHOD_DEFS.map((m) => ({
+    ...m,
+    name: t(m.nameKey, m.nameKey),
+    description: t(m.descKey, m.descKey),
+  }));
 
   // Form state
   const [amount, setAmount] = useState(invoice?.amount_due?.toString() || '');
@@ -104,17 +97,17 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
 
     const numAmount = parseFloat(amount);
     if (!amount || isNaN(numAmount) || numAmount <= 0) {
-      newErrors.amount = 'Angi et gyldig belop';
+      newErrors.amount = t('invalidAmount', 'Angi et gyldig beløp');
     } else if (numAmount > parseFloat(invoice.amount_due)) {
-      newErrors.amount = 'Belopet kan ikke overstige utstaende belop';
+      newErrors.amount = t('amountExceedsDue', 'Beløpet kan ikke overstige utestående beløp');
     }
 
     if (!paymentMethod) {
-      newErrors.paymentMethod = 'Velg betalingsmetode';
+      newErrors.paymentMethod = t('selectPaymentMethod', 'Velg betalingsmetode');
     }
 
     if (!paymentDate) {
-      newErrors.paymentDate = 'Velg betalingsdato';
+      newErrors.paymentDate = t('selectPaymentDate', 'Velg betalingsdato');
     }
 
     setErrors(newErrors);
@@ -167,7 +160,9 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
               <CreditCard className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Registrer betaling</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {t('recordPayment', 'Registrer betaling')}
+              </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Faktura {invoice.invoice_number}
               </p>
@@ -182,11 +177,13 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
         <div className="px-6 py-4 bg-gray-50 border-b">
           <div className="flex justify-between items-center">
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Pasient</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('patient', 'Pasient')}</p>
               <p className="font-medium">{invoice.patient_name}</p>
             </div>
             <div className="text-right">
-              <p className="text-sm text-gray-600 dark:text-gray-300">Utstaende</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                {t('outstanding', 'Utestående')}
+              </p>
               <p className="text-2xl font-bold text-blue-600">
                 {formatCurrency(invoice.amount_due)}
               </p>
@@ -194,7 +191,7 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
           </div>
           {invoice.amount_paid > 0 && (
             <div className="mt-2 text-sm text-green-600">
-              Allerede betalt: {formatCurrency(invoice.amount_paid)}
+              {t('alreadyPaid', 'Allerede betalt')}: {formatCurrency(invoice.amount_paid)}
             </div>
           )}
         </div>
@@ -203,7 +200,9 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
           {/* Amount */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Belop (NOK) *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('amountNok', 'Beløp (NOK)')} *
+            </label>
             <div className="flex gap-2">
               <div className="flex-1 relative">
                 <input
@@ -227,7 +226,7 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
                 onClick={handleFullPayment}
                 className="px-4 py-2 bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors whitespace-nowrap"
               >
-                Fullt belop
+                {t('fullAmount', 'Fullt beløp')}
               </button>
             </div>
             {errors.amount && (
@@ -241,7 +240,7 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
           {/* Payment Method */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Betalingsmetode *
+              {t('paymentMethod', 'Betalingsmetode')} *
             </label>
             <div className="grid grid-cols-2 gap-2">
               {PAYMENT_METHODS.map((method) => {
@@ -293,7 +292,9 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
 
           {/* Payment Date */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Betalingsdato *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('paymentDate', 'Betalingsdato')} *
+            </label>
             <div className="relative">
               <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
               <input
@@ -317,7 +318,7 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
           {/* Payment Reference (optional) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Referanse (valgfri)
+              {t('referenceOptional', 'Referanse (valgfri)')}
             </label>
             <div className="relative">
               <Receipt className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
@@ -325,7 +326,7 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
                 type="text"
                 value={paymentReference}
                 onChange={(e) => setPaymentReference(e.target.value)}
-                placeholder="F.eks. transaksjonsnummer, kvitteringsnummer..."
+                placeholder={t('referenceHint', 'F.eks. transaksjonsnummer, kvitteringsnummer...')}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
@@ -334,12 +335,12 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
           {/* Notes (optional) */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Merknad (valgfri)
+              {t('noteOptional', 'Merknad (valgfri)')}
             </label>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Intern merknad om betalingen..."
+              placeholder={t('paymentNoteHint', 'Intern merknad om betalingen...')}
               rows={2}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 resize-none"
             />
@@ -350,8 +351,12 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
             <div className="bg-red-50 text-red-700 p-4 rounded-lg flex items-start gap-2">
               <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium">Kunne ikke registrere betaling</p>
-                <p className="text-sm">{recordMutation.error?.message || 'En feil oppstod'}</p>
+                <p className="font-medium">
+                  {t('couldNotRecordPayment', 'Kunne ikke registrere betaling')}
+                </p>
+                <p className="text-sm">
+                  {recordMutation.error?.message || t('unknownError', 'En feil oppstod')}
+                </p>
               </div>
             </div>
           )}
@@ -361,8 +366,13 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
             <div className="bg-green-50 text-green-700 p-4 rounded-lg flex items-start gap-2">
               <Check className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium">Betaling registrert</p>
-                <p className="text-sm">{formatCurrency(amount)} er registrert som betalt</p>
+                <p className="font-medium">{t('paymentRecorded', 'Betaling registrert')}</p>
+                <p className="text-sm">
+                  {t('paymentRegisteredAs', '{amount} er registrert som betalt').replace(
+                    '{amount}',
+                    formatCurrency(amount)
+                  )}
+                </p>
               </div>
             </div>
           )}
@@ -374,7 +384,7 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
             onClick={onClose}
             className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            {recordMutation.isSuccess ? 'Lukk' : 'Avbryt'}
+            {recordMutation.isSuccess ? t('close', 'Lukk') : t('cancel', 'Avbryt')}
           </button>
 
           {!recordMutation.isSuccess && (
@@ -386,12 +396,12 @@ export default function PaymentTracker({ invoice, onClose, onPaymentRecorded }) 
               {recordMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Registrerer...
+                  {t('registering', 'Registrerer...')}
                 </>
               ) : (
                 <>
                   <Check className="w-4 h-4" />
-                  Registrer betaling
+                  {t('recordPayment', 'Registrer betaling')}
                 </>
               )}
             </button>

@@ -83,7 +83,7 @@ export async function sendPushToPatient(patientId, notification) {
 
     if (result.rows.length === 0 || !result.rows[0].device_tokens) {
       logger.debug('No mobile user linked for patient — push skipped', {
-        patientId: patientId.slice(0, 8) + '...',
+        patientId: `${patientId.slice(0, 8)}...`,
       });
       return { success: true, tokenCount: 0 };
     }
@@ -118,7 +118,7 @@ export async function sendPushToMobileUser(mobileUserId, notification) {
 
     if (result.rows.length === 0 || !result.rows[0].device_tokens) {
       logger.debug('No device tokens for mobile user — push skipped', {
-        mobileUserId: mobileUserId.slice(0, 8) + '...',
+        mobileUserId: `${mobileUserId.slice(0, 8)}...`,
       });
       return { success: true, tokenCount: 0 };
     }

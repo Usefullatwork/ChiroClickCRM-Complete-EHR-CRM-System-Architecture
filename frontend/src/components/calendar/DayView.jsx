@@ -15,6 +15,7 @@ import { format, parseISO, isToday, differenceInMinutes } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { Calendar as CalendarIcon, Plus, Clock, User } from 'lucide-react';
 import AppointmentCard from './AppointmentCard';
+import { useTranslation } from '../../i18n';
 
 // =============================================================================
 // CONSTANTS
@@ -136,6 +137,7 @@ export default function DayView({
   statusColors,
   isLoading,
 }) {
+  const { t } = useTranslation('appointments');
   const scrollContainerRef = useRef(null);
   const isTodayDate = isToday(date);
   const slots = generateTimeSlots(workHours);
@@ -331,11 +333,13 @@ export default function DayView({
       <div className="w-80 border-l border-gray-200 flex flex-col bg-gray-50">
         <div className="p-4 border-b border-gray-200 bg-white">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-gray-900">Dagens avtaler</h3>
+            <h3 className="font-semibold text-gray-900">
+              {t('todaysAppointments', 'Dagens avtaler')}
+            </h3>
             <button
               onClick={() => onSlotClick(date, 9, 0)}
               className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-              title="Ny avtale"
+              title={t('newAppointment', 'Ny avtale')}
             >
               <Plus className="w-5 h-5" />
             </button>
@@ -346,13 +350,15 @@ export default function DayView({
           {appointments.length === 0 ? (
             <div className="text-center py-12">
               <CalendarIcon className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-              <p className="text-gray-500 dark:text-gray-400 mb-4">Ingen avtaler denne dagen</p>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">
+                {t('noAppointmentsThisDay', 'Ingen avtaler denne dagen')}
+              </p>
               <button
                 onClick={() => onSlotClick(date, 9, 0)}
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
                 <Plus className="w-4 h-4" />
-                Ny avtale
+                {t('newAppointment', 'Ny avtale')}
               </button>
             </div>
           ) : (

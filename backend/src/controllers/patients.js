@@ -244,7 +244,7 @@ export const deletePatient = async (req, res) => {
  */
 export const searchPatients = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const { q, limit } = req.query;
 
     if (!q || q.length < 2) {
@@ -255,6 +255,24 @@ export const searchPatients = async (req, res) => {
     }
 
     const patients = await patientService.searchPatients(organizationId, q, parseInt(limit) || 10);
+
+    // Log audit — CRITICAL: patient search must be logged (Normen compliance)
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'SEARCH',
+      resourceType: 'PATIENT',
+      resourceId: null,
+      details: {
+        search_type: 'quick',
+        query_length: q.length,
+        results_count: patients.length,
+      },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
 
     res.json(patients);
   } catch (error) {
@@ -315,10 +333,24 @@ export const advancedSearchPatients = async (req, res) => {
  */
 export const getPatientStatistics = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const { id } = req.params;
 
     const statistics = await patientService.getPatientStatistics(organizationId, id);
+
+    // Log audit — patient statistics access contains aggregated health data
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'READ',
+      resourceType: 'PATIENT',
+      resourceId: id,
+      details: { data_type: 'statistics' },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
 
     res.json(statistics);
   } catch (error) {
@@ -336,10 +368,28 @@ export const getPatientStatistics = async (req, res) => {
  */
 export const getPatientsNeedingFollowUp = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const daysInactive = parseInt(req.query.days) || 90;
 
     const patients = await patientService.getPatientsNeedingFollowUp(organizationId, daysInactive);
+
+    // Log audit — accessing a list of at-risk patients is a clinically significant read
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'READ',
+      resourceType: 'PATIENT',
+      resourceId: null,
+      details: {
+        list_type: 'follow_up_needed',
+        days_inactive: daysInactive,
+        results_count: patients.length,
+      },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
 
     res.json(patients);
   } catch (error) {
@@ -368,8 +418,12 @@ export const exportVcf = async (req, res) => {
       const firstName = (contact.first_name || '').trim();
       const lastName = (contact.last_name || '').trim();
       const phone = (contact.phone || '').trim();
-      if (!firstName && !lastName) continue;
-      if (!phone) continue;
+      if (!firstName && !lastName) {
+        continue;
+      }
+      if (!phone) {
+        continue;
+      }
 
       vcfLines.push('BEGIN:VCARD');
       vcfLines.push('VERSION:3.0');
@@ -430,7 +484,9 @@ export const exportSingleVcf = async (req, res) => {
       `N:${lastName};${firstName};;;`,
       `FN:${firstName} ${lastName}`.trim(),
     ];
-    if (phone) vcfLines.push(`TEL;TYPE=CELL:${phone}`);
+    if (phone) {
+      vcfLines.push(`TEL;TYPE=CELL:${phone}`);
+    }
     vcfLines.push('END:VCARD');
 
     const vcfContent = vcfLines.join('\r\n');

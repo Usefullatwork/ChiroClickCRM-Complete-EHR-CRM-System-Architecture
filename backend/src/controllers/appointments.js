@@ -10,7 +10,7 @@ import { scheduleReminder, cancelReminders } from '../services/appointmentRemind
 
 export const getAppointmentById = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const { id } = req.params;
 
     const appointment = await appointmentService.getAppointmentById(organizationId, id);
@@ -18,6 +18,18 @@ export const getAppointmentById = async (req, res) => {
     if (!appointment) {
       return res.status(404).json({ error: 'Appointment not found' });
     }
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'READ',
+      resourceType: 'APPOINTMENT',
+      resourceId: id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
 
     res.json(appointment);
   } catch (error) {
@@ -28,7 +40,7 @@ export const getAppointmentById = async (req, res) => {
 
 export const getAppointments = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const options = {
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 50,
@@ -40,6 +52,19 @@ export const getAppointments = async (req, res) => {
     };
 
     const result = await appointmentService.getAllAppointments(organizationId, options);
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'READ',
+      resourceType: 'APPOINTMENT',
+      resourceId: null,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json(result);
   } catch (error) {
     logger.error('Error in getAppointments controller:', error);
@@ -128,6 +153,18 @@ export const confirmAppointment = async (req, res) => {
       return res.status(404).json({ error: 'Appointment not found' });
     }
 
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'UPDATE',
+      resourceType: 'APPOINTMENT',
+      resourceId: id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     broadcastToOrg(organizationId, 'appointment:updated', { appointment });
 
     res.json({ success: true, data: appointment, message: 'Appointment confirmed' });
@@ -139,7 +176,7 @@ export const confirmAppointment = async (req, res) => {
 
 export const checkInAppointment = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const { id } = req.params;
 
     const appointment = await appointmentService.checkInAppointment(organizationId, id);
@@ -147,6 +184,18 @@ export const checkInAppointment = async (req, res) => {
     if (!appointment) {
       return res.status(404).json({ error: 'Appointment not found' });
     }
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'UPDATE',
+      resourceType: 'APPOINTMENT',
+      resourceId: id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
 
     broadcastToOrg(organizationId, 'appointment:updated', { appointment });
     broadcastToOrg(organizationId, 'appointment:status-changed', {
@@ -212,9 +261,22 @@ export const updateStatus = async (req, res) => {
 
 export const getStats = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const { startDate, endDate } = req.query;
     const stats = await appointmentService.getAppointmentStats(organizationId, startDate, endDate);
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'READ',
+      resourceType: 'APPOINTMENT',
+      resourceId: null,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json(stats);
   } catch (error) {
     logger.error('Error in getStats controller:', error);
@@ -227,7 +289,7 @@ export const getStats = async (req, res) => {
  */
 export const cancelAppointment = async (req, res) => {
   try {
-    const { organizationId, userId } = req;
+    const { organizationId, userId, user } = req;
     const { id } = req.params;
     const { reason } = req.body;
 
@@ -244,6 +306,18 @@ export const cancelAppointment = async (req, res) => {
         error: 'Appointment not found',
       });
     }
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'UPDATE',
+      resourceType: 'APPOINTMENT',
+      resourceId: id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
 
     // Cancel pending reminders
     try {

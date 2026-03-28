@@ -57,7 +57,14 @@ export const getAllProtocols = async (options = {}) => {
   } = options;
 
   let sql = `
-    SELECT *
+    SELECT
+      id, body_region, category, test_name, test_name_no,
+      description, description_no, positive_indication, positive_indication_no,
+      execution_instructions, execution_instructions_no,
+      normal_findings, normal_findings_no,
+      language, is_system, display_order,
+      is_red_flag, red_flag_criteria,
+      created_at, updated_at
     FROM examination_protocols
     WHERE language = $1
       AND is_system = true
@@ -122,7 +129,14 @@ export const getAllProtocols = async (options = {}) => {
  */
 export const getProtocolById = async (id) => {
   const sql = `
-    SELECT *
+    SELECT
+      id, body_region, category, test_name, test_name_no,
+      description, description_no, positive_indication, positive_indication_no,
+      execution_instructions, execution_instructions_no,
+      normal_findings, normal_findings_no,
+      language, is_system, display_order,
+      is_red_flag, red_flag_criteria,
+      created_at, updated_at
     FROM examination_protocols
     WHERE id = $1
   `;
@@ -141,7 +155,14 @@ export const getProtocolById = async (id) => {
  */
 export const searchProtocols = async (searchQuery, language = 'NO', limit = 50) => {
   const sql = `
-    SELECT *
+    SELECT
+      id, body_region, category, test_name, test_name_no,
+      description, description_no, positive_indication, positive_indication_no,
+      execution_instructions, execution_instructions_no,
+      normal_findings, normal_findings_no,
+      language, is_system, display_order,
+      is_red_flag, red_flag_criteria,
+      created_at, updated_at
     FROM examination_protocols
     WHERE language = $1
       AND is_system = true
@@ -168,7 +189,14 @@ export const searchProtocols = async (searchQuery, language = 'NO', limit = 50) 
  */
 export const getProtocolsByRegion = async (bodyRegion, language = 'NO') => {
   const sql = `
-    SELECT *
+    SELECT
+      id, body_region, category, test_name, test_name_no,
+      description, description_no, positive_indication, positive_indication_no,
+      execution_instructions, execution_instructions_no,
+      normal_findings, normal_findings_no,
+      language, is_system, display_order,
+      is_red_flag, red_flag_criteria,
+      created_at, updated_at
     FROM examination_protocols
     WHERE body_region = $1
       AND language = $2
@@ -195,7 +223,14 @@ export const getProtocolsByRegion = async (bodyRegion, language = 'NO') => {
  */
 export const getProtocolsByCategory = async (category, language = 'NO') => {
   const sql = `
-    SELECT *
+    SELECT
+      id, body_region, category, test_name, test_name_no,
+      description, description_no, positive_indication, positive_indication_no,
+      execution_instructions, execution_instructions_no,
+      normal_findings, normal_findings_no,
+      language, is_system, display_order,
+      is_red_flag, red_flag_criteria,
+      created_at, updated_at
     FROM examination_protocols
     WHERE category = $1
       AND language = $2
@@ -487,7 +522,7 @@ export const getRedFlags = async (organizationId, encounterId) => {
     throw new Error('Encounter not found or access denied');
   }
 
-  const sql = `SELECT * FROM check_examination_red_flags($1)`;
+  const sql = `SELECT test_name, finding, red_flag_criteria, severity FROM check_examination_red_flags($1)`;
   const result = await query(sql, [encounterId]);
 
   return result.rows;
@@ -502,7 +537,11 @@ export const getRedFlags = async (organizationId, encounterId) => {
  */
 export const getAllTemplateSets = async (language = 'NO') => {
   const sql = `
-    SELECT *
+    SELECT
+      id, template_name, template_name_no, description, description_no,
+      chief_complaint, chief_complaint_no, protocol_ids,
+      language, is_system, usage_count,
+      created_at, updated_at
     FROM examination_template_sets
     WHERE language = $1
       AND is_system = true
@@ -518,7 +557,11 @@ export const getAllTemplateSets = async (language = 'NO') => {
  */
 export const getTemplateSetsByComplaint = async (complaint, language = 'NO') => {
   const sql = `
-    SELECT *
+    SELECT
+      id, template_name, template_name_no, description, description_no,
+      chief_complaint, chief_complaint_no, protocol_ids,
+      language, is_system, usage_count,
+      created_at, updated_at
     FROM examination_template_sets
     WHERE (chief_complaint = $1 OR chief_complaint_no = $1)
       AND language = $2
@@ -534,7 +577,15 @@ export const getTemplateSetsByComplaint = async (complaint, language = 'NO') => 
  * Get template set by ID
  */
 export const getTemplateSetById = async (id) => {
-  const sql = `SELECT * FROM examination_template_sets WHERE id = $1`;
+  const sql = `
+    SELECT
+      id, template_name, template_name_no, description, description_no,
+      chief_complaint, chief_complaint_no, protocol_ids,
+      language, is_system, usage_count,
+      created_at, updated_at
+    FROM examination_template_sets
+    WHERE id = $1
+  `;
   const result = await query(sql, [id]);
 
   if (result.rows.length === 0) {

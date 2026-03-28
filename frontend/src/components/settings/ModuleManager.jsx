@@ -20,7 +20,9 @@ export default function ModuleManager() {
   const [saving, setSaving] = useState(false);
 
   const handleToggle = async (moduleId) => {
-    if (moduleId === 'core_ehr') return;
+    if (moduleId === 'core_ehr') {
+      return;
+    }
 
     const newValue = !modules[moduleId];
     const updated = { ...modules, [moduleId]: newValue };

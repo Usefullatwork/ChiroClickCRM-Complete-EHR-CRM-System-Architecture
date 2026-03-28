@@ -30,7 +30,7 @@ vi.mock('../../services/api', () => ({
 
 vi.mock('../../i18n', () => ({
   useTranslation: () => ({
-    t: (key) => {
+    t: (key, fallback) => {
       const map = {
         patients: 'Pasienter',
         newPatient: 'Ny Pasient',
@@ -88,9 +88,10 @@ vi.mock('../../i18n', () => ({
         'validation.emailInvalid': 'Email must be valid',
         'validation.error': 'Error',
       };
-      return map[key] || key;
+      return map[key] || fallback || key;
     },
-    _lang: 'nb',
+    lang: 'no',
+    setLang: vi.fn(),
   }),
 }));
 

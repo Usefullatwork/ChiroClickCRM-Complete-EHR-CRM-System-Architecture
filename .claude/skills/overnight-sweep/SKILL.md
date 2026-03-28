@@ -2,6 +2,9 @@
 name: overnight-sweep
 description: Orchestrates the full weekly improvement sweep. Run with /overnight-sweep or activate when asked about automated code improvement, weekly scan, or overnight analysis.
 allowed-tools: Read, Grep, Glob, Bash(npm audit *), Bash(npm run test *), Bash(npx vitest *), Bash(git log *), Bash(git diff *)
+user-invocable: true
+model: opus
+effort: high
 ---
 
 # Weekly Improvement Sweep — ChiroClickCRM

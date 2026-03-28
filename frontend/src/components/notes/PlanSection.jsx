@@ -4,6 +4,7 @@
  */
 import { ClipboardCheck, Target, Activity, AlertTriangle, Plus, Trash2 } from 'lucide-react';
 import { useTranslation } from '../../i18n';
+import { usePrompt } from '../ui/PromptDialog';
 
 export default function PlanSection({
   consultData,
@@ -23,6 +24,7 @@ export default function PlanSection({
   setShowCodePicker,
 }) {
   const { t } = useTranslation('clinical');
+  const prompt = usePrompt();
 
   return (
     <>
@@ -37,21 +39,24 @@ export default function PlanSection({
           label="Primaerdiagnose"
           value={consultData.assessment.primaryDiagnosis}
           onChange={(v) => updateField('assessment', 'primaryDiagnosis', v)}
-          placeholder="Hoveddiagnose..."
+          placeholder={t('primaryDiagnosisPlaceholder', 'Hoveddiagnose...')}
           required
         />
         <TextField
           label="Differensialdiagnoser"
           value={consultData.assessment.differentialDiagnosis}
           onChange={(v) => updateField('assessment', 'differentialDiagnosis', v)}
-          placeholder="Andre mulige diagnoser..."
+          placeholder={t('differentialDiagnosesPlaceholder', 'Andre mulige diagnoser...')}
         />
         <TextField
           label="Klinisk vurdering"
           value={consultData.assessment.clinicalImpression}
           onChange={(v) => updateField('assessment', 'clinicalImpression', v)}
           rows={3}
-          placeholder="Samlet klinisk vurdering og resonnement..."
+          placeholder={t(
+            'overallClinicalAssessmentPlaceholder',
+            'Samlet klinisk vurdering og resonnement...'
+          )}
         />
 
         {/* Red Flags / Rode flagg */}
@@ -62,7 +67,7 @@ export default function PlanSection({
           <div className="space-y-2">
             {(consultData.assessment.redFlags || []).map((flag, index) => (
               <div
-                key={index}
+                key={`redflag-${flag}-${index}`}
                 className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg"
               >
                 <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
@@ -71,7 +76,7 @@ export default function PlanSection({
                   <button
                     onClick={() => removeRedFlag(index)}
                     className="p-1 hover:bg-red-100 rounded"
-                    aria-label="Fjern rodt flagg"
+                    aria-label={t('removeRedFlag', 'Fjern rodt flagg')}
                   >
                     <Trash2 className="w-4 h-4 text-red-500" />
                   </button>
@@ -80,8 +85,8 @@ export default function PlanSection({
             ))}
             {!readOnly && (
               <button
-                onClick={() => {
-                  const flag = prompt('Legg til rodt flagg:');
+                onClick={async () => {
+                  const flag = await prompt({ title: t('addRedFlagTitle', 'Legg til rodt flagg') });
                   if (flag) {
                     addRedFlag(flag);
                   }
@@ -102,7 +107,7 @@ export default function PlanSection({
               value={consultData.assessment.severity || ''}
               onChange={(e) => updateField('assessment', 'severity', e.target.value)}
               disabled={readOnly}
-              aria-label="Alvorlighetsgrad"
+              aria-label={t('severity', 'Alvorlighetsgrad')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Velg...</option>
@@ -115,13 +120,13 @@ export default function PlanSection({
             label="Prognose"
             value={consultData.assessment.prognosis}
             onChange={(v) => updateField('assessment', 'prognosis', v)}
-            placeholder="God, moderat, darlig"
+            placeholder={t('prognosisPlaceholder', 'God, moderat, darlig')}
           />
           <InputField
             label="Forventet bedringstid"
             value={consultData.assessment.expectedRecoveryTime}
             onChange={(v) => updateField('assessment', 'expectedRecoveryTime', v)}
-            placeholder="F.eks. 4-6 uker"
+            placeholder={t('expectedDurationPlaceholder', 'F.eks. 4-6 uker')}
           />
         </div>
       </Section>
@@ -144,9 +149,9 @@ export default function PlanSection({
               )}
             </div>
             <div className="flex flex-wrap gap-2">
-              {(consultData.icd10_codes || []).map((code, index) => (
+              {(consultData.icd10_codes || []).map((code) => (
                 <span
-                  key={index}
+                  key={code}
                   className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-lg text-sm"
                 >
                   {code}
@@ -178,13 +183,13 @@ export default function PlanSection({
             label="Kortsiktige mal"
             value={consultData.plan.treatmentGoals?.shortTerm}
             onChange={(v) => updateNestedField('plan', 'treatmentGoals', 'shortTerm', v)}
-            placeholder="Mal for de neste 2-4 ukene..."
+            placeholder={t('shortTermGoalsPlaceholder', 'Mal for de neste 2-4 ukene...')}
           />
           <TextField
             label="Langsiktige mal"
             value={consultData.plan.treatmentGoals?.longTerm}
             onChange={(v) => updateNestedField('plan', 'treatmentGoals', 'longTerm', v)}
-            placeholder="Mal for de neste 2-3 manedene..."
+            placeholder={t('longTermGoalsPlaceholder', 'Mal for de neste 2-3 manedene...')}
           />
         </div>
         <TextField
@@ -192,20 +197,20 @@ export default function PlanSection({
           value={consultData.plan.proposedTreatment}
           onChange={(v) => updateField('plan', 'proposedTreatment', v)}
           rows={3}
-          placeholder="Behandlingsmetoder som vil bli brukt..."
+          placeholder={t('treatmentMethodsPlaceholder', 'Behandlingsmetoder som vil bli brukt...')}
         />
         <div className="grid grid-cols-2 gap-4">
           <InputField
             label="Behandlingsfrekvens"
             value={consultData.plan.treatmentFrequency}
             onChange={(v) => updateField('plan', 'treatmentFrequency', v)}
-            placeholder="F.eks. 2x/uke"
+            placeholder={t('visitFrequencyPlaceholder', 'F.eks. 2x/uke')}
           />
           <InputField
             label="Estimert antall behandlinger"
             value={consultData.plan.estimatedVisits}
             onChange={(v) => updateField('plan', 'estimatedVisits', v)}
-            placeholder="F.eks. 6-8 behandlinger"
+            placeholder={t('estimatedSessionsPlaceholder', 'F.eks. 6-8 behandlinger')}
           />
         </div>
         <TextField
@@ -213,43 +218,43 @@ export default function PlanSection({
           value={consultData.plan.initialTreatment}
           onChange={(v) => updateField('plan', 'initialTreatment', v)}
           rows={3}
-          placeholder="Hva ble gjort i forste konsultasjon..."
+          placeholder={t('initialTreatmentPlaceholder', 'Hva ble gjort i forste konsultasjon...')}
         />
         <TextField
           label="Ovelser/Hjemmeoppgaver"
           value={consultData.plan.exercises}
           onChange={(v) => updateField('plan', 'exercises', v)}
-          placeholder="Ovelser forskrevet til pasienten..."
+          placeholder={t('prescribedExercisesPlaceholder', 'Ovelser forskrevet til pasienten...')}
         />
         <TextField
           label="Pasientundervisning"
           value={consultData.plan.patientEducation}
           onChange={(v) => updateField('plan', 'patientEducation', v)}
-          placeholder="Informasjon gitt til pasienten..."
+          placeholder={t('patientEducationPlaceholder', 'Informasjon gitt til pasienten...')}
         />
         <TextField
           label="Livsstilsanbefalinger"
           value={consultData.plan.lifestyleRecommendations}
           onChange={(v) => updateField('plan', 'lifestyleRecommendations', v)}
-          placeholder="Ergonomi, aktivitet, etc..."
+          placeholder={t('lifestyleAdvicePlaceholder', 'Ergonomi, aktivitet, etc...')}
         />
         <TextField
           label="Oppfolging"
           value={consultData.plan.followUp}
           onChange={(v) => updateField('plan', 'followUp', v)}
-          placeholder="Neste time og plan videre..."
+          placeholder={t('followUpPlanPlaceholder', 'Neste time og plan videre...')}
         />
         <TextField
           label="Henvisninger"
           value={consultData.plan.referrals}
           onChange={(v) => updateField('plan', 'referrals', v)}
-          placeholder="Eventuelle henvisninger..."
+          placeholder={t('referralsPlaceholder', 'Eventuelle henvisninger...')}
         />
         <TextField
           label="Kontraindikasjoner"
           value={consultData.plan.contraindications}
           onChange={(v) => updateField('plan', 'contraindications', v)}
-          placeholder="Hva bor unngaas..."
+          placeholder={t('contraindicationsPlaceholder', 'Hva bor unngaas...')}
         />
 
         {/* Informed Consent */}
@@ -271,7 +276,7 @@ export default function PlanSection({
             value={consultData.duration_minutes || 60}
             onChange={(e) => updateRootField('duration_minutes', parseInt(e.target.value))}
             disabled={readOnly}
-            aria-label="Konsultasjonens varighet i minutter"
+            aria-label={t('consultationDuration', 'Konsultasjonens varighet i minutter')}
             className="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

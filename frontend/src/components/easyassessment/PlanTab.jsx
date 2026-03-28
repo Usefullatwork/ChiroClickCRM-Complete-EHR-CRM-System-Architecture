@@ -13,6 +13,7 @@ export default function PlanTab({
   updateQuickSelect,
   buildAIContext,
 }) {
+  const { t } = useTranslation('clinical');
   return (
     <div className="space-y-4">
       {viewMode === 'easy' ? (
@@ -40,7 +41,7 @@ export default function PlanTab({
               label="Treatment"
               value={encounterData.plan.treatment}
               onChange={(val) => updateField('plan', 'treatment', val)}
-              placeholder="Treatment performed..."
+              placeholder={t('treatmentPerformedPlaceholder', 'Treatment performed...')}
               rows={4}
               aiEnabled={true}
               aiFieldType="treatment"
@@ -54,7 +55,7 @@ export default function PlanTab({
               label="Exercises"
               value={encounterData.plan.exercises}
               onChange={(val) => updateField('plan', 'exercises', val)}
-              placeholder="Home exercises..."
+              placeholder={t('homeExercisesPlaceholder2', 'Home exercises...')}
               rows={4}
               aiEnabled={true}
               aiFieldType="exercises"
@@ -72,7 +73,7 @@ export default function PlanTab({
             label="Advice"
             value={encounterData.plan.advice}
             onChange={(val) => updateField('plan', 'advice', val)}
-            placeholder="Patient education..."
+            placeholder={t('patientEducationPlaceholder2', 'Patient education...')}
             quickPhrases={ADVICE_PHRASES}
             rows={3}
             aiEnabled={true}
@@ -87,7 +88,7 @@ export default function PlanTab({
             label="Follow-up"
             value={encounterData.plan.follow_up}
             onChange={(val) => updateField('plan', 'follow_up', val)}
-            placeholder="Next appointment..."
+            placeholder={t('nextAppointmentPlaceholder2', 'Next appointment...')}
             quickPhrases={FOLLOW_UP_PHRASES}
             rows={3}
             aiEnabled={true}

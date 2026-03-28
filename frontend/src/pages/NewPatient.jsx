@@ -268,7 +268,7 @@ export default function NewPatient() {
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.first_name ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="First name"
+                placeholder={t('firstNamePlaceholder', 'First name')}
               />
               {errors.first_name && (
                 <p className="text-red-600 text-sm mt-1">{errors.first_name}</p>
@@ -287,7 +287,7 @@ export default function NewPatient() {
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.last_name ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="Last name"
+                placeholder={t('lastNamePlaceholder', 'Last name')}
               />
               {errors.last_name && <p className="text-red-600 text-sm mt-1">{errors.last_name}</p>}
             </div>
@@ -421,7 +421,7 @@ export default function NewPatient() {
                 value={formData.address.street}
                 onChange={(e) => handleAddressChange('street', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Street address"
+                placeholder={t('streetAddressPlaceholder', 'Street address')}
               />
             </div>
 
@@ -445,7 +445,7 @@ export default function NewPatient() {
                 value={formData.address.city}
                 onChange={(e) => handleAddressChange('city', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="City"
+                placeholder={t('cityPlaceholder', 'City')}
               />
             </div>
           </div>
@@ -498,7 +498,7 @@ export default function NewPatient() {
                 value={formData.preferred_therapist}
                 onChange={(e) => handleChange('preferred_therapist', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Mads, Andre, Mikael, Edle..."
+                placeholder={t('preferredTherapistPlaceholder', 'Mads, Andre, Mikael, Edle...')}
               />
             </div>
 
@@ -522,7 +522,10 @@ export default function NewPatient() {
                 onChange={(e) => handleChange('general_notes', e.target.value)}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="Any additional notes about the patient..."
+                placeholder={t(
+                  'patientNotesPlaceholder',
+                  'Any additional notes about the patient...'
+                )}
               />
             </div>
           </div>
@@ -593,15 +596,20 @@ export default function NewPatient() {
 
         {/* Treatment Preferences */}
         <div className="pt-6 border-t border-gray-200">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Behandlingspreferanser</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">
+            {t('treatmentPreferences', 'Behandlingspreferanser')}
+          </h3>
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
-            Angi hva pasienten er komfortabel med. La stå tom hvis ikke avklart.
+            {t(
+              'treatmentPreferencesDesc',
+              'Angi hva pasienten er komfortabel med. La stå tom hvis ikke avklart.'
+            )}
           </p>
           <div className="space-y-4">
             {/* Needles preference */}
             <div className="flex items-center gap-6">
               <span className="text-sm font-medium text-gray-700 w-40">
-                Nåler (dry needling, akupunktur):
+                {t('needles', 'Nåler')} (dry needling, {t('acupuncture', 'akupunktur')}):
               </span>
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2">
@@ -612,7 +620,7 @@ export default function NewPatient() {
                     onChange={() => handleChange('treatment_pref_needles', true)}
                     className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
                   />
-                  <span className="text-sm text-green-700">OK</span>
+                  <span className="text-sm text-green-700">{t('prefOk', 'OK')}</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -622,7 +630,7 @@ export default function NewPatient() {
                     onChange={() => handleChange('treatment_pref_needles', false)}
                     className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
                   />
-                  <span className="text-sm text-red-700">Ikke OK</span>
+                  <span className="text-sm text-red-700">{t('prefNotOk', 'Ikke OK')}</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -632,14 +640,18 @@ export default function NewPatient() {
                     onChange={() => handleChange('treatment_pref_needles', null)}
                     className="w-4 h-4 text-gray-600 dark:text-gray-300 border-gray-300 focus:ring-gray-500"
                   />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Ikke avklart</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {t('prefNotCleared', 'Ikke avklart')}
+                  </span>
                 </label>
               </div>
             </div>
 
             {/* Adjustments preference */}
             <div className="flex items-center gap-6">
-              <span className="text-sm font-medium text-gray-700 w-40">Justeringer generelt:</span>
+              <span className="text-sm font-medium text-gray-700 w-40">
+                {t('adjustments', 'Justeringer')} {t('general', 'generelt')}:
+              </span>
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2">
                   <input
@@ -649,7 +661,7 @@ export default function NewPatient() {
                     onChange={() => handleChange('treatment_pref_adjustments', true)}
                     className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
                   />
-                  <span className="text-sm text-green-700">OK</span>
+                  <span className="text-sm text-green-700">{t('prefOk', 'OK')}</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -659,7 +671,7 @@ export default function NewPatient() {
                     onChange={() => handleChange('treatment_pref_adjustments', false)}
                     className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
                   />
-                  <span className="text-sm text-red-700">Ikke OK</span>
+                  <span className="text-sm text-red-700">{t('prefNotOk', 'Ikke OK')}</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -669,7 +681,9 @@ export default function NewPatient() {
                     onChange={() => handleChange('treatment_pref_adjustments', null)}
                     className="w-4 h-4 text-gray-600 dark:text-gray-300 border-gray-300 focus:ring-gray-500"
                   />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Ikke avklart</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {t('prefNotCleared', 'Ikke avklart')}
+                  </span>
                 </label>
               </div>
             </div>
@@ -677,7 +691,7 @@ export default function NewPatient() {
             {/* Neck adjustments preference */}
             <div className="flex items-center gap-6">
               <span className="text-sm font-medium text-gray-700 w-40">
-                Nakkejusteringer spesifikt:
+                {t('neckAdjustments', 'Nakkejusteringer')} {t('specifically', 'spesifikt')}:
               </span>
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2">
@@ -688,7 +702,7 @@ export default function NewPatient() {
                     onChange={() => handleChange('treatment_pref_neck_adjustments', true)}
                     className="w-4 h-4 text-green-600 border-gray-300 focus:ring-green-500"
                   />
-                  <span className="text-sm text-green-700">OK</span>
+                  <span className="text-sm text-green-700">{t('prefOk', 'OK')}</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -698,7 +712,7 @@ export default function NewPatient() {
                     onChange={() => handleChange('treatment_pref_neck_adjustments', false)}
                     className="w-4 h-4 text-red-600 border-gray-300 focus:ring-red-500"
                   />
-                  <span className="text-sm text-red-700">Ikke OK</span>
+                  <span className="text-sm text-red-700">{t('prefNotOk', 'Ikke OK')}</span>
                 </label>
                 <label className="flex items-center gap-2">
                   <input
@@ -708,7 +722,9 @@ export default function NewPatient() {
                     onChange={() => handleChange('treatment_pref_neck_adjustments', null)}
                     className="w-4 h-4 text-gray-600 dark:text-gray-300 border-gray-300 focus:ring-gray-500"
                   />
-                  <span className="text-sm text-gray-500 dark:text-gray-400">Ikke avklart</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    {t('prefNotCleared', 'Ikke avklart')}
+                  </span>
                 </label>
               </div>
             </div>
@@ -716,13 +732,16 @@ export default function NewPatient() {
             {/* Treatment preference notes */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notater om behandlingspreferanser
+                {t('preferenceNotes', 'Notater om behandlingspreferanser')}
               </label>
               <textarea
                 value={formData.treatment_pref_notes}
                 onChange={(e) => handleChange('treatment_pref_notes', e.target.value)}
                 rows={2}
-                placeholder="f.eks. pasient er nervøs for nakkejusteringer pga tidligere ubehag..."
+                placeholder={t(
+                  'treatmentNotesPlaceholder',
+                  'f.eks. pasient er nervøs for nakkejusteringer pga tidligere ubehag...'
+                )}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
               />
             </div>

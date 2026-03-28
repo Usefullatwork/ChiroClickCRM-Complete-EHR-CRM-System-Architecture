@@ -44,7 +44,7 @@ function TimelineEntry({ entry, patientId, onNavigate }) {
             {entry.signed && (
               <CheckCircle
                 className="w-4 h-4 text-green-500 dark:text-green-400"
-                aria-label="Signert"
+                aria-label={t('signed', 'Signert')}
               />
             )}
             <span className="text-xs text-gray-500 dark:text-gray-400">
@@ -89,10 +89,15 @@ export default function PatientTimeline({ patientId, encounters = [], onNavigate
 
   // Apply active filter
   const filteredItems = useMemo(() => {
-    if (activeFilter === 'all') return timelineItems;
-    if (activeFilter === 'journals') return timelineItems.filter((i) => i.type === 'encounter');
-    if (activeFilter === 'communications')
+    if (activeFilter === 'all') {
+      return timelineItems;
+    }
+    if (activeFilter === 'journals') {
+      return timelineItems.filter((i) => i.type === 'encounter');
+    }
+    if (activeFilter === 'communications') {
       return timelineItems.filter((i) => i.type === 'communication');
+    }
     return timelineItems;
   }, [timelineItems, activeFilter]);
 

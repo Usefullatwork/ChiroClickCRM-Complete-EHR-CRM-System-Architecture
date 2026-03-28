@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { templatesAPI } from '../services/api';
 import { Search, Star, ChevronRight, ChevronDown, Copy, Heart, X } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 export default function TemplatePicker({ onSelectTemplate, _soapSection, isOpen, onClose }) {
+  const { t } = useTranslation('clinical');
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategories, setExpandedCategories] = useState({});
@@ -194,7 +196,7 @@ export default function TemplatePicker({ onSelectTemplate, _soapSection, isOpen,
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Søk etter maler..."
+            placeholder={t('searchTemplatesPlaceholder', 'Søk etter maler...')}
             className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>

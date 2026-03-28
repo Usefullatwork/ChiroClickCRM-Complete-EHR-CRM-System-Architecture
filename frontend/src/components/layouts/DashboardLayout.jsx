@@ -126,7 +126,9 @@ export default function DashboardLayout() {
 
   const isActive = useCallback(
     (href) => {
-      if (href === '/') return location.pathname === '/';
+      if (href === '/') {
+        return location.pathname === '/';
+      }
       return location.pathname.startsWith(href);
     },
     [location.pathname]
@@ -153,7 +155,7 @@ export default function DashboardLayout() {
           <button
             onClick={() => setCommandPaletteOpen(true)}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-200"
-            aria-label="Search"
+            aria-label={t('search', 'Søk')}
           >
             <Search className="w-5 h-5" />
           </button>
@@ -161,7 +163,7 @@ export default function DashboardLayout() {
           <button
             onClick={() => setMobileMenuOpen(true)}
             className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-200"
-            aria-label="Open navigation menu"
+            aria-label={t('openNavigationMenu', 'Åpne navigasjonsmeny')}
           >
             <Menu className="w-6 h-6" />
           </button>
@@ -184,7 +186,7 @@ export default function DashboardLayout() {
         }`}
         role="dialog"
         aria-modal="true"
-        aria-label="Navigation menu"
+        aria-label={t('navigationMenu', 'Navigasjonsmeny')}
       >
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between px-4 py-4 border-b border-gray-200 dark:border-gray-700">
@@ -199,13 +201,16 @@ export default function DashboardLayout() {
             <button
               onClick={() => setMobileMenuOpen(false)}
               className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-500 dark:text-gray-200"
-              aria-label="Close navigation menu"
+              aria-label={t('closeNavigationMenu', 'Lukk navigasjonsmeny')}
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
-          <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Main navigation">
+          <nav
+            className="flex-1 overflow-y-auto px-3 py-4"
+            aria-label={t('mainNavigation', 'Hovednavigasjon')}
+          >
             <ul className="space-y-1">
               {CORE_NAV.filter((i) => !i.module || isModuleEnabled(i.module)).map((item) => (
                 <NavItem
@@ -272,7 +277,10 @@ export default function DashboardLayout() {
           </div>
 
           {/* Navigation - Core */}
-          <nav className="flex-1 overflow-y-auto px-3 py-4" aria-label="Main navigation">
+          <nav
+            className="flex-1 overflow-y-auto px-3 py-4"
+            aria-label={t('mainNavigation', 'Hovednavigasjon')}
+          >
             <ul className="space-y-0.5">
               {CORE_NAV.filter((i) => !i.module || isModuleEnabled(i.module)).map((item) => (
                 <NavItem key={item.key} item={item} isActive={isActive} t={t} />
@@ -325,7 +333,7 @@ export default function DashboardLayout() {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-teal-600 focus:text-white focus:rounded-lg"
       >
-        Skip to content
+        {t('skipToContent', 'Hopp til innhold')}
       </a>
 
       {/* Desktop top bar with quick actions */}

@@ -26,6 +26,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import ICD10CodePicker from './ICD10CodePicker';
+import { usePrompt } from '../ui/PromptDialog';
 
 import logger from '../../utils/logger';
 /**
@@ -48,6 +49,7 @@ export default function FollowUpTemplate({
   readOnly = false,
 }) {
   const { t } = useTranslation('clinical');
+  const prompt = usePrompt();
   // Auto-save timer ref
   const autoSaveTimerRef = useRef(null);
   const [lastAutoSave, setLastAutoSave] = useState(null);
@@ -730,7 +732,7 @@ export default function FollowUpTemplate({
           <div className="space-y-2">
             {(followUpData.assessment.redFlags || []).map((flag, index) => (
               <div
-                key={index}
+                key={`redflag-${flag}-${index}`}
                 className="flex items-center gap-2 p-2 bg-red-50 border border-red-200 rounded-lg"
               >
                 <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0" />
@@ -747,8 +749,8 @@ export default function FollowUpTemplate({
             ))}
             {!readOnly && (
               <button
-                onClick={() => {
-                  const flag = prompt(t('addRedFlagPrompt'));
+                onClick={async () => {
+                  const flag = await prompt({ title: t('addRedFlagTitle', 'Legg til rodt flagg') });
                   if (flag) {
                     addRedFlag(flag);
                   }
@@ -798,9 +800,9 @@ export default function FollowUpTemplate({
               )}
             </div>
             <div className="flex flex-wrap gap-2">
-              {(followUpData.icd10_codes || []).map((code, index) => (
+              {(followUpData.icd10_codes || []).map((code) => (
                 <span
-                  key={index}
+                  key={code}
                   className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-lg text-sm"
                 >
                   {code}

@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 import {
   FileText,
   Wand2,
@@ -65,6 +66,7 @@ export default function MedicalCertificateGenerator({
   onSave,
   className = '',
 }) {
+  const { t } = useTranslation('letters');
   const [selectedType, setSelectedType] = useState('MEDICAL_CERTIFICATE');
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -263,7 +265,7 @@ export default function MedicalCertificateGenerator({
                 onChange={(e) =>
                   setAdditionalFields({ ...additionalFields, institution: e.target.value })
                 }
-                placeholder="F.eks. Universitetet i Oslo"
+                placeholder={t('institutionPlaceholder', 'F.eks. Universitetet i Oslo')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -275,7 +277,7 @@ export default function MedicalCertificateGenerator({
                 onChange={(e) =>
                   setAdditionalFields({ ...additionalFields, purpose: e.target.value })
                 }
-                placeholder="F.eks. Utsatt eksamen i PSYC1000"
+                placeholder={t('purposePlaceholder', 'F.eks. Utsatt eksamen i PSYC1000')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -293,7 +295,7 @@ export default function MedicalCertificateGenerator({
                 onChange={(e) =>
                   setAdditionalFields({ ...additionalFields, recipient: e.target.value })
                 }
-                placeholder="F.eks. SATS Majorstuen"
+                placeholder={t('facilityPlaceholder', 'F.eks. SATS Majorstuen')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -305,7 +307,7 @@ export default function MedicalCertificateGenerator({
                 onChange={(e) =>
                   setAdditionalFields({ ...additionalFields, duration: e.target.value })
                 }
-                placeholder="F.eks. 6 uker"
+                placeholder={t('durationExamplePlaceholder', 'F.eks. 6 uker')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -341,7 +343,10 @@ export default function MedicalCertificateGenerator({
                 onChange={(e) =>
                   setAdditionalFields({ ...additionalFields, restrictions: e.target.value })
                 }
-                placeholder="F.eks. Unngå tunge løft, behov for hyppige pauser"
+                placeholder={t(
+                  'restrictionsPlaceholder',
+                  'F.eks. Unngå tunge løft, behov for hyppige pauser'
+                )}
                 rows={2}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -354,7 +359,7 @@ export default function MedicalCertificateGenerator({
                 onChange={(e) =>
                   setAdditionalFields({ ...additionalFields, duration: e.target.value })
                 }
-                placeholder="F.eks. 2-4 uker"
+                placeholder={t('recoveryTimePlaceholder', 'F.eks. 2-4 uker')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -370,7 +375,10 @@ export default function MedicalCertificateGenerator({
               onChange={(e) =>
                 setAdditionalFields({ ...additionalFields, purpose: e.target.value })
               }
-              placeholder="Beskriv formålet med erklæringen..."
+              placeholder={t(
+                'certificatePurposePlaceholder',
+                'Beskriv formålet med erklæringen...'
+              )}
               rows={2}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />

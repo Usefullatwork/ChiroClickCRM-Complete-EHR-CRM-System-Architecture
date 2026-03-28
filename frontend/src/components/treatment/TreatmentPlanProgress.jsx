@@ -12,7 +12,7 @@ export default function TreatmentPlanProgress({
   onViewPlan,
   onNewPlan,
   compact = false,
-  lang = 'no',
+  _lang = 'no',
 }) {
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(true);

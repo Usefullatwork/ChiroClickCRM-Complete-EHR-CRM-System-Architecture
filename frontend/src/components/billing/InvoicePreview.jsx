@@ -334,8 +334,8 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {items.map((item, index) => (
-                    <tr key={index}>
+                  {items.map((item) => (
+                    <tr key={item.code || item.name}>
                       <td className="px-4 py-3 text-blue-600 font-medium">{item.code}</td>
                       <td className="px-4 py-3">{item.name}</td>
                       <td className="px-4 py-3 text-center">{item.quantity}</td>
@@ -406,7 +406,7 @@ export default function InvoicePreview({ invoiceId, onClose, onRecordPayment }) 
               </h3>
               <div className="border border-gray-200 rounded-lg divide-y">
                 {payments.map((payment, index) => (
-                  <div key={index} className="p-3 flex items-center justify-between">
+                  <div key={payment.id || index} className="p-3 flex items-center justify-between">
                     <div>
                       <p className="font-medium text-gray-900">{formatCurrency(payment.amount)}</p>
                       <p className="text-sm text-gray-500 dark:text-gray-400">

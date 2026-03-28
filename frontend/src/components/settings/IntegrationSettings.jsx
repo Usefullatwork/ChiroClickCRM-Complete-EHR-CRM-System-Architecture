@@ -9,7 +9,9 @@ export default function IntegrationSettings({ t }) {
       const response = await fetch('/api/v1/patients/export/vcf', {
         credentials: 'include',
       });
-      if (!response.ok) throw new Error('Export failed');
+      if (!response.ok) {
+        throw new Error('Export failed');
+      }
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

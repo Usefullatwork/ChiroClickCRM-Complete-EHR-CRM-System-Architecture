@@ -46,19 +46,19 @@ cd frontend && npx playwright test              # E2E tests
 - `frontend/src/components/` — 39 subdirs, ~300 components
 - `backend/src/services/` — 97 service files (ai/, providers/, crm, exercises, pdf, etc.)
 - `backend/src/routes/` — 49 route files (47 registered + 2 regulatory stubs). Swagger at `/api-docs` (109 endpoints)
-- `database/migrations/` — 078 migrations (PGlite auto-applies on startup via `db-init.js`)
+- `database/migrations/` — 078 migrations (PGlite auto-applies on startup via `db-init.js`). Gap at 025 is intentional (removed in commit 201f79b)
 
 ## Patient Connectivity (v2.1 — COMPLETE)
 
-| Service                    | Role                                                          |
-| -------------------------- | ------------------------------------------------------------- |
-| `documentDelivery.js`      | PDF generate → portal doc → email/SMS/push pipeline           |
-| `pushNotification.js`      | Expo Push API wrapper (mock in desktop)                       |
-| `appointmentReminders.js`  | Schedule on create, cancel on cancel, \*/15 cron              |
-| `communications.js`        | Core SMS/email abstraction — all delivery routes through here |
-| `patientPortal.js` (route) | Booking, messaging, documents, preferences                    |
-| `mobile.js` (route)        | +8 endpoints: messages, documents, booking                    |
-| `automations/actions.js`   | 9 action types incl. SEND_BOOKING_LINK                        |
+| Service                    | Role                                                                          |
+| -------------------------- | ----------------------------------------------------------------------------- |
+| `documentDelivery.js`      | PDF generate → portal doc → email/SMS/push pipeline                           |
+| `pushNotification.js`      | Expo Push API wrapper (mock in desktop)                                       |
+| `appointmentReminders.js`  | Schedule on create, cancel on cancel, \*/15 cron                              |
+| `communications.js`        | Core SMS/email abstraction — all delivery routes through here                 |
+| `patientPortal.js` (route) | Booking, messaging, documents, preferences                                    |
+| `routes/mobile/` (dir)     | Split into 7 sub-routes: auth, profile, exercises, programs, workouts, clinic |
+| `automations/actions.js`   | 9 action types incl. SEND_BOOKING_LINK                                        |
 
 **Provider strategy**: Mock in desktop mode. Set `EMAIL_PROVIDER=smtp` + `SMS_PROVIDER=twilio` + Firebase creds for real delivery.
 
@@ -94,3 +94,57 @@ Budget enforcement: `canSpend()` pre-flight. Auto-resets daily/monthly.
 - `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (future)
 - `services/ai.js` is a shim re-exporting from `services/ai/` (5 modules)
 - i18n: ~50 bilingual `{en,no}` strings remain by design
+
+## System Basics V2 (v1.3.0, medical preset)
+
+### Installed Components
+
+- **Agents**: 18 (6 core + 2 browser + 6 seo + 4 workflows)
+- **Skills**: 28 (19 SB2 + 6 project-specific + 3 medical)
+- **Commands**: 27 (18 SB2 + 9 project-specific)
+- **Rules**: 7 (5 SB2 base + 2 medical)
+- **Hooks**: Full template (12 event types)
+
+### Command Structure (27 commands in 4 categories)
+
+| Category         | Commands                                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------------------------- |
+| session/ (7)     | save-state, resume, reboot, health, backup, start, memory-curator                                               |
+| development/ (9) | dev-task, parallel, finish-branch, tech-debt, changelog, electron-verify, rpi-research, rpi-plan, rpi-implement |
+| quality/ (7)     | test, release-check, i18n-scan, api-coverage, dep-audit, perf-audit, code-audit                                 |
+| update/ (4)      | update, add-source, sync-skills, add-skill                                                                      |
+
+### Session Management
+
+1. Work normally until warned at 40 tool calls
+2. Run `/session:save-state` to persist progress
+3. Run `/compact` to reclaim context
+4. Run `/session:resume` to restore and continue
+5. If degraded, `/session:reboot` for 5-question recovery
+
+### Agent Model Routing
+
+- **Sonnet**: Implementation (backend-dev, frontend-dev, clinical-qa, test-analyzer)
+- **Opus**: Review (code-reviewer, compliance-scanner, chief-of-staff, research-lead)
+
+### Dream Consolidation
+
+- Manual: `/dream` to consolidate session learnings
+- Auto: `should-dream.sh` Stop hook triggers after 24hr gap
+- State: `.planning/last-dream-timestamp`
+
+### MCP Servers (template)
+
+Copy `.mcp.json.template` to `.mcp.json` and fill in API keys:
+
+- Playwright (visual testing)
+- Context7 (documentation lookup)
+- DeepWiki (wiki research)
+- Firecrawl (web scraping, requires API key)
+
+### Unified Update System
+
+```bash
+node scripts/update.js --check   # Check for updates
+node scripts/update.js           # Apply updates
+```

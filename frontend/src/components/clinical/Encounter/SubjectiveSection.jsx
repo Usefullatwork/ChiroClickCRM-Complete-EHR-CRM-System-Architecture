@@ -1,4 +1,5 @@
 import { useEncounter } from '../../../context/EncounterContext';
+import { useTranslation } from '../../../i18n';
 
 export default function SubjectiveSection({
   onTextInputWithMacros,
@@ -6,6 +7,7 @@ export default function SubjectiveSection({
   onSetActiveField,
   quickPhrases,
 }) {
+  const { t } = useTranslation('clinical');
   const { encounterData, isSigned, updateField, setEncounterData } = useEncounter();
 
   return (
@@ -28,7 +30,7 @@ export default function SubjectiveSection({
               setEncounterData((prev) => ({ ...prev, vas_pain_start: parseInt(e.target.value) }))
             }
             disabled={isSigned}
-            aria-label="VAS smerteskala start"
+            aria-label={t('vasPainScaleStart', 'VAS smerteskala start')}
             className="w-20 h-1.5 accent-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
           />
           <span className="text-sm font-semibold text-blue-600 w-6">
@@ -39,16 +41,19 @@ export default function SubjectiveSection({
       <div className="p-4 space-y-3">
         <input
           type="text"
-          placeholder="Hovedklage..."
+          placeholder={t('chiefComplaintPlaceholder', 'Hovedklage...')}
           value={encounterData.subjective.chief_complaint}
           onChange={(e) => updateField('subjective', 'chief_complaint', e.target.value)}
           disabled={isSigned}
-          aria-label="Hovedklage"
+          aria-label={t('chiefComplaint', 'Hovedklage')}
           className="w-full px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
         />
         <textarea
-          placeholder="Anamnese og symptombeskrivelse... (bruk .bs for makro)"
-          aria-label="Anamnese og symptombeskrivelse"
+          placeholder={t(
+            'historyPlaceholder',
+            'Anamnese og symptombeskrivelse... (bruk .bs for makro)'
+          )}
+          aria-label={t('historyLabel', 'Anamnese og symptombeskrivelse')}
           className="w-full min-h-[100px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
           value={encounterData.subjective.history}
           onChange={(e) => {
@@ -75,20 +80,20 @@ export default function SubjectiveSection({
         <div className="grid grid-cols-2 gap-3">
           <input
             type="text"
-            placeholder="Debut (når startet det?)"
+            placeholder={t('onsetPlaceholder', 'Debut (når startet det?)')}
             value={encounterData.subjective.onset}
             onChange={(e) => updateField('subjective', 'onset', e.target.value)}
             disabled={isSigned}
-            aria-label="Debut"
+            aria-label={t('onset', 'Debut')}
             className="px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
           />
           <input
             type="text"
-            placeholder="Smertebeskrivelse"
+            placeholder={t('painDescriptionPlaceholder', 'Smertebeskrivelse')}
             value={encounterData.subjective.pain_description}
             onChange={(e) => updateField('subjective', 'pain_description', e.target.value)}
             disabled={isSigned}
-            aria-label="Smertebeskrivelse"
+            aria-label={t('painDescription', 'Smertebeskrivelse')}
             className="px-3 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-blue-500 text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
           />
         </div>

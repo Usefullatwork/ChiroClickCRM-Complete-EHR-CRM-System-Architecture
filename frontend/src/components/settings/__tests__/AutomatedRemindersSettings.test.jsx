@@ -37,9 +37,11 @@ const createWrapper = () => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
-  return ({ children }) => (
+  const Wrapper = ({ children }) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
+  Wrapper.displayName = 'TestQueryWrapper';
+  return Wrapper;
 };
 
 describe('AutomatedRemindersSettings', () => {

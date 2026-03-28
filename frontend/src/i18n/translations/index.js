@@ -16,6 +16,8 @@ import { analytics } from './analytics';
 import { ai } from './ai';
 import { assessment } from './assessment';
 import { portal } from './portal';
+import { automations } from './automations';
+import { neuroexam } from './neuroexam';
 
 export const translations = {
   common,
@@ -36,4 +38,6 @@ export const translations = {
   ai,
   assessment,
   portal,
+  automations,
+  neuroexam,
 };

@@ -3,18 +3,22 @@
 When a tool call, test, or build fails:
 
 ## Strike 1: Diagnose & Fix
+
 - Read the error message carefully
 - Identify root cause (not just symptoms)
 - Apply a targeted fix
 - Re-run to verify
 
 ## Strike 2: Alternative Approach
+
 - The first fix didn't work — do NOT retry the same thing
 - Step back and consider a different approach
 - Check if the problem is upstream (wrong file, wrong assumption, missing dependency)
+- For complex failures, invoke the `root-cause-tracer` agent which traces execution paths and builds causal chains to identify the root cause rather than symptoms. This agent generates ranked hypotheses with evidence and proposes multiple remediation paths.
 - Apply the alternative and verify
 
 ## Strike 3: STOP
+
 - Two attempts failed — continuing will waste tokens and context
 - Log the issue to `.planning/progress.md` with:
   - What was attempted

@@ -20,6 +20,7 @@ import {
   Legend,
 } from 'recharts';
 import { CheckCircle2, Activity, Clock, PauseCircle, TrendingUp } from 'lucide-react';
+import { useTranslation } from '../../i18n/useTranslation';
 
 /**
  * Status colors for pie chart
@@ -38,6 +39,8 @@ const STATUS_COLORS = {
  * @param {boolean} loading - Loading state
  */
 export const ComplianceChart = ({ data = {}, loading = false }) => {
+  const { t } = useTranslation('analytics');
+
   // Format pie chart data
   const pieData = useMemo(() => {
     if (!data) {
@@ -45,12 +48,28 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
     }
 
     return [
-      { name: 'Fullfort', value: data.completed || 0, color: STATUS_COLORS.completed },
-      { name: 'Aktiv', value: data.active || 0, color: STATUS_COLORS.active },
-      { name: 'Pauset', value: data.paused || 0, color: STATUS_COLORS.paused },
-      { name: 'Kansellert', value: data.cancelled || 0, color: STATUS_COLORS.cancelled },
+      {
+        name: t('complianceCompleted', 'Fullført'),
+        value: data.completed || 0,
+        color: STATUS_COLORS.completed,
+      },
+      {
+        name: t('complianceActive', 'Aktiv'),
+        value: data.active || 0,
+        color: STATUS_COLORS.active,
+      },
+      {
+        name: t('compliancePaused', 'Pauset'),
+        value: data.paused || 0,
+        color: STATUS_COLORS.paused,
+      },
+      {
+        name: t('complianceCancelled', 'Kansellert'),
+        value: data.cancelled || 0,
+        color: STATUS_COLORS.cancelled,
+      },
     ].filter((item) => item.value > 0);
-  }, [data]);
+  }, [data, t]);
 
   // Format trend data
   const trendData = useMemo(() => {
@@ -90,8 +109,8 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
       return (
         <div className="bg-white px-4 py-3 shadow-lg rounded-lg border border-gray-200">
           <p className="text-sm font-semibold text-gray-900 mb-2">{label}</p>
-          {payload.map((entry, index) => (
-            <div key={index} className="flex items-center gap-2 text-sm">
+          {payload.map((entry) => (
+            <div key={entry.name} className="flex items-center gap-2 text-sm">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
               <span className="text-gray-600 dark:text-gray-300">{entry.name}:</span>
               <span className="font-semibold text-gray-900">
@@ -129,16 +148,20 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
               <CheckCircle2 size={20} className="text-teal-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Pasientetterlevelse</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t('complianceTitle', 'Pasientetterlevelse')}
+              </h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Ovelsesprogrammer siste 90 dager
+                {t('complianceLast90Days', 'Øvelsesprogrammer siste 90 dager')}
               </p>
             </div>
           </div>
 
           {/* Main compliance rate */}
           <div className="text-right">
-            <p className="text-xs text-gray-500 dark:text-gray-400">Etterlevelsesrate</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {t('complianceRate', 'Etterlevelsesrate')}
+            </p>
             <p
               className={`text-2xl font-bold ${
                 completionRate >= 70
@@ -159,7 +182,9 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Pie chart - Status distribution */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-4">Statusfordeling</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-4">
+              {t('complianceStatusDistribution', 'Statusfordeling')}
+            </h4>
             {pieData.length > 0 ? (
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
@@ -187,14 +212,16 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
               </ResponsiveContainer>
             ) : (
               <div className="h-48 flex items-center justify-center text-gray-400 dark:text-gray-300">
-                <p>Ingen data</p>
+                <p>{t('complianceNoData', 'Ingen data')}</p>
               </div>
             )}
           </div>
 
           {/* Line chart - Weekly trend */}
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-4">Ukentlig trend</h4>
+            <h4 className="text-sm font-medium text-gray-700 mb-4">
+              {t('complianceWeeklyTrend', 'Ukentlig trend')}
+            </h4>
             {trendData.length > 0 ? (
               <ResponsiveContainer width="100%" height={200}>
                 <LineChart data={trendData} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
@@ -224,7 +251,7 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
               </ResponsiveContainer>
             ) : (
               <div className="h-48 flex items-center justify-center text-gray-400 dark:text-gray-300">
-                <p>Ingen trenddata</p>
+                <p>{t('complianceNoTrendData', 'Ingen trenddata')}</p>
               </div>
             )}
           </div>
@@ -237,35 +264,35 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 mb-1">
               <Activity size={14} />
-              <span className="text-xs">Totalt</span>
+              <span className="text-xs">{t('complianceTotalLabel', 'Totalt')}</span>
             </div>
             <p className="text-lg font-bold text-gray-900">{data.totalPrescriptions || 0}</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-green-600 mb-1">
               <CheckCircle2 size={14} />
-              <span className="text-xs">Fullfort</span>
+              <span className="text-xs">{t('complianceCompleted', 'Fullført')}</span>
             </div>
             <p className="text-lg font-bold text-green-600">{data.completed || 0}</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-blue-600 mb-1">
               <Clock size={14} />
-              <span className="text-xs">Aktive</span>
+              <span className="text-xs">{t('complianceActive', 'Aktiv')}</span>
             </div>
             <p className="text-lg font-bold text-blue-600">{data.active || 0}</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-amber-600 mb-1">
               <PauseCircle size={14} />
-              <span className="text-xs">Pauset</span>
+              <span className="text-xs">{t('compliancePaused', 'Pauset')}</span>
             </div>
             <p className="text-lg font-bold text-amber-600">{data.paused || 0}</p>
           </div>
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 mb-1">
               <TrendingUp size={14} />
-              <span className="text-xs">Gj.snitt progresjon</span>
+              <span className="text-xs">{t('complianceAvgProgress', 'Gj.snitt progresjon')}</span>
             </div>
             <p className="text-lg font-bold text-teal-600">{avgProgressRate}%</p>
           </div>
@@ -279,6 +306,8 @@ export const ComplianceChart = ({ data = {}, loading = false }) => {
  * ComplianceGauge - Simple gauge display for compliance rate
  */
 export const ComplianceGauge = ({ rate = 0, label = 'Etterlevelse', loading = false }) => {
+  const { t } = useTranslation('analytics');
+
   const getColor = () => {
     if (rate >= 70) {
       return '#10b981';
@@ -330,7 +359,11 @@ export const ComplianceGauge = ({ rate = 0, label = 'Etterlevelse', loading = fa
       <div>
         <p className="text-sm font-medium text-gray-900">{label}</p>
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          {rate >= 70 ? 'Utmerket' : rate >= 50 ? 'Middels' : 'Lav'}
+          {rate >= 70
+            ? t('complianceExcellent', 'Utmerket')
+            : rate >= 50
+              ? t('complianceModerate', 'Moderat')
+              : t('complianceLow', 'Lav')}
         </p>
       </div>
     </div>

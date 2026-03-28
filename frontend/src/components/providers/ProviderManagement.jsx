@@ -419,7 +419,7 @@ function ProviderForm({ provider, onSave, onCancel, onDelete }) {
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="Kiropraktor"
+              placeholder={t('titlePlaceholder', 'Kiropraktor')}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
@@ -431,7 +431,7 @@ function ProviderForm({ provider, onSave, onCancel, onDelete }) {
               type="text"
               value={formData.credentials}
               onChange={(e) => setFormData({ ...formData, credentials: e.target.value })}
-              placeholder="DC, MChiro"
+              placeholder={t('credentialsPlaceholder', 'DC, MChiro')}
               className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>

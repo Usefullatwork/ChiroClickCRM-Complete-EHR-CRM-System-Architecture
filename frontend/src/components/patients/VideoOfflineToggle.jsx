@@ -48,7 +48,7 @@ export function VideoOfflineToggle({
   videoUrl,
   exerciseId,
   _exerciseName,
-  lang = 'no',
+  _lang = 'no',
   variant = 'button',
   onCached,
   onRemoved,
@@ -237,7 +237,7 @@ export function VideoOfflineToggle({
  * @param {Array} props.exercises - List of exercises with video URLs
  * @param {string} props.lang - Language
  */
-export function VideoOfflineManager({ exercises, lang = 'no' }) {
+export function VideoOfflineManager({ exercises, _lang = 'no' }) {
   const { t } = useTranslation('exercises');
 
   const {

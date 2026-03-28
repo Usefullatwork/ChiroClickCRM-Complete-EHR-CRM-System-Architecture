@@ -369,4 +369,308 @@ describe('Exercises Service', () => {
       expect(result.name_no).toBe('Ny Ovelse');
     });
   });
+
+  // =============================================================================
+  // UPDATE EXERCISE
+  // =============================================================================
+
+  describe('updateExercise', () => {
+    it('should update allowed fields and return updated exercise', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ id: 'ex-1', name_no: 'Oppdatert Ovelse', difficulty: 'intermediate' }],
+      });
+
+      const result = await exercisesService.updateExercise('ex-1', testOrgId, {
+        name_no: 'Oppdatert Ovelse',
+        difficulty: 'intermediate',
+      });
+
+      expect(result).toBeDefined();
+      expect(result.name_no).toBe('Oppdatert Ovelse');
+      expect(mockQuery).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return null when exercise not found', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await exercisesService.updateExercise('non-existent', testOrgId, {
+        name_no: 'Test',
+      });
+
+      expect(result).toBeNull();
+    });
+
+    it('should throw when no valid fields are provided', async () => {
+      await expect(
+        exercisesService.updateExercise('ex-1', testOrgId, { invalid_field: 'value' })
+      ).rejects.toThrow('No valid fields to update');
+    });
+  });
+
+  // =============================================================================
+  // DELETE EXERCISE
+  // =============================================================================
+
+  describe('deleteExercise', () => {
+    it('should soft-delete exercise and return success', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [{ id: 'ex-1' }] });
+
+      const result = await exercisesService.deleteExercise('ex-1', testOrgId);
+
+      expect(result).toEqual({ success: true });
+      expect(mockQuery).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return null when exercise not found', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await exercisesService.deleteExercise('non-existent', testOrgId);
+
+      expect(result).toBeNull();
+    });
+  });
+
+  // =============================================================================
+  // PROGRAM MANAGEMENT
+  // =============================================================================
+
+  describe('createProgram', () => {
+    it('should create an exercise program and return it', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'prog-1',
+            name_no: 'Nakkerehabilitering',
+            name_en: 'Neck Rehabilitation',
+            target_condition: 'cervicogenic_headache',
+            difficulty: 'beginner',
+            duration_weeks: 6,
+          },
+        ],
+      });
+
+      const result = await exercisesService.createProgram(
+        testOrgId,
+        {
+          name_no: 'Nakkerehabilitering',
+          name_en: 'Neck Rehabilitation',
+          target_condition: 'cervicogenic_headache',
+          body_region: 'cervical',
+          difficulty: 'beginner',
+          exercises: [],
+          duration_weeks: 6,
+        },
+        'prac-1'
+      );
+
+      expect(result).toBeDefined();
+      expect(result.id).toBe('prog-1');
+      expect(result.name_no).toBe('Nakkerehabilitering');
+    });
+
+    it('should throw on database error', async () => {
+      mockQuery.mockRejectedValueOnce(new Error('Insert failed'));
+
+      await expect(
+        exercisesService.createProgram(testOrgId, { name_no: 'Test' }, 'prac-1')
+      ).rejects.toThrow('Insert failed');
+    });
+  });
+
+  describe('updateProgram', () => {
+    it('should update allowed program fields and return updated program', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ id: 'prog-1', name_no: 'Oppdatert Program', is_active: false }],
+      });
+
+      const result = await exercisesService.updateProgram('prog-1', testOrgId, {
+        name_no: 'Oppdatert Program',
+        is_active: false,
+      });
+
+      expect(result).toBeDefined();
+      expect(result.name_no).toBe('Oppdatert Program');
+    });
+
+    it('should return null when program not found', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await exercisesService.updateProgram('non-existent', testOrgId, {
+        name_no: 'Test',
+      });
+
+      expect(result).toBeNull();
+    });
+
+    it('should throw when no valid fields are provided', async () => {
+      await expect(
+        exercisesService.updateProgram('prog-1', testOrgId, { invalid_field: 'value' })
+      ).rejects.toThrow('No valid fields to update');
+    });
+  });
+
+  describe('deleteProgram', () => {
+    it('should soft-delete program and return success', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [{ id: 'prog-1' }] });
+
+      const result = await exercisesService.deleteProgram('prog-1', testOrgId);
+
+      expect(result).toEqual({ success: true });
+    });
+
+    it('should return null when program not found', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await exercisesService.deleteProgram('non-existent', testOrgId);
+
+      expect(result).toBeNull();
+    });
+  });
+
+  // =============================================================================
+  // COMPLIANCE STATISTICS
+  // =============================================================================
+
+  describe('getComplianceStats', () => {
+    it('should return compliance rows for active prescriptions', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'presc-1',
+            exercise_name: 'Hakeinndragning',
+            patient_name: 'Kari Nordmann',
+            compliance_percent: 75,
+            days_active: 14,
+          },
+          {
+            id: 'presc-2',
+            exercise_name: 'Cat-Cow',
+            patient_name: 'Ola Nordmann',
+            compliance_percent: 50,
+            days_active: 7,
+          },
+        ],
+      });
+
+      const result = await exercisesService.getComplianceStats(testOrgId, 30);
+
+      expect(result).toHaveLength(2);
+      expect(result[0].compliance_percent).toBe(75);
+      const [sqlStr, params] = mockQuery.mock.calls[0];
+      expect(params).toContain(testOrgId);
+      expect(params).toContain(30);
+    });
+
+    it('should return empty array when no active prescriptions', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await exercisesService.getComplianceStats(testOrgId);
+
+      expect(result).toHaveLength(0);
+    });
+
+    it('should throw on database error', async () => {
+      mockQuery.mockRejectedValueOnce(new Error('DB error'));
+
+      await expect(exercisesService.getComplianceStats(testOrgId)).rejects.toThrow('DB error');
+    });
+  });
+
+  // =============================================================================
+  // PRESCRIPTION WORKFLOWS
+  // =============================================================================
+
+  describe('discontinuePrescription', () => {
+    it('should discontinue a prescription with reason and return it', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'presc-1',
+            status: 'discontinued',
+            discontinue_reason: 'Patient request',
+            discontinued_by: 'prac-1',
+          },
+        ],
+      });
+
+      const result = await exercisesService.discontinuePrescription(
+        'presc-1',
+        testOrgId,
+        'prac-1',
+        'Patient request'
+      );
+
+      expect(result).toBeDefined();
+      expect(result.status).toBe('discontinued');
+      expect(result.discontinue_reason).toBe('Patient request');
+    });
+
+    it('should return null when prescription not found', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await exercisesService.discontinuePrescription(
+        'non-existent',
+        testOrgId,
+        'prac-1',
+        'No longer needed'
+      );
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('completePrescription', () => {
+    it('should mark a prescription as completed', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ id: 'presc-1', status: 'completed' }],
+      });
+
+      const result = await exercisesService.completePrescription('presc-1', testOrgId);
+
+      expect(result).toBeDefined();
+      expect(result.status).toBe('completed');
+    });
+
+    it('should return null when prescription not found', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await exercisesService.completePrescription('non-existent', testOrgId);
+
+      expect(result).toBeNull();
+    });
+  });
+
+  describe('logCompliance', () => {
+    it('should append a compliance entry and return updated prescription', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          {
+            id: 'presc-1',
+            compliance_log: { '2026-03-26': { completed: true, pain_level: 3 } },
+          },
+        ],
+      });
+
+      const result = await exercisesService.logCompliance('presc-1', testOrgId, {
+        date: '2026-03-26',
+        completed: true,
+        pain_level: 3,
+        sets_completed: 3,
+      });
+
+      expect(result).toBeDefined();
+      expect(result.compliance_log).toHaveProperty('2026-03-26');
+      expect(mockQuery).toHaveBeenCalledTimes(1);
+    });
+
+    it('should return null when prescription not found', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await exercisesService.logCompliance('non-existent', testOrgId, {
+        completed: false,
+      });
+
+      expect(result).toBeNull();
+    });
+  });
 });

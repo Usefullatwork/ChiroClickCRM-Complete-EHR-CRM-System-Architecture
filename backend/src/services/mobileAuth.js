@@ -5,6 +5,7 @@
 
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
+import { query as dbQuery } from '../config/database.js';
 
 // Lazy-load optional social login deps (ESM-only jose breaks Jest)
 let OAuth2Client;
@@ -61,12 +62,12 @@ function generateToken() {
 /**
  * Send OTP via Twilio (or mock for development)
  */
-async function sendOTP(db, phoneNumber) {
+async function sendOTP(phoneNumber) {
   // Normalize phone number
   const normalizedPhone = normalizePhoneNumber(phoneNumber);
 
   // Check rate limiting (max 5 OTPs per hour)
-  const rateLimitCheck = await db.query(
+  const rateLimitCheck = await dbQuery(
     `
     SELECT COUNT(*) as count FROM otp_codes
     WHERE phone_number = $1
@@ -84,7 +85,7 @@ async function sendOTP(db, phoneNumber) {
   const expiresAt = new Date(Date.now() + OTP_EXPIRY_MINUTES * 60 * 1000);
 
   // Store OTP
-  await db.query(
+  await dbQuery(
     `
     INSERT INTO otp_codes (phone_number, code, expires_at)
     VALUES ($1, $2, $3)
@@ -119,11 +120,11 @@ async function sendOTP(db, phoneNumber) {
 /**
  * Verify OTP and create/login user
  */
-async function verifyOTP(db, phoneNumber, code) {
+async function verifyOTP(phoneNumber, code) {
   const normalizedPhone = normalizePhoneNumber(phoneNumber);
 
   // Find valid OTP
-  const otpResult = await db.query(
+  const otpResult = await dbQuery(
     `
     SELECT id, attempts FROM otp_codes
     WHERE phone_number = $1
@@ -139,7 +140,7 @@ async function verifyOTP(db, phoneNumber, code) {
 
   if (otpResult.rows.length === 0) {
     // Increment attempts on wrong code
-    await db.query(
+    await dbQuery(
       `
       UPDATE otp_codes
       SET attempts = attempts + 1
@@ -156,7 +157,7 @@ async function verifyOTP(db, phoneNumber, code) {
   const otpRecord = otpResult.rows[0];
 
   // Mark OTP as verified
-  await db.query(
+  await dbQuery(
     `
     UPDATE otp_codes SET verified = TRUE WHERE id = $1
   `,
@@ -164,9 +165,11 @@ async function verifyOTP(db, phoneNumber, code) {
   );
 
   // Find or create mobile user
-  const userResult = await db.query(
+  const userResult = await dbQuery(
     `
-    SELECT * FROM mobile_users WHERE phone_number = $1
+    SELECT id, phone_number, phone_verified, display_name, avatar_url,
+           preferred_language, notification_time, notification_enabled, created_at
+    FROM mobile_users WHERE phone_number = $1
   `,
     [normalizedPhone]
   );
@@ -176,11 +179,12 @@ async function verifyOTP(db, phoneNumber, code) {
 
   if (userResult.rows.length === 0) {
     // Create new user
-    const createResult = await db.query(
+    const createResult = await dbQuery(
       `
       INSERT INTO mobile_users (phone_number, phone_verified)
       VALUES ($1, TRUE)
-      RETURNING *
+      RETURNING id, phone_number, phone_verified, display_name, avatar_url,
+                preferred_language, notification_time, notification_enabled, created_at
     `,
       [normalizedPhone]
     );
@@ -188,7 +192,7 @@ async function verifyOTP(db, phoneNumber, code) {
     isNewUser = true;
 
     // Initialize streak tracking
-    await db.query(
+    await dbQuery(
       `
       INSERT INTO user_streaks (mobile_user_id, current_streak, longest_streak)
       VALUES ($1, 0, 0)
@@ -198,7 +202,7 @@ async function verifyOTP(db, phoneNumber, code) {
   } else {
     user = userResult.rows[0];
     // Update phone verified status
-    await db.query(
+    await dbQuery(
       `
       UPDATE mobile_users
       SET phone_verified = TRUE, last_active_at = NOW()
@@ -209,7 +213,7 @@ async function verifyOTP(db, phoneNumber, code) {
   }
 
   // Generate tokens
-  const tokens = await generateTokens(db, user);
+  const tokens = await generateTokens(user);
 
   return {
     user: sanitizeUser(user),
@@ -221,7 +225,7 @@ async function verifyOTP(db, phoneNumber, code) {
 /**
  * Verify Google Sign-In token
  */
-async function verifyGoogleToken(db, idToken) {
+async function verifyGoogleToken(idToken) {
   await loadSocialAuthDeps();
   const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -238,9 +242,11 @@ async function verifyGoogleToken(db, idToken) {
     const picture = payload.picture;
 
     // Find or create user
-    const userResult = await db.query(
+    const userResult = await dbQuery(
       `
-      SELECT * FROM mobile_users WHERE google_id = $1
+      SELECT id, phone_number, phone_verified, display_name, avatar_url,
+             preferred_language, notification_time, notification_enabled, created_at
+      FROM mobile_users WHERE google_id = $1
     `,
       [googleId]
     );
@@ -250,11 +256,12 @@ async function verifyGoogleToken(db, idToken) {
 
     if (userResult.rows.length === 0) {
       // Create new user
-      const createResult = await db.query(
+      const createResult = await dbQuery(
         `
         INSERT INTO mobile_users (google_id, display_name, avatar_url, phone_number, phone_verified)
         VALUES ($1, $2, $3, $4, FALSE)
-        RETURNING *
+        RETURNING id, phone_number, phone_verified, display_name, avatar_url,
+                  preferred_language, notification_time, notification_enabled, created_at
       `,
         [googleId, name, picture, `google_${googleId}`]
       );
@@ -262,7 +269,7 @@ async function verifyGoogleToken(db, idToken) {
       isNewUser = true;
 
       // Initialize streak
-      await db.query(
+      await dbQuery(
         `
         INSERT INTO user_streaks (mobile_user_id, current_streak, longest_streak)
         VALUES ($1, 0, 0)
@@ -272,7 +279,7 @@ async function verifyGoogleToken(db, idToken) {
     } else {
       user = userResult.rows[0];
       // Update last active
-      await db.query(
+      await dbQuery(
         `
         UPDATE mobile_users
         SET last_active_at = NOW(), display_name = COALESCE(display_name, $2), avatar_url = COALESCE(avatar_url, $3)
@@ -282,7 +289,7 @@ async function verifyGoogleToken(db, idToken) {
       );
     }
 
-    const tokens = await generateTokens(db, user);
+    const tokens = await generateTokens(user);
 
     return {
       user: sanitizeUser(user),
@@ -297,7 +304,7 @@ async function verifyGoogleToken(db, idToken) {
 /**
  * Verify Apple Sign-In token
  */
-async function verifyAppleToken(db, identityToken, appleUser) {
+async function verifyAppleToken(identityToken, appleUser) {
   try {
     // Decode token header to get key id
     const decoded = jwt.decode(identityToken, { complete: true });
@@ -328,9 +335,11 @@ async function verifyAppleToken(db, identityToken, appleUser) {
       : null;
 
     // Find or create user
-    const userResult = await db.query(
+    const userResult = await dbQuery(
       `
-      SELECT * FROM mobile_users WHERE apple_id = $1
+      SELECT id, phone_number, phone_verified, display_name, avatar_url,
+             preferred_language, notification_time, notification_enabled, created_at
+      FROM mobile_users WHERE apple_id = $1
     `,
       [appleId]
     );
@@ -339,18 +348,19 @@ async function verifyAppleToken(db, identityToken, appleUser) {
     let isNewUser = false;
 
     if (userResult.rows.length === 0) {
-      const createResult = await db.query(
+      const createResult = await dbQuery(
         `
         INSERT INTO mobile_users (apple_id, display_name, phone_number, phone_verified)
         VALUES ($1, $2, $3, FALSE)
-        RETURNING *
+        RETURNING id, phone_number, phone_verified, display_name, avatar_url,
+                  preferred_language, notification_time, notification_enabled, created_at
       `,
         [appleId, name, `apple_${appleId}`]
       );
       user = createResult.rows[0];
       isNewUser = true;
 
-      await db.query(
+      await dbQuery(
         `
         INSERT INTO user_streaks (mobile_user_id, current_streak, longest_streak)
         VALUES ($1, 0, 0)
@@ -359,7 +369,7 @@ async function verifyAppleToken(db, identityToken, appleUser) {
       );
     } else {
       user = userResult.rows[0];
-      await db.query(
+      await dbQuery(
         `
         UPDATE mobile_users
         SET last_active_at = NOW()
@@ -369,7 +379,7 @@ async function verifyAppleToken(db, identityToken, appleUser) {
       );
     }
 
-    const tokens = await generateTokens(db, user);
+    const tokens = await generateTokens(user);
 
     return {
       user: sanitizeUser(user),
@@ -384,7 +394,7 @@ async function verifyAppleToken(db, identityToken, appleUser) {
 /**
  * Generate access and refresh tokens
  */
-async function generateTokens(db, user) {
+async function generateTokens(user) {
   const accessToken = jwt.sign(
     {
       userId: user.id,
@@ -400,7 +410,7 @@ async function generateTokens(db, user) {
   const refreshExpiry = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
 
   // Store refresh token
-  await db.query(
+  await dbQuery(
     `
     INSERT INTO mobile_refresh_tokens (mobile_user_id, token_hash, expires_at)
     VALUES ($1, $2, $3)
@@ -419,10 +429,10 @@ async function generateTokens(db, user) {
 /**
  * Refresh access token
  */
-async function refreshAccessToken(db, refreshToken) {
+async function refreshAccessToken(refreshToken) {
   const tokenHash = hashToken(refreshToken);
 
-  const result = await db.query(
+  const result = await dbQuery(
     `
     SELECT rt.*, mu.*
     FROM mobile_refresh_tokens rt
@@ -452,7 +462,7 @@ async function refreshAccessToken(db, refreshToken) {
   );
 
   // Update last active
-  await db.query(
+  await dbQuery(
     `
     UPDATE mobile_users SET last_active_at = NOW() WHERE id = $1
   `,
@@ -468,10 +478,10 @@ async function refreshAccessToken(db, refreshToken) {
 /**
  * Revoke refresh token (logout)
  */
-async function revokeToken(db, refreshToken) {
+async function revokeToken(refreshToken) {
   const tokenHash = hashToken(refreshToken);
 
-  await db.query(
+  await dbQuery(
     `
     UPDATE mobile_refresh_tokens
     SET revoked = TRUE, revoked_at = NOW()
@@ -486,8 +496,8 @@ async function revokeToken(db, refreshToken) {
 /**
  * Revoke all user tokens (logout everywhere)
  */
-async function revokeAllUserTokens(db, userId) {
-  await db.query(
+async function revokeAllUserTokens(userId) {
+  await dbQuery(
     `
     UPDATE mobile_refresh_tokens
     SET revoked = TRUE, revoked_at = NOW()
@@ -517,8 +527,8 @@ function verifyAccessToken(token) {
 /**
  * Register device token for push notifications
  */
-async function registerDeviceToken(db, userId, deviceToken, _deviceInfo = {}) {
-  await db.query(
+async function registerDeviceToken(userId, deviceToken, _deviceInfo = {}) {
+  await dbQuery(
     `
     UPDATE mobile_users
     SET device_tokens = array_append(
@@ -536,8 +546,8 @@ async function registerDeviceToken(db, userId, deviceToken, _deviceInfo = {}) {
 /**
  * Unregister device token
  */
-async function unregisterDeviceToken(db, userId, deviceToken) {
-  await db.query(
+async function unregisterDeviceToken(userId, deviceToken) {
+  await dbQuery(
     `
     UPDATE mobile_users
     SET device_tokens = array_remove(device_tokens, $2)
@@ -591,10 +601,12 @@ function sanitizeUser(user) {
 /**
  * Get user by ID
  */
-async function getUserById(db, userId) {
-  const result = await db.query(
+async function getUserById(userId) {
+  const result = await dbQuery(
     `
-    SELECT * FROM mobile_users WHERE id = $1
+    SELECT id, phone_number, phone_verified, display_name, avatar_url,
+           preferred_language, notification_time, notification_enabled, created_at
+    FROM mobile_users WHERE id = $1
   `,
     [userId]
   );
@@ -609,7 +621,7 @@ async function getUserById(db, userId) {
 /**
  * Update user profile
  */
-async function updateProfile(db, userId, updates) {
+async function updateProfile(userId, updates) {
   const allowedFields = [
     'display_name',
     'avatar_url',
@@ -635,12 +647,13 @@ async function updateProfile(db, userId, updates) {
     throw new Error('No valid fields to update');
   }
 
-  const result = await db.query(
+  const result = await dbQuery(
     `
     UPDATE mobile_users
     SET ${setClauses.join(', ')}
     WHERE id = $1
-    RETURNING *
+    RETURNING id, phone_number, phone_verified, display_name, avatar_url,
+              preferred_language, notification_time, notification_enabled, created_at
   `,
     values
   );

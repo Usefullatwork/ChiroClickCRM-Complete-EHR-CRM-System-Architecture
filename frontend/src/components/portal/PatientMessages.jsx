@@ -30,7 +30,9 @@ export default function PatientMessages({ patientId }) {
 
   const handleSend = (e) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!newMessage.trim()) {
+      return;
+    }
     sendMutation.mutate(newMessage.trim());
   };
 

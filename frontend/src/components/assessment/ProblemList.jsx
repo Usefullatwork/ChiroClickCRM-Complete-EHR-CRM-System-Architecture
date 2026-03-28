@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Plus, X, AlertCircle, Calendar, ChevronDown, ChevronUp } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 /**
  * ProblemList - Patient problem/condition list panel
@@ -60,6 +61,7 @@ export default function ProblemList({
   _compact = false,
   className = '',
 }) {
+  const { t } = useTranslation('clinical');
   const [showAddForm, setShowAddForm] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [_editingId, setEditingId] = useState(null);
@@ -165,7 +167,10 @@ export default function ProblemList({
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                placeholder="Search conditions or ICD-10 codes..."
+                placeholder={t(
+                  'searchConditionsPlaceholder',
+                  'Search conditions or ICD-10 codes...'
+                )}
                 className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 autoFocus
               />
@@ -225,14 +230,14 @@ export default function ProblemList({
                   type="text"
                   value={newProblem.code}
                   onChange={(e) => setNewProblem({ ...newProblem, code: e.target.value })}
-                  placeholder="ICD-10"
+                  placeholder={t('icd10Placeholder', 'ICD-10')}
                   className="px-2 py-1.5 text-sm border border-gray-300 rounded"
                 />
                 <input
                   type="text"
                   value={newProblem.name}
                   onChange={(e) => setNewProblem({ ...newProblem, name: e.target.value })}
-                  placeholder="Condition name"
+                  placeholder={t('conditionNamePlaceholder', 'Condition name')}
                   className="col-span-2 px-2 py-1.5 text-sm border border-gray-300 rounded"
                 />
               </div>

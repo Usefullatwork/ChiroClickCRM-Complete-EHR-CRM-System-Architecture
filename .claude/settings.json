@@ -50,8 +50,10 @@
       "Bash(kill *)",
       "Bash(date *)",
       "Bash(wc *)",
-      "Bash(node -e *)"
+      "Bash(node -e *)",
+      "Bash(bash hooks/scripts/*)"
     ],
+    "defaultMode": "bypassPermissions",
     "deny": [
       "Bash(git push --force*)",
       "Bash(git reset --hard*)",
@@ -111,7 +113,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "CF=/tmp/claude_tc; C=$(cat $CF 2>/dev/null||echo 0); C=$((C+1)); echo $C>$CF; [ $C -eq 40 ] && echo '{\"systemMessage\":\"40 tool calls. Consider /save-state then /compact at next logical boundary.\"}'; [ $C -eq 60 ] && echo '{\"systemMessage\":\"60 tool calls. Context degradation likely. Run /save-state NOW.\"}'",
+            "command": "CF=/tmp/claude_tc; C=$(cat $CF 2>/dev/null||echo 0); C=$((C+1)); echo $C>$CF; [ $C -eq 40 ] && echo '{\"systemMessage\":\"40 tool calls. Consider /session:save-state then /compact at next logical boundary.\"}'; [ $C -eq 60 ] && echo '{\"systemMessage\":\"60 tool calls. Context degradation likely. Run /session:save-state NOW.\"}'",
             "timeout": 2
           }
         ]
@@ -123,6 +125,155 @@
             "type": "command",
             "command": "if [ \"$CLAUDE_TOOL_USE_EXIT_CODE\" != \"0\" ] && echo \"$CLAUDE_TOOL_INPUT\" | grep -qE '(npm test|npx vitest|npm run build|npx playwright)'; then echo '{\"systemMessage\":\"VERIFICATION FAILED. Do NOT proceed. Diagnose first. After 3 failures on same issue, stop and ask user.\"}'; fi",
             "timeout": 3
+          }
+        ]
+      },
+      {
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "C=$(cat /tmp/claude_tc 2>/dev/null||echo 0); [ \"$C\" -eq 50 ] && echo '{\"systemMessage\":\"Session at 50 tool calls \\u2014 consider running /session:save-state soon\"}'; [ \"$C\" -eq 70 ] && echo '{\"systemMessage\":\"Session at 70 tool calls \\u2014 quality degradation likely. Run /session:save-state then /compact, or start a fresh session.\"}'; [ \"$C\" -eq 90 ] && echo '{\"systemMessage\":\"Session at 90 tool calls \\u2014 strongly recommend fresh session. Use /session:reboot for context recovery.\"}'",
+            "timeout": 2
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "Before stopping, verify: (1) Does the code work? (2) Are tests passing? (3) Are there any console.log statements that should be removed? (4) Are all user-facing strings using i18n keys? If any check fails, continue working."
+          }
+        ]
+      },
+      {
+        "description": "Send an OS notification when Claude finishes responding so the user knows to check this terminal.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/notify-stop.sh",
+            "timeout": 8000
+          }
+        ]
+      },
+      {
+        "description": "Check if 24+ hours since last /dream consolidation and suggest running it.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/should-dream.sh",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "description": "Log spawned agent type and task description to .planning/agent-log.txt for traceability across multi-agent sessions.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mkdir -p .planning && echo \"[$(date '+%Y-%m-%d %H:%M:%S')] AGENT START | type=${AGENT_TYPE:-unknown} | task=${AGENT_TASK_DESCRIPTION:-no description}\" >> .planning/agent-log.txt",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "description": "Log agent completion status and wall-clock duration to .planning/agent-log.txt so post-session reviews can audit which agents finished cleanly.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mkdir -p .planning && echo \"[$(date '+%Y-%m-%d %H:%M:%S')] AGENT STOP  | type=${AGENT_TYPE:-unknown} | status=${AGENT_EXIT_STATUS:-unknown} | duration=${AGENT_DURATION_MS:-?}ms\" >> .planning/agent-log.txt",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "description": "Auto-save session state before context compression so progress is not lost if the compact fails or the session restarts.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/auto-save-state.sh",
+            "timeout": 10000
+          }
+        ]
+      }
+    ],
+    "PostCompact": [
+      {
+        "description": "After context compaction, inject a reminder to restore state from the pre-compact snapshot so progress context is not lost.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "SNAP=$(ls -t .planning/snapshots/snapshot-*.md 2>/dev/null | head -1); if [ -n \"$SNAP\" ]; then echo \"{\\\"systemMessage\\\":\\\"Post-compact: state snapshot available at $SNAP. Read it to restore context.\\\"}\"; fi",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "description": "Run auto-sync check at session start to pull in any upstream changes or skill updates before work begins.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash hooks/scripts/auto-sync.sh",
+            "timeout": 15000
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "description": "Append a session summary (timestamp, tool-call count, files modified) to .planning/session-log.txt for auditing and context-health tracking.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mkdir -p .planning && TC=$(cat /tmp/claude_tc 2>/dev/null || echo 0) && MODIFIED=$(git diff --name-only 2>/dev/null | wc -l | tr -d ' ') && echo \"[$(date '+%Y-%m-%d %H:%M:%S')] SESSION END | tool_calls=$TC | files_modified=$MODIFIED\" >> .planning/session-log.txt",
+            "timeout": 5000
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "description": "Log tool failures to .planning/failure-log.txt for post-session diagnosis of recurring issues.",
+        "matcher": ".*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mkdir -p .planning && read -r INPUT && TOOL=$(echo \"$INPUT\" | jq -r '.tool_name // \"unknown\"' 2>/dev/null || echo unknown) && ERR=$(echo \"$INPUT\" | jq -r '.error // \"no details\"' 2>/dev/null | head -1) && echo \"[$(date '+%Y-%m-%d %H:%M:%S')] FAIL | tool=$TOOL | error=$ERR\" >> .planning/failure-log.txt",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "description": "Log system notifications to .planning/notification-log.txt for audit trail of permission prompts, idle events, and auth changes.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mkdir -p .planning && read -r INPUT && TYPE=$(echo \"$INPUT\" | jq -r '.notification_type // \"unknown\"' 2>/dev/null || echo unknown) && MSG=$(echo \"$INPUT\" | jq -r '.message // \"\"' 2>/dev/null | head -1) && echo \"[$(date '+%Y-%m-%d %H:%M:%S')] NOTIFY | type=$TYPE | message=$MSG\" >> .planning/notification-log.txt",
+            "timeout": 3000
+          }
+        ]
+      }
+    ],
+    "ConfigChange": [
+      {
+        "description": "Log configuration changes to .planning/config-change-log.txt so settings drift is auditable.",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "mkdir -p .planning && read -r INPUT && SRC=$(echo \"$INPUT\" | jq -r '.source // \"unknown\"' 2>/dev/null || echo unknown) && FILE=$(echo \"$INPUT\" | jq -r '.file_path // \"unknown\"' 2>/dev/null || echo unknown) && echo \"[$(date '+%Y-%m-%d %H:%M:%S')] CONFIG CHANGE | source=$SRC | file=$FILE\" >> .planning/config-change-log.txt",
+            "timeout": 3000
           }
         ]
       }

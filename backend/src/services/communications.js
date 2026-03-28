@@ -284,7 +284,12 @@ export const getTemplates = async (organizationId, type = null) => {
     }
 
     const result = await query(
-      `SELECT * FROM message_templates ${whereClause} ORDER BY category, name`,
+      `SELECT
+         id, organization_id, name, type, category, language,
+         subject, body, available_variables,
+         times_used, success_rate, last_used_at,
+         is_active, is_default, created_at, updated_at
+       FROM message_templates ${whereClause} ORDER BY category, name`,
       params
     );
 

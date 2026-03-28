@@ -6,13 +6,10 @@
  * and payment tracking for Norwegian chiropractic clinics
  */
 
-import { createRequire } from 'module';
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
 import { DEFAULT_PAGE_SIZE_LARGE, DEFAULT_INVOICE_DUE_DAYS } from '../config/constants.js';
-
-const require = createRequire(import.meta.url);
-const takstCodes = require('../data/takst-codes.json');
+import takstCodes from '../data/takst-codes.json' with { type: 'json' };
 
 // Invoice statuses
 export const INVOICE_STATUS = {
@@ -234,7 +231,6 @@ export const getInvoiceById = async (organizationId, invoiceId) => {
             p.city as patient_city,
             p.email as patient_email,
             p.phone as patient_phone,
-            p.national_id as patient_national_id,
             o.name as organization_name,
             o.address as organization_address,
             o.postal_code as organization_postal_code,
@@ -505,7 +501,8 @@ export const recordPayment = async (organizationId, invoiceId, paymentData) => {
  */
 export const getInvoicePayments = async (organizationId, invoiceId) => {
   const result = await query(
-    `SELECT * FROM invoice_payments
+    `SELECT id, organization_id, invoice_id, amount, payment_method, payment_reference, payment_date, notes, created_at
+     FROM invoice_payments
      WHERE organization_id = $1 AND invoice_id = $2
      ORDER BY payment_date DESC`,
     [organizationId, invoiceId]
@@ -764,7 +761,7 @@ export const getHelfoReportData = async (organizationId, startDate, endDate) => 
       i.helfo_refund,
       i.items,
       p.first_name || ' ' || p.last_name as patient_name,
-      p.national_id as patient_fnr
+      p.date_of_birth as patient_dob
      FROM invoices i
      JOIN patients p ON p.id = i.patient_id
      WHERE i.organization_id = $1

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { macrosAPI } from '../../services/api';
 import toast from '../../utils/toast';
+import { useTranslation } from '../../i18n';
 
 const CATEGORIES = [
   { value: '', label: 'Alle kategorier' },
@@ -70,6 +71,7 @@ const SOAP_SECTIONS = [
 ];
 
 export default function MacroManager() {
+  const { t } = useTranslation('clinical');
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -260,7 +262,7 @@ export default function MacroManager() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Sok i makroer..."
+              placeholder={t('searchMacros', 'Søk i makroer...')}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
           </div>
@@ -432,7 +434,7 @@ export default function MacroManager() {
                             <button
                               onClick={() => setDeleteTarget(macro)}
                               className="p-1.5 rounded hover:bg-gray-100 text-gray-400 dark:text-gray-300 hover:text-red-600 transition-colors"
-                              title="Slett"
+                              title={t('delete', 'Slett')}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -534,7 +536,7 @@ function MacroModal({ macro, onSave, onClose, isSaving }) {
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="f.eks. Nakkesmerter - Subjektiv"
+              placeholder={t('macroNamePlaceholder', 'f.eks. Nakkesmerter - Subjektiv')}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               required
             />
@@ -546,7 +548,10 @@ function MacroModal({ macro, onSave, onClose, isSaving }) {
               value={form.text}
               onChange={(e) => setForm({ ...form, text: e.target.value })}
               rows={5}
-              placeholder="Skriv inn makroteksten. Bruk {{patient.fullName}} for variabler."
+              placeholder={t(
+                'macroTextPlaceholder',
+                'Skriv inn makroteksten. Bruk {{patient.fullName}} for variabler.'
+              )}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-mono"
               required
             />
@@ -593,7 +598,7 @@ function MacroModal({ macro, onSave, onClose, isSaving }) {
                 type="text"
                 value={form.subcategory}
                 onChange={(e) => setForm({ ...form, subcategory: e.target.value })}
-                placeholder="Valgfritt"
+                placeholder={t('optional', 'Valgfritt')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
               />
             </div>
@@ -603,7 +608,7 @@ function MacroModal({ macro, onSave, onClose, isSaving }) {
                 type="text"
                 value={form.shortcutKey}
                 onChange={(e) => setForm({ ...form, shortcutKey: e.target.value })}
-                placeholder="f.eks. Ctrl+Shift+N"
+                placeholder={t('shortcutKeyPlaceholder', 'f.eks. Ctrl+Shift+N')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
               />
             </div>

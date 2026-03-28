@@ -8,7 +8,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Bell,
   BellDot,
-  Check,
+  Check as _Check,
   CheckCheck,
   AlertTriangle,
   Calendar,
@@ -37,11 +37,17 @@ const TIME_UNITS = {
 function formatTimeAgo(dateStr, lang = 'no') {
   const units = TIME_UNITS[lang] || TIME_UNITS.no;
   const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (seconds < 60) return `${seconds}${units.s}`;
+  if (seconds < 60) {
+    return `${seconds}${units.s}`;
+  }
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}${units.m}`;
+  if (minutes < 60) {
+    return `${minutes}${units.m}`;
+  }
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}${units.h}`;
+  if (hours < 24) {
+    return `${hours}${units.h}`;
+  }
   const days = Math.floor(hours / 24);
   return `${days}${units.d}`;
 }
@@ -54,9 +60,13 @@ export default function NotificationDropdown() {
 
   // Click-outside detection
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      return;
+    }
     const handler = (e) => {
-      if (ref.current && !ref.current.contains(e.target)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target)) {
+        setOpen(false);
+      }
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);

@@ -142,7 +142,23 @@ export const getExerciseById = async (exerciseId, organizationId) => {
 export const getExerciseByCode = async (code, organizationId) => {
   try {
     const result = await query(
-      `SELECT * FROM exercise_library
+      `SELECT
+         id, organization_id, code,
+         name, name_norwegian, name_no, name_en,
+         description, description_norwegian,
+         category, subcategory, body_region,
+         difficulty_level, difficulty,
+         instructions, instructions_norwegian, instructions_no, instructions_en,
+         sets_default, reps_default, hold_seconds,
+         default_sets, default_reps, default_hold_seconds, default_rest_seconds, default_frequency,
+         frequency_per_day, frequency_per_week, duration_weeks,
+         image_url, video_url, thumbnail_url,
+         contraindications, precautions, common_errors,
+         equipment_needed, requires_supervision,
+         source, is_active, is_system, is_global,
+         usage_count, display_order, tags,
+         created_by, created_at, updated_at
+       FROM exercise_library
        WHERE code = $1 AND (organization_id = $2 OR is_global = true)
        LIMIT 1`,
       [code, organizationId]

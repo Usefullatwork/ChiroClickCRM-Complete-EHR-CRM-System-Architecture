@@ -397,7 +397,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
           <div className="space-y-2">
             {generatedVariations.map((variation, index) => (
               <button
-                key={index}
+                key={`variation-${index}`}
                 onClick={() => handleChange('content', variation)}
                 className="w-full p-3 text-left text-sm bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200"
               >

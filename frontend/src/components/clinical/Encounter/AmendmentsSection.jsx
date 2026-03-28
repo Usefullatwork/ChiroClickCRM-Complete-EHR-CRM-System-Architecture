@@ -1,4 +1,5 @@
 import { FileText, Save, Loader2, Lock } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 
 export default function AmendmentsSection({
   isSigned,
@@ -15,6 +16,8 @@ export default function AmendmentsSection({
   amendments,
   signAmendmentMutation,
 }) {
+  const { t } = useTranslation('clinical');
+
   if (!isSigned) {
     return null;
   }
@@ -24,7 +27,7 @@ export default function AmendmentsSection({
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-bold text-amber-800 tracking-wide flex items-center gap-2">
           <FileText className="h-4 w-4" />
-          TILLEGG / RETTELSER
+          {t('amendmentsTitle', 'TILLEGG / RETTELSER')}
         </h3>
         {!showAmendmentForm && (
           <button
@@ -32,7 +35,7 @@ export default function AmendmentsSection({
             className="px-3 py-1.5 text-sm font-medium rounded-lg bg-amber-600 text-white hover:bg-amber-700 transition-colors flex items-center gap-1.5"
           >
             <FileText className="h-3.5 w-3.5" />
-            Legg til Tillegg
+            {t('addAmendment', 'Legg til Tillegg')}
           </button>
         )}
       </div>
@@ -50,22 +53,33 @@ export default function AmendmentsSection({
                 onChange={(e) => setAmendmentType(e.target.value)}
                 className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-amber-500"
               >
-                <option value="ADDENDUM">Tillegg (ny informasjon)</option>
-                <option value="CORRECTION">Rettelse (korrigering av feil)</option>
-                <option value="CLARIFICATION">Avklaring (utdyping)</option>
-                <option value="LATE_ENTRY">Sen registrering</option>
+                <option value="ADDENDUM">
+                  {t('amendmentTypeAddendum', 'Tillegg (ny informasjon)')}
+                </option>
+                <option value="CORRECTION">
+                  {t('amendmentTypeCorrection', 'Rettelse (korrigering av feil)')}
+                </option>
+                <option value="CLARIFICATION">
+                  {t('amendmentTypeClarification', 'Avklaring (utdyping)')}
+                </option>
+                <option value="LATE_ENTRY">
+                  {t('amendmentTypeLateEntry', 'Sen registrering')}
+                </option>
               </select>
             </div>
             {amendmentType === 'CORRECTION' && (
               <div className="flex-1">
                 <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
-                  Begrunnelse for rettelse *
+                  {t('correctionReason', 'Begrunnelse for rettelse')} *
                 </label>
                 <input
                   type="text"
                   value={amendmentReason}
                   onChange={(e) => setAmendmentReason(e.target.value)}
-                  placeholder="Begrunn hvorfor rettelsen er nødvendig"
+                  placeholder={t(
+                    'correctionReasonPlaceholder',
+                    'Begrunn hvorfor rettelsen er nødvendig'
+                  )}
                   className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-amber-500"
                 />
               </div>
@@ -73,12 +87,15 @@ export default function AmendmentsSection({
           </div>
           <div className="mb-3">
             <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
-              Innhold
+              {t('amendmentContent', 'Innhold')}
             </label>
             <textarea
               value={amendmentContent}
               onChange={(e) => setAmendmentContent(e.target.value)}
-              placeholder="Skriv tillegget eller rettelsen her..."
+              placeholder={t(
+                'amendmentContentPlaceholder',
+                'Skriv tillegget eller rettelsen her...'
+              )}
               rows={4}
               className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-amber-500 resize-none"
             />
@@ -92,7 +109,7 @@ export default function AmendmentsSection({
               }}
               className="px-4 py-2 text-sm font-medium rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors"
             >
-              Avbryt
+              {t('cancel', 'Avbryt')}
             </button>
             <button
               onClick={handleCreateAmendment}
@@ -108,7 +125,7 @@ export default function AmendmentsSection({
               ) : (
                 <Save className="h-4 w-4" />
               )}
-              Lagre Tillegg
+              {t('saveAmendment', 'Lagre Tillegg')}
             </button>
           </div>
         </div>
@@ -132,10 +149,14 @@ export default function AmendmentsSection({
                             : 'bg-amber-100 text-amber-700'
                     }`}
                   >
-                    {amendment.amendment_type === 'ADDENDUM' && 'Tillegg'}
-                    {amendment.amendment_type === 'CORRECTION' && 'Rettelse'}
-                    {amendment.amendment_type === 'CLARIFICATION' && 'Avklaring'}
-                    {amendment.amendment_type === 'LATE_ENTRY' && 'Sen registrering'}
+                    {amendment.amendment_type === 'ADDENDUM' &&
+                      t('amendmentLabelAddendum', 'Tillegg')}
+                    {amendment.amendment_type === 'CORRECTION' &&
+                      t('amendmentLabelCorrection', 'Rettelse')}
+                    {amendment.amendment_type === 'CLARIFICATION' &&
+                      t('amendmentLabelClarification', 'Avklaring')}
+                    {amendment.amendment_type === 'LATE_ENTRY' &&
+                      t('amendmentLabelLateEntry', 'Sen registrering')}
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400">
                     #{index + 1} - {new Date(amendment.created_at).toLocaleDateString('no-NO')}{' '}
@@ -149,7 +170,7 @@ export default function AmendmentsSection({
                   {amendment.signed_at ? (
                     <span className="flex items-center gap-1 text-xs text-green-600">
                       <Lock className="h-3 w-3" />
-                      Signert
+                      {t('signed', 'Signert')}
                     </span>
                   ) : (
                     <button
@@ -157,20 +178,21 @@ export default function AmendmentsSection({
                       disabled={signAmendmentMutation.isPending}
                       className="px-2 py-1 text-xs font-medium rounded bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 transition-colors"
                     >
-                      Signer
+                      {t('sign', 'Signer')}
                     </button>
                   )}
                 </div>
               </div>
               {amendment.reason && (
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-2 italic">
-                  Begrunnelse: {amendment.reason}
+                  {t('reason', 'Begrunnelse')}: {amendment.reason}
                 </p>
               )}
               <p className="text-sm text-slate-700 whitespace-pre-wrap">{amendment.content}</p>
               <p className="text-xs text-slate-400 dark:text-slate-300 mt-2">
-                Skrevet av: {amendment.author_name || 'Ukjent'}
-                {amendment.signed_by_name && ` | Signert av: ${amendment.signed_by_name}`}
+                {t('writtenBy', 'Skrevet av')}: {amendment.author_name || t('unknown', 'Ukjent')}
+                {amendment.signed_by_name &&
+                  ` | ${t('signedBy', 'Signert av')}: ${amendment.signed_by_name}`}
               </p>
             </div>
           ))}
@@ -179,7 +201,10 @@ export default function AmendmentsSection({
 
       {(!amendments?.data || amendments.data.length === 0) && !showAmendmentForm && (
         <p className="text-sm text-amber-700 text-center py-4">
-          Ingen tillegg eller rettelser ennå. Klikk "Legg til Tillegg" for å dokumentere endringer.
+          {t(
+            'noAmendmentsYet',
+            'Ingen tillegg eller rettelser ennå. Klikk "Legg til Tillegg" for å dokumentere endringer.'
+          )}
         </p>
       )}
     </section>

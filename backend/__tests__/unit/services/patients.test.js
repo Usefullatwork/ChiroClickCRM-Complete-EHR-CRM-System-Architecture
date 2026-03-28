@@ -584,4 +584,270 @@ describe('Patients Service', () => {
       );
     });
   });
+
+  // =============================================================================
+  // GET ACTIVE CONTACTS FOR EXPORT (VCF)
+  // =============================================================================
+
+  describe('getActiveContactsForExport', () => {
+    it('should return only first_name, last_name, phone fields', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [
+          { first_name: 'Anna', last_name: 'Berg', phone: '+47 11 22 33 44' },
+          { first_name: 'Lars', last_name: 'Hansen', phone: '+47 55 66 77 88' },
+        ],
+      });
+
+      const result = await patientsService.getActiveContactsForExport(testOrgId);
+
+      expect(result).toHaveLength(2);
+      expect(result[0]).toHaveProperty('first_name', 'Anna');
+      expect(result[0]).toHaveProperty('last_name', 'Berg');
+      expect(result[0]).toHaveProperty('phone');
+      // No health data fields in the result
+      expect(result[0]).not.toHaveProperty('date_of_birth');
+      expect(result[0]).not.toHaveProperty('encrypted_personal_number');
+    });
+
+    it('should pass organization_id as first query parameter (org isolation)', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      await patientsService.getActiveContactsForExport(testOrgId);
+
+      const queryCall = mockQuery.mock.calls[0];
+      expect(queryCall[1][0]).toBe(testOrgId);
+    });
+
+    it('should only query ACTIVE patients with a non-empty phone', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      await patientsService.getActiveContactsForExport(testOrgId);
+
+      const sql = mockQuery.mock.calls[0][0];
+      // status is hardcoded as 'ACTIVE' literal in this query (not parameterized)
+      expect(sql).toContain('ACTIVE');
+      expect(sql).toContain("phone != ''");
+      expect(sql).toContain('phone IS NOT NULL');
+    });
+
+    it('should return empty array when no active contacts with phones exist', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      const result = await patientsService.getActiveContactsForExport(testOrgId);
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  // =============================================================================
+  // ORGANIZATION ID ISOLATION
+  // =============================================================================
+
+  describe('organization ID isolation', () => {
+    it('getAllPatients always includes org_id as first param', async () => {
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ count: '0' }] })
+        .mockResolvedValueOnce({ rows: [] });
+
+      await patientsService.getAllPatients(testOrgId);
+
+      expect(mockQuery.mock.calls[0][1][0]).toBe(testOrgId);
+      expect(mockQuery.mock.calls[1][1][0]).toBe(testOrgId);
+    });
+
+    it('getPatientById always scopes query to org_id', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      await patientsService.getPatientById(testOrgId, 'p1');
+
+      const params = mockQuery.mock.calls[0][1];
+      expect(params[0]).toBe(testOrgId);
+      expect(params[1]).toBe('p1');
+    });
+
+    it('deletePatient always scopes update to org_id', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      await patientsService.deletePatient(testOrgId, 'p99');
+
+      const params = mockQuery.mock.calls[0][1];
+      expect(params[0]).toBe(testOrgId);
+      expect(params[1]).toBe('p99');
+    });
+
+    it('getPatientStatistics always scopes both queries to org_id', async () => {
+      mockQuery
+        .mockResolvedValueOnce({
+          rows: [
+            {
+              total_visits: '0',
+              initial_visits: '0',
+              followup_visits: '0',
+              avg_duration: null,
+              first_visit: null,
+              last_visit: null,
+              total_gross: '0',
+              total_paid: '0',
+              total_insurance: '0',
+              total_transactions: '0',
+              total_appointments: '0',
+              completed: '0',
+              no_shows: '0',
+              cancelled: '0',
+            },
+          ],
+        })
+        .mockResolvedValueOnce({ rows: [] });
+
+      await patientsService.getPatientStatistics(testOrgId, 'p1');
+
+      expect(mockQuery.mock.calls[0][1][0]).toBe(testOrgId);
+      expect(mockQuery.mock.calls[1][1][0]).toBe(testOrgId);
+    });
+  });
+
+  // =============================================================================
+  // SEARCH WITH SPECIAL CHARACTERS
+  // =============================================================================
+
+  describe('searchPatients — special characters', () => {
+    it('should pass raw search term wrapped in % wildcards (no escaping)', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      await patientsService.searchPatients(testOrgId, "O'Brien");
+
+      const params = mockQuery.mock.calls[0][1];
+      expect(params[1]).toBe("%O'Brien%");
+    });
+
+    it('should handle search terms containing SQL-like patterns without breaking', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [] });
+
+      await patientsService.searchPatients(testOrgId, 'test%injection');
+
+      const params = mockQuery.mock.calls[0][1];
+      // Param is passed as a bind variable — no SQL injection possible
+      expect(params[1]).toBe('%test%injection%');
+      expect(mockQuery).toHaveBeenCalledTimes(1);
+    });
+
+    it('should handle empty string search term gracefully', async () => {
+      mockQuery.mockResolvedValueOnce({
+        rows: [{ id: 'p1', first_name: 'Anna', last_name: 'Berg' }],
+      });
+
+      const result = await patientsService.searchPatients(testOrgId, '');
+
+      expect(result).toHaveLength(1);
+    });
+  });
+
+  // =============================================================================
+  // ADVANCED SEARCH — ADDITIONAL SCENARIOS
+  // =============================================================================
+
+  describe('advancedSearchPatients — additional filters', () => {
+    it('should apply phone normalization (strips non-digits)', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [{ count: '1' }] }).mockResolvedValueOnce({
+        rows: [{ id: 'p1', encrypted_personal_number: null }],
+      });
+
+      await patientsService.advancedSearchPatients(testOrgId, { phone: '+47 12 34 56 78' });
+
+      const params = mockQuery.mock.calls[0][1];
+      // Phone param should be the digit-only version wrapped in %
+      expect(params[1]).toBe('%4712345678%');
+    });
+
+    it('should apply needs_followup filter without adding extra params', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [{ count: '2' }] }).mockResolvedValueOnce({
+        rows: [
+          { id: 'p1', encrypted_personal_number: null },
+          { id: 'p2', encrypted_personal_number: null },
+        ],
+      });
+
+      const result = await patientsService.advancedSearchPatients(testOrgId, {
+        needs_followup: true,
+      });
+
+      expect(result.patients).toHaveLength(2);
+      // should_be_followed_up constraint added inline — no extra param beyond orgId
+      const countSql = mockQuery.mock.calls[0][0];
+      expect(countSql).toContain('should_be_followed_up');
+    });
+
+    it('should apply followup_before date filter', async () => {
+      mockQuery.mockResolvedValueOnce({ rows: [{ count: '1' }] }).mockResolvedValueOnce({
+        rows: [{ id: 'p3', encrypted_personal_number: null }],
+      });
+
+      await patientsService.advancedSearchPatients(testOrgId, {
+        followup_before: '2026-06-01',
+      });
+
+      const params = mockQuery.mock.calls[0][1];
+      expect(params).toContain('2026-06-01');
+      const sql = mockQuery.mock.calls[0][0];
+      expect(sql).toContain('should_be_followed_up');
+    });
+
+    it('should include filters_applied in response', async () => {
+      mockQuery
+        .mockResolvedValueOnce({ rows: [{ count: '0' }] })
+        .mockResolvedValueOnce({ rows: [] });
+
+      const result = await patientsService.advancedSearchPatients(testOrgId, {
+        name: 'Hansen',
+        status: 'ACTIVE',
+        sort_by: 'date_of_birth',
+        sort_order: 'desc',
+      });
+
+      expect(result.filters_applied).toBeDefined();
+      expect(result.filters_applied.name).toBe('Hansen');
+      expect(result.filters_applied.status).toBe('ACTIVE');
+      expect(result.filters_applied.sort_by).toBe('date_of_birth');
+      expect(result.filters_applied.sort_order).toBe('desc');
+    });
+  });
+
+  // =============================================================================
+  // PATIENT STATISTICS — ZERO-DATA PATIENT
+  // =============================================================================
+
+  describe('getPatientStatistics — zero-data patient', () => {
+    it('should return structured response even when patient has no encounters', async () => {
+      mockQuery
+        .mockResolvedValueOnce({
+          rows: [
+            {
+              total_visits: '0',
+              initial_visits: '0',
+              followup_visits: '0',
+              avg_duration: null,
+              first_visit: null,
+              last_visit: null,
+              total_gross: '0',
+              total_paid: '0',
+              total_insurance: '0',
+              total_transactions: '0',
+              total_appointments: '0',
+              completed: '0',
+              no_shows: '0',
+              cancelled: '0',
+            },
+          ],
+        })
+        .mockResolvedValueOnce({ rows: [] });
+
+      const result = await patientsService.getPatientStatistics(testOrgId, 'brand-new-patient');
+
+      expect(result.visits.total_visits).toBe('0');
+      expect(result.visits.first_visit).toBeNull();
+      expect(result.financial.total_paid).toBe('0');
+      expect(result.appointments.no_shows).toBe('0');
+      expect(result.topDiagnoses).toEqual([]);
+    });
+  });
 });

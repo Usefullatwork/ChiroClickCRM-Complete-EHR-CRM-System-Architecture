@@ -32,7 +32,9 @@ export default function SendDocumentModal({
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   const handleSend = async () => {
     try {
@@ -60,7 +62,9 @@ export default function SendDocumentModal({
   };
 
   const handleClose = () => {
-    if (sending) return;
+    if (sending) {
+      return;
+    }
     setError(null);
     setSuccess(false);
     setMethod('email');

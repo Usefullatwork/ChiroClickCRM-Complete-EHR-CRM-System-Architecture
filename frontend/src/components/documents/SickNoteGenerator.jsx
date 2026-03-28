@@ -185,12 +185,12 @@ function InputField({
 
 // Main SickNoteGenerator Component
 export default function SickNoteGenerator({
-  language = 'no', // Kept for backwards compat
+  _language = 'no', // Kept for backwards compat
   initialData = null,
   patientData = null,
   practitionerData = null,
   onSave,
-  onSend,
+  _onSend,
 }) {
   const { t, lang } = useTranslation('assessment');
 
@@ -693,7 +693,7 @@ ${'='.repeat(60)}
                   label={t('sickNoteLicenseNumber', 'HPR-nummer')}
                   value={data.practitioner.hprNumber}
                   onChange={(v) => updateSection('practitioner', 'hprNumber', v)}
-                  placeholder="HPR-nummer"
+                  placeholder={t('hprNumberPlaceholder', 'HPR-nummer')}
                   required
                 />
                 <InputField
