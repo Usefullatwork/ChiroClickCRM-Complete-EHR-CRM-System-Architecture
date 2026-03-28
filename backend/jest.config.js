@@ -30,6 +30,8 @@ export default {
   moduleNameMapper: {
     '^(\\.{1,2}/.*)\\.js$': '$1',
   },
+  // Allow packages/ to resolve node_modules from backend/
+  modulePaths: ['<rootDir>/node_modules'],
   // Run tests serially to avoid database conflicts
   maxWorkers: 1,
   // Force exit after tests complete (handles open database connections)

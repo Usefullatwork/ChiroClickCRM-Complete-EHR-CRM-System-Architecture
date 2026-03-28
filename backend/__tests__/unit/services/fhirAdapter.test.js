@@ -5,7 +5,7 @@
 
 import { jest } from '@jest/globals';
 
-const { fhirAdapter } = await import('../../../src/services/fhirAdapter.js');
+const { fhirAdapter } = await import('../../../../packages/fhir-adapter/fhirAdapter.js');
 
 // ---------------------------------------------------------------------------
 // Fixtures

@@ -3,7 +3,7 @@
  * Handle FHIR resource requests
  */
 
-import fhirAdapter from '../services/fhirAdapter.js';
+import fhirAdapter from '../../../packages/fhir-adapter/fhirAdapter.js';
 import { query } from '../config/database.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';

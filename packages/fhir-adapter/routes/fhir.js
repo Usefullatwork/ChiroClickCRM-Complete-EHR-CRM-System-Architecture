@@ -4,9 +4,9 @@
  */
 
 import express from 'express';
-import * as fhirController from '../controllers/fhir.js';
-import { requireAuth } from '../middleware/auth.js';
-import validate from '../middleware/validation.js';
+import * as fhirController from '../../../backend/src/controllers/fhir.js';
+import { requireAuth } from '../../../backend/src/middleware/auth.js';
+import validate from '../../../backend/src/middleware/validation.js';
 import {
   getPatientSchema,
   searchPatientsSchema,
@@ -18,7 +18,7 @@ import {
   searchObservationsSchema,
   getPatientEverythingSchema,
   exportPatientSchema,
-} from '../validators/fhir.validators.js';
+} from '../../../backend/src/validators/fhir.validators.js';
 
 const router = express.Router();
 

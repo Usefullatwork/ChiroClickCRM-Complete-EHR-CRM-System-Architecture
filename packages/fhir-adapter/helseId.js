@@ -10,8 +10,8 @@
 
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
-import logger from '../utils/logger.js';
-import secrets from '../utils/vault.js';
+import logger from '../../backend/src/utils/logger.js';
+import secrets from '../../backend/src/utils/vault.js';
 
 // ============================================================================
 // HELSEID CONFIGURATION

@@ -4,8 +4,8 @@
  */
 
 import express from 'express';
-import HelseIdClient from '../services/helseId.js';
-import logger from '../utils/logger.js';
+import HelseIdClient from '../helseId.js';
+import logger from '../../../backend/src/utils/logger.js';
 
 const router = express.Router();
 
@@ -394,7 +394,7 @@ router.get('/userinfo', async (req, res) => {
  * Helper: Find or create user from HelseID claims
  */
 async function findOrCreateUser(helseIdUser) {
-  const { query } = await import('../config/database.js');
+  const { query } = await import('../../../backend/src/config/database.js');
 
   // Try to find existing user by HelseID subject
   const existing = await query(

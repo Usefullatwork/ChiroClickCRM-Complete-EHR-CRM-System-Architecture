@@ -7,17 +7,17 @@
  * (routes never import services directly).
  */
 
-import PDFDocument from 'pdfkit';
 import logger from '../utils/logger.js';
 import { query } from '../config/database.js';
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
 import https from 'https';
 import http from 'http';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import {
+  fontName,
+  formatNorwegianDate,
+  formatNorwegianCurrency,
+  createDoc,
+  docToBuffer,
+} from './pdf-utils.js';
 
 /**
  * Fetch image from URL and return as buffer
@@ -61,162 +61,6 @@ const fetchImageBuffer = async (url) => {
   });
 };
 
-// Norwegian date formatter
-const formatDateNO = (date) => {
-  if (!date) {
-    return 'N/A';
-  }
-  const d = new Date(date);
-  return d.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' });
-};
-
-// Format currency in Norwegian style
-const formatCurrencyNO = (amount) => {
-  if (amount === null || amount === undefined) {
-    return '0 kr';
-  }
-  return `${Number(amount).toLocaleString('no-NO')} kr`;
-};
-
-/**
- * Get path to a Unicode-capable font
- * @returns {string|null} Font path or null if not found
- */
-const getUnicodeFontPath = () => {
-  // Try common Windows font paths for Arial (supports Norwegian characters)
-  const windowsFontPaths = [
-    'C:/Windows/Fonts/arial.ttf',
-    'C:/Windows/Fonts/Arial.ttf',
-    'C:/Windows/Fonts/calibri.ttf',
-    'C:/Windows/Fonts/Calibri.ttf',
-    'C:/Windows/Fonts/segoeui.ttf',
-  ];
-
-  // Try common Linux/Mac paths
-  const unixFontPaths = [
-    '/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',
-    '/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf',
-    '/System/Library/Fonts/Helvetica.ttc',
-  ];
-
-  const allPaths = [...windowsFontPaths, ...unixFontPaths];
-
-  for (const fontPath of allPaths) {
-    if (fs.existsSync(fontPath)) {
-      return fontPath;
-    }
-  }
-  return null;
-};
-
-// Cache the font path
-let cachedFontPath = null;
-let fontPathChecked = false;
-
-// Cache the bold font path
-let cachedBoldFontPath = null;
-
-/**
- * Get path to bold variant of the font
- * @param {string} regularPath - Path to regular font
- * @returns {string|null} Bold font path or null
- */
-const getBoldFontPath = (regularPath) => {
-  if (!regularPath) {
-    return null;
-  }
-
-  // Try common bold font naming conventions
-  const boldPaths = [
-    regularPath.replace(/\.ttf$/i, 'bd.ttf'), // arial.ttf -> arialbd.ttf
-    regularPath.replace(/\.ttf$/i, '-Bold.ttf'), // font.ttf -> font-Bold.ttf
-    regularPath.replace(/\.ttf$/i, 'b.ttf'), // font.ttf -> fontb.ttf
-  ];
-
-  for (const boldPath of boldPaths) {
-    if (fs.existsSync(boldPath)) {
-      return boldPath;
-    }
-  }
-  return null;
-};
-
-/**
- * Create a new PDF document with standard settings
- * @returns {PDFDocument} Configured PDF document
- */
-const createPDFDocument = () => {
-  const doc = new PDFDocument({
-    size: 'A4',
-    margins: { top: 50, bottom: 50, left: 50, right: 50 },
-    info: {
-      Title: 'ChiroClick Document',
-      Author: 'ChiroClick EHR',
-      Creator: 'ChiroClick PDF Service',
-    },
-  });
-
-  // Check for Unicode font path (only once)
-  if (!fontPathChecked) {
-    cachedFontPath = getUnicodeFontPath();
-    cachedBoldFontPath = getBoldFontPath(cachedFontPath);
-    fontPathChecked = true;
-    if (cachedFontPath) {
-      logger.info(`PDF Service: Using Unicode font from ${cachedFontPath}`);
-      if (cachedBoldFontPath) {
-        logger.info(`PDF Service: Using bold font from ${cachedBoldFontPath}`);
-      }
-    } else {
-      logger.warn(
-        'PDF Service: No Unicode font found, Norwegian characters may not display correctly'
-      );
-    }
-  }
-
-  // Register fonts on THIS document instance (each PDFDocument is independent)
-  if (cachedFontPath) {
-    try {
-      doc.registerFont('Unicode', cachedFontPath);
-      // Use actual bold font if available, otherwise fall back to regular
-      if (cachedBoldFontPath) {
-        doc.registerFont('Unicode-Bold', cachedBoldFontPath);
-      } else {
-        doc.registerFont('Unicode-Bold', cachedFontPath);
-      }
-    } catch (err) {
-      logger.warn(`Failed to register Unicode font: ${err.message}`);
-    }
-  }
-
-  return doc;
-};
-
-/**
- * Get font name - uses Unicode font if available, falls back to Helvetica
- * @param {boolean} bold - Whether to use bold variant
- * @returns {string} Font name
- */
-const getFont = (bold = false) => {
-  if (cachedFontPath) {
-    return bold ? 'Unicode-Bold' : 'Unicode';
-  }
-  return bold ? 'Helvetica-Bold' : 'Helvetica';
-};
-
-/**
- * Convert PDF document stream to buffer
- * @param {PDFDocument} doc - PDF document
- * @returns {Promise<Buffer>} PDF as buffer
- */
-const pdfToBuffer = (doc) =>
-  new Promise((resolve, reject) => {
-    const chunks = [];
-    doc.on('data', (chunk) => chunks.push(chunk));
-    doc.on('end', () => resolve(Buffer.concat(chunks)));
-    doc.on('error', reject);
-    doc.end();
-  });
-
 /**
  * Draw document header with clinic info
  * @param {PDFDocument} doc - PDF document
@@ -225,7 +69,7 @@ const pdfToBuffer = (doc) =>
  */
 const drawHeader = (doc, data, title) => {
   // Title
-  doc.fontSize(20).font('Helvetica-Bold').text(title, { align: 'center' });
+  doc.fontSize(20).font(fontName(true)).text(title, { align: 'center' });
   doc.moveDown(0.5);
 
   // Horizontal line
@@ -234,7 +78,7 @@ const drawHeader = (doc, data, title) => {
 
   // Clinic info (right aligned)
   const _startY = doc.y;
-  doc.fontSize(10).font('Helvetica');
+  doc.fontSize(10).font(fontName(false));
   doc.text(data.clinic_name || 'Klinikk', { align: 'right' });
   doc.text(data.clinic_address || '', { align: 'right' });
   if (data.clinic_phone) {
@@ -246,7 +90,7 @@ const drawHeader = (doc, data, title) => {
   doc.moveDown(0.5);
 
   // Date
-  doc.text(`Dato: ${formatDateNO(new Date())}`, { align: 'right' });
+  doc.text(`Dato: ${formatNorwegianDate(new Date())}`, { align: 'right' });
   doc.moveDown(1.5);
 };
 
@@ -262,11 +106,11 @@ const drawPatientInfo = (doc, data) => {
   doc.rect(50, boxTop, 495, 70).fill('#f5f5f5');
 
   // Patient info text
-  doc.fillColor('#000000').fontSize(10).font('Helvetica-Bold');
+  doc.fillColor('#000000').fontSize(10).font(fontName(true));
   doc.text('Pasientinformasjon:', 60, boxTop + 10);
-  doc.font('Helvetica');
+  doc.font(fontName(false));
   doc.text(`Navn: ${data.first_name || ''} ${data.last_name || ''}`, 60, boxTop + 25);
-  doc.text(`Fødselsdato: ${formatDateNO(data.date_of_birth)}`, 60, boxTop + 40);
+  doc.text(`F\u00f8dselsdato: ${formatNorwegianDate(data.date_of_birth)}`, 60, boxTop + 40);
 
   const address = [data.address, data.postal_code, data.city].filter(Boolean).join(', ');
   if (address) {
@@ -283,10 +127,10 @@ const drawPatientInfo = (doc, data) => {
  * @param {string} title - Section title
  */
 const drawSectionHeader = (doc, title) => {
-  doc.fontSize(12).font('Helvetica-Bold').fillColor('#333333');
+  doc.fontSize(12).font(fontName(true)).fillColor('#333333');
   doc.text(title);
   doc.moveDown(0.3);
-  doc.font('Helvetica').fontSize(10).fillColor('#000000');
+  doc.font(fontName(false)).fontSize(10).fillColor('#000000');
 };
 
 /**
@@ -296,7 +140,7 @@ const drawSectionHeader = (doc, title) => {
  */
 const drawSignature = (doc, data) => {
   doc.moveDown(2);
-  doc.fontSize(10).font('Helvetica');
+  doc.fontSize(10).font(fontName(false));
   doc.text('Med vennlig hilsen,');
   doc.moveDown(2);
 
@@ -304,9 +148,9 @@ const drawSignature = (doc, data) => {
   doc.moveTo(50, doc.y).lineTo(200, doc.y).stroke();
   doc.moveDown(0.5);
 
-  doc.font('Helvetica-Bold');
+  doc.font(fontName(true));
   doc.text(data.practitioner_name || 'Behandler');
-  doc.font('Helvetica');
+  doc.font(fontName(false));
   doc.text('Kiropraktor');
   if (data.hpr_number) {
     doc.text(`HPR-nummer: ${data.hpr_number}`);
@@ -351,7 +195,7 @@ export const generatePatientLetter = async (organizationId, encounterId, letterT
     }
 
     const data = encounterResult.rows[0];
-    const doc = createPDFDocument();
+    const doc = createDoc();
 
     // Generate letter based on type
     switch (letterType) {
@@ -369,7 +213,7 @@ export const generatePatientLetter = async (organizationId, encounterId, letterT
     }
 
     // Convert to buffer
-    const pdfBuffer = await pdfToBuffer(doc);
+    const pdfBuffer = await docToBuffer(doc);
 
     logger.info(`Generated ${letterType} PDF for encounter ${encounterId}`, {
       size: pdfBuffer.length,
@@ -419,7 +263,7 @@ function generateSickLeavePDF(doc, data) {
   // Sick leave period if applicable
   if (data.sick_leave_start || data.sick_leave_end) {
     drawSectionHeader(doc, 'Sykefraværsperiode:');
-    const period = `${formatDateNO(data.sick_leave_start)} - ${formatDateNO(data.sick_leave_end)}`;
+    const period = `${formatNorwegianDate(data.sick_leave_start)} - ${formatNorwegianDate(data.sick_leave_end)}`;
     doc.text(period);
     doc.moveDown(1);
   }
@@ -458,20 +302,20 @@ function generateReferralPDF(doc, data) {
   // Findings
   drawSectionHeader(doc, 'Funn:');
   if (data.objective?.observation) {
-    doc.font('Helvetica-Bold').text('Observasjon: ', { continued: true });
-    doc.font('Helvetica').text(data.objective.observation);
+    doc.font(fontName(true)).text('Observasjon: ', { continued: true });
+    doc.font(fontName(false)).text(data.objective.observation);
   }
   if (data.objective?.palpation) {
-    doc.font('Helvetica-Bold').text('Palpasjon: ', { continued: true });
-    doc.font('Helvetica').text(data.objective.palpation);
+    doc.font(fontName(true)).text('Palpasjon: ', { continued: true });
+    doc.font(fontName(false)).text(data.objective.palpation);
   }
   if (data.objective?.ortho_tests) {
-    doc.font('Helvetica-Bold').text('Ortopediske tester: ', { continued: true });
-    doc.font('Helvetica').text(data.objective.ortho_tests);
+    doc.font(fontName(true)).text('Ortopediske tester: ', { continued: true });
+    doc.font(fontName(false)).text(data.objective.ortho_tests);
   }
   if (data.objective?.neuro_tests) {
-    doc.font('Helvetica-Bold').text('Nevrologiske tester: ', { continued: true });
-    doc.font('Helvetica').text(data.objective.neuro_tests);
+    doc.font(fontName(true)).text('Nevrologiske tester: ', { continued: true });
+    doc.font(fontName(false)).text(data.objective.neuro_tests);
   }
   doc.moveDown(1);
 
@@ -506,40 +350,40 @@ function generateTreatmentSummaryPDF(doc, data) {
   // SUBJECTIVE
   drawSectionHeader(doc, 'SUBJEKTIVT (S):');
   if (data.subjective?.chief_complaint) {
-    doc.font('Helvetica-Bold').text('Hovedplage: ', { continued: true });
-    doc.font('Helvetica').text(data.subjective.chief_complaint);
+    doc.font(fontName(true)).text('Hovedplage: ', { continued: true });
+    doc.font(fontName(false)).text(data.subjective.chief_complaint);
   }
   if (data.subjective?.history) {
-    doc.font('Helvetica-Bold').text('Sykehistorie: ', { continued: true });
-    doc.font('Helvetica').text(data.subjective.history);
+    doc.font(fontName(true)).text('Sykehistorie: ', { continued: true });
+    doc.font(fontName(false)).text(data.subjective.history);
   }
   if (data.subjective?.pain_description) {
-    doc.font('Helvetica-Bold').text('Smertebeskrivelse: ', { continued: true });
-    doc.font('Helvetica').text(data.subjective.pain_description);
+    doc.font(fontName(true)).text('Smertebeskrivelse: ', { continued: true });
+    doc.font(fontName(false)).text(data.subjective.pain_description);
   }
   doc.moveDown(1);
 
   // OBJECTIVE
   drawSectionHeader(doc, 'OBJEKTIVT (O):');
   if (data.objective?.observation) {
-    doc.font('Helvetica-Bold').text('Observasjon: ', { continued: true });
-    doc.font('Helvetica').text(data.objective.observation);
+    doc.font(fontName(true)).text('Observasjon: ', { continued: true });
+    doc.font(fontName(false)).text(data.objective.observation);
   }
   if (data.objective?.palpation) {
-    doc.font('Helvetica-Bold').text('Palpasjon: ', { continued: true });
-    doc.font('Helvetica').text(data.objective.palpation);
+    doc.font(fontName(true)).text('Palpasjon: ', { continued: true });
+    doc.font(fontName(false)).text(data.objective.palpation);
   }
   if (data.objective?.rom) {
-    doc.font('Helvetica-Bold').text('Bevegelighet (ROM): ', { continued: true });
-    doc.font('Helvetica').text(data.objective.rom);
+    doc.font(fontName(true)).text('Bevegelighet (ROM): ', { continued: true });
+    doc.font(fontName(false)).text(data.objective.rom);
   }
   if (data.objective?.ortho_tests) {
-    doc.font('Helvetica-Bold').text('Ortopediske tester: ', { continued: true });
-    doc.font('Helvetica').text(data.objective.ortho_tests);
+    doc.font(fontName(true)).text('Ortopediske tester: ', { continued: true });
+    doc.font(fontName(false)).text(data.objective.ortho_tests);
   }
   if (data.objective?.neuro_tests) {
-    doc.font('Helvetica-Bold').text('Nevrologiske tester: ', { continued: true });
-    doc.font('Helvetica').text(data.objective.neuro_tests);
+    doc.font(fontName(true)).text('Nevrologiske tester: ', { continued: true });
+    doc.font(fontName(false)).text(data.objective.neuro_tests);
   }
   doc.moveDown(1);
 
@@ -549,32 +393,32 @@ function generateTreatmentSummaryPDF(doc, data) {
     doc.text(data.assessment.clinical_reasoning, { align: 'justify' });
   }
   if (data.icpc_codes && data.icpc_codes.length > 0) {
-    doc.font('Helvetica-Bold').text('Diagnosekode(r): ', { continued: true });
-    doc.font('Helvetica').text(data.icpc_codes.join(', '));
+    doc.font(fontName(true)).text('Diagnosekode(r): ', { continued: true });
+    doc.font(fontName(false)).text(data.icpc_codes.join(', '));
   }
   if (data.assessment?.prognosis) {
-    doc.font('Helvetica-Bold').text('Prognose: ', { continued: true });
-    doc.font('Helvetica').text(data.assessment.prognosis);
+    doc.font(fontName(true)).text('Prognose: ', { continued: true });
+    doc.font(fontName(false)).text(data.assessment.prognosis);
   }
   doc.moveDown(1);
 
   // PLAN
   drawSectionHeader(doc, 'PLAN (P):');
   if (data.plan?.treatment) {
-    doc.font('Helvetica-Bold').text('Behandling: ', { continued: true });
-    doc.font('Helvetica').text(data.plan.treatment);
+    doc.font(fontName(true)).text('Behandling: ', { continued: true });
+    doc.font(fontName(false)).text(data.plan.treatment);
   }
   if (data.plan?.exercises) {
-    doc.font('Helvetica-Bold').text('Øvelser: ', { continued: true });
-    doc.font('Helvetica').text(data.plan.exercises);
+    doc.font(fontName(true)).text('Øvelser: ', { continued: true });
+    doc.font(fontName(false)).text(data.plan.exercises);
   }
   if (data.plan?.advice) {
-    doc.font('Helvetica-Bold').text('Råd: ', { continued: true });
-    doc.font('Helvetica').text(data.plan.advice);
+    doc.font(fontName(true)).text('Råd: ', { continued: true });
+    doc.font(fontName(false)).text(data.plan.advice);
   }
   if (data.plan?.follow_up) {
-    doc.font('Helvetica-Bold').text('Oppfølging: ', { continued: true });
-    doc.font('Helvetica').text(data.plan.follow_up);
+    doc.font(fontName(true)).text('Oppfølging: ', { continued: true });
+    doc.font(fontName(false)).text(data.plan.follow_up);
   }
   doc.moveDown(1);
 
@@ -623,14 +467,14 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
     }
 
     const data = result.rows[0];
-    const doc = createPDFDocument();
+    const doc = createDoc();
 
     // Header with clinic info
     doc
       .fontSize(18)
-      .font('Helvetica-Bold')
+      .font(fontName(true))
       .text(data.clinic_name || 'Klinikk', { align: 'left' });
-    doc.fontSize(10).font('Helvetica');
+    doc.fontSize(10).font(fontName(false));
     doc.text(data.clinic_address || '');
     if (data.clinic_phone) {
       doc.text(`Tlf: ${data.clinic_phone}`);
@@ -640,11 +484,14 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
     }
 
     // Invoice title and number (right side)
-    doc.fontSize(24).font('Helvetica-Bold');
+    doc.fontSize(24).font(fontName(true));
     doc.text('FAKTURA', 400, 50, { width: 145, align: 'right' });
-    doc.fontSize(10).font('Helvetica');
+    doc.fontSize(10).font(fontName(false));
     doc.text(`Nr: ${data.invoice_number || 'N/A'}`, 400, 80, { width: 145, align: 'right' });
-    doc.text(`Dato: ${formatDateNO(data.created_at)}`, 400, 95, { width: 145, align: 'right' });
+    doc.text(`Dato: ${formatNorwegianDate(data.created_at)}`, 400, 95, {
+      width: 145,
+      align: 'right',
+    });
 
     // Horizontal line
     doc.y = 130;
@@ -652,8 +499,8 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
     doc.moveDown(1);
 
     // Patient info
-    doc.fontSize(10).font('Helvetica-Bold').text('Faktureres til:');
-    doc.font('Helvetica');
+    doc.fontSize(10).font(fontName(true)).text('Faktureres til:');
+    doc.font(fontName(false));
     doc.text(`${data.first_name || ''} ${data.last_name || ''}`);
     if (data.address) {
       doc.text(data.address);
@@ -672,14 +519,14 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
     // Table header
     const tableTop = doc.y;
     doc.rect(50, tableTop, 495, 25).fill('#f0f0f0');
-    doc.fillColor('#000000').fontSize(10).font('Helvetica-Bold');
+    doc.fillColor('#000000').fontSize(10).font(fontName(true));
     doc.text('Takst', 60, tableTop + 7);
     doc.text('Beskrivelse', 150, tableTop + 7);
     doc.text('Beløp', 450, tableTop + 7, { width: 85, align: 'right' });
 
     // Table rows
     let rowY = tableTop + 25;
-    doc.font('Helvetica');
+    doc.font(fontName(false));
 
     if (Array.isArray(treatmentCodes) && treatmentCodes.length > 0) {
       treatmentCodes.forEach((code, index) => {
@@ -691,7 +538,10 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
         doc.text(code.code || code, 60, rowY + 5);
         doc.text(code.description || '', 150, rowY + 5, { width: 280 });
         if (code.price) {
-          doc.text(formatCurrencyNO(code.price), 450, rowY + 5, { width: 85, align: 'right' });
+          doc.text(formatNorwegianCurrency(code.price), 450, rowY + 5, {
+            width: 85,
+            align: 'right',
+          });
         }
         rowY += rowHeight;
       });
@@ -707,17 +557,19 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
 
     // Totals
     doc.fontSize(11);
-    doc.text(`Bruttobeløp: ${formatCurrencyNO(data.gross_amount)}`, { align: 'right' });
-    doc.text(`Egenandel refusjon: ${formatCurrencyNO(data.insurance_amount)}`, { align: 'right' });
+    doc.text(`Bruttobeløp: ${formatNorwegianCurrency(data.gross_amount)}`, { align: 'right' });
+    doc.text(`Egenandel refusjon: ${formatNorwegianCurrency(data.insurance_amount)}`, {
+      align: 'right',
+    });
     doc.moveDown(0.5);
-    doc.fontSize(14).font('Helvetica-Bold');
-    doc.text(`Å betale: ${formatCurrencyNO(data.patient_amount)}`, { align: 'right' });
+    doc.fontSize(14).font(fontName(true));
+    doc.text(`Å betale: ${formatNorwegianCurrency(data.patient_amount)}`, { align: 'right' });
     doc.moveDown(1.5);
 
     // Payment info
-    doc.fontSize(10).font('Helvetica');
-    doc.font('Helvetica-Bold').text('Betalingsinformasjon:');
-    doc.font('Helvetica');
+    doc.fontSize(10).font(fontName(false));
+    doc.font(fontName(true)).text('Betalingsinformasjon:');
+    doc.font(fontName(false));
     doc.text('Vennligst betal innen 14 dager.');
     doc.moveDown(0.5);
 
@@ -727,11 +579,11 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
       CANCELLED: 'KANSELLERT',
     };
     const statusText = statusMap[data.payment_status] || data.payment_status;
-    doc.font('Helvetica-Bold').text(`Status: ${statusText}`);
+    doc.font(fontName(true)).text(`Status: ${statusText}`);
 
     // Footer
     const footerY = doc.page.height - 50;
-    doc.fontSize(8).font('Helvetica').fillColor('#666666');
+    doc.fontSize(8).font(fontName(false)).fillColor('#666666');
     const footerText = [
       data.clinic_name,
       data.clinic_address,
@@ -743,7 +595,7 @@ export const generateInvoice = async (organizationId, financialMetricId) => {
     doc.text(footerText, 50, footerY, { align: 'center', width: 495 });
 
     // Convert to buffer
-    const pdfBuffer = await pdfToBuffer(doc);
+    const pdfBuffer = await docToBuffer(doc);
 
     logger.info(`Generated invoice PDF for financial metric ${financialMetricId}`, {
       size: pdfBuffer.length,
@@ -775,12 +627,12 @@ export const generateCustomPDF = async (options) => {
   try {
     const { title, content, clinic = {}, patient = null, practitioner = null } = options;
 
-    const doc = createPDFDocument();
+    const doc = createDoc();
 
     // Header
     doc
       .fontSize(20)
-      .font('Helvetica-Bold')
+      .font(fontName(true))
       .text(title || 'Dokument', { align: 'center' });
     doc.moveDown(0.5);
     doc.moveTo(50, doc.y).lineTo(545, doc.y).stroke();
@@ -788,12 +640,12 @@ export const generateCustomPDF = async (options) => {
 
     // Clinic info
     if (clinic.name) {
-      doc.fontSize(10).font('Helvetica');
+      doc.fontSize(10).font(fontName(false));
       doc.text(clinic.name, { align: 'right' });
       if (clinic.address) {
         doc.text(clinic.address, { align: 'right' });
       }
-      doc.text(`Dato: ${formatDateNO(new Date())}`, { align: 'right' });
+      doc.text(`Dato: ${formatNorwegianDate(new Date())}`, { align: 'right' });
       doc.moveDown(1);
     }
 
@@ -803,7 +655,7 @@ export const generateCustomPDF = async (options) => {
     }
 
     // Main content
-    doc.fontSize(11).font('Helvetica');
+    doc.fontSize(11).font(fontName(false));
     doc.text(content || '', { align: 'justify' });
 
     // Signature
@@ -811,12 +663,12 @@ export const generateCustomPDF = async (options) => {
       drawSignature(doc, practitioner);
     }
 
-    const pdfBuffer = await pdfToBuffer(doc);
+    const pdfBuffer = await docToBuffer(doc);
 
     return {
       buffer: pdfBuffer,
       contentType: 'application/pdf',
-      filename: `${title || 'document'}_${formatDateNO(new Date()).replace(/\./g, '-')}.pdf`,
+      filename: `${title || 'document'}_${formatNorwegianDate(new Date()).replace(/\./g, '-')}.pdf`,
     };
   } catch (error) {
     logger.error('Error generating custom PDF:', error);
@@ -861,11 +713,11 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
     );
 
     const exercises = exercisesResult.rows;
-    const doc = createPDFDocument();
+    const doc = createDoc();
 
     // Use Unicode font throughout
-    const font = getFont(false);
-    const fontBold = getFont(true);
+    const font = fontName(false);
+    const fontBold = fontName(true);
 
     // Header
     doc.fontSize(20).font(fontBold).text('Ditt øvelsesprogram', { align: 'center' });
@@ -887,7 +739,7 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
     // Patient info
     doc.fontSize(12).font(font);
     doc.text(`Pasient: ${patient.first_name} ${patient.last_name}`);
-    doc.text(`Dato: ${formatDateNO(new Date())}`);
+    doc.text(`Dato: ${formatNorwegianDate(new Date())}`);
     doc.moveDown(1);
 
     // Introduction
@@ -1102,7 +954,7 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
     doc.fillColor('#000000');
 
     // Convert to buffer
-    const pdfBuffer = await pdfToBuffer(doc);
+    const pdfBuffer = await docToBuffer(doc);
 
     logger.info(`Generated exercise handout PDF for patient ${patientId}`, {
       size: pdfBuffer.length,
@@ -1112,7 +964,7 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
     return {
       buffer: pdfBuffer,
       contentType: 'application/pdf',
-      filename: `Ovelsesprogram_${patient.last_name}_${formatDateNO(new Date()).replace(/\./g, '-')}.pdf`,
+      filename: `Ovelsesprogram_${patient.last_name}_${formatNorwegianDate(new Date()).replace(/\./g, '-')}.pdf`,
       patientId,
       exerciseCount: exercises.length,
     };

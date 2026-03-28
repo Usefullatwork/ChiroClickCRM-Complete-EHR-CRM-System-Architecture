@@ -3,7 +3,7 @@ import { useState, useMemo, lazy, Suspense } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { encountersAPI } from '../services/api';
-import { useClinicalPreferences } from '../hooks';
+import { useClinicalPreferences } from '../hooks/useClinicalPreferences';
 import { useEncounterSave } from '../hooks/useEncounterSave';
 import { useDiagnosisHandlers } from '../hooks/useDiagnosisHandlers';
 import { useEncounterHandlers } from '../hooks/useEncounterHandlers';
