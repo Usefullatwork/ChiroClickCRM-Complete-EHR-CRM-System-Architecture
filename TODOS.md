@@ -71,20 +71,62 @@ Isolation level whitelist + savepoint name regex in database helpers.
 
 ---
 
-## Remaining Work (Sprint 6+)
+## Sprint 6: Test Coverage + Refactoring Blitz — ALL DONE
+
+### ✅ Clinical domain tests — DONE (Sprint 6A, cf6ddec)
+
+18 new test files for clinical services (338 tests). clinicalDataParser, clinicalEvals, clinicalVision,
+exerciseCrud, exercisePrescriptions, exercisePrograms, noteCrud, noteFormatting, noteSearch,
+outcomeScoring, pdf-utils, pdfReferralLetter, pdfSickNote, pdfTreatmentSummary, questionnaires,
+structuredExtraction, templateCrud, templateRenderer.
+
+### ✅ Communication + automation tests — DONE (Sprint 6B, a162114)
+
+11 new test files (316 tests). bulkDispatch, bulkFiltering, bulkTemplating, documentParser,
+outlookBridge, conditions, triggers, automationsCore, automationsWorkflow, crmCore, crmAnalytics.
+
+### ✅ AI + practice + jobs tests — DONE (Sprint 6C, c49ffcb)
+
+13 new test files (423 tests). clinicalPrompts, journalPrompts, promptShared, ragRetrieval,
+systemPrompts, jobRunner, communicationJobs, aiJobs, maintenanceJobs, trainingPipeline,
+modelValidation, dataCuration, retrainingMetrics.
+
+### ✅ Frontend refactoring — DONE (Sprint 6D, 1a46071)
+
+5 large components split into sub-modules (<500 lines each):
+WorkflowBuilder, CSVColumnMapper, PatientEducationLibrary, BulkSender, ClinicalProtocols.
+4 data files extracted to JSON: orthopedicExamDefinitions (7382L), neurologicalExamDefinitions (2232L),
+examinationProtocols (1881L), questionnaires (2754L).
+
+### ✅ Backend route refactoring — DONE (Sprint 6E, 19595b7)
+
+5 large routes split into 22 domain sub-routes with barrel index.js:
+billing (1285L), crm (1182L), training (934L), encounters (830L), templates (741L).
+Zero regressions (3686 backend tests still pass).
+
+### ✅ E2E test expansion — DONE (Sprint 6F, bb3de68)
+
+3 new Playwright specs (35 tests): gdpr-erasure, kiosk-intake, multi-org-security.
+
+---
+
+## Remaining Work (Sprint 7+)
 
 ### Refactoring
 
 - [ ] Merge components/patient + patients, communications + comms
-- [ ] Move 7 data definition files to JSON (~14,000 lines)
+- [x] Move 4 data definition files to JSON (~14,000 lines) — Sprint 6D
 - [ ] Root folder cleanup
+- [ ] Split remaining large FE: AnatomicalBodyChart (3641L), RegionalBodyDiagrams (1396L), FacialLinesChart (1284L), CranialNervePanel (1185L)
+- [ ] Split remaining large BE services: pdf.js (982L), patients.js (815L), exerciseLibrary.js (810L)
 
 ### Testing
 
-- [ ] 3 missing E2E flows (GDPR erasure, kiosk intake, cross-org rejection)
-- [ ] ~25 backend services without unit tests
+- [x] 3 missing E2E flows (GDPR erasure, kiosk intake, cross-org rejection) — Sprint 6F
+- [x] ~25 backend services without unit tests — Sprint 6A/B/C (~42 covered)
 - [ ] AnatomyViewer + MuscleMap tests
+- [ ] i18n translation file consolidation (common.js 1231L, clinical.js 1129L, exercises.js 1021L)
 
 ### Documentation
 
-- [ ] Update CLAUDE.md with Sprint 5 architecture changes
+- [x] Update CLAUDE.md with Sprint 6 changes

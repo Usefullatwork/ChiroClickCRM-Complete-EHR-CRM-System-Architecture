@@ -12,14 +12,15 @@ Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electro
 
 ## Current State
 
-- **Backend**: 3,686 tests pass (136 suites). 77 integration suites fail pre-existing (PGlite top-level await + Jest ESM circular init — NOT from our work).
-- **Frontend**: 158/158 tests pass, 0 lint errors, build OK
-- **E2E**: 18 Playwright spec files (99 bailout patterns fixed in Session 4)
+- **Backend**: 4,544 tests pass (176 suites). 79 integration suites fail pre-existing (PGlite top-level await + Jest ESM circular init — NOT from our work).
+- **Frontend**: 158/158 tests pass (32 pre-existing failures in InvoiceGenerator/BodyChart/PlaygroundTab/Training/Automations), build OK
+- **E2E**: 21 Playwright spec files (+3 in Sprint 6: GDPR erasure, kiosk intake, multi-org security)
 - **CI**: 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
 - **Electron**: Portable exe verified (96MB), PGlite WASM loads correctly
 - **Latest migration**: 079 (`v7 training data`)
-- **Branch**: `review/deep-review-sprint-v2` (10 commits ahead of main: Sessions 2-4 + Sprint 5)
+- **Branch**: `sprint6/overnight-blitz` (Sprint 6: test coverage + refactoring blitz)
 - **Services**: 8 domain dirs + 27 extracted modules. All files <500 lines. Zero SELECT \*.
+- **Sprint 6**: +42 test files, 5 FE components split, 4 data files→JSON, 5 BE routes split into sub-routes
 
 ## Commands
 
