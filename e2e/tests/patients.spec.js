@@ -29,25 +29,21 @@ test.describe('Patient List', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientsList = authenticatedPage.locator('[data-testid="patients-list"]');
-    const listVisible = await patientsList.isVisible().catch(() => false);
+    const emptyState = authenticatedPage.locator('text=/No patients|Ingen pasienter/i');
 
-    if (listVisible) {
-      const rows = authenticatedPage.locator('[data-testid="patient-row"]');
-      const count = await rows.count();
-      expect(count).toBeGreaterThanOrEqual(0);
-    }
-    // Empty state is also acceptable
+    // Either the list or empty state should render
+    await expect(patientsList.or(emptyState)).toBeVisible({ timeout: 10000 });
   });
 
   test('should open patient details when clicking a row', async ({ authenticatedPage }) => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
-    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await patientRow.click();
-      await expect(authenticatedPage).toHaveURL(/.*patients\/[a-zA-Z0-9-]+.*/);
-    }
+    await patientRow.click();
+    await expect(authenticatedPage).toHaveURL(/.*patients\/[a-zA-Z0-9-]+.*/);
   });
 
   test('should navigate to new patient form', async ({ authenticatedPage }) => {
@@ -159,15 +155,15 @@ test.describe('Patient Detail', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
-    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await patientRow.click();
-      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
+    await patientRow.click();
+    await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
-      await expect(authenticatedPage.locator('[data-testid="patient-detail-name"]')).toBeVisible();
-      await expect(authenticatedPage.locator('[data-testid="patient-detail-tabs"]')).toBeVisible();
-      await expect(authenticatedPage.locator('[data-testid="patient-detail-panel"]')).toBeVisible();
-    }
+    await expect(authenticatedPage.locator('[data-testid="patient-detail-name"]')).toBeVisible();
+    await expect(authenticatedPage.locator('[data-testid="patient-detail-tabs"]')).toBeVisible();
+    await expect(authenticatedPage.locator('[data-testid="patient-detail-panel"]')).toBeVisible();
   });
 
   test('should display contact information tab', async ({ authenticatedPage }) => {
@@ -177,13 +173,13 @@ test.describe('Patient Detail', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
-    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await patientRow.click();
-      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
+    await patientRow.click();
+    await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
-      await expect(authenticatedPage.locator('[data-testid="patient-detail-tab-contact"]')).toBeVisible({ timeout: 10000 });
-    }
+    await expect(authenticatedPage.locator('[data-testid="patient-detail-tab-contact"]')).toBeVisible({ timeout: 10000 });
   });
 
   test('should display clinical information tab', async ({ authenticatedPage }) => {
@@ -193,13 +189,13 @@ test.describe('Patient Detail', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
-    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await patientRow.click();
-      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
+    await patientRow.click();
+    await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
-      await expect(authenticatedPage.locator('[data-testid="patient-detail-tab-clinical"]')).toBeVisible({ timeout: 10000 });
-    }
+    await expect(authenticatedPage.locator('[data-testid="patient-detail-tab-clinical"]')).toBeVisible({ timeout: 10000 });
   });
 
   test('should display visits tab', async ({ authenticatedPage }) => {
@@ -209,13 +205,13 @@ test.describe('Patient Detail', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
-    if (await patientRow.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await patientRow.click();
-      await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
+    await patientRow.click();
+    await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
-      await expect(authenticatedPage.locator('[data-testid="patient-detail-tab-visits"]')).toBeVisible({ timeout: 15000 });
-    }
+    await expect(authenticatedPage.locator('[data-testid="patient-detail-tab-visits"]')).toBeVisible({ timeout: 15000 });
   });
 });
 

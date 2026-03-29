@@ -37,7 +37,7 @@ let appointments;
 
 beforeEach(async () => {
   jest.clearAllMocks();
-  appointments = await import('../../src/services/appointments.js');
+  appointments = await import('../../src/services/practice/appointments.js');
 });
 
 describe('Appointments Service', () => {

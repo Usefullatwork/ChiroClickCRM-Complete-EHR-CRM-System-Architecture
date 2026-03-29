@@ -12,6 +12,59 @@ const ElectronStore = require('electron-store');
 const { isFirstRun, ensureDataDirectories, getSplashHTML, setDataDir } = require('./first-run');
 
 // ============================================================================
+// Crash Handling — log to file, show dialog, survive unexpected errors
+// ============================================================================
+
+const CRASH_LOG_MAX_BYTES = 100 * 1024; // 100KB
+
+/**
+ * Rotate crash.log if it exceeds CRASH_LOG_MAX_BYTES.
+ * Keeps only the tail of the file so the most recent entries survive.
+ */
+function rotateCrashLog(crashLogPath) {
+  try {
+    if (!fs.existsSync(crashLogPath)) return;
+    const stats = fs.statSync(crashLogPath);
+    if (stats.size <= CRASH_LOG_MAX_BYTES) return;
+    const content = fs.readFileSync(crashLogPath, 'utf8');
+    // Keep the last ~80KB worth of entries
+    const trimmed = content.slice(content.length - Math.floor(CRASH_LOG_MAX_BYTES * 0.8));
+    // Start at the next full line to avoid a partial first entry
+    const firstNewline = trimmed.indexOf('\n');
+    fs.writeFileSync(crashLogPath, firstNewline > -1 ? trimmed.slice(firstNewline + 1) : trimmed);
+  } catch {
+    // Best-effort — don't crash the crash handler
+  }
+}
+
+process.on('uncaughtException', (error) => {
+  try {
+    const crashLog = path.join(app.getPath('userData'), 'crash.log');
+    const entry = `[${new Date().toISOString()}] UNCAUGHT: ${error.stack || error.message}\n`;
+    fs.appendFileSync(crashLog, entry);
+  } catch {
+    // userData may not be available yet during very early startup
+  }
+
+  if (mainWindow) {
+    dialog.showErrorBox('Uventet feil',
+      'ChiroClickEHR opplevde en uventet feil.\n\n' +
+      'Programmet vil prove a starte pa nytt.\n\n' +
+      `Feilmelding: ${error.message}`);
+  }
+});
+
+process.on('unhandledRejection', (reason) => {
+  try {
+    const crashLog = path.join(app.getPath('userData'), 'crash.log');
+    const entry = `[${new Date().toISOString()}] REJECTION: ${reason?.stack || reason}\n`;
+    fs.appendFileSync(crashLog, entry);
+  } catch {
+    // Best-effort
+  }
+});
+
+// ============================================================================
 // Settings Store - persists window position/size across sessions
 // ============================================================================
 
@@ -26,6 +79,7 @@ const store = new ElectronStore({
 const BACKEND_PORT = 3000;
 let mainWindow = null;
 let backendProcess = null;
+let isShuttingDown = false;
 
 // ============================================================================
 // Backend Server Management
@@ -150,8 +204,21 @@ function startBackend() {
   });
 
   backendProcess.on('exit', (code) => {
-    console.log(`[desktop] Backend process exited with code ${code}`);
+    process.stdout.write(`[desktop] Backend process exited with code ${code}\n`);
     backendProcess = null;
+    // Auto-restart on unexpected exit (not during intentional shutdown)
+    if (code !== 0 && !isShuttingDown) {
+      process.stdout.write('[desktop] Backend crashed — restarting in 2s...\n');
+      setTimeout(() => {
+        startBackend();
+        waitForBackendHealth(BACKEND_PORT).then((ready) => {
+          if (ready && mainWindow) {
+            mainWindow.webContents.send('backend-ready');
+            mainWindow.reload();
+          }
+        });
+      }, 2000);
+    }
   });
 
   backendProcess.on('error', (err) => {
@@ -168,6 +235,7 @@ function startBackend() {
  * Kill the backend process gracefully, then force-kill after timeout.
  */
 function stopBackend() {
+  isShuttingDown = true;
   return new Promise((resolve) => {
     if (!backendProcess) {
       resolve();
@@ -367,8 +435,8 @@ ipcMain.handle('get-data-path', () => {
 });
 
 ipcMain.handle('restart-backend', async () => {
-  console.log('[desktop] Restarting backend...');
   await stopBackend();
+  isShuttingDown = false; // Reset — this is an intentional restart, not a shutdown
   startBackend();
   const ready = await waitForBackendHealth(BACKEND_PORT);
   if (ready && mainWindow) {
@@ -412,6 +480,9 @@ ipcMain.handle('check-ollama-status', async () => {
 // ============================================================================
 
 app.whenReady().then(async () => {
+  // Rotate crash log if it grew too large
+  rotateCrashLog(path.join(app.getPath('userData'), 'crash.log'));
+
   // Set up menu
   createMenu();
 
@@ -490,6 +561,7 @@ app.on('activate', () => {
 
 // Graceful shutdown
 app.on('before-quit', async (event) => {
+  isShuttingDown = true;
   if (backendProcess) {
     event.preventDefault();
     await stopBackend();

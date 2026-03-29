@@ -41,7 +41,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 
 // Mock noteValidator
 const mockValidate = jest.fn();
-jest.unstable_mockModule('../../../src/services/noteValidator.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/noteValidator.js', () => ({
   validate: mockValidate,
   default: { validate: mockValidate },
 }));
@@ -95,7 +95,7 @@ const {
   searchNotes,
   getNoteHistory,
   createAmendment,
-} = await import('../../../src/services/clinicalNotes.js');
+} = await import('../../../src/services/clinical/clinicalNotes.js');
 
 describe('Clinical Notes Service', () => {
   const ORG_ID = 'org-test-001';

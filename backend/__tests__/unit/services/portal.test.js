@@ -29,7 +29,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
   },
 }));
 
-jest.unstable_mockModule('../../../src/services/communications.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/communications.js', () => ({
   sendSMS: jest.fn(),
   sendEmail: jest.fn(),
   default: {
@@ -38,14 +38,14 @@ jest.unstable_mockModule('../../../src/services/communications.js', () => ({
   },
 }));
 
-jest.unstable_mockModule('../../../src/services/pushNotification.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/pushNotification.js', () => ({
   sendPushToPatient: jest.fn(),
   default: {
     sendPushToPatient: jest.fn(),
   },
 }));
 
-const portalService = await import('../../../src/services/portal.js');
+const portalService = await import('../../../src/services/practice/portal.js');
 
 const ORG_ID = 'org-001';
 const PATIENT_ID = 'pat-001';
@@ -626,7 +626,7 @@ describe('Portal Service', () => {
         })
         .mockResolvedValueOnce({ rows: [savedMessage] });
 
-      const { sendSMS } = await import('../../../src/services/communications.js');
+      const { sendSMS } = await import('../../../src/services/communication/communications.js');
       sendSMS.mockResolvedValueOnce({});
 
       await portalService.sendPatientMessage(
@@ -652,7 +652,7 @@ describe('Portal Service', () => {
         })
         .mockResolvedValueOnce({ rows: [savedMessage] });
 
-      const { sendSMS } = await import('../../../src/services/communications.js');
+      const { sendSMS } = await import('../../../src/services/communication/communications.js');
       sendSMS.mockRejectedValueOnce(new Error('Twilio down'));
 
       const result = await portalService.sendPatientMessage(

@@ -7,7 +7,7 @@ import { useState, useMemo, lazy, Suspense } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Brain, Database, RefreshCw, TestTube, Server } from 'lucide-react';
 import { trainingAPI } from '../services/api';
-import { ModelsTab } from '../components/training';
+import ModelsTab from '../components/training/ModelsTab';
 import { useTranslation } from '../i18n';
 
 // Lazy load tab components

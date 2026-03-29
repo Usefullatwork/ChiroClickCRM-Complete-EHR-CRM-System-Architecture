@@ -94,7 +94,7 @@ const {
   generateReferralLetter,
   generateSickNote,
   generateInvoice,
-} = await import('../../../src/services/pdfGenerator.js');
+} = await import('../../../src/services/clinical/pdfGenerator.js');
 
 // ── Test data factories ────────────────────────────────────────────────
 function makePatientRow(overrides = {}) {

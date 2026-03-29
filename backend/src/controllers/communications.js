@@ -2,7 +2,7 @@
  * Communications Controller
  */
 
-import * as communicationService from '../services/communications.js';
+import * as communicationService from '../services/communication/communications.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 

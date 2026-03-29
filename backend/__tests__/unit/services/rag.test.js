@@ -39,9 +39,9 @@ jest.unstable_mockModule('../../../src/db/index.js', () => ({
 // ---------------------------------------------------------------------------
 // Import AFTER mocking
 // ---------------------------------------------------------------------------
-const { RAGService, ragService } = await import('../../../src/services/rag.js');
+const { RAGService, ragService } = await import('../../../src/services/training/rag.js');
 const { EmbeddingsService, embeddingsService, toPgVector, cosineSimilarity, embed, embedBatch } =
-  await import('../../../src/services/embeddings.js');
+  await import('../../../src/services/training/embeddings.js');
 
 // ---------------------------------------------------------------------------
 // Helpers

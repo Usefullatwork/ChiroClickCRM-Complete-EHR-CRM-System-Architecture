@@ -44,7 +44,7 @@ describe('Clinical Vision Service', () => {
     mockCreate.mockReset();
     mockReadFileSync.mockReset();
 
-    const mod = await import('../../src/services/clinicalVision.js');
+    const mod = await import('../../src/services/clinical/clinicalVision.js');
     analyzeImage = mod.analyzeImage;
     ANALYSIS_TYPES = mod.ANALYSIS_TYPES;
     SUPPORTED_TYPES = mod.SUPPORTED_TYPES;

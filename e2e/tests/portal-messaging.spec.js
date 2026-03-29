@@ -20,20 +20,16 @@ test.describe('Portal Messages — Patient View', () => {
       .locator('text=/Ingen meldinger|No messages/i')
       .first();
 
-    const titleVisible = await pageTitle.isVisible({ timeout: 10000 }).catch(() => false);
-    const emptyVisible = await emptyState.isVisible({ timeout: 5000 }).catch(() => false);
-
     // At least the page title or empty state should be visible
-    expect(titleVisible || emptyVisible).toBe(true);
+    await expect(pageTitle.or(emptyState)).toBeVisible({ timeout: 10000 });
 
     // Verify "New message" button exists
     const newMessageButton = authenticatedPage
       .locator('button')
       .filter({ hasText: /Ny melding|New message/i })
       .first();
-    if (await newMessageButton.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(newMessageButton).toBeEnabled();
-    }
+    await expect(newMessageButton).toBeVisible({ timeout: 5000 });
+    await expect(newMessageButton).toBeEnabled();
   });
 
   test('should open compose view and display form fields', async ({ authenticatedPage }) => {
@@ -46,7 +42,7 @@ test.describe('Portal Messages — Patient View', () => {
       .locator('button')
       .filter({ hasText: /Ny melding|New message/i })
       .first();
-    if (!(await newMessageButton.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(newMessageButton).toBeVisible({ timeout: 5000 });
 
     await newMessageButton.click();
     await authenticatedPage.waitForTimeout(500);
@@ -59,20 +55,14 @@ test.describe('Portal Messages — Patient View', () => {
       .locator('textarea')
       .first();
 
-    if (await subjectInput.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(subjectInput).toBeVisible();
-    }
-    if (await bodyTextarea.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(bodyTextarea).toBeVisible();
-    }
+    await expect(subjectInput).toBeVisible({ timeout: 5000 });
+    await expect(bodyTextarea).toBeVisible({ timeout: 5000 });
 
-    // Verify send button exists and is initially disabled (empty body)
+    // Verify send button exists
     const sendButton = authenticatedPage
       .locator('button[type="submit"]')
       .first();
-    if (await sendButton.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(sendButton).toBeVisible();
-    }
+    await expect(sendButton).toBeVisible({ timeout: 3000 });
   });
 
   test('should enable send button when message body is filled', async ({ authenticatedPage }) => {
@@ -84,14 +74,14 @@ test.describe('Portal Messages — Patient View', () => {
       .locator('button')
       .filter({ hasText: /Ny melding|New message/i })
       .first();
-    if (!(await newMessageButton.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(newMessageButton).toBeVisible({ timeout: 5000 });
 
     await newMessageButton.click();
     await authenticatedPage.waitForTimeout(500);
 
     // Fill in the message body
     const bodyTextarea = authenticatedPage.locator('textarea').first();
-    if (!(await bodyTextarea.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(bodyTextarea).toBeVisible({ timeout: 5000 });
 
     await bodyTextarea.fill('Test melding fra E2E');
     await authenticatedPage.waitForTimeout(300);
@@ -100,9 +90,8 @@ test.describe('Portal Messages — Patient View', () => {
     const sendButton = authenticatedPage
       .locator('button[type="submit"]')
       .first();
-    if (await sendButton.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(sendButton).toBeEnabled();
-    }
+    await expect(sendButton).toBeVisible({ timeout: 3000 });
+    await expect(sendButton).toBeEnabled();
   });
 });
 
@@ -113,7 +102,8 @@ test.describe('Staff Messages — Patient Detail', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
-    if (!(await patientRow.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
     await patientRow.click();
     await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
@@ -123,22 +113,18 @@ test.describe('Staff Messages — Patient Detail', () => {
       .locator('button, [role="tab"]')
       .filter({ hasText: /Meldinger|Messages/i })
       .first();
+    await expect(messagesTab).toBeVisible({ timeout: 5000 });
 
-    if (await messagesTab.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await messagesTab.click();
-      await authenticatedPage.waitForTimeout(1000);
+    await messagesTab.click();
+    await authenticatedPage.waitForTimeout(1000);
 
-      // After clicking messages tab, look for the message compose area or empty state
-      const composeArea = authenticatedPage.locator('textarea');
-      const emptyState = authenticatedPage
-        .locator('text=/Ingen meldinger|No messages/i')
-        .first();
+    // After clicking messages tab, look for the message compose area or empty state
+    const composeArea = authenticatedPage.locator('textarea').first();
+    const emptyState = authenticatedPage
+      .locator('text=/Ingen meldinger|No messages/i')
+      .first();
 
-      const composeVisible = await composeArea.first().isVisible({ timeout: 5000 }).catch(() => false);
-      const emptyVisible = await emptyState.isVisible({ timeout: 5000 }).catch(() => false);
-
-      // Either the compose area or empty state should be visible
-      expect(composeVisible || emptyVisible).toBe(true);
-    }
+    // Either the compose area or empty state should be visible
+    await expect(composeArea.or(emptyState)).toBeVisible({ timeout: 5000 });
   });
 });

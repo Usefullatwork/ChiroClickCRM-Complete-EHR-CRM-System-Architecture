@@ -5,8 +5,8 @@
  * @module controllers/exercises
  */
 
-import exerciseLibraryService from '../services/exerciseLibrary.js';
-import exerciseDeliveryService from '../services/exerciseDelivery.js';
+import exerciseLibraryService from '../services/clinical/exerciseLibrary.js';
+import exerciseDeliveryService from '../services/clinical/exerciseDelivery.js';
 import { logAudit } from '../utils/audit.js';
 
 // ============================================================================

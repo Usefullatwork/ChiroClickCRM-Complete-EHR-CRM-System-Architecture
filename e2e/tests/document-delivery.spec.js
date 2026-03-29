@@ -12,7 +12,8 @@ test.describe('Document Generation in Encounter', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
-    if (!(await patientRow.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
     await patientRow.click();
     await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
@@ -22,16 +23,14 @@ test.describe('Document Generation in Encounter', () => {
       .locator('button')
       .filter({ hasText: /New Visit|Ny konsultasjon/i })
       .first();
-    if (!(await newVisitButton.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(newVisitButton).toBeVisible({ timeout: 5000 });
 
     await newVisitButton.click();
     await authenticatedPage.waitForTimeout(3000);
 
     // Verify the encounter loaded — look for Plan section which hosts document actions
     const planSection = authenticatedPage.locator('[data-testid="encounter-plan"]');
-    if (await planSection.isVisible({ timeout: 10000 }).catch(() => false)) {
-      await expect(planSection).toBeVisible();
-    }
+    await expect(planSection).toBeVisible({ timeout: 10000 });
 
     // Look for PDF/document generation buttons (Norwegian or English labels)
     const pdfButtons = authenticatedPage
@@ -48,7 +47,8 @@ test.describe('Document Generation in Encounter', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
-    if (!(await patientRow.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
     await patientRow.click();
     await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
@@ -57,7 +57,7 @@ test.describe('Document Generation in Encounter', () => {
       .locator('button')
       .filter({ hasText: /New Visit|Ny konsultasjon/i })
       .first();
-    if (!(await newVisitButton.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(newVisitButton).toBeVisible({ timeout: 5000 });
 
     await newVisitButton.click();
     await authenticatedPage.waitForTimeout(3000);
@@ -66,9 +66,7 @@ test.describe('Document Generation in Encounter', () => {
     const noteGenerator = authenticatedPage
       .locator('text=/Generer Notat|Clinical Note|Klinisk notat/i')
       .first();
-    if (await noteGenerator.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(noteGenerator).toBeVisible();
-    }
+    await expect(noteGenerator).toBeVisible({ timeout: 5000 });
   });
 });
 
@@ -85,35 +83,36 @@ test.describe('SendDocumentModal', () => {
       .filter({ hasText: /Send til pasient|Send to patient/i })
       .first();
 
-    if (await sendButton.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await sendButton.click();
-      await authenticatedPage.waitForTimeout(500);
+    const hasSendButton = await sendButton.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasSendButton, 'No exercise prescription send button available');
 
-      // Verify modal appears with delivery method options
-      const modal = authenticatedPage.locator('[role="dialog"]');
-      await expect(modal).toBeVisible({ timeout: 5000 });
+    await sendButton.click();
+    await authenticatedPage.waitForTimeout(500);
 
-      // Verify delivery method radio buttons exist (E-post, SMS, Begge)
-      await expect(
-        modal.locator('text=/E-post|Email/i')
-      ).toBeVisible({ timeout: 5000 });
-      await expect(
-        modal.locator('text=/SMS/i')
-      ).toBeVisible({ timeout: 5000 });
-      await expect(
-        modal.locator('text=/Begge|Both/i')
-      ).toBeVisible({ timeout: 5000 });
+    // Verify modal appears with delivery method options
+    const modal = authenticatedPage.locator('[role="dialog"]');
+    await expect(modal).toBeVisible({ timeout: 5000 });
 
-      // Verify send and cancel buttons exist
-      const sendAction = modal.locator('button').filter({ hasText: /^Send$/i });
-      await expect(sendAction).toBeVisible();
+    // Verify delivery method radio buttons exist (E-post, SMS, Begge)
+    await expect(
+      modal.locator('text=/E-post|Email/i')
+    ).toBeVisible({ timeout: 5000 });
+    await expect(
+      modal.locator('text=/SMS/i')
+    ).toBeVisible({ timeout: 5000 });
+    await expect(
+      modal.locator('text=/Begge|Both/i')
+    ).toBeVisible({ timeout: 5000 });
 
-      const cancelAction = modal.locator('button').filter({ hasText: /Avbryt|Cancel/i });
-      await expect(cancelAction).toBeVisible();
+    // Verify send and cancel buttons exist
+    const sendAction = modal.locator('button').filter({ hasText: /^Send$/i });
+    await expect(sendAction).toBeVisible();
 
-      // Close modal
-      await cancelAction.click();
-    }
+    const cancelAction = modal.locator('button').filter({ hasText: /Avbryt|Cancel/i });
+    await expect(cancelAction).toBeVisible();
+
+    // Close modal
+    await cancelAction.click();
   });
 });
 
@@ -131,10 +130,7 @@ test.describe('Portal Documents Page', () => {
       .locator('text=/Ingen dokumenter|No documents/i')
       .first();
 
-    const titleVisible = await pageTitle.isVisible({ timeout: 10000 }).catch(() => false);
-    const emptyVisible = await emptyState.isVisible({ timeout: 5000 }).catch(() => false);
-
     // At least the page header or empty state should render
-    expect(titleVisible || emptyVisible).toBe(true);
+    await expect(pageTitle.or(emptyState)).toBeVisible({ timeout: 10000 });
   });
 });

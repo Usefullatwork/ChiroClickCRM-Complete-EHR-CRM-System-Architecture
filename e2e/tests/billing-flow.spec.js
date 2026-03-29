@@ -15,17 +15,15 @@ test.describe('Billing via Encounter Takster', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
-    if (!(await patientRow.isVisible({ timeout: 5000 }).catch(() => false))) {
-      // No patients in seed data - skip gracefully
-      return;
-    }
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
     await patientRow.click();
     await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
     // Click "New Visit" button on patient detail page
     const newVisitButton = authenticatedPage.locator('button').filter({ hasText: /New Visit|Ny konsultasjon/i }).first();
-    if (!(await newVisitButton.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(newVisitButton).toBeVisible({ timeout: 5000 });
 
     await newVisitButton.click();
 
@@ -34,9 +32,7 @@ test.describe('Billing via Encounter Takster', () => {
 
     // Plan section should be visible
     const planSection = authenticatedPage.locator('[data-testid="encounter-plan"]');
-    if (await planSection.isVisible({ timeout: 10000 }).catch(() => false)) {
-      await expect(planSection).toBeVisible();
-    }
+    await expect(planSection).toBeVisible({ timeout: 10000 });
   });
 
   test('should show encounter save and sign buttons', async ({ authenticatedPage }) => {
@@ -46,13 +42,14 @@ test.describe('Billing via Encounter Takster', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
-    if (!(await patientRow.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
     await patientRow.click();
     await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
     const newVisitButton = authenticatedPage.locator('button').filter({ hasText: /New Visit|Ny konsultasjon/i }).first();
-    if (!(await newVisitButton.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(newVisitButton).toBeVisible({ timeout: 5000 });
 
     await newVisitButton.click();
 
@@ -61,9 +58,8 @@ test.describe('Billing via Encounter Takster', () => {
 
     // Save button
     const saveButton = authenticatedPage.locator('[data-testid="encounter-save-button"]');
-    if (await saveButton.isVisible({ timeout: 10000 }).catch(() => false)) {
-      await expect(saveButton).toBeEnabled();
-    }
+    await expect(saveButton).toBeVisible({ timeout: 10000 });
+    await expect(saveButton).toBeEnabled();
   });
 });
 
@@ -75,14 +71,15 @@ test.describe('Appointment Financial Context', () => {
     // Wait for data to load
     await authenticatedPage.waitForTimeout(1000);
 
-    // Appointment list or empty state
+    // Appointment list or empty state — verify the page loaded
     const list = authenticatedPage.locator('[data-testid="appointments-list"]');
-    const listVisible = await list.isVisible().catch(() => false);
+    const emptyState = authenticatedPage.locator('text=/No appointments|Ingen avtaler/i');
+    await expect(list.or(emptyState)).toBeVisible({ timeout: 10000 });
 
+    const listVisible = await list.isVisible();
     if (listVisible) {
       const rows = authenticatedPage.locator('[data-testid="appointment-row"]');
       const count = await rows.count();
-
       if (count > 0) {
         // Each appointment row should have status and patient info
         const firstRow = rows.first();
@@ -99,16 +96,13 @@ test.describe('Appointment Financial Context', () => {
 
     const rows = authenticatedPage.locator('[data-testid="appointment-row"]');
     const count = await rows.count();
+    test.skip(count === 0, 'No appointment rows in seed data');
 
-    if (count > 0) {
-      // Click "View Patient" button on first appointment (may be i18n'd)
-      const viewPatientButton = rows.first().locator('button').filter({ hasText: /View|Se pasient/i }).first();
-
-      if (await viewPatientButton.isVisible()) {
-        await viewPatientButton.click();
-        await expect(authenticatedPage).toHaveURL(/.*patients\/.*/);
-      }
-    }
+    // Click "View Patient" button on first appointment (may be i18n'd)
+    const viewPatientButton = rows.first().locator('button').filter({ hasText: /View|Se pasient/i }).first();
+    await expect(viewPatientButton).toBeVisible();
+    await viewPatientButton.click();
+    await expect(authenticatedPage).toHaveURL(/.*patients\/.*/);
   });
 });
 
@@ -147,8 +141,7 @@ test.describe('Patient Export', () => {
 
     // Export button exists on patients page (labeled "Export")
     const exportButton = authenticatedPage.locator('button').filter({ hasText: 'Export' }).first();
-    if (await exportButton.isVisible()) {
-      await expect(exportButton).toBeEnabled();
-    }
+    await expect(exportButton).toBeVisible();
+    await expect(exportButton).toBeEnabled();
   });
 });

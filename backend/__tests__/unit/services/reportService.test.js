@@ -30,7 +30,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 // ── Mock email service ────────────────────────────────────────────────────────
 let sendEmailImpl = () => Promise.resolve({ success: true, messageId: 'digest-msg-1' });
 
-jest.unstable_mockModule('../../../src/services/emailService.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/emailService.js', () => ({
   sendEmail: (...args) => sendEmailImpl(...args),
 }));
 
@@ -59,10 +59,10 @@ jest.unstable_mockModule('@anthropic-ai/sdk', () => {
 });
 
 // ── Import modules after all mocks ────────────────────────────────────────────
-const { generateWeeklyAIDigest } = await import('../../../src/services/reportService.js');
+const { generateWeeklyAIDigest } = await import('../../../src/services/clinical/reportService.js');
 
 // batchProcessor requires CLAUDE_API_KEY at getClient() time, not import time
-const batchProcessorModule = await import('../../../src/services/batchProcessor.js');
+const batchProcessorModule = await import('../../../src/services/practice/batchProcessor.js');
 const {
   createBatch,
   getBatchStatus,

@@ -5,8 +5,8 @@
 import express from 'express';
 import * as encounterController from '../controllers/encounters.js';
 import * as amendmentController from '../controllers/amendments.js';
-import * as clinicalWorkflow from '../services/clinicalWorkflow.js';
-import * as encounterService from '../services/encounters.js';
+import * as clinicalWorkflow from '../services/clinical/clinicalWorkflow.js';
+import * as encounterService from '../services/clinical/encounters.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
 import { readLimiter } from '../middleware/rateLimiting.js';
@@ -18,8 +18,8 @@ import {
   signEncounterSchema,
   generateNoteSchema,
 } from '../validators/encounter.validators.js';
-import { validate as validateNote } from '../services/noteValidator.js';
-import { logAction } from '../services/auditLog.js';
+import { validate as validateNote } from '../services/clinical/noteValidator.js';
+import { logAction } from '../services/practice/auditLog.js';
 import logger from '../utils/logger.js';
 
 const router = express.Router();

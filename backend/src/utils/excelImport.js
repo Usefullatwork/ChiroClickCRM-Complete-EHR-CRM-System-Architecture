@@ -5,7 +5,7 @@
 
 import { readFile } from 'fs/promises';
 import ExcelJS from 'exceljs';
-import { createPatient } from '../services/patients.js';
+import { createPatient } from '../services/practice/patients.js';
 // encryption available via ./encryption.js
 import logger from './logger.js';
 

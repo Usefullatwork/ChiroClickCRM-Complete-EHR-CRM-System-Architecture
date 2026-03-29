@@ -102,9 +102,9 @@ jest.unstable_mockModule('exceljs', () => {
 // ---------------------------------------------------------------------------
 
 const { parseExcelFile, importPatientsFromExcel, generatePatientTemplate } =
-  await import('../../../src/services/excelImport.js');
+  await import('../../../src/services/practice/excelImport.js');
 
-const textParserModule = await import('../../../src/services/textParser.js');
+const textParserModule = await import('../../../src/services/training/textParser.js');
 const { extractPatientFromText, parsePatientTable, parsePatientData } = textParserModule;
 
 const { parseNorwegianPhone, parseNationalId, parseNorwegianDate } = textParserModule.default;

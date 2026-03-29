@@ -2,10 +2,9 @@
  * FHIR Adapter Service Tests
  */
 
-import fhirAdapter from '../../src/services/fhirAdapter.js';
+import fhirAdapter from '../../../packages/fhir-adapter/fhirAdapter.js';
 
 describe('FHIR Adapter Service', () => {
-
   describe('patientToFHIR', () => {
     const mockPatient = {
       id: '123e4567-e89b-12d3-a456-426614174000',
@@ -19,12 +18,12 @@ describe('FHIR Adapter Service', () => {
         street: 'Storgata 1',
         city: 'Oslo',
         postal_code: '0123',
-        country: 'NO'
+        country: 'NO',
       },
       status: 'ACTIVE',
       solvit_id: 'SOL-12345',
       created_at: '2024-01-01T10:00:00Z',
-      updated_at: '2024-06-01T12:00:00Z'
+      updated_at: '2024-06-01T12:00:00Z',
     };
 
     test('should convert patient to FHIR R4 Patient resource', () => {
@@ -62,8 +61,8 @@ describe('FHIR Adapter Service', () => {
       const fhirPatient = fhirAdapter.patientToFHIR(mockPatient);
 
       expect(fhirPatient.telecom).toHaveLength(2);
-      expect(fhirPatient.telecom.some(t => t.system === 'phone')).toBe(true);
-      expect(fhirPatient.telecom.some(t => t.system === 'email')).toBe(true);
+      expect(fhirPatient.telecom.some((t) => t.system === 'phone')).toBe(true);
+      expect(fhirPatient.telecom.some((t) => t.system === 'email')).toBe(true);
     });
 
     test('should include address', () => {
@@ -78,13 +77,15 @@ describe('FHIR Adapter Service', () => {
     test('should include Norwegian profile', () => {
       const fhirPatient = fhirAdapter.patientToFHIR(mockPatient);
 
-      expect(fhirPatient.meta.profile).toContain('http://hl7.no/fhir/StructureDefinition/no-basis-Patient');
+      expect(fhirPatient.meta.profile).toContain(
+        'http://hl7.no/fhir/StructureDefinition/no-basis-Patient'
+      );
     });
 
     test('should include SolvIt identifier', () => {
       const fhirPatient = fhirAdapter.patientToFHIR(mockPatient);
 
-      expect(fhirPatient.identifier.some(i => i.value === 'SOL-12345')).toBe(true);
+      expect(fhirPatient.identifier.some((i) => i.value === 'SOL-12345')).toBe(true);
     });
 
     test('should include Norwegian as communication language', () => {
@@ -93,7 +94,6 @@ describe('FHIR Adapter Service', () => {
       expect(fhirPatient.communication).toHaveLength(1);
       expect(fhirPatient.communication[0].language.coding[0].code).toBe('no');
     });
-
   });
 
   describe('encounterToFHIR', () => {
@@ -106,29 +106,29 @@ describe('FHIR Adapter Service', () => {
       duration_minutes: 30,
       subjective: {
         chief_complaint: 'Neck pain',
-        history: 'Gradual onset over 2 weeks'
+        history: 'Gradual onset over 2 weeks',
       },
       objective: {
         observation: 'Forward head posture',
         palpation: 'Tenderness C5-C7',
-        rom: 'Cervical rotation reduced 20%'
+        rom: 'Cervical rotation reduced 20%',
       },
       assessment: {
-        clinical_reasoning: 'Mechanical neck pain without radiculopathy'
+        clinical_reasoning: 'Mechanical neck pain without radiculopathy',
       },
       plan: {
         treatment: 'SMT C5-C7, soft tissue therapy',
-        follow_up: '1 week'
+        follow_up: '1 week',
       },
       icpc_codes: ['L01', 'L83'],
       signed_at: '2024-06-15T09:30:00Z',
       version: 1,
-      created_at: '2024-06-15T09:00:00Z'
+      created_at: '2024-06-15T09:00:00Z',
     };
 
     const mockPatient = {
       first_name: 'Ola',
-      last_name: 'Nordmann'
+      last_name: 'Nordmann',
     };
 
     test('should convert encounter to FHIR R4 Encounter resource', () => {
@@ -195,13 +195,13 @@ describe('FHIR Adapter Service', () => {
       const fhirEncounter = fhirAdapter.encounterToFHIR(mockEncounter, mockPatient);
 
       expect(fhirEncounter.participant).toHaveLength(1);
-      expect(fhirEncounter.participant[0].individual.reference).toBe(`Practitioner/${mockEncounter.practitioner_id}`);
+      expect(fhirEncounter.participant[0].individual.reference).toBe(
+        `Practitioner/${mockEncounter.practitioner_id}`
+      );
     });
-
   });
 
   describe('diagnosisToFHIR', () => {
-
     test('should convert ICPC-2 diagnosis to Condition', () => {
       const diagnosis = { code: 'L01', system: 'ICPC2', description_no: 'Nakke symptom' };
       const condition = fhirAdapter.diagnosisToFHIR(diagnosis, 'patient-123', 'encounter-456');
@@ -233,20 +233,22 @@ describe('FHIR Adapter Service', () => {
 
       expect(condition.verificationStatus.coding[0].code).toBe('confirmed');
     });
-
   });
 
   describe('measurementToFHIR', () => {
-
     test('should convert VAS pain score to Observation', () => {
       const measurement = {
         pain_intensity: 7,
-        created_at: '2024-06-15T10:00:00Z'
+        created_at: '2024-06-15T10:00:00Z',
       };
-      const observations = fhirAdapter.measurementToFHIR(measurement, 'patient-123', 'encounter-456');
+      const observations = fhirAdapter.measurementToFHIR(
+        measurement,
+        'patient-123',
+        'encounter-456'
+      );
 
       expect(observations.length).toBeGreaterThan(0);
-      const vasObs = observations.find(o => o.code.text === 'VAS Pain Score');
+      const vasObs = observations.find((o) => o.code.text === 'VAS Pain Score');
       expect(vasObs).toBeDefined();
       expect(vasObs.valueInteger).toBe(7);
       expect(vasObs.interpretation[0].coding[0].code).toBe('H'); // High
@@ -255,9 +257,9 @@ describe('FHIR Adapter Service', () => {
     test('should convert ROM measurements to Observations', () => {
       const measurement = {
         rom_measurements: {
-          cervical: { flexion: 45, extension: 40 }
+          cervical: { flexion: 45, extension: 40 },
         },
-        created_at: '2024-06-15T10:00:00Z'
+        created_at: '2024-06-15T10:00:00Z',
       };
       const observations = fhirAdapter.measurementToFHIR(measurement, 'patient-123');
 
@@ -269,7 +271,7 @@ describe('FHIR Adapter Service', () => {
       const measurement = {
         outcome_measure_type: 'NDI',
         outcome_score: 34.5,
-        created_at: '2024-06-15T10:00:00Z'
+        created_at: '2024-06-15T10:00:00Z',
       };
       const observations = fhirAdapter.measurementToFHIR(measurement, 'patient-123');
 
@@ -284,11 +286,9 @@ describe('FHIR Adapter Service', () => {
 
       expect(observations).toEqual([]);
     });
-
   });
 
   describe('FHIR constants', () => {
-
     test('should export FHIR version', () => {
       expect(fhirAdapter.FHIR_VERSION).toBe('4.0.1');
     });
@@ -296,7 +296,5 @@ describe('FHIR Adapter Service', () => {
     test('should export FHIR base URL', () => {
       expect(fhirAdapter.FHIR_BASE_URL).toBeDefined();
     });
-
   });
-
 });

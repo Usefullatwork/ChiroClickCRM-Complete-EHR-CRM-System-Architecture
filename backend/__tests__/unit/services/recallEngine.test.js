@@ -39,7 +39,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 }));
 
 const mockCreateNotification = jest.fn();
-jest.unstable_mockModule('../../../src/services/notifications.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/notifications.js', () => ({
   createNotification: mockCreateNotification,
   default: { createNotification: mockCreateNotification },
 }));
@@ -56,7 +56,7 @@ jest.unstable_mockModule('../../../src/services/automations/actions.js', () => (
 }));
 
 // Import after mocking
-const recallEngine = await import('../../../src/services/recallEngine.js');
+const recallEngine = await import('../../../src/services/practice/recallEngine.js');
 
 describe('Recall Engine Service', () => {
   const testOrgId = 'org-test-001';

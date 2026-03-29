@@ -28,7 +28,7 @@ const mockGenerateReferralLetter = jest.fn();
 const mockGenerateSickNote = jest.fn();
 const mockGenerateInvoice = jest.fn();
 
-jest.unstable_mockModule('../../src/services/pdfGenerator.js', () => ({
+jest.unstable_mockModule('../../src/services/clinical/pdfGenerator.js', () => ({
   generateTreatmentSummary: mockGenerateTreatmentSummary,
   generateReferralLetter: mockGenerateReferralLetter,
   generateSickNote: mockGenerateSickNote,
@@ -36,12 +36,12 @@ jest.unstable_mockModule('../../src/services/pdfGenerator.js', () => ({
 }));
 
 const mockSendEmail = jest.fn();
-jest.unstable_mockModule('../../src/services/emailService.js', () => ({
+jest.unstable_mockModule('../../src/services/communication/emailService.js', () => ({
   sendEmail: mockSendEmail,
 }));
 
 const mockSendSMS = jest.fn();
-jest.unstable_mockModule('../../src/services/smsService.js', () => ({
+jest.unstable_mockModule('../../src/services/communication/smsService.js', () => ({
   sendSMS: mockSendSMS,
 }));
 
@@ -51,7 +51,7 @@ let deliverDocument;
 
 beforeEach(async () => {
   jest.clearAllMocks();
-  const mod = await import('../../src/services/documentDelivery.js');
+  const mod = await import('../../src/services/communication/documentDelivery.js');
   deliverDocument = mod.deliverDocument;
 });
 

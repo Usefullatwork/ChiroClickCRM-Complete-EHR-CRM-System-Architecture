@@ -62,7 +62,7 @@ jest.unstable_mockModule('../../../src/config/constants.js', () => ({
 const mockCreateNotification = jest.fn().mockResolvedValue({ id: 'notif-1' });
 const mockNotifyByRole = jest.fn().mockResolvedValue([]);
 
-jest.unstable_mockModule('../../../src/services/notifications.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/notifications.js', () => ({
   createNotification: mockCreateNotification,
   notifyByRole: mockNotifyByRole,
   NOTIFICATION_TYPES: {
@@ -86,10 +86,10 @@ beforeAll(async () => {
   executeAction = actions.executeAction;
   ACTION_TYPES = actions.ACTION_TYPES;
 
-  const recall = await import('../../../src/services/recallEngine.js');
+  const recall = await import('../../../src/services/practice/recallEngine.js');
   processRecalls = recall.processRecalls;
 
-  const comms = await import('../../../src/services/automatedComms.js');
+  const comms = await import('../../../src/services/communication/automatedComms.js');
   checkExerciseInactivity = comms.checkExerciseInactivity;
 });
 

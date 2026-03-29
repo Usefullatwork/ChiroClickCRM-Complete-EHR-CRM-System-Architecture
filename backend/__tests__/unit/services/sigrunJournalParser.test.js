@@ -27,7 +27,7 @@ const {
   detectPractitionerStyle,
   SIGRUN_TREATMENT_PATTERNS,
   SIGRUN_ASSESSMENT_PATTERNS,
-} = await import('../../../src/services/sigrunJournalParser.js');
+} = await import('../../../src/services/training/sigrunJournalParser.js');
 
 describe('Sigrun Journal Parser', () => {
   beforeEach(() => {

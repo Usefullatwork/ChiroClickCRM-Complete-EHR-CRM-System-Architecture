@@ -30,7 +30,7 @@ jest.unstable_mockModule('../../../src/services/providers/aiProviderFactory.js',
 
 // Import after mocking
 const { orchestrate, parseSafetyResult } =
-  await import('../../../src/services/clinicalOrchestrator.js');
+  await import('../../../src/services/clinical/clinicalOrchestrator.js');
 const logger = (await import('../../../src/utils/logger.js')).default;
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

@@ -38,12 +38,12 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
   },
 }));
 
-jest.unstable_mockModule('../../../src/services/documentDelivery.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/documentDelivery.js', () => ({
   generatePdf: jest.fn(),
   deliverDocument: jest.fn(),
 }));
 
-jest.unstable_mockModule('../../../src/services/websocket.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/websocket.js', () => ({
   broadcastToOrg: jest.fn(),
   sendToUser: jest.fn(),
   getOnlineCount: jest.fn(),
@@ -51,7 +51,7 @@ jest.unstable_mockModule('../../../src/services/websocket.js', () => ({
   initializeWebSocket: jest.fn(),
 }));
 
-jest.unstable_mockModule('../../../src/services/notifications.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/notifications.js', () => ({
   notifyByRole: jest.fn().mockResolvedValue(undefined),
   createNotification: jest.fn(),
   getNotifications: jest.fn(),
@@ -74,10 +74,10 @@ jest.unstable_mockModule('../../../src/services/notifications.js', () => ({
 }));
 
 // Import after mocking
-const portalService = await import('../../../src/services/patientPortal.js');
-const { generatePdf } = await import('../../../src/services/documentDelivery.js');
-const { broadcastToOrg } = await import('../../../src/services/websocket.js');
-const { notifyByRole } = await import('../../../src/services/notifications.js');
+const portalService = await import('../../../src/services/practice/patientPortal.js');
+const { generatePdf } = await import('../../../src/services/communication/documentDelivery.js');
+const { broadcastToOrg } = await import('../../../src/services/communication/websocket.js');
+const { notifyByRole } = await import('../../../src/services/communication/notifications.js');
 
 const PATIENT_ID = 'pat-001';
 const ORG_ID = 'org-001';

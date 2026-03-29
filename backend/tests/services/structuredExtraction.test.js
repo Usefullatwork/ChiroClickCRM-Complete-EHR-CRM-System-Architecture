@@ -34,7 +34,7 @@ describe('Structured Extraction Service', () => {
     process.env.CLAUDE_API_KEY = 'test-api-key';
     mockCreate.mockReset();
 
-    const mod = await import('../../src/services/structuredExtraction.js');
+    const mod = await import('../../src/services/clinical/structuredExtraction.js');
     extractSOAP = mod.extractSOAP;
     extractDiagnoses = mod.extractDiagnoses;
     SOAP_EXTRACTION_TOOL = mod.SOAP_EXTRACTION_TOOL;

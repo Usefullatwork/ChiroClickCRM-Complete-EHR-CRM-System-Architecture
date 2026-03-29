@@ -39,9 +39,9 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 }));
 
 // Import after mocking
-const progressService = await import('../../../src/services/progressTracking.js');
+const progressService = await import('../../../src/services/clinical/progressTracking.js');
 const { scoreODI, scoreNDI, scoreVAS, scoreDASH, scoreNPRS, getScorer, scoreQuestionnaire } =
-  await import('../../../src/services/outcomeScoring.js');
+  await import('../../../src/services/clinical/outcomeScoring.js');
 
 // =============================================================================
 // PROGRESS TRACKING SERVICE

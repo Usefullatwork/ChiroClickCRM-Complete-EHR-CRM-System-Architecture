@@ -35,7 +35,7 @@ const mockGenerateReferralLetter = jest.fn();
 const mockGenerateSickNote = jest.fn();
 const mockGenerateInvoice = jest.fn();
 
-jest.unstable_mockModule('../../../src/services/pdfGenerator.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/pdfGenerator.js', () => ({
   generateTreatmentSummary: mockGenerateTreatmentSummary,
   generateReferralLetter: mockGenerateReferralLetter,
   generateSickNote: mockGenerateSickNote,
@@ -45,7 +45,7 @@ jest.unstable_mockModule('../../../src/services/pdfGenerator.js', () => ({
 // ── Mock email service ────────────────────────────────────────────────────────
 const mockSendEmail = jest.fn();
 
-jest.unstable_mockModule('../../../src/services/emailService.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/emailService.js', () => ({
   sendEmail: mockSendEmail,
   default: { sendEmail: mockSendEmail },
 }));
@@ -53,7 +53,7 @@ jest.unstable_mockModule('../../../src/services/emailService.js', () => ({
 // ── Mock SMS service ──────────────────────────────────────────────────────────
 const mockSendSMS = jest.fn();
 
-jest.unstable_mockModule('../../../src/services/smsService.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/smsService.js', () => ({
   sendSMS: mockSendSMS,
   default: { sendSMS: mockSendSMS },
 }));
@@ -61,7 +61,7 @@ jest.unstable_mockModule('../../../src/services/smsService.js', () => ({
 // ── Mock push notification (dynamic import — best-effort) ─────────────────────
 const mockSendPushToPatient = jest.fn();
 
-jest.unstable_mockModule('../../../src/services/pushNotification.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/pushNotification.js', () => ({
   sendPushToPatient: mockSendPushToPatient,
   default: { sendPushToPatient: mockSendPushToPatient },
 }));
@@ -69,13 +69,14 @@ jest.unstable_mockModule('../../../src/services/pushNotification.js', () => ({
 // ── Mock exercise delivery (dynamic import for exercise_prescription) ─────────
 const mockGeneratePrescriptionPDF = jest.fn();
 
-jest.unstable_mockModule('../../../src/services/exerciseDelivery.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/exerciseDelivery.js', () => ({
   generatePrescriptionPDF: mockGeneratePrescriptionPDF,
   default: { generatePrescriptionPDF: mockGeneratePrescriptionPDF },
 }));
 
 // ── Import after all mocks are set up ─────────────────────────────────────────
-const { generatePdf, deliverDocument } = await import('../../../src/services/documentDelivery.js');
+const { generatePdf, deliverDocument } =
+  await import('../../../src/services/communication/documentDelivery.js');
 
 // ── Test constants ─────────────────────────────────────────────────────────────
 const ORG_ID = 'org-aaa-111';

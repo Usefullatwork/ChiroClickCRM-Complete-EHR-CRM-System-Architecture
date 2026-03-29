@@ -38,7 +38,7 @@ let treatmentPlans;
 
 beforeEach(async () => {
   jest.clearAllMocks();
-  treatmentPlans = await import('../../src/services/treatmentPlans.js');
+  treatmentPlans = await import('../../src/services/clinical/treatmentPlans.js');
 });
 
 describe('Treatment Plans Service', () => {

@@ -3,7 +3,7 @@
  * JWT verification and patient context resolution for mobile app routes
  */
 
-import * as mobileAuth from '../services/mobileAuth.js';
+import * as mobileAuth from '../services/practice/mobileAuth.js';
 import { query } from '../config/database.js';
 
 // Logger - noop fallback avoids raw console usage

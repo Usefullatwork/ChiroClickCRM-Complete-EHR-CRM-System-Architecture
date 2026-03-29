@@ -61,12 +61,12 @@ jest.unstable_mockModule('../../../src/utils/hybridCache.js', () => ({
 
 // Import after mocking
 const { checkIn, getIntakeForm, submitIntakeForm, submitConsent, getQueue } =
-  await import('../../../src/services/kiosk.js');
+  await import('../../../src/services/practice/kiosk.js');
 
-const { macroService } = await import('../../../src/services/macros.js');
+const { macroService } = await import('../../../src/services/clinical/macros.js');
 
 const { searchPatients, searchDiagnosis, searchEncounters, globalSearch, suggestCompletions } =
-  await import('../../../src/services/search.js');
+  await import('../../../src/services/practice/search.js');
 
 const { NotFoundError, BusinessLogicError } = await import('../../../src/utils/errors.js');
 

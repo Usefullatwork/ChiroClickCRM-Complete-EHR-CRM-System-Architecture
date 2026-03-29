@@ -4,7 +4,7 @@
  */
 
 import express from 'express';
-import * as mobileAuth from '../../services/mobileAuth.js';
+import * as mobileAuth from '../../services/practice/mobileAuth.js';
 import { query } from '../../config/database.js';
 import { authenticateMobile } from '../../middleware/mobileAuth.js';
 

@@ -18,20 +18,20 @@ jest.unstable_mockModule('../../src/utils/logger.js', () => ({
 
 // Mock orchestrator — factory pattern for beforeEach reassignment
 let mockOrchestrate;
-jest.unstable_mockModule('../../src/services/clinicalOrchestrator.js', () => ({
+jest.unstable_mockModule('../../src/services/clinical/clinicalOrchestrator.js', () => ({
   orchestrate: (...args) => mockOrchestrate(...args),
 }));
 
 // Mock ai.js — needed by quickSuggestion
 let mockGenerateCompletion;
 let mockExtractCompletionText;
-jest.unstable_mockModule('../../src/services/ai.js', () => ({
+jest.unstable_mockModule('../../src/services/ai/index.js', () => ({
   generateCompletion: (...args) => mockGenerateCompletion(...args),
   extractCompletionText: (...args) => mockExtractCompletionText(...args),
 }));
 
 const { runClinicalPipeline, quickSuggestion } =
-  await import('../../src/services/clinicalAgent.js');
+  await import('../../src/services/clinical/clinicalAgent.js');
 
 describe('ClinicalAgent', () => {
   const patientData = { age: 45, name: 'Test Pasient' };

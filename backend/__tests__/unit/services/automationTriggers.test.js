@@ -77,7 +77,7 @@ jest.unstable_mockModule('../../../src/services/automations/index.js', () => ({
 }));
 
 const mockSendEmail = jest.fn();
-jest.unstable_mockModule('../../../src/services/email.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/email.js', () => ({
   sendEmail: mockSendEmail,
 }));
 
@@ -97,7 +97,7 @@ const {
   checkLifecycleChangeTrigger,
   getTriggerStats,
   getUpcomingTriggers,
-} = await import('../../../src/services/automationTriggers.js');
+} = await import('../../../src/services/practice/automationTriggers.js');
 
 const {
   getSettings,
@@ -109,7 +109,7 @@ const {
   autoAcceptReferral,
   processPendingReferrals,
   getAutoAcceptLog,
-} = await import('../../../src/services/autoAccept.js');
+} = await import('../../../src/services/practice/autoAccept.js');
 
 // ============================================================================
 // AUTOMATION TRIGGERS

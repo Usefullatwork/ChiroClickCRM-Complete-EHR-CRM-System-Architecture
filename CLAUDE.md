@@ -12,13 +12,14 @@ Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electro
 
 ## Current State
 
-- **Backend**: 2,657 tests (130 suites), 0 lint errors
-- **Frontend**: ~1,050 tests (55 suites), 0 lint errors
-- **E2E**: 88 tests (11 Playwright specs)
+- **Backend**: 3,686 tests pass (136 suites). 77 integration suites fail pre-existing (PGlite top-level await + Jest ESM circular init — NOT from our work).
+- **Frontend**: 158/158 tests pass, 0 lint errors, build OK
+- **E2E**: 18 Playwright spec files (99 bailout patterns fixed in Session 4)
 - **CI**: 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
 - **Electron**: Portable exe verified (96MB), PGlite WASM loads correctly
-- **Latest migration**: 078 (`mobile_push_connectivity`)
-- **Branch**: main (v2.1 merged)
+- **Latest migration**: 079 (`v7 training data`)
+- **Branch**: `review/deep-review-sprint-v2` (10 commits ahead of main: Sessions 2-4 + Sprint 5)
+- **Services**: 8 domain dirs + 27 extracted modules. All files <500 lines. Zero SELECT \*.
 
 ## Commands
 
@@ -43,8 +44,12 @@ cd frontend && npx playwright test              # E2E tests
 
 **Key directories:**
 
-- `frontend/src/components/` — 39 subdirs, ~300 components
-- `backend/src/services/` — 97 service files (ai/, providers/, crm, exercises, pdf, etc.)
+- `frontend/src/components/` — 40 subdirs (incl. crm-settings/), ~300 components
+- `frontend/src/services/api/` — 7 domain modules (patients, clinical, billing, communications, ai, admin, client)
+- `frontend/src/config/api.js` — API_BASE_URL + API_TIMEOUT constants
+- `backend/src/services/` — 8 domain dirs + extracted modules per domain
+- `backend/src/jobs/` — 4 scheduler modules (jobRunner, communicationJobs, aiJobs, maintenanceJobs)
+- `backend/src/application/services/` — 4 AI training modules (trainingPipeline, modelValidation, dataCuration, retrainingMetrics)
 - `backend/src/routes/` — 49 route files (47 registered + 2 regulatory stubs). Swagger at `/api-docs` (109 endpoints)
 - `database/migrations/` — 078 migrations (PGlite auto-applies on startup via `db-init.js`). Gap at 025 is intentional (removed in commit 201f79b)
 
@@ -89,10 +94,9 @@ Budget enforcement: `canSpend()` pre-flight. Auto-resets daily/monthly.
 
 ## Tech Debt
 
-- `pdf.js` + `pdfGenerator.js` split by domain — both via `controllers/pdf.js`
-- `assessment/` BodyChart + SpineDiagram not consolidated with `anatomy/`
+- `pdf.js` + `pdfGenerator.js` split by domain — both in `services/clinical/`, accessed via `controllers/pdf.js`
 - `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (future)
-- `services/ai.js` is a shim re-exporting from `services/ai/` (5 modules)
+- `services/ai/` — runtime inference (9 modules). `services/training/` — model training pipeline (13 modules)
 - i18n: ~50 bilingual `{en,no}` strings remain by design
 
 ## System Basics V2 (v1.3.0, medical preset)

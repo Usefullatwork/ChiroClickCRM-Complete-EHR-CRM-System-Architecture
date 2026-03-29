@@ -30,7 +30,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 
 // Import after mocking
 const { getTodayWorkout, logWorkout, getProgress, getAchievements } =
-  await import('../../../src/services/mobileWorkouts.js');
+  await import('../../../src/services/practice/mobileWorkouts.js');
 
 const MOBILE_USER_ID = 'mobile-user-001';
 const ENROLLMENT_ID = 'enrollment-001';

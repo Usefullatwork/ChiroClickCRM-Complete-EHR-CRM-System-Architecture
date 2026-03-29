@@ -13,10 +13,76 @@ dotenv.config();
 const ALGORITHM = process.env.ENCRYPTION_ALGORITHM || 'aes-256-cbc';
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
-// Validate encryption key
-if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length !== 32) {
-  logger.error('⚠️  WARNING: ENCRYPTION_KEY must be exactly 32 characters long');
-  logger.error('⚠️  Please set a proper ENCRYPTION_KEY in your .env file');
+/**
+ * Known weak keys that must be rejected in production.
+ * These are common defaults/test values that provide no real security.
+ */
+const WEAK_KEYS = [
+  '00000000000000000000000000000000',
+  '11111111111111111111111111111111',
+  'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',
+  'test1234test1234test1234test1234',
+  '12345678901234567890123456789012',
+];
+
+/**
+ * Validate the ENCRYPTION_KEY for PHI safety.
+ *
+ * Behavior by environment:
+ *  - production: throws if key is missing, wrong length, or weak (stops server)
+ *  - desktop (DESKTOP_MODE=true): warns but continues (key auto-generated from machine ID)
+ *  - development/test: warns but continues (current behavior preserved)
+ *
+ * @returns {{ valid: boolean, reason?: string }} Validation result
+ */
+export const validateEncryptionKey = () => {
+  const key = process.env.ENCRYPTION_KEY;
+  const nodeEnv = process.env.NODE_ENV;
+  const isProduction = nodeEnv === 'production';
+  const isDesktop = process.env.DESKTOP_MODE === 'true';
+
+  // --- Check 1: Key exists ---
+  if (!key) {
+    const msg = 'ENCRYPTION_KEY is not set — PHI cannot be encrypted';
+    if (isProduction && !isDesktop) {
+      throw new Error(`FATAL: ${msg}. Refusing to start in production without encryption.`);
+    }
+    logger.warn(msg);
+    return { valid: false, reason: 'missing' };
+  }
+
+  // --- Check 2: Key length ---
+  if (key.length !== 32) {
+    const msg = `ENCRYPTION_KEY must be exactly 32 characters (got ${key.length})`;
+    if (isProduction && !isDesktop) {
+      throw new Error(`FATAL: ${msg}. Refusing to start in production with invalid key length.`);
+    }
+    logger.warn(msg);
+    return { valid: false, reason: 'invalid_length' };
+  }
+
+  // --- Check 3: Weak key detection ---
+  if (WEAK_KEYS.includes(key)) {
+    const msg = 'ENCRYPTION_KEY is a known weak/test value — not safe for PHI';
+    if (isProduction && !isDesktop) {
+      throw new Error(`FATAL: ${msg}. Refusing to start in production with a weak key.`);
+    }
+    logger.warn(msg);
+    return { valid: false, reason: 'weak_key' };
+  }
+
+  // All checks passed
+  logger.info('ENCRYPTION_KEY validation passed');
+  return { valid: true };
+};
+
+// Run validation at module load (preserves current fail-fast behavior)
+try {
+  validateEncryptionKey();
+} catch (err) {
+  // In production, re-throw to crash the process
+  logger.error(err.message);
+  throw err;
 }
 
 /**
@@ -325,4 +391,5 @@ export default {
   validateFodselsnummer,
   getBirthYearFromFodselsnummer,
   maskSensitive,
+  validateEncryptionKey,
 };

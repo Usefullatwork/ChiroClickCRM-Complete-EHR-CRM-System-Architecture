@@ -52,7 +52,7 @@ const {
   extractHprNumber,
   extractPersonalNumber,
   getHelseIdStatus,
-} = await import('../../../src/services/helseId.js');
+} = await import('../../../../packages/fhir-adapter/helseId.js');
 
 // ---------------------------------------------------------------------------
 // Helpers

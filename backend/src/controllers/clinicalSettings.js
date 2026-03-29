@@ -3,7 +3,7 @@
  * Handles API requests for clinical documentation preferences
  */
 
-import * as clinicalSettingsService from '../services/clinicalSettings.js';
+import * as clinicalSettingsService from '../services/clinical/clinicalSettings.js';
 import logger from '../utils/logger.js';
 
 /**

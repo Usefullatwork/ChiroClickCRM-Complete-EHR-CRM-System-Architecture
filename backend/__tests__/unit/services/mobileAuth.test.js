@@ -91,13 +91,13 @@ const {
   getUserById,
   updateProfile,
   normalizePhoneNumber,
-} = await import('../../../src/services/mobileAuth.js');
+} = await import('../../../src/services/practice/mobileAuth.js');
 
 const { listExercises, getExerciseById, getCategories } =
-  await import('../../../src/services/mobileExercises.js');
+  await import('../../../src/services/practice/mobileExercises.js');
 
 const { listPrograms, getProgramDetails, enrollInProgram, getMyPrograms } =
-  await import('../../../src/services/mobilePrograms.js');
+  await import('../../../src/services/practice/mobilePrograms.js');
 
 // ── Helpers ──
 const mockUser = {

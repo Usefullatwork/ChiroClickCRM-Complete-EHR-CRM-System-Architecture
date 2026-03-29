@@ -34,7 +34,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 // Import service under test AFTER mocks are registered
 // ---------------------------------------------------------------------------
 
-const smsService = await import('../../../src/services/smsService.js');
+const smsService = await import('../../../src/services/communication/smsService.js');
 
 const {
   normalizePhoneNumber,

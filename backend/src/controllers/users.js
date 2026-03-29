@@ -2,7 +2,7 @@
  * Users Controller
  */
 
-import * as userService from '../services/users.js';
+import * as userService from '../services/practice/users.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 

@@ -5,8 +5,8 @@
 
 import express from 'express';
 import { authenticateMobile } from '../../middleware/mobileAuth.js';
-import * as mobilePrograms from '../../services/mobilePrograms.js';
-import { logAction } from '../../services/auditLog.js';
+import * as mobilePrograms from '../../services/practice/mobilePrograms.js';
+import { logAction } from '../../services/practice/auditLog.js';
 
 const router = express.Router();
 

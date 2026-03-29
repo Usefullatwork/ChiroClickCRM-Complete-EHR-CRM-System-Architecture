@@ -38,7 +38,7 @@ const {
   checkDaysSinceVisit,
   runAutomatedChecks,
   getAutomationStats,
-} = await import('../../../src/services/automatedComms.js');
+} = await import('../../../src/services/communication/automatedComms.js');
 
 describe('Automated Communications Service', () => {
   beforeEach(() => {

@@ -5,7 +5,7 @@
  * the appropriate audit logging function (logAudit / logAction).
  *
  * Strategy: Mock both audit functions (logAudit from utils/audit.js and
- * logAction from services/auditLog.js) because PGlite does not create the
+ * logAction from services/practice/auditLog.js) because PGlite does not create the
  * audit_logs / audit_log tables during test initialisation. The mocks allow
  * us to assert that each route CALLS the logger with the correct arguments
  * (action, resourceType, userId, organizationId) without a live DB table.
@@ -40,7 +40,7 @@ jest.unstable_mockModule('../../../src/utils/audit.js', () => ({
   },
 }));
 
-jest.unstable_mockModule('../../../src/services/auditLog.js', () => ({
+jest.unstable_mockModule('../../../src/services/practice/auditLog.js', () => ({
   logAction: logActionMock,
   logEncounterAction: jest.fn().mockResolvedValue(null),
   logAISuggestion: jest.fn().mockResolvedValue(null),
@@ -300,7 +300,7 @@ describe('Audit Log Verification Integration Tests', () => {
 
   // =========================================================================
   // 4. POST /encounters — audit via logAudit (encounters controller uses
-  //    utils/audit.js logAudit, not services/auditLog.js logAction)
+  //    utils/audit.js logAudit, not services/practice/auditLog.js logAction)
   // =========================================================================
 
   describe('POST /api/v1/encounters -> audit via logAudit', () => {

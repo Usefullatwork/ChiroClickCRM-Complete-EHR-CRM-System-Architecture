@@ -40,12 +40,12 @@ const mockExerciseDeliveryService = {
   sendPortalSMS: jest.fn(),
 };
 
-jest.unstable_mockModule('../../src/services/exerciseLibrary.js', () => ({
+jest.unstable_mockModule('../../src/services/clinical/exerciseLibrary.js', () => ({
   default: mockExerciseLibraryService,
   ...mockExerciseLibraryService,
 }));
 
-jest.unstable_mockModule('../../src/services/exerciseDelivery.js', () => ({
+jest.unstable_mockModule('../../src/services/clinical/exerciseDelivery.js', () => ({
   default: mockExerciseDeliveryService,
   ...mockExerciseDeliveryService,
 }));

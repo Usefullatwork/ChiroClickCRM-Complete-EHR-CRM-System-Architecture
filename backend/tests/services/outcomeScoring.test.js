@@ -11,7 +11,7 @@ import {
   scoreNPRS,
   getScorer,
   scoreQuestionnaire,
-} from '../../src/services/outcomeScoring.js';
+} from '../../src/services/clinical/outcomeScoring.js';
 
 describe('Outcome Scoring Algorithms', () => {
   // =========================================================================

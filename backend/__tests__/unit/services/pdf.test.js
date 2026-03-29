@@ -96,7 +96,7 @@ jest.unstable_mockModule('http', () => ({
 }));
 
 // Import after mocking
-const pdfService = await import('../../../src/services/pdf.js');
+const pdfService = await import('../../../src/services/clinical/pdf.js');
 const { generatePatientLetter, generateInvoice, generateCustomPDF, generateExerciseHandout } =
   pdfService;
 

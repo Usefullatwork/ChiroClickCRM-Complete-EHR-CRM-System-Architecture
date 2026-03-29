@@ -39,7 +39,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 }));
 
 // Import after mocking
-const billingService = await import('../../../src/services/billing.js');
+const billingService = await import('../../../src/services/practice/billing.js');
 
 describe('Billing Service', () => {
   const testOrgId = 'org-test-001';

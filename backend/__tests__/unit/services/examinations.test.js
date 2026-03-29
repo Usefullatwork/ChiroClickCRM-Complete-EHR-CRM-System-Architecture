@@ -46,7 +46,7 @@ const {
   createTemplateSet,
   mapFindingsToObjective,
   incrementTemplateSetUsage,
-} = await import('../../../src/services/examinations.js');
+} = await import('../../../src/services/clinical/examinations.js');
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */

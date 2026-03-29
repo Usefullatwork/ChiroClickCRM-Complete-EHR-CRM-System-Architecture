@@ -92,7 +92,7 @@ const {
   trackClick,
   sendExerciseProgramEmail,
   sendAppointmentReminderEmail,
-} = await import('../../../src/services/emailService.js');
+} = await import('../../../src/services/communication/emailService.js');
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 

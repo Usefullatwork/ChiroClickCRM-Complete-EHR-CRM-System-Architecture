@@ -26,15 +26,14 @@ test.describe('Keyboard Navigation', () => {
 
     // Find the desktop sidebar navigation (visible at 1280px via hidden md:flex)
     const sidebar = authenticatedPage.locator('nav[aria-label="Main navigation"]').first();
+    await expect(sidebar).toBeVisible();
 
-    if (await sidebar.isVisible()) {
-      // Focus first link in the nav
-      const firstLink = sidebar.locator('a').first();
-      await firstLink.focus();
-      await authenticatedPage.keyboard.press('Tab');
-      await authenticatedPage.keyboard.press('Enter');
-      await authenticatedPage.waitForTimeout(500);
-    }
+    // Focus first link in the nav
+    const firstLink = sidebar.locator('a').first();
+    await firstLink.focus();
+    await authenticatedPage.keyboard.press('Tab');
+    await authenticatedPage.keyboard.press('Enter');
+    await authenticatedPage.waitForTimeout(500);
   });
 
   test('should close modal with Escape key', async ({ authenticatedPage }) => {
@@ -44,14 +43,13 @@ test.describe('Keyboard Navigation', () => {
     // Click "New Patient" button to navigate to form
     const createButton = authenticatedPage.locator('[data-testid="patients-add-button"]');
 
-    if (await createButton.isVisible()) {
-      await createButton.click();
-      await authenticatedPage.waitForTimeout(500);
+    await expect(createButton).toBeVisible();
+    await createButton.click();
+    await authenticatedPage.waitForTimeout(500);
 
-      // Press Escape to dismiss any open dialog
-      await authenticatedPage.keyboard.press('Escape');
-      await authenticatedPage.waitForTimeout(300);
-    }
+    // Press Escape to dismiss any open dialog
+    await authenticatedPage.keyboard.press('Escape');
+    await authenticatedPage.waitForTimeout(300);
   });
 });
 
@@ -137,13 +135,12 @@ test.describe('ARIA Labels', () => {
     // Wait for either patient list or empty state
     const list = authenticatedPage.locator('[data-testid="patients-list"]');
     const listVisible = await list.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!listVisible, 'No patient list rendered (empty state)');
 
-    if (listVisible) {
-      const table = list.locator('table').first();
-      const headers = table.locator('th');
-      const headerCount = await headers.count();
-      expect(headerCount).toBeGreaterThan(0);
-    }
+    const table = list.locator('table').first();
+    const headers = table.locator('th');
+    const headerCount = await headers.count();
+    expect(headerCount).toBeGreaterThan(0);
   });
 });
 
@@ -198,14 +195,13 @@ test.describe('Focus Management', () => {
 
     const focusedElement = authenticatedPage.locator(':focus');
 
-    if (await focusedElement.isVisible()) {
-      const outlineStyle = await focusedElement.evaluate((el) => {
-        const style = window.getComputedStyle(el);
-        return style.outline || style.boxShadow;
-      });
+    await expect(focusedElement).toBeVisible();
+    const outlineStyle = await focusedElement.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return style.outline || style.boxShadow;
+    });
 
-      expect(outlineStyle).toBeTruthy();
-    }
+    expect(outlineStyle).toBeTruthy();
   });
 });
 

@@ -26,7 +26,7 @@ jest.unstable_mockModule('../../src/services/providers/aiProviderFactory.js', ()
 }));
 
 const { orchestrate, parseSafetyResult } =
-  await import('../../src/services/clinicalOrchestrator.js');
+  await import('../../src/services/clinical/clinicalOrchestrator.js');
 
 describe('ClinicalOrchestrator', () => {
   const patientData = { age: 45, name: 'Test Pasient' };

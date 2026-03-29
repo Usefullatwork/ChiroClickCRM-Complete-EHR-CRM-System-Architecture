@@ -58,6 +58,7 @@ export {
   getAIStatus,
   buildFieldPrompt,
   generateCompletionStream,
+  generateCompletion,
 } from './promptBuilder.js';
 
 // Default export matching original ai.js default export

@@ -7,20 +7,18 @@ import {
   checkRedFlagsInContent,
   checkMedicationWarnings,
   validateMedicalLogic,
-  checkAgeRelatedRisks
-} from '../../src/services/clinicalValidation.js';
+  checkAgeRelatedRisks,
+} from '../../src/services/clinical/clinicalValidation.js';
 
 describe('Clinical Validation Service', () => {
-
   describe('checkRedFlagsInContent', () => {
-
     test('should detect cauda equina symptoms', () => {
       const content = 'Pasient har blæreforstyrrelser og nummenhet mellom bena';
       const flags = checkRedFlagsInContent(content);
 
       expect(flags.length).toBeGreaterThan(0);
-      expect(flags.some(f => f.severity === 'CRITICAL')).toBe(true);
-      expect(flags.some(f => f.flag === 'cauda_equina')).toBe(true);
+      expect(flags.some((f) => f.severity === 'CRITICAL')).toBe(true);
+      expect(flags.some((f) => f.flag === 'cauda_equina')).toBe(true);
     });
 
     test('should detect saddle anesthesia', () => {
@@ -28,7 +26,7 @@ describe('Clinical Validation Service', () => {
       const flags = checkRedFlagsInContent(content);
 
       expect(flags.length).toBeGreaterThan(0);
-      expect(flags.some(f => f.category === 'cauda_equina')).toBe(true);
+      expect(flags.some((f) => f.category === 'cauda_equina')).toBe(true);
     });
 
     test('should detect malignancy indicators', () => {
@@ -36,8 +34,8 @@ describe('Clinical Validation Service', () => {
       const flags = checkRedFlagsInContent(content);
 
       expect(flags.length).toBeGreaterThan(0);
-      expect(flags.some(f => f.flag === 'malignancy')).toBe(true);
-      expect(flags.some(f => f.severity === 'HIGH')).toBe(true);
+      expect(flags.some((f) => f.flag === 'malignancy')).toBe(true);
+      expect(flags.some((f) => f.severity === 'HIGH')).toBe(true);
     });
 
     test('should detect infection indicators', () => {
@@ -45,7 +43,7 @@ describe('Clinical Validation Service', () => {
       const flags = checkRedFlagsInContent(content);
 
       expect(flags.length).toBeGreaterThan(0);
-      expect(flags.some(f => f.flag === 'infection')).toBe(true);
+      expect(flags.some((f) => f.flag === 'infection')).toBe(true);
     });
 
     test('should detect fracture risk', () => {
@@ -53,7 +51,7 @@ describe('Clinical Validation Service', () => {
       const flags = checkRedFlagsInContent(content);
 
       expect(flags.length).toBeGreaterThan(0);
-      expect(flags.some(f => f.flag === 'fracture')).toBe(true);
+      expect(flags.some((f) => f.flag === 'fracture')).toBe(true);
     });
 
     test('should return empty array for normal content', () => {
@@ -67,7 +65,7 @@ describe('Clinical Validation Service', () => {
       const content = 'Morning stiffness lasting more than 30 minutes that improves with activity';
       const flags = checkRedFlagsInContent(content);
 
-      expect(flags.some(f => f.flag === 'inflammatory')).toBe(true);
+      expect(flags.some((f) => f.flag === 'inflammatory')).toBe(true);
     });
 
     test('should detect neurological symptoms', () => {
@@ -75,19 +73,17 @@ describe('Clinical Validation Service', () => {
       const flags = checkRedFlagsInContent(content);
 
       expect(flags.length).toBeGreaterThan(0);
-      expect(flags.some(f => f.flag === 'neurological')).toBe(true);
+      expect(flags.some((f) => f.flag === 'neurological')).toBe(true);
     });
-
   });
 
   describe('checkMedicationWarnings', () => {
-
     test('should warn about anticoagulants', () => {
       const medications = ['Warfarin 5mg', 'Metoprolol 50mg'];
       const warnings = checkMedicationWarnings(medications);
 
       expect(warnings.length).toBeGreaterThan(0);
-      expect(warnings.some(w => w.category === 'anticoagulants')).toBe(true);
+      expect(warnings.some((w) => w.category === 'anticoagulants')).toBe(true);
       expect(warnings[0].contraindications).toContain('HVLA');
     });
 
@@ -96,7 +92,7 @@ describe('Clinical Validation Service', () => {
       const warnings = checkMedicationWarnings(medications);
 
       expect(warnings.length).toBeGreaterThan(0);
-      expect(warnings.some(w => w.category === 'anticoagulants')).toBe(true);
+      expect(warnings.some((w) => w.category === 'anticoagulants')).toBe(true);
     });
 
     test('should warn about steroids', () => {
@@ -104,7 +100,7 @@ describe('Clinical Validation Service', () => {
       const warnings = checkMedicationWarnings(medications);
 
       expect(warnings.length).toBeGreaterThan(0);
-      expect(warnings.some(w => w.category === 'steroids')).toBe(true);
+      expect(warnings.some((w) => w.category === 'steroids')).toBe(true);
     });
 
     test('should warn about bisphosphonates', () => {
@@ -112,7 +108,7 @@ describe('Clinical Validation Service', () => {
       const warnings = checkMedicationWarnings(medications);
 
       expect(warnings.length).toBeGreaterThan(0);
-      expect(warnings.some(w => w.category === 'bisphosphonates')).toBe(true);
+      expect(warnings.some((w) => w.category === 'bisphosphonates')).toBe(true);
     });
 
     test('should return empty for safe medications', () => {
@@ -126,11 +122,9 @@ describe('Clinical Validation Service', () => {
       const warnings = checkMedicationWarnings([]);
       expect(warnings.length).toBe(0);
     });
-
   });
 
   describe('validateMedicalLogic', () => {
-
     test('should validate appropriate treatment for neck symptoms', () => {
       const result = validateMedicalLogic('L01', 'SMT_cervical', {});
 
@@ -141,20 +135,20 @@ describe('Clinical Validation Service', () => {
     test('should flag contraindicated treatments', () => {
       const context = {
         patient: {
-          contraindications: ['cervical myelopathy']
-        }
+          contraindications: ['cervical myelopathy'],
+        },
       };
       const result = validateMedicalLogic('L01', 'HVLA_cervical', context);
 
       expect(result.valid).toBe(false);
-      expect(result.errors.some(e => e.type === 'contraindication')).toBe(true);
+      expect(result.errors.some((e) => e.type === 'contraindication')).toBe(true);
     });
 
     test('should flag cauda equina contraindication', () => {
       const context = {
         patient: {
-          red_flags: ['cauda equina suspected']
-        }
+          red_flags: ['cauda equina suspected'],
+        },
       };
       const result = validateMedicalLogic('L03', 'SMT_lumbar', context);
 
@@ -167,36 +161,34 @@ describe('Clinical Validation Service', () => {
       expect(result.recommendations.length).toBeGreaterThan(0);
       expect(result.recommendations[0].recommended).toContain('exercise');
     });
-
   });
 
   describe('checkAgeRelatedRisks', () => {
-
     test('should flag pediatric patients', () => {
       const warnings = checkAgeRelatedRisks(12, 'neck pain', {});
 
       expect(warnings.length).toBeGreaterThan(0);
-      expect(warnings.some(w => w.action === 'PEDIATRIC_PROTOCOL')).toBe(true);
+      expect(warnings.some((w) => w.action === 'PEDIATRIC_PROTOCOL')).toBe(true);
     });
 
     test('should flag geriatric patients', () => {
       const warnings = checkAgeRelatedRisks(72, 'lower back pain', {});
 
       expect(warnings.length).toBeGreaterThan(0);
-      expect(warnings.some(w => w.message.includes('Geriatric'))).toBe(true);
+      expect(warnings.some((w) => w.message.includes('Geriatric'))).toBe(true);
     });
 
     test('should flag new onset in elderly', () => {
       const warnings = checkAgeRelatedRisks(68, 'new onset back pain, sudden start', {});
 
       expect(warnings.length).toBeGreaterThan(0);
-      expect(warnings.some(w => w.severity === 'MODERATE')).toBe(true);
+      expect(warnings.some((w) => w.severity === 'MODERATE')).toBe(true);
     });
 
     test('should flag first episode after 50', () => {
       const warnings = checkAgeRelatedRisks(55, 'first episode of back pain', {});
 
-      expect(warnings.some(w => w.action === 'RED_FLAG_SCREENING')).toBe(true);
+      expect(warnings.some((w) => w.action === 'RED_FLAG_SCREENING')).toBe(true);
     });
 
     test('should return empty for healthy middle-aged', () => {
@@ -204,15 +196,13 @@ describe('Clinical Validation Service', () => {
 
       expect(warnings.length).toBe(0);
     });
-
   });
 
   describe('validateClinicalContent (integration)', () => {
-
     test('should return valid for normal clinical content', async () => {
       const content = 'Pasient med mild nakkeømhet etter kontorarbeid. Normal ROM.';
       const result = await validateClinicalContent(content, {
-        patient: { age: 35 }
+        patient: { age: 35 },
       });
 
       expect(result.isValid).toBe(true);
@@ -224,7 +214,7 @@ describe('Clinical Validation Service', () => {
     test('should flag critical content and require review', async () => {
       const content = 'Pasient med blæreforstyrrelser, sadel-nummenhet og bilateral svakhet i bena';
       const result = await validateClinicalContent(content, {
-        patient: { age: 45 }
+        patient: { age: 45 },
       });
 
       expect(result.hasRedFlags).toBe(true);
@@ -240,8 +230,8 @@ describe('Clinical Validation Service', () => {
         patient: {
           age: 60,
           current_medications: ['Warfarin 5mg'],
-          red_flags: ['previous cancer']
-        }
+          red_flags: ['previous cancer'],
+        },
       });
 
       expect(result.warnings.length).toBeGreaterThan(0);
@@ -255,7 +245,5 @@ describe('Clinical Validation Service', () => {
       expect(result.isValid).toBe(true);
       expect(result.errors.length).toBe(0);
     });
-
   });
-
 });

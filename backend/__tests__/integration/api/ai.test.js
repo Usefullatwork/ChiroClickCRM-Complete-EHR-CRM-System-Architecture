@@ -20,7 +20,7 @@ import app from '../../../src/server.js';
 // Module mocks — must be declared before any import that resolves them
 // ---------------------------------------------------------------------------
 
-jest.mock('../../../src/services/ai.js', () => ({
+jest.mock('../../../src/services/ai/index.js', () => ({
   spellCheckNorwegian: jest.fn().mockResolvedValue({
     original: 'nakke smerter',
     corrected: 'nakkesmerter',
@@ -62,7 +62,7 @@ jest.mock('../../../src/services/ai.js', () => ({
   generateFieldText: jest.fn().mockResolvedValue({ text: 'mocked field text' }),
 }));
 
-jest.mock('../../../src/services/extendedThinking.js', () => ({
+jest.mock('../../../src/services/training/extendedThinking.js', () => ({
   analyzeWithThinking: jest.fn().mockResolvedValue({
     conclusion: 'Differensialdiagnose: cervikobrachial syndrom.',
     reasoning: 'Basert på kliniske funn.',
@@ -76,14 +76,14 @@ jest.mock('../../../src/services/extendedThinking.js', () => ({
   }),
 }));
 
-jest.mock('../../../src/services/clinicalVision.js', () => ({
+jest.mock('../../../src/services/clinical/clinicalVision.js', () => ({
   analyzeImage: jest.fn().mockResolvedValue({
     findings: 'No significant pathology detected.',
     disclaimer: 'AI analysis — confirm with qualified clinician.',
   }),
 }));
 
-jest.mock('../../../src/services/structuredExtraction.js', () => ({
+jest.mock('../../../src/services/clinical/structuredExtraction.js', () => ({
   extractSOAP: jest.fn().mockResolvedValue({
     subjective: 'Nakkesmerter',
     objective: 'Ømhet C4-C6',
@@ -95,7 +95,7 @@ jest.mock('../../../src/services/structuredExtraction.js', () => ({
     .mockResolvedValue([{ code: 'L83', description: 'Cervikobrachial syndrom' }]),
 }));
 
-jest.mock('../../../src/services/clinicalOrchestrator.js', () => ({
+jest.mock('../../../src/services/clinical/clinicalOrchestrator.js', () => ({
   orchestrate: jest.fn().mockResolvedValue({
     clinical: { summary: 'Nakkesmerter, mild' },
     differential: [],

@@ -25,7 +25,7 @@ jest.unstable_mockModule('../../../src/utils/logger.js', () => ({
 }));
 
 const mockNotifyByRole = jest.fn();
-jest.unstable_mockModule('../../../src/services/notifications.js', () => ({
+jest.unstable_mockModule('../../../src/services/communication/notifications.js', () => ({
   notifyByRole: mockNotifyByRole,
   NOTIFICATION_TYPES: {
     AI_RETRAINING_READY: 'AI_RETRAINING_READY',
@@ -44,7 +44,7 @@ const {
   generateTrainingDataFromFeedback,
   exportFeedbackForTraining,
   updateDailyMetrics,
-} = await import('../../../src/services/aiLearning.js');
+} = await import('../../../src/services/training/aiLearning.js');
 
 const logger = (await import('../../../src/utils/logger.js')).default;
 

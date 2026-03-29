@@ -5,8 +5,8 @@
 
 import { query } from '../config/database.js';
 import logger from '../utils/logger.js';
-import * as communicationsService from '../services/communications.js';
-import * as followupsService from '../services/followups.js';
+import * as communicationsService from '../services/communication/communications.js';
+import * as followupsService from '../services/practice/followups.js';
 
 /**
  * Execute a workflow action

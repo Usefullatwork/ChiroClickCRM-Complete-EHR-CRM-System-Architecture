@@ -4,7 +4,7 @@
  */
 
 import { aiRetrainingService } from '../application/services/AIRetrainingService.js';
-import * as rlaifService from '../services/rlaif.js';
+import * as rlaifService from '../services/training/rlaif.js';
 import * as schedulerService from '../jobs/scheduler.js';
 import logger from '../utils/logger.js';
 

@@ -7,13 +7,11 @@ import {
   validateHprNumber,
   extractHprNumber,
   extractPersonalNumber,
-  getHelseIdStatus
-} from '../../src/services/helseId.js';
+  getHelseIdStatus,
+} from '../../../packages/fhir-adapter/helseId.js';
 
 describe('HelseID Service', () => {
-
   describe('validateFodselsnummer', () => {
-
     test('should validate correct fødselsnummer', () => {
       // Valid test fødselsnummer (from test data, not real)
       const result = validateFodselsnummer('01015450100');
@@ -76,11 +74,9 @@ describe('HelseID Service', () => {
         expect(['MALE', 'FEMALE']).toContain(result1.gender);
       }
     });
-
   });
 
   describe('validateHprNumber', () => {
-
     test('should reject null HPR number', async () => {
       const result = await validateHprNumber(null);
 
@@ -109,14 +105,12 @@ describe('HelseID Service', () => {
       expect(result).toHaveProperty('valid');
       expect(result).toHaveProperty('error');
     });
-
   });
 
   describe('extractHprNumber', () => {
-
     test('should extract HPR number from HelseID claims', () => {
       const claims = {
-        'helseid://claims/hpr/hpr_number': '123456789'
+        'helseid://claims/hpr/hpr_number': '123456789',
       };
       const hpr = extractHprNumber(claims);
 
@@ -125,7 +119,7 @@ describe('HelseID Service', () => {
 
     test('should extract from alternative claim format', () => {
       const claims = {
-        'hpr_number': '987654321'
+        hpr_number: '987654321',
       };
       const hpr = extractHprNumber(claims);
 
@@ -134,21 +128,19 @@ describe('HelseID Service', () => {
 
     test('should return null if no HPR number in claims', () => {
       const claims = {
-        'sub': 'user-123',
-        'name': 'Test User'
+        sub: 'user-123',
+        name: 'Test User',
       };
       const hpr = extractHprNumber(claims);
 
       expect(hpr).toBeNull();
     });
-
   });
 
   describe('extractPersonalNumber', () => {
-
     test('should extract personal number from HelseID claims', () => {
       const claims = {
-        'helseid://claims/identity/pid': '01015450100'
+        'helseid://claims/identity/pid': '01015450100',
       };
       const pid = extractPersonalNumber(claims);
 
@@ -157,7 +149,7 @@ describe('HelseID Service', () => {
 
     test('should extract from alternative claim format', () => {
       const claims = {
-        'pid': '01015450100'
+        pid: '01015450100',
       };
       const pid = extractPersonalNumber(claims);
 
@@ -166,17 +158,15 @@ describe('HelseID Service', () => {
 
     test('should return null if no personal number in claims', () => {
       const claims = {
-        'sub': 'user-123'
+        sub: 'user-123',
       };
       const pid = extractPersonalNumber(claims);
 
       expect(pid).toBeNull();
     });
-
   });
 
   describe('getHelseIdStatus', () => {
-
     test('should return status object', () => {
       const status = getHelseIdStatus();
 
@@ -199,7 +189,5 @@ describe('HelseID Service', () => {
       expect(status.endpoints).toHaveProperty('authorization_endpoint');
       expect(status.endpoints).toHaveProperty('token_endpoint');
     });
-
   });
-
 });

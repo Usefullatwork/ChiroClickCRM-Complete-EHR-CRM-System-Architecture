@@ -46,7 +46,7 @@ let mockCheckRedFlags;
 let mockUpdateEncounter;
 let mockGenerateFormattedNote;
 
-jest.unstable_mockModule('../../../src/services/encounters.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/encounters.js', () => ({
   createEncounter: (...args) => mockCreateEncounter(...args),
   getEncounterById: (...args) => mockGetEncounterById(...args),
   getPatientEncounterHistory: (...args) => mockGetPatientEncounterHistory(...args),
@@ -59,7 +59,7 @@ jest.unstable_mockModule('../../../src/services/encounters.js', () => ({
 // ─── examinationService mock ──────────────────────────────────────────────────
 let mockCreateFinding;
 
-jest.unstable_mockModule('../../../src/services/examinations.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/examinations.js', () => ({
   createFinding: (...args) => mockCreateFinding(...args),
   default: {},
 }));
@@ -69,7 +69,7 @@ let mockGetTreatmentCode;
 let mockIncrementTreatmentUsageCount;
 let mockCalculateTreatmentPrice;
 
-jest.unstable_mockModule('../../../src/services/treatments.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/treatments.js', () => ({
   getTreatmentCode: (...args) => mockGetTreatmentCode(...args),
   incrementTreatmentUsageCount: (...args) => mockIncrementTreatmentUsageCount(...args),
   calculateTreatmentPrice: (...args) => mockCalculateTreatmentPrice(...args),
@@ -79,7 +79,7 @@ jest.unstable_mockModule('../../../src/services/treatments.js', () => ({
 // ─── noteValidator mock ───────────────────────────────────────────────────────
 let mockValidateNote;
 
-jest.unstable_mockModule('../../../src/services/noteValidator.js', () => ({
+jest.unstable_mockModule('../../../src/services/clinical/noteValidator.js', () => ({
   validate: (...args) => mockValidateNote(...args),
 }));
 
@@ -89,7 +89,7 @@ jest.unstable_mockModule('../../../src/services/providers/aiProviderFactory.js',
 }));
 
 // ─── Lazy imports (after all mocks) ──────────────────────────────────────────
-const workflowModule = await import('../../../src/services/clinicalWorkflow.js');
+const workflowModule = await import('../../../src/services/clinical/clinicalWorkflow.js');
 const {
   startEncounter,
   recordExamination,
@@ -99,7 +99,7 @@ const {
   mapTreatmentsToPlan,
 } = workflowModule;
 
-const evalsModule = await import('../../../src/services/clinicalEvals.js');
+const evalsModule = await import('../../../src/services/clinical/clinicalEvals.js');
 const { getEvalSummary, runEvalBatch, GRADING_SYSTEM } = evalsModule;
 
 // ─── Test fixtures ────────────────────────────────────────────────────────────

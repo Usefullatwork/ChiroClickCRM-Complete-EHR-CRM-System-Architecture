@@ -13,7 +13,7 @@ import { randomUUID } from '../../helpers/testUtils.js';
 
 // Audit log mock — verified per-suite that logAction is called correctly
 const mockLogAction = jest.fn().mockResolvedValue(null);
-jest.unstable_mockModule('../../../src/services/auditLog.js', () => ({
+jest.unstable_mockModule('../../../src/services/practice/auditLog.js', () => ({
   logAction: mockLogAction,
 }));
 

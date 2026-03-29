@@ -4,9 +4,10 @@
  */
 
 import express from 'express';
-import * as treatmentPlanService from '../services/treatmentPlans.js';
+import * as treatmentPlanService from '../services/clinical/treatmentPlans.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import validate from '../middleware/validation.js';
+import { logAudit } from '../utils/audit.js';
 import {
   createPlanSchema,
   getPatientPlansSchema,
@@ -106,6 +107,19 @@ router.post(
       organizationId,
       practitionerId,
     });
+
+    await logAudit({
+      organizationId,
+      userId: req.user?.id,
+      userEmail: req.user?.email,
+      userRole: req.user?.role,
+      action: 'CREATE',
+      resourceType: 'TREATMENT_PLAN',
+      resourceId: plan.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.status(201).json(plan);
   }
 );
@@ -272,6 +286,20 @@ router.patch(
     if (!plan) {
       return res.status(404).json({ error: 'Treatment plan not found' });
     }
+
+    await logAudit({
+      organizationId,
+      userId: req.user?.id,
+      userEmail: req.user?.email,
+      userRole: req.user?.role,
+      action: 'UPDATE',
+      resourceType: 'TREATMENT_PLAN',
+      resourceId: req.params.id,
+      changes: req.body,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json(plan);
   }
 );
@@ -378,7 +406,21 @@ router.post(
   requireRole(['ADMIN', 'PRACTITIONER']),
   validate(addMilestoneSchema),
   async (req, res) => {
+    const { organizationId } = req;
     const milestone = await treatmentPlanService.addMilestone(req.params.planId, req.body);
+
+    await logAudit({
+      organizationId,
+      userId: req.user?.id,
+      userEmail: req.user?.email,
+      userRole: req.user?.role,
+      action: 'CREATE',
+      resourceType: 'TREATMENT_PLAN_MILESTONE',
+      resourceId: milestone.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.status(201).json(milestone);
   }
 );
@@ -446,10 +488,25 @@ router.patch(
   requireRole(['ADMIN', 'PRACTITIONER']),
   validate(updateMilestoneSchema),
   async (req, res) => {
+    const { organizationId } = req;
     const milestone = await treatmentPlanService.updateMilestone(req.params.milestoneId, req.body);
     if (!milestone) {
       return res.status(404).json({ error: 'Milestone not found' });
     }
+
+    await logAudit({
+      organizationId,
+      userId: req.user?.id,
+      userEmail: req.user?.email,
+      userRole: req.user?.role,
+      action: 'UPDATE',
+      resourceType: 'TREATMENT_PLAN_MILESTONE',
+      resourceId: req.params.milestoneId,
+      changes: req.body,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json(milestone);
   }
 );
@@ -515,7 +572,21 @@ router.post(
   requireRole(['ADMIN', 'PRACTITIONER']),
   validate(addSessionSchema),
   async (req, res) => {
+    const { organizationId } = req;
     const session = await treatmentPlanService.addSession(req.params.planId, req.body);
+
+    await logAudit({
+      organizationId,
+      userId: req.user?.id,
+      userEmail: req.user?.email,
+      userRole: req.user?.role,
+      action: 'CREATE',
+      resourceType: 'TREATMENT_PLAN_SESSION',
+      resourceId: session.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.status(201).json(session);
   }
 );
@@ -573,10 +644,25 @@ router.post(
   requireRole(['ADMIN', 'PRACTITIONER']),
   validate(completeSessionSchema),
   async (req, res) => {
+    const { organizationId } = req;
     const session = await treatmentPlanService.completeSession(req.params.sessionId, req.body);
     if (!session) {
       return res.status(404).json({ error: 'Session not found' });
     }
+
+    await logAudit({
+      organizationId,
+      userId: req.user?.id,
+      userEmail: req.user?.email,
+      userRole: req.user?.role,
+      action: 'UPDATE',
+      resourceType: 'TREATMENT_PLAN_SESSION',
+      resourceId: req.params.sessionId,
+      changes: { status: 'COMPLETED' },
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json(session);
   }
 );

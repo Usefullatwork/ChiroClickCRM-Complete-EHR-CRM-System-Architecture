@@ -16,7 +16,7 @@ import { lazy, Suspense } from 'react';
  * Detailed mode: examination/AnatomicalBodyChart (3,641 lines) — full anatomical chart
  */
 
-const SimpleBodyChart = lazy(() => import('../assessment/BodyChart'));
+const SimpleBodyChart = lazy(() => import('./BodyChart'));
 const DetailedBodyChart = lazy(() => import('../examination/AnatomicalBodyChart'));
 
 const LoadingFallback = (
