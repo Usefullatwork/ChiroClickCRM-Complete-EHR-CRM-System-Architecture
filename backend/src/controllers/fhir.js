@@ -457,7 +457,11 @@ export const searchObservations = async (req, res) => {
     const { patient, date, _count = 50 } = req.query;
 
     let sql = `
-      SELECT cm.*, p.id as patient_id
+      SELECT cm.id, cm.encounter_id, cm.patient_id, cm.ortho_tests, cm.neuro_tests,
+        cm.rom_measurements, cm.pain_location, cm.pain_quality, cm.pain_intensity,
+        cm.outcome_measure_type, cm.outcome_score, cm.outcome_data,
+        cm.postural_findings, cm.gait_analysis, cm.created_at,
+        p.id as patient_id
       FROM clinical_measurements cm
       JOIN patients p ON cm.patient_id = p.id
       WHERE p.organization_id = $1
