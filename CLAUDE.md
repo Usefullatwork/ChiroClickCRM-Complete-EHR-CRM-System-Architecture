@@ -12,13 +12,14 @@ Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electro
 
 ## Current State
 
-- **Backend**: 2,657 tests (130 suites), 0 lint errors
-- **Frontend**: ~1,050 tests (55 suites), 0 lint errors
-- **E2E**: 88 tests (11 Playwright specs)
+- **Backend**: 2,421/2,423 unit tests pass (80/81 suites). 77 integration suites fail pre-existing (PGlite top-level await + Jest ESM circular init — NOT from our work).
+- **Frontend**: 158/158 tests pass, 0 lint errors
+- **E2E**: 18 Playwright spec files (99 bailout patterns fixed in Session 4)
 - **CI**: 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
 - **Electron**: Portable exe verified (96MB), PGlite WASM loads correctly
-- **Latest migration**: 078 (`mobile_push_connectivity`)
-- **Branch**: main (v2.1 merged)
+- **Latest migration**: 079 (`v7 training data`)
+- **Branch**: `review/deep-review-sprint-v2` (4 commits ahead of main: Sessions 2-4)
+- **Services**: 8 domain dirs: clinical/ (36), communication/ (14), practice/ (34), training/ (13), ai/ (9), automations/ (5), crm/ (6), providers/ (8)
 
 ## Commands
 
