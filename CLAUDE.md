@@ -12,14 +12,14 @@ Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electro
 
 ## Current State
 
-- **Backend**: 2,421/2,423 unit tests pass (80/81 suites). 77 integration suites fail pre-existing (PGlite top-level await + Jest ESM circular init — NOT from our work).
-- **Frontend**: 158/158 tests pass, 0 lint errors
+- **Backend**: 3,686 tests pass (136 suites). 77 integration suites fail pre-existing (PGlite top-level await + Jest ESM circular init — NOT from our work).
+- **Frontend**: 158/158 tests pass, 0 lint errors, build OK
 - **E2E**: 18 Playwright spec files (99 bailout patterns fixed in Session 4)
 - **CI**: 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
 - **Electron**: Portable exe verified (96MB), PGlite WASM loads correctly
 - **Latest migration**: 079 (`v7 training data`)
-- **Branch**: `review/deep-review-sprint-v2` (4 commits ahead of main: Sessions 2-4)
-- **Services**: 8 domain dirs: clinical/ (36), communication/ (14), practice/ (34), training/ (13), ai/ (9), automations/ (5), crm/ (6), providers/ (8)
+- **Branch**: `review/deep-review-sprint-v2` (10 commits ahead of main: Sessions 2-4 + Sprint 5)
+- **Services**: 8 domain dirs + 27 extracted modules. All files <500 lines. Zero SELECT \*.
 
 ## Commands
 
@@ -44,8 +44,12 @@ cd frontend && npx playwright test              # E2E tests
 
 **Key directories:**
 
-- `frontend/src/components/` — 39 subdirs, ~300 components
-- `backend/src/services/` — 8 domain dirs: clinical/ (36), communication/ (14), practice/ (34), training/ (13), ai/ (9), automations/ (5), crm/ (6), providers/ (8)
+- `frontend/src/components/` — 40 subdirs (incl. crm-settings/), ~300 components
+- `frontend/src/services/api/` — 7 domain modules (patients, clinical, billing, communications, ai, admin, client)
+- `frontend/src/config/api.js` — API_BASE_URL + API_TIMEOUT constants
+- `backend/src/services/` — 8 domain dirs + extracted modules per domain
+- `backend/src/jobs/` — 4 scheduler modules (jobRunner, communicationJobs, aiJobs, maintenanceJobs)
+- `backend/src/application/services/` — 4 AI training modules (trainingPipeline, modelValidation, dataCuration, retrainingMetrics)
 - `backend/src/routes/` — 49 route files (47 registered + 2 regulatory stubs). Swagger at `/api-docs` (109 endpoints)
 - `database/migrations/` — 078 migrations (PGlite auto-applies on startup via `db-init.js`). Gap at 025 is intentional (removed in commit 201f79b)
 
