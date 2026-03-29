@@ -7,7 +7,7 @@
 
 import { query, transaction } from '../../config/database.js';
 import logger from '../../utils/logger.js';
-import { sendEmail } from '../communication/email.js';
+import { sendEmail } from '../communication/emailService.js';
 
 // ============================================================================
 // SETTINGS MANAGEMENT
