@@ -307,9 +307,19 @@ export const getClient = async () => {
  * @param {object} options - Transaction options (isolationLevel)
  * @returns {Promise<any>} Transaction result
  */
+const VALID_ISOLATION_LEVELS = [
+  'READ UNCOMMITTED',
+  'READ COMMITTED',
+  'REPEATABLE READ',
+  'SERIALIZABLE',
+];
+
 export const transaction = async (callback, options = {}) => {
   const database = await getDB();
   const isolationLevel = options.isolationLevel || 'READ COMMITTED';
+  if (!VALID_ISOLATION_LEVELS.includes(isolationLevel)) {
+    throw new Error(`Invalid isolation level: ${isolationLevel}`);
+  }
 
   // Create a client-like wrapper for the callback
   const client = {
@@ -339,6 +349,9 @@ export const transaction = async (callback, options = {}) => {
  * Savepoint helper for nested transactions
  */
 export const savepoint = async (client, name, callback) => {
+  if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name)) {
+    throw new Error(`Invalid savepoint name: ${name}`);
+  }
   const database = await getDB();
   try {
     await database.query(`SAVEPOINT ${name}`);

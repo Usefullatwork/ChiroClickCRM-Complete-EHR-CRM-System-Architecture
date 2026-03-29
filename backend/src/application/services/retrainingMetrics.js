@@ -86,7 +86,11 @@ export const getTrainingHistory = async (limit = 10) => {
 export const getRetrainingStatus = async (isRetraining, currentModelVersion) => {
   try {
     const eventResult = await query(`
-      SELECT * FROM ai_retraining_events
+      SELECT id, organization_id, trigger_type, trigger_reason,
+          suggestion_types_affected, training_samples_count, feedback_samples_used,
+          date_range_start, date_range_end, previous_model_version, new_model_version,
+          status, test_results, error_message, completed_at, created_at, updated_at
+        FROM ai_retraining_events
       ORDER BY started_at DESC
       LIMIT 1
     `);

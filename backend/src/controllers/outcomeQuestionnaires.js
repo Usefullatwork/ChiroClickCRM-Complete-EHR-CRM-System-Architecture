@@ -5,6 +5,7 @@
 
 import { query } from '../config/database.js';
 import { scoreQuestionnaire } from '../services/clinical/outcomeScoring.js';
+import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
 const VALID_TYPES = ['ODI', 'NDI', 'VAS', 'DASH', 'NPRS'];
@@ -59,11 +60,16 @@ export const submitQuestionnaire = async (req, res) => {
       ]
     );
 
-    logger.info('Questionnaire submitted', {
-      type: questionnaireType,
-      patientId,
-      score: result.score,
-      severity: result.severity,
+    await logAudit({
+      organizationId,
+      userId,
+      userEmail: req.user?.email,
+      userRole: req.user?.role,
+      action: 'CREATE',
+      resourceType: 'QUESTIONNAIRE_RESPONSE',
+      resourceId: insertResult.rows[0].id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
     });
 
     res.status(201).json({
@@ -215,7 +221,18 @@ export const deleteQuestionnaire = async (req, res) => {
       return res.status(404).json({ error: 'Questionnaire not found' });
     }
 
-    logger.info('Questionnaire deleted', { id });
+    await logAudit({
+      organizationId,
+      userId: req.user?.id,
+      userEmail: req.user?.email,
+      userRole: req.user?.role,
+      action: 'DELETE',
+      resourceType: 'QUESTIONNAIRE_RESPONSE',
+      resourceId: id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json({ message: 'Questionnaire deleted', id });
   } catch (error) {
     logger.error('Error in deleteQuestionnaire:', error);
