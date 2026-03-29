@@ -524,7 +524,27 @@ export async function initializeDatabase(db) {
     logger.error('Failed to seed demo users:', err.message);
   }
 
-  // 5. Also add a "Mads Admin" practitioner matching the frontend dev bypass
+  // 6. Seed demo patients (50 real names from SolvIt CRM)
+  try {
+    const patientSeedPath = path.resolve(__dirname, '../../../database/seeds/demo-patients.sql');
+    if (fs.existsSync(patientSeedPath)) {
+      const patientSql = fs.readFileSync(patientSeedPath, 'utf8');
+      const patientStmts = splitSqlStatements(patientSql);
+      for (const stmt of patientStmts) {
+        if (!stmt.trim()) continue;
+        try {
+          await db.query(stmt);
+        } catch (err) {
+          logger.warn(`Patient seed skipped: ${err.message.substring(0, 80)}`);
+        }
+      }
+      logger.info('Demo patients seeded (50 patients)');
+    }
+  } catch (err) {
+    logger.error('Failed to seed demo patients:', err.message);
+  }
+
+  // 7. Also add a "Mads Admin" practitioner matching the frontend dev bypass
   try {
     await db.query(`
       INSERT INTO users (id, organization_id, email, password_hash, first_name, last_name, role, is_active, email_verified)

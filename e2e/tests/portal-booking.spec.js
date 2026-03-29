@@ -16,18 +16,15 @@ test.describe('Portal Booking — Patient View', () => {
       .locator('h1')
       .filter({ hasText: /Mine timer|My Appointments/i })
       .first();
-    if (await pageTitle.isVisible({ timeout: 10000 }).catch(() => false)) {
-      await expect(pageTitle).toBeVisible();
-    }
+    await expect(pageTitle).toBeVisible({ timeout: 10000 });
 
     // Verify "Request appointment" button exists
     const requestButton = authenticatedPage
       .locator('button')
       .filter({ hasText: /Be om time|Request/i })
       .first();
-    if (await requestButton.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(requestButton).toBeEnabled();
-    }
+    await expect(requestButton).toBeVisible({ timeout: 5000 });
+    await expect(requestButton).toBeEnabled();
   });
 
   test('should open booking request form and show date picker', async ({ authenticatedPage }) => {
@@ -40,7 +37,7 @@ test.describe('Portal Booking — Patient View', () => {
       .locator('button')
       .filter({ hasText: /Be om time|Request/i })
       .first();
-    if (!(await requestButton.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(requestButton).toBeVisible({ timeout: 5000 });
 
     await requestButton.click();
     await authenticatedPage.waitForTimeout(500);
@@ -53,9 +50,7 @@ test.describe('Portal Booking — Patient View', () => {
     const selectDateFirst = authenticatedPage
       .locator('text=/Velg dato først|Select date first/i')
       .first();
-    if (await selectDateFirst.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(selectDateFirst).toBeVisible();
-    }
+    await expect.soft(selectDateFirst).toBeVisible({ timeout: 3000 });
   });
 
   test('should select a date and show slot loading or available slots', async ({ authenticatedPage }) => {
@@ -67,14 +62,14 @@ test.describe('Portal Booking — Patient View', () => {
       .locator('button')
       .filter({ hasText: /Be om time|Request/i })
       .first();
-    if (!(await requestButton.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(requestButton).toBeVisible({ timeout: 5000 });
 
     await requestButton.click();
     await authenticatedPage.waitForTimeout(500);
 
     // Fill in a future date
     const dateInput = authenticatedPage.locator('input[type="date"]').first();
-    if (!(await dateInput.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(dateInput).toBeVisible({ timeout: 5000 });
 
     const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
     await dateInput.fill(tomorrow);
@@ -89,12 +84,14 @@ test.describe('Portal Booking — Patient View', () => {
       .first();
     const slotButtons = authenticatedPage.locator('button').filter({ hasText: /^\d{2}:\d{2}$/ });
 
-    const loadingVisible = await loadingSlots.isVisible({ timeout: 3000 }).catch(() => false);
-    const noSlotsVisible = await noSlots.isVisible({ timeout: 3000 }).catch(() => false);
-    const slotsCount = await slotButtons.count();
-
     // One of these outcomes should occur after setting a date
-    expect(loadingVisible || noSlotsVisible || slotsCount >= 0).toBe(true);
+    const slotsCount = await slotButtons.count();
+    if (slotsCount === 0) {
+      // If no slot buttons, then loading or "no slots" message should be visible
+      await expect(loadingSlots.or(noSlots)).toBeVisible({ timeout: 5000 });
+    } else {
+      await expect(slotButtons.first()).toBeVisible();
+    }
   });
 
   test('should show submit button in booking form', async ({ authenticatedPage }) => {
@@ -106,7 +103,7 @@ test.describe('Portal Booking — Patient View', () => {
       .locator('button')
       .filter({ hasText: /Be om time|Request/i })
       .first();
-    if (!(await requestButton.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(requestButton).toBeVisible({ timeout: 5000 });
 
     await requestButton.click();
     await authenticatedPage.waitForTimeout(500);
@@ -116,15 +113,11 @@ test.describe('Portal Booking — Patient View', () => {
       .locator('button[type="submit"]')
       .filter({ hasText: /Send forespørsel|Send request/i })
       .first();
-    if (await submitButton.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(submitButton).toBeVisible();
-    }
+    await expect(submitButton).toBeVisible({ timeout: 5000 });
 
     // Verify reason textarea exists
     const reasonInput = authenticatedPage.locator('textarea').first();
-    if (await reasonInput.isVisible({ timeout: 3000 }).catch(() => false)) {
-      await expect(reasonInput).toBeVisible();
-    }
+    await expect(reasonInput).toBeVisible({ timeout: 3000 });
   });
 });
 
@@ -140,8 +133,6 @@ test.describe('Staff Booking Requests View', () => {
       .filter({ hasText: /Ventende|Pending/i })
       .first();
 
-    if (await pendingFilter.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(pendingFilter).toBeVisible();
-    }
+    await expect.soft(pendingFilter).toBeVisible({ timeout: 5000 });
   });
 });

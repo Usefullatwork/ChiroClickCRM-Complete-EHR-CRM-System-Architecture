@@ -46,6 +46,21 @@ if (process.env.NODE_ENV === 'production' && process.env.DESKTOP_MODE === 'true'
   logger.info('Running in desktop (Electron) production mode');
 }
 
+// CRITICAL: Validate encryption key before any routes are registered.
+// In production (non-desktop), this throws and stops the server.
+import { validateEncryptionKey } from './utils/encryption.js';
+try {
+  const keyResult = validateEncryptionKey();
+  if (keyResult.valid) {
+    logger.info('Startup encryption key check: PASSED');
+  } else {
+    logger.warn(`Startup encryption key check: FAILED (${keyResult.reason})`);
+  }
+} catch (err) {
+  logger.error(`Startup encryption key check: FATAL — ${err.message}`);
+  process.exit(1);
+}
+
 // Initialize Express app
 const app = express();
 const httpServer = createServer(app);

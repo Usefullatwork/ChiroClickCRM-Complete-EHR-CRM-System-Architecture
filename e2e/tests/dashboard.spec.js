@@ -40,22 +40,20 @@ test.describe('Dashboard', () => {
 
     // Find the "New Patient" quick action button (may be i18n'd)
     const newPatientAction = authenticatedPage.locator('button').filter({ hasText: /New Patient|Ny pasient/i }).first();
+    await expect(newPatientAction).toBeVisible();
 
-    if (await newPatientAction.isVisible()) {
-      await newPatientAction.click();
-      await expect(authenticatedPage).toHaveURL(/.*patients\/new.*/);
-    }
+    await newPatientAction.click();
+    await expect(authenticatedPage).toHaveURL(/.*patients\/new.*/);
   });
 
   test('should navigate to appointments from schedule', async ({ authenticatedPage }) => {
     // The "View All" / "Se alle" button is in the dashboard-chart section header
     const chartSection = authenticatedPage.locator('[data-testid="dashboard-chart"]');
     const viewAllLink = chartSection.locator('button, a').filter({ hasText: /View All|Se alle/i }).first();
+    await expect(viewAllLink).toBeVisible();
 
-    if (await viewAllLink.isVisible()) {
-      await viewAllLink.click();
-      await expect(authenticatedPage).toHaveURL(/.*appointments.*/);
-    }
+    await viewAllLink.click();
+    await expect(authenticatedPage).toHaveURL(/.*appointments.*/);
   });
 });
 

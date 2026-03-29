@@ -50,7 +50,7 @@ test.describe('CRM Flow', () => {
 
     // If API failed, skip — cannot test form
     const hasError = await authenticatedPage.locator('text=Request failed').isVisible();
-    if (hasError) return;
+    test.skip(hasError, 'API request failed — cannot test lead form');
 
     // Click add new lead button
     const addButton = authenticatedPage.locator('button:has-text("Ny Lead")').or(
@@ -58,71 +58,66 @@ test.describe('CRM Flow', () => {
     ).or(
       authenticatedPage.locator('button:has-text("New Lead")')
     );
-    if (await addButton.first().isVisible()) {
-      await addButton.first().click();
+    await expect(addButton.first()).toBeVisible();
+    await addButton.first().click();
 
-      // Form should appear with name field
-      const nameInput = authenticatedPage.locator('input[name="name"]').or(
-        authenticatedPage.locator('input[placeholder*="Navn"]')
-      ).or(
-        authenticatedPage.locator('input[placeholder*="Name"]')
-      );
-      await expect(nameInput.first()).toBeVisible({ timeout: 5000 });
-    }
+    // Form should appear with name field
+    const nameInput = authenticatedPage.locator('input[name="name"]').or(
+      authenticatedPage.locator('input[placeholder*="Navn"]')
+    ).or(
+      authenticatedPage.locator('input[placeholder*="Name"]')
+    );
+    await expect(nameInput.first()).toBeVisible({ timeout: 5000 });
   });
 
   test('should navigate to campaigns section', async ({ authenticatedPage }) => {
-    const campaignsTab = authenticatedPage.locator('text=Kampanjer');
-    if (await campaignsTab.first().isVisible()) {
-      await campaignsTab.first().click();
-      await authenticatedPage.waitForLoadState('networkidle');
+    const campaignsTab = authenticatedPage.locator('text=Kampanjer').first();
+    await expect(campaignsTab).toBeVisible();
+    await campaignsTab.click();
+    await authenticatedPage.waitForLoadState('networkidle');
 
-      // Should show campaigns content
-      await expect(
-        authenticatedPage.locator('text=Kampanjer').first()
-      ).toBeVisible({ timeout: 10000 });
-    }
+    // Should show campaigns content
+    await expect(
+      authenticatedPage.locator('text=Kampanjer').first()
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test('should navigate to waitlist section', async ({ authenticatedPage }) => {
-    const waitlistTab = authenticatedPage.locator('text=Venteliste');
-    if (await waitlistTab.first().isVisible()) {
-      await waitlistTab.first().click();
-      await authenticatedPage.waitForLoadState('networkidle');
+    const waitlistTab = authenticatedPage.locator('text=Venteliste').first();
+    await expect(waitlistTab).toBeVisible();
+    await waitlistTab.click();
+    await authenticatedPage.waitForLoadState('networkidle');
 
-      // Should show waitlist content
-      await expect(
-        authenticatedPage.locator('text=Venteliste').first()
-      ).toBeVisible({ timeout: 10000 });
-    }
+    // Should show waitlist content
+    await expect(
+      authenticatedPage.locator('text=Venteliste').first()
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test('should navigate to referral program section', async ({ authenticatedPage }) => {
     const referralTab = authenticatedPage.locator('text=Henvisning').or(
       authenticatedPage.locator('text=Referral')
-    );
-    if (await referralTab.first().isVisible()) {
-      await referralTab.first().click();
-      await authenticatedPage.waitForLoadState('networkidle');
+    ).first();
+    await expect(referralTab).toBeVisible();
+    await referralTab.click();
+    await authenticatedPage.waitForLoadState('networkidle');
 
-      // Should show referral content
-      await expect(
-        authenticatedPage.locator('text=Henvisning').or(authenticatedPage.locator('text=Referral')).first()
-      ).toBeVisible({ timeout: 10000 });
-    }
+    // Should show referral content
+    await expect(
+      authenticatedPage.locator('text=Henvisning').or(authenticatedPage.locator('text=Referral')).first()
+    ).toBeVisible({ timeout: 10000 });
   });
 
   test('should show retention dashboard', async ({ authenticatedPage }) => {
     const retentionTab = authenticatedPage.locator('text=Retensjon').or(
       authenticatedPage.locator('text=Retention')
-    );
-    if (await retentionTab.first().isVisible()) {
-      await retentionTab.first().click();
-      await authenticatedPage.waitForLoadState('networkidle');
+    ).first();
+    await expect(retentionTab).toBeVisible();
+    await retentionTab.click();
+    await authenticatedPage.waitForLoadState('networkidle');
 
-      await expect(
-        authenticatedPage.locator('text=Retensjon').or(authenticatedPage.locator('text=Retention')).first()
-      ).toBeVisible({ timeout: 10000 });
-    }
+    await expect(
+      authenticatedPage.locator('text=Retensjon').or(authenticatedPage.locator('text=Retention')).first()
+    ).toBeVisible({ timeout: 10000 });
   });
 });
