@@ -32,7 +32,11 @@ export async function generateReferralLetter(referralData) {
   } = referralData;
 
   const res = await query(
-    `SELECT ce.*, p.first_name, p.last_name, p.date_of_birth, p.phone, p.email, p.solvit_id,
+    `SELECT ce.id, ce.organization_id, ce.patient_id, ce.practitioner_id,
+            ce.encounter_date, ce.encounter_type,
+            ce.subjective, ce.objective, ce.assessment, ce.plan,
+            ce.icpc_codes, ce.icd10_codes,
+            p.first_name, p.last_name, p.date_of_birth, p.phone, p.email, p.solvit_id,
             o.name AS clinic_name, o.address AS clinic_address, o.phone AS clinic_phone,
             o.email AS clinic_email, o.org_number,
             u.first_name || ' ' || u.last_name AS practitioner_name, u.hpr_number

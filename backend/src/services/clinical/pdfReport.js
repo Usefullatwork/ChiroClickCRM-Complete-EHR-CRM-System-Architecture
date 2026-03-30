@@ -19,7 +19,8 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
   try {
     // Get patient info
     const patientResult = await query(
-      `SELECT p.*, o.name as clinic_name, o.address as clinic_address, o.phone as clinic_phone
+      `SELECT p.id, p.organization_id, p.first_name, p.last_name, p.date_of_birth,
+              o.name as clinic_name, o.address as clinic_address, o.phone as clinic_phone
        FROM patients p
        JOIN organizations o ON o.id = p.organization_id
        WHERE p.id = $1 AND p.organization_id = $2`,
@@ -34,7 +35,10 @@ export const generateExerciseHandout = async (organizationId, patientId) => {
 
     // Get active exercise prescriptions with full exercise details
     const exercisesResult = await query(
-      `SELECT pep.*,
+      `SELECT pep.id, pep.patient_id, pep.organization_id, pep.exercise_id,
+              pep.exercise_name, pep.exercise_code, pep.exercise_instructions,
+              pep.sets, pep.reps, pep.hold_seconds, pep.frequency,
+              pep.custom_instructions, pep.status, pep.created_at,
               e.video_url, e.image_url, e.thumbnail_url,
               e.contraindications, e.precautions,
               e.instructions_no, e.instructions_en

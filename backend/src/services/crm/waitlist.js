@@ -35,7 +35,11 @@ export const getWaitlist = async (clinicId, options = {}) => {
 
   params.push(limit, offset);
   const result = await query(
-    `SELECT w.*,
+    `SELECT w.id, w.organization_id, w.patient_id, w.preferred_practitioner_id,
+            w.preferred_days, w.preferred_time_start, w.preferred_time_end,
+            w.service_type, w.duration_minutes, w.priority, w.status,
+            w.notes, w.added_at, w.last_notified_at, w.notification_count,
+            w.booked_appointment_id, w.expires_at,
             p.first_name, p.last_name, p.phone, p.email,
             u.first_name as practitioner_first_name, u.last_name as practitioner_last_name
      FROM waitlist w
@@ -164,7 +168,9 @@ export const notifyWaitlistPatients = async (clinicId, slotInfo) => {
   }
 
   const entries = await query(
-    `SELECT w.*, p.first_name, p.last_name, p.phone, p.email
+    `SELECT w.id, w.organization_id, w.patient_id, w.preferred_practitioner_id,
+            w.service_type, w.priority, w.status, w.notification_count,
+            p.first_name, p.last_name, p.phone, p.email
      FROM waitlist w
      JOIN patients p ON w.patient_id = p.id
      ${whereClause}

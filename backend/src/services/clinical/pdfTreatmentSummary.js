@@ -26,7 +26,9 @@ export async function generateTreatmentSummary(patientId, orgId, options = {}) {
   const maxEncounters = options.maxEncounters || 20;
 
   const patientRes = await query(
-    `SELECT p.*, o.name AS clinic_name, o.address AS clinic_address,
+    `SELECT p.id, p.organization_id, p.first_name, p.last_name, p.date_of_birth,
+            p.phone, p.email, p.solvit_id,
+            o.name AS clinic_name, o.address AS clinic_address,
             o.phone AS clinic_phone, o.email AS clinic_email, o.org_number
      FROM patients p
      JOIN organizations o ON o.id = p.organization_id

@@ -252,8 +252,13 @@ export const getProtocolsByCategory = async (category, language = 'NO') => {
 export const getFindingsByEncounter = async (organizationId, encounterId) => {
   const sql = `
     SELECT
-      f.*,
-      p.test_name,
+      f.id, f.encounter_id, f.protocol_id, f.body_region, f.category,
+      f.test_name, f.result, f.laterality, f.severity,
+      f.findings_text, f.clinician_notes,
+      f.measurement_value, f.measurement_unit,
+      f.pain_score, f.pain_location, f.examined_by,
+      f.created_at, f.updated_at,
+      p.test_name AS protocol_test_name,
       p.test_name_no,
       p.description_no,
       p.positive_indication_no
@@ -275,7 +280,12 @@ export const getFindingsByEncounter = async (organizationId, encounterId) => {
  */
 export const getFindingById = async (organizationId, id) => {
   const sql = `
-    SELECT f.*
+    SELECT f.id, f.encounter_id, f.protocol_id, f.body_region, f.category,
+           f.test_name, f.result, f.laterality, f.severity,
+           f.findings_text, f.clinician_notes,
+           f.measurement_value, f.measurement_unit,
+           f.pain_score, f.pain_location, f.examined_by,
+           f.created_at, f.updated_at
     FROM structured_examination_findings f
     INNER JOIN clinical_encounters e ON f.encounter_id = e.id
     INNER JOIN patients pt ON e.patient_id = pt.id

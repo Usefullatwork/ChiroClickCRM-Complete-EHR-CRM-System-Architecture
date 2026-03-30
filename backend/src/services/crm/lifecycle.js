@@ -136,7 +136,11 @@ export const getReferrals = async (clinicId, options = {}) => {
 
   params.push(limit, offset);
   const result = await query(
-    `SELECT r.*,
+    `SELECT r.id, r.organization_id, r.referrer_patient_id, r.referrer_name, r.referrer_email,
+            r.referrer_phone, r.referred_name, r.referred_email, r.referred_phone,
+            r.referred_patient_id, r.status, r.reward_type, r.reward_amount,
+            r.reward_description, r.reward_issued, r.reward_issued_at,
+            r.converted_at, r.notes, r.created_at, r.updated_at,
             rp.first_name as referrer_first_name, rp.last_name as referrer_last_name,
             ref.first_name as referred_first_name, ref.last_name as referred_last_name
      FROM referrals r
@@ -278,7 +282,9 @@ export const getReferralStats = async (clinicId) => {
  */
 export const getSurveys = async (clinicId) => {
   const result = await query(
-    `SELECT s.*,
+    `SELECT s.id, s.organization_id, s.name, s.description, s.survey_type,
+            s.questions, s.auto_send, s.send_after_days, s.is_active,
+            s.created_at, s.updated_at,
             COUNT(sr.id) as total_responses,
             AVG(sr.nps_score) as avg_nps
      FROM surveys s
@@ -333,7 +339,9 @@ export const getSurveyResponses = async (clinicId, surveyId, options = {}) => {
   );
 
   const result = await query(
-    `SELECT sr.*, p.first_name, p.last_name
+    `SELECT sr.id, sr.survey_id, sr.patient_id, sr.responses, sr.nps_score,
+            sr.nps_category, sr.feedback_text, sr.completed_at, sr.created_at,
+            p.first_name, p.last_name
      FROM survey_responses sr
      JOIN surveys s ON sr.survey_id = s.id
      LEFT JOIN patients p ON sr.patient_id = p.id
@@ -435,7 +443,9 @@ export const getCommunicationHistory = async (clinicId, options = {}) => {
 
   params.push(limit, offset);
   const result = await query(
-    `SELECT cl.*,
+    `SELECT cl.id, cl.organization_id, cl.patient_id, cl.lead_id, cl.user_id,
+            cl.channel, cl.direction, cl.subject, cl.message, cl.template_used,
+            cl.contact_value, cl.status, cl.campaign_id, cl.created_at,
             p.first_name as patient_first_name, p.last_name as patient_last_name,
             u.first_name as user_first_name, u.last_name as user_last_name
      FROM communication_log cl

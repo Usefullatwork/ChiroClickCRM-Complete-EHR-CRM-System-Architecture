@@ -215,7 +215,10 @@ export const getCampaignStats = async (clinicId, campaignId) => {
  */
 export const getWorkflows = async (clinicId) => {
   const result = await query(
-    `SELECT w.*,
+    `SELECT w.id, w.organization_id, w.name, w.description, w.trigger_type, w.trigger_config,
+            w.actions, w.conditions, w.is_active, w.max_runs_per_patient,
+            w.total_runs, w.successful_runs, w.failed_runs,
+            w.created_by, w.created_at, w.updated_at,
             COUNT(we.id) as total_executions,
             COUNT(we.id) FILTER (WHERE we.status = 'COMPLETED') as successful_executions
      FROM workflows w

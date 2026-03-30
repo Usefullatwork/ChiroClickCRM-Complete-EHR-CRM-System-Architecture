@@ -17,7 +17,12 @@ import { INVOICE_STATUS } from './billingCalc.js';
  */
 export const getInvoiceById = async (organizationId, invoiceId) => {
   const result = await query(
-    `SELECT i.*,
+    `SELECT i.id, i.organization_id, i.patient_id, i.practitioner_id, i.encounter_id,
+            i.invoice_number, i.invoice_date, i.due_date, i.status,
+            i.line_items, i.subtotal, i.tax_amount, i.total_amount,
+            i.patient_amount, i.insurance_amount, i.amount_paid, i.amount_due,
+            i.payment_method, i.notes, i.sent_at, i.paid_at, i.cancelled_at,
+            i.cancellation_reason, i.created_at, i.updated_at,
             p.first_name as patient_first_name,
             p.last_name as patient_last_name,
             p.address as patient_address,
@@ -128,7 +133,11 @@ export const getInvoices = async (organizationId, options = {}) => {
 
   // Get invoices
   const result = await query(
-    `SELECT i.*,
+    `SELECT i.id, i.organization_id, i.patient_id, i.practitioner_id,
+            i.invoice_number, i.invoice_date, i.due_date, i.status,
+            i.subtotal, i.tax_amount, i.total_amount,
+            i.patient_amount, i.insurance_amount, i.amount_paid, i.amount_due,
+            i.sent_at, i.paid_at, i.created_at, i.updated_at,
             p.first_name || ' ' || p.last_name as patient_name,
             p.email as patient_email
      FROM invoices i
@@ -181,7 +190,8 @@ export const updateInvoice = async (organizationId, invoiceId, updates) => {
     `UPDATE invoices
      SET ${setClause.join(', ')}
      WHERE id = $1 AND organization_id = $2
-     RETURNING *`,
+     RETURNING id, organization_id, invoice_number, invoice_date, due_date, status,
+               patient_amount, amount_paid, amount_due, notes, created_at, updated_at`,
     params
   );
 
@@ -206,7 +216,8 @@ export const finalizeInvoice = async (organizationId, invoiceId) => {
          sent_at = NOW(),
          updated_at = NOW()
      WHERE id = $1 AND organization_id = $2 AND status IN ('draft', 'pending')
-     RETURNING *`,
+     RETURNING id, organization_id, invoice_number, invoice_date, due_date, status,
+               patient_amount, amount_paid, amount_due, sent_at, created_at, updated_at`,
     [invoiceId, organizationId, INVOICE_STATUS.SENT]
   );
 
@@ -262,7 +273,8 @@ export const recordPayment = async (organizationId, invoiceId, paymentData) => {
       payment_date,
       notes
     ) VALUES ($1, $2, $3, $4, $5, $6, $7)
-    RETURNING *`,
+    RETURNING id, organization_id, invoice_id, amount, payment_method,
+              payment_reference, payment_date, notes, created_at`,
     [organizationId, invoiceId, amount, payment_method, payment_reference, payment_date, notes]
   );
 
@@ -275,7 +287,8 @@ export const recordPayment = async (organizationId, invoiceId, paymentData) => {
          paid_at = CASE WHEN $5 = 'paid' THEN NOW() ELSE paid_at END,
          updated_at = NOW()
      WHERE id = $1 AND organization_id = $2
-     RETURNING *`,
+     RETURNING id, organization_id, invoice_number, invoice_date, due_date, status,
+               patient_amount, amount_paid, amount_due, paid_at, created_at, updated_at`,
     [invoiceId, organizationId, newAmountPaid, amountDue - newAmountPaid, newStatus]
   );
 
@@ -320,7 +333,8 @@ export const cancelInvoice = async (organizationId, invoiceId, reason) => {
          cancelled_at = NOW(),
          updated_at = NOW()
      WHERE id = $1 AND organization_id = $2 AND status NOT IN ('paid', 'cancelled')
-     RETURNING *`,
+     RETURNING id, organization_id, invoice_number, invoice_date, status,
+               cancellation_reason, cancelled_at, created_at, updated_at`,
     [invoiceId, organizationId, INVOICE_STATUS.CANCELLED, reason]
   );
 

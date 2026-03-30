@@ -75,7 +75,12 @@ export const getAllEncounters = async (organizationId, options = {}) => {
     params.push(limit, offset);
     const result = await query(
       `SELECT
-        ce.*,
+        ce.id, ce.organization_id, ce.patient_id, ce.practitioner_id,
+        ce.encounter_date, ce.encounter_type, ce.duration_minutes,
+        ce.subjective, ce.objective, ce.assessment, ce.plan,
+        ce.icpc_codes, ce.icd10_codes, ce.treatments,
+        ce.vas_pain_start, ce.vas_pain_end,
+        ce.signed_at, ce.signed_by, ce.created_at, ce.updated_at,
         p.first_name || ' ' || p.last_name as patient_name,
         p.solvit_id,
         u.first_name || ' ' || u.last_name as practitioner_name
@@ -110,7 +115,14 @@ export const getEncounterById = async (organizationId, encounterId) => {
   try {
     const result = await query(
       `SELECT
-        ce.*,
+        ce.id, ce.organization_id, ce.patient_id, ce.practitioner_id,
+        ce.encounter_date, ce.encounter_type, ce.duration_minutes,
+        ce.subjective, ce.objective, ce.assessment, ce.plan,
+        ce.icpc_codes, ce.icd10_codes, ce.treatments,
+        ce.vas_pain_start, ce.vas_pain_end,
+        ce.nav_series_number, ce.nav_diagnosis_date,
+        ce.signed_at, ce.signed_by, ce.generated_note,
+        ce.episode_id, ce.is_current, ce.created_at, ce.updated_at,
         p.first_name || ' ' || p.last_name as patient_name,
         p.solvit_id,
         p.date_of_birth,
@@ -145,7 +157,12 @@ export const getPatientEncounters = async (organizationId, patientId, limit = 10
   try {
     const result = await query(
       `SELECT
-        ce.*,
+        ce.id, ce.organization_id, ce.patient_id, ce.practitioner_id,
+        ce.encounter_date, ce.encounter_type, ce.duration_minutes,
+        ce.subjective, ce.objective, ce.assessment, ce.plan,
+        ce.icpc_codes, ce.icd10_codes, ce.treatments,
+        ce.vas_pain_start, ce.vas_pain_end,
+        ce.signed_at, ce.signed_by, ce.episode_id, ce.created_at, ce.updated_at,
         u.first_name || ' ' || u.last_name as practitioner_name
       FROM clinical_encounters ce
       LEFT JOIN users u ON u.id = ce.practitioner_id
@@ -194,7 +211,11 @@ export const createEncounter = async (organizationId, encounterData) => {
         nav_diagnosis_date
       ) VALUES (
         $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17
-      ) RETURNING *`,
+      ) RETURNING id, organization_id, patient_id, practitioner_id, encounter_date,
+                  encounter_type, duration_minutes, subjective, objective, assessment, plan,
+                  icpc_codes, icd10_codes, treatments, vas_pain_start, vas_pain_end,
+                  nav_series_number, nav_diagnosis_date, signed_at, signed_by,
+                  created_at, updated_at`,
       [
         organizationId,
         encounterData.patient_id,
@@ -302,7 +323,11 @@ export const updateEncounter = async (organizationId, encounterId, encounterData
       `UPDATE clinical_encounters
        SET ${updateFields.join(', ')}, updated_at = NOW()
        WHERE organization_id = $1 AND id = $2
-       RETURNING *`,
+       RETURNING id, organization_id, patient_id, practitioner_id, encounter_date,
+                 encounter_type, duration_minutes, subjective, objective, assessment, plan,
+                 icpc_codes, icd10_codes, treatments, vas_pain_start, vas_pain_end,
+                 nav_series_number, nav_diagnosis_date, signed_at, signed_by,
+                 created_at, updated_at`,
       params
     );
 
@@ -328,7 +353,8 @@ export const signEncounter = async (organizationId, encounterId, userId) => {
       `UPDATE clinical_encounters
        SET signed_at = NOW(), signed_by = $3, is_current = true
        WHERE organization_id = $1 AND id = $2 AND signed_at IS NULL
-       RETURNING *`,
+       RETURNING id, organization_id, patient_id, practitioner_id, encounter_date,
+                 encounter_type, signed_at, signed_by, is_current, created_at, updated_at`,
       [organizationId, encounterId, userId]
     );
 

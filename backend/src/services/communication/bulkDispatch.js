@@ -186,7 +186,9 @@ export const processCommunicationQueue = async (batchSize = 10) => {
 
   try {
     const pendingResult = await query(
-      `SELECT q.*, b.organization_id, b.type as batch_type, b.clinic_info
+      `SELECT q.id, q.batch_id, q.patient_id, q.type, q.recipient_phone, q.recipient_email,
+              q.subject, q.content, q.status, q.retry_count, q.scheduled_at, q.created_at,
+              b.organization_id, b.type as batch_type, b.clinic_info
       FROM bulk_communication_queue q
       JOIN bulk_communication_batches b ON b.id = q.batch_id
       WHERE q.status = 'PENDING' AND (q.scheduled_at IS NULL OR q.scheduled_at <= NOW())

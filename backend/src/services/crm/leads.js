@@ -75,7 +75,12 @@ export const getLeads = async (clinicId, options = {}) => {
   // Get leads
   params.push(limit, offset);
   const result = await query(
-    `SELECT l.*, u.first_name as assigned_first_name, u.last_name as assigned_last_name
+    `SELECT l.id, l.organization_id, l.first_name, l.last_name, l.email, l.phone,
+            l.source, l.source_detail, l.status, l.score, l.temperature,
+            l.assigned_to, l.primary_interest, l.chief_complaint, l.notes,
+            l.next_follow_up_date, l.converted_patient_id, l.converted_at,
+            l.lost_reason, l.created_at, l.updated_at,
+            u.first_name as assigned_first_name, u.last_name as assigned_last_name
      FROM leads l
      LEFT JOIN users u ON l.assigned_to = u.id
      ${whereClause}
@@ -100,7 +105,11 @@ export const getLeads = async (clinicId, options = {}) => {
  */
 export const getLeadById = async (clinicId, leadId) => {
   const result = await query(
-    `SELECT l.*,
+    `SELECT l.id, l.organization_id, l.first_name, l.last_name, l.email, l.phone,
+            l.source, l.source_detail, l.status, l.score, l.temperature,
+            l.assigned_to, l.primary_interest, l.chief_complaint, l.notes,
+            l.next_follow_up_date, l.converted_patient_id, l.converted_at,
+            l.lost_reason, l.created_at, l.updated_at,
             u.first_name as assigned_first_name, u.last_name as assigned_last_name,
             p.id as converted_patient_id, p.first_name as converted_patient_first_name
      FROM leads l
@@ -116,7 +125,9 @@ export const getLeadById = async (clinicId, leadId) => {
 
   // Get activities
   const activities = await query(
-    `SELECT la.*, u.first_name, u.last_name
+    `SELECT la.id, la.lead_id, la.user_id, la.activity_type, la.description,
+            la.old_value, la.new_value, la.created_at,
+            u.first_name, u.last_name
      FROM lead_activities la
      LEFT JOIN users u ON la.user_id = u.id
      WHERE la.lead_id = $1

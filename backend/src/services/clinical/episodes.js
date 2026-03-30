@@ -72,7 +72,14 @@ export const createEpisode = async (organizationId, episodeData) => {
       next_reeval_due,
       clinical_notes
     ) VALUES ($1, $2, $3, $4, 'ACTIVE', $5, $6, $7, $8, $9, $10, $11, $11, $12, $12, CURRENT_DATE, $13, $14)
-    RETURNING *`,
+    RETURNING id, organization_id, patient_id, chief_complaint, body_region, status,
+              start_date, end_date, primary_diagnosis_icpc, primary_diagnosis_icd10,
+              secondary_diagnoses, initial_visit_frequency, estimated_duration_weeks,
+              total_visits_planned, baseline_pain_level, current_pain_level,
+              baseline_function_score, current_function_score, improvement_percentage,
+              last_reeval_date, next_reeval_due, visits_since_last_reeval,
+              mmi_date, mmi_determined_by, abn_on_file, abn_signed_date, abn_document_id,
+              clinical_notes, discharge_notes, created_at, updated_at`,
     [
       organizationId,
       patient_id,
@@ -100,7 +107,17 @@ export const createEpisode = async (organizationId, episodeData) => {
  */
 export const getActiveEpisode = async (organizationId, patientId) => {
   const result = await query(
-    `SELECT e.*, p.first_name || ' ' || p.last_name as patient_name
+    `SELECT e.id, e.organization_id, e.patient_id, e.chief_complaint, e.body_region,
+            e.status, e.start_date, e.end_date,
+            e.primary_diagnosis_icpc, e.primary_diagnosis_icd10, e.secondary_diagnoses,
+            e.initial_visit_frequency, e.estimated_duration_weeks, e.total_visits_planned,
+            e.baseline_pain_level, e.current_pain_level,
+            e.baseline_function_score, e.current_function_score, e.improvement_percentage,
+            e.last_reeval_date, e.next_reeval_due, e.visits_since_last_reeval,
+            e.mmi_date, e.mmi_determined_by,
+            e.abn_on_file, e.abn_signed_date, e.abn_document_id,
+            e.clinical_notes, e.discharge_notes, e.created_at, e.updated_at,
+            p.first_name || ' ' || p.last_name as patient_name
      FROM care_episodes e
      JOIN patients p ON p.id = e.patient_id
      WHERE e.organization_id = $1
@@ -119,7 +136,16 @@ export const getActiveEpisode = async (organizationId, patientId) => {
  */
 export const getEpisodeById = async (organizationId, episodeId) => {
   const result = await query(
-    `SELECT e.*,
+    `SELECT e.id, e.organization_id, e.patient_id, e.chief_complaint, e.body_region,
+            e.status, e.start_date, e.end_date,
+            e.primary_diagnosis_icpc, e.primary_diagnosis_icd10, e.secondary_diagnoses,
+            e.initial_visit_frequency, e.estimated_duration_weeks, e.total_visits_planned,
+            e.baseline_pain_level, e.current_pain_level,
+            e.baseline_function_score, e.current_function_score, e.improvement_percentage,
+            e.last_reeval_date, e.next_reeval_due, e.visits_since_last_reeval,
+            e.mmi_date, e.mmi_determined_by,
+            e.abn_on_file, e.abn_signed_date, e.abn_document_id,
+            e.clinical_notes, e.discharge_notes, e.created_at, e.updated_at,
             p.first_name || ' ' || p.last_name as patient_name,
             u.first_name || ' ' || u.last_name as mmi_determined_by_name
      FROM care_episodes e
@@ -137,7 +163,14 @@ export const getEpisodeById = async (organizationId, episodeId) => {
  */
 export const getPatientEpisodes = async (organizationId, patientId) => {
   const result = await query(
-    `SELECT e.*,
+    `SELECT e.id, e.organization_id, e.patient_id, e.chief_complaint, e.body_region,
+            e.status, e.start_date, e.end_date,
+            e.primary_diagnosis_icpc, e.primary_diagnosis_icd10,
+            e.baseline_pain_level, e.current_pain_level,
+            e.baseline_function_score, e.current_function_score, e.improvement_percentage,
+            e.last_reeval_date, e.next_reeval_due, e.visits_since_last_reeval,
+            e.mmi_date, e.abn_on_file,
+            e.created_at, e.updated_at,
             COUNT(ce.id) as visit_count
      FROM care_episodes e
      LEFT JOIN clinical_encounters ce ON ce.episode_id = e.id
@@ -186,7 +219,10 @@ export const updateEpisodeProgress = async (organizationId, episodeId, progressD
     `UPDATE care_episodes
      SET ${updates.join(', ')}, updated_at = NOW()
      WHERE id = $1 AND organization_id = $2
-     RETURNING *`,
+     RETURNING id, organization_id, patient_id, chief_complaint, body_region, status,
+               start_date, end_date, current_pain_level, current_function_score,
+               improvement_percentage, visits_since_last_reeval,
+               last_reeval_date, next_reeval_due, clinical_notes, created_at, updated_at`,
     params
   );
 
@@ -221,7 +257,10 @@ export const performReEvaluation = async (organizationId, episodeId, reevalData)
          clinical_notes = COALESCE(clinical_notes, '') || E'\\n' || $6,
          updated_at = NOW()
      WHERE id = $1 AND organization_id = $2
-     RETURNING *`,
+     RETURNING id, organization_id, patient_id, chief_complaint, body_region, status,
+               start_date, current_pain_level, current_function_score, improvement_percentage,
+               visits_since_last_reeval, last_reeval_date, next_reeval_due,
+               clinical_notes, created_at, updated_at`,
     [
       episodeId,
       organizationId,
@@ -264,7 +303,9 @@ export const transitionToMaintenance = async (organizationId, episodeId, transit
          clinical_notes = COALESCE(clinical_notes, '') || E'\\n' || $7,
          updated_at = NOW()
      WHERE id = $1 AND organization_id = $2
-     RETURNING *`,
+     RETURNING id, organization_id, patient_id, status, mmi_date, mmi_determined_by,
+               abn_on_file, abn_signed_date, abn_document_id,
+               clinical_notes, created_at, updated_at`,
     [
       episodeId,
       organizationId,
@@ -297,7 +338,8 @@ export const recordABN = async (organizationId, episodeId, abnData) => {
          abn_document_id = $4,
          updated_at = NOW()
      WHERE id = $1 AND organization_id = $2
-     RETURNING *`,
+     RETURNING id, organization_id, patient_id, status,
+               abn_on_file, abn_signed_date, abn_document_id, created_at, updated_at`,
     [episodeId, organizationId, abn_signed_date, abn_document_id]
   );
 
@@ -322,7 +364,8 @@ export const dischargeEpisode = async (organizationId, episodeId, dischargeData)
          discharge_notes = $3,
          updated_at = NOW()
      WHERE id = $1 AND organization_id = $2
-     RETURNING *`,
+     RETURNING id, organization_id, patient_id, status, end_date,
+               discharge_notes, created_at, updated_at`,
     [episodeId, organizationId, discharge_notes]
   );
 

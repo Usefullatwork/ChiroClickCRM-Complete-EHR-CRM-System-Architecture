@@ -51,7 +51,9 @@ export const checkDaysSinceVisitTriggers = async (organizationId = null) => {
   try {
     // Get all active DAYS_SINCE_VISIT workflows
     let workflowQuery = `
-      SELECT w.*
+      SELECT w.id, w.organization_id, w.name, w.trigger_type, w.trigger_config,
+             w.actions, w.conditions, w.is_active, w.max_runs_per_patient,
+             w.created_at, w.updated_at
       FROM workflows w
       WHERE w.trigger_type = $1
         AND w.is_active = true
@@ -83,7 +85,8 @@ export const checkDaysSinceVisitTriggers = async (organizationId = null) => {
       // 3. Have active status
       // 4. Belong to this organization
       const patientsResult = await query(
-        `SELECT p.*,
+        `SELECT p.id, p.organization_id, p.first_name, p.last_name, p.email, p.phone,
+          p.last_visit_date, p.status, p.lifecycle_stage,
           EXTRACT(DAY FROM (CURRENT_DATE - p.last_visit_date)) AS days_since_visit
         FROM patients p
         WHERE p.organization_id = $1
@@ -225,7 +228,9 @@ export const checkBirthdayTriggers = async (organizationId = null) => {
   try {
     // Get all active BIRTHDAY workflows
     let workflowQuery = `
-      SELECT w.*
+      SELECT w.id, w.organization_id, w.name, w.trigger_type, w.trigger_config,
+             w.actions, w.conditions, w.is_active, w.max_runs_per_patient,
+             w.created_at, w.updated_at
       FROM workflows w
       WHERE w.trigger_type = $1
         AND w.is_active = true
@@ -253,7 +258,8 @@ export const checkBirthdayTriggers = async (organizationId = null) => {
 
       // Find patients with birthdays
       const patientsResult = await query(
-        `SELECT p.*,
+        `SELECT p.id, p.organization_id, p.first_name, p.last_name, p.email, p.phone,
+          p.date_of_birth, p.status,
           DATE_PART('day', p.date_of_birth) AS birth_day,
           DATE_PART('month', p.date_of_birth) AS birth_month,
           EXTRACT(YEAR FROM AGE(CURRENT_DATE, p.date_of_birth)) AS age
@@ -470,7 +476,8 @@ export const getAppointmentsNeedingFollowUp = async (organizationId, options = {
   try {
     const result = await query(
       `SELECT
-        a.*,
+        a.id, a.organization_id, a.patient_id, a.practitioner_id,
+        a.appointment_type, a.status, a.start_time, a.end_time, a.notes,
         p.first_name || ' ' || p.last_name AS patient_name,
         p.phone AS patient_phone,
         p.email AS patient_email,

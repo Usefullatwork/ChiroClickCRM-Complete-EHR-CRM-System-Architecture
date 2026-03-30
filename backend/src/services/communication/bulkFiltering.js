@@ -157,7 +157,10 @@ export const getPendingQueue = async (organizationId, options = {}) => {
 
     params.push(limit, offset);
     const result = await query(
-      `SELECT q.*, b.type as batch_type, b.priority, p.first_name, p.last_name, p.phone, p.email
+      `SELECT q.id, q.batch_id, q.patient_id, q.type, q.recipient_phone, q.recipient_email,
+              q.subject, q.content, q.status, q.retry_count, q.last_error,
+              q.scheduled_at, q.sent_at, q.failed_at, q.created_at,
+              b.type as batch_type, b.priority, p.first_name, p.last_name, p.phone, p.email
       FROM bulk_communication_queue q
       JOIN bulk_communication_batches b ON b.id = q.batch_id
       JOIN patients p ON p.id = q.patient_id
@@ -216,7 +219,8 @@ export const getBatches = async (organizationId, options = {}) => {
 
     params.push(limit, offset);
     const result = await query(
-      `SELECT b.*,
+      `SELECT b.id, b.organization_id, b.type, b.status, b.priority, b.total_count,
+              b.created_at, b.scheduled_at, b.started_at, b.completed_at,
         (SELECT COUNT(*) FROM bulk_communication_queue WHERE batch_id = b.id AND status = 'SENT') as sent_count,
         (SELECT COUNT(*) FROM bulk_communication_queue WHERE batch_id = b.id AND status = 'FAILED') as failed_count,
         (SELECT COUNT(*) FROM bulk_communication_queue WHERE batch_id = b.id AND status = 'PENDING') as pending_count,

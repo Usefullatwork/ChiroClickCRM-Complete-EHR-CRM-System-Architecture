@@ -86,7 +86,13 @@ export const getAllNotes = async (organizationId, options = {}) => {
     params.push(limit, offset);
     const result = await query(
       `SELECT
-        cn.*,
+        cn.id, cn.organization_id, cn.patient_id, cn.practitioner_id,
+        cn.note_type, cn.template_type, cn.note_date, cn.status,
+        cn.subjective, cn.objective, cn.assessment, cn.plan,
+        cn.icd10_codes, cn.icpc_codes, cn.duration_minutes,
+        cn.vas_pain_start, cn.vas_pain_end,
+        cn.is_draft, cn.draft_saved_at, cn.signed_at, cn.signed_by,
+        cn.has_amendments, cn.encounter_id, cn.created_at, cn.updated_at,
         p.first_name || ' ' || p.last_name as patient_name,
         p.solvit_id,
         u.first_name || ' ' || u.last_name as practitioner_name
@@ -121,7 +127,14 @@ export const getNoteById = async (organizationId, noteId) => {
   try {
     const result = await query(
       `SELECT
-        cn.*,
+        cn.id, cn.organization_id, cn.patient_id, cn.practitioner_id,
+        cn.note_type, cn.template_type, cn.note_date, cn.status,
+        cn.subjective, cn.objective, cn.assessment, cn.plan,
+        cn.icd10_codes, cn.icpc_codes, cn.vestibular_data,
+        cn.duration_minutes, cn.vas_pain_start, cn.vas_pain_end,
+        cn.prescribed_exercises, cn.is_draft, cn.draft_saved_at, cn.auto_save_data,
+        cn.signed_at, cn.signed_by, cn.signature_hash, cn.has_amendments,
+        cn.encounter_id, cn.created_by, cn.updated_by, cn.created_at, cn.updated_at,
         p.first_name || ' ' || p.last_name as patient_name,
         p.solvit_id, p.date_of_birth, p.red_flags, p.contraindications,
         p.allergies, p.current_medications,
@@ -155,7 +168,15 @@ export const getPatientNotes = async (organizationId, patientId, options = {}) =
     }
 
     const result = await query(
-      `SELECT cn.*, u.first_name || ' ' || u.last_name as practitioner_name
+      `SELECT cn.id, cn.organization_id, cn.patient_id, cn.practitioner_id,
+              cn.note_type, cn.template_type, cn.note_date, cn.status,
+              cn.subjective, cn.objective, cn.assessment, cn.plan,
+              cn.icd10_codes, cn.icpc_codes, cn.vestibular_data,
+              cn.duration_minutes, cn.vas_pain_start, cn.vas_pain_end,
+              cn.prescribed_exercises, cn.is_draft, cn.draft_saved_at,
+              cn.signed_at, cn.signed_by, cn.has_amendments,
+              cn.encounter_id, cn.created_at, cn.updated_at,
+              u.first_name || ' ' || u.last_name as practitioner_name
       FROM clinical_notes cn
       LEFT JOIN users u ON u.id = cn.practitioner_id
       ${whereClause}
@@ -476,7 +497,13 @@ export const getNoteTemplates = async (organizationId, options = {}) => {
 export const getUserDrafts = async (organizationId, userId) => {
   try {
     const result = await query(
-      `SELECT cn.*, p.first_name || ' ' || p.last_name as patient_name
+      `SELECT cn.id, cn.organization_id, cn.patient_id, cn.practitioner_id,
+              cn.note_type, cn.template_type, cn.note_date, cn.status,
+              cn.subjective, cn.objective, cn.assessment, cn.plan,
+              cn.icd10_codes, cn.icpc_codes, cn.duration_minutes,
+              cn.is_draft, cn.draft_saved_at, cn.auto_save_data,
+              cn.encounter_id, cn.created_at, cn.updated_at,
+              p.first_name || ' ' || p.last_name as patient_name
       FROM clinical_notes cn
       JOIN patients p ON p.id = cn.patient_id
       WHERE cn.organization_id = $1 AND cn.practitioner_id = $2

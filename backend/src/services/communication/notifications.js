@@ -70,7 +70,8 @@ export async function getNotifications(organizationId, userId, options = {}) {
 
     const result = await query(
       `
-      SELECT n.*
+      SELECT n.id, n.organization_id, n.user_id, n.type, n.title, n.message,
+             n.link, n.metadata, n.priority, n.read_at, n.created_at
       FROM notifications n
       ${whereClause}
       ORDER BY n.created_at DESC
