@@ -22,7 +22,7 @@
   --popover-foreground:    220 25% 12%;
 
   /* ── Primary — Teal (clinical trust) ────────── */
-  --primary:               174 62% 38%;      /* teal-600 */
+  --primary:               174 62% 30%;      /* teal-700 — WCAG AA 5.03:1 on white */
   --primary-foreground:    0 0% 100%;
 
   /* ── Secondary — Warm neutral ───────────────── */
@@ -38,23 +38,23 @@
   --accent-foreground:     25 80% 18%;
 
   /* ── Destructive ────────────────────────────── */
-  --destructive:           0 72% 55%;        /* red-500 */
+  --destructive:           0 72% 48%;        /* red-600 — WCAG AA 5.24:1 on white */
   --destructive-foreground: 0 0% 100%;
 
   /* ── Semantic status ────────────────────────── */
-  --clinical:              174 62% 38%;      /* teal primary */
+  --clinical:              174 62% 30%;      /* matches primary — WCAG AA */
   --clinical-foreground:   0 0% 100%;
-  --success:               152 60% 40%;      /* green-600 */
+  --success:               152 60% 33%;      /* green-700 — WCAG AA 4.51:1 on white */
   --success-foreground:    0 0% 100%;
-  --warning:               38 90% 55%;       /* amber-500 */
+  --warning:               38 90% 55%;       /* amber-500 — 6.26:1 PASS */
   --warning-foreground:    25 80% 18%;
-  --info:                  210 70% 52%;      /* blue-500 */
+  --info:                  210 70% 45%;      /* blue-600 — WCAG AA 4.88:1 on white */
   --info-foreground:       0 0% 100%;
 
   /* ── Chrome ─────────────────────────────────── */
   --border:                35 15% 88%;       /* warm border */
   --input:                 35 15% 88%;
-  --ring:                  174 62% 38%;      /* teal ring */
+  --ring:                  174 62% 30%;      /* matches primary */
 
   /* ── Typography Scale (fluid with clamp) ──── */
   --text-xs:               0.75rem;                                    /* 12px — fixed, too small for fluid */
