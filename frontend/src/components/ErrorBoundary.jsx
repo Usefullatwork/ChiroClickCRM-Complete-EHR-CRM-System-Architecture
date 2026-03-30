@@ -115,7 +115,7 @@ export class ErrorBoundary extends React.Component {
               </div>
             )}
 
-            <div className="flex gap-3 justify-center">
+            <div className="flex gap-3 justify-center flex-wrap">
               <button
                 onClick={this.handleRetry}
                 className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
@@ -129,6 +129,17 @@ export class ErrorBoundary extends React.Component {
                 Last siden på nytt
               </button>
             </div>
+
+            <button
+              onClick={() => {
+                logErrorToService(this.state.error, this.state.errorInfo);
+                this.setState({ reported: true });
+              }}
+              disabled={this.state.reported}
+              className="mt-4 text-sm text-gray-500 hover:text-gray-700 underline disabled:no-underline disabled:text-green-600 transition-colors"
+            >
+              {this.state.reported ? 'Feil rapportert — takk!' : 'Rapporter feil'}
+            </button>
           </div>
         </div>
       );

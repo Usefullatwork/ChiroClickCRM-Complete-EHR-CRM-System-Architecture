@@ -143,45 +143,101 @@ apiClient.interceptors.request.use(
   }
 );
 
-// Response interceptor - Handle errors
+// Retry configuration for resilient API calls
+const RETRY_CONFIG = {
+  maxRetries: 3,
+  baseDelay: 1000, // 1s, 2s, 4s exponential backoff
+  retryableStatuses: [500, 502, 503, 504],
+  idempotentMethods: ['get', 'head', 'options'],
+};
+
+/**
+ * Retry interceptor — exponential backoff for 5xx and network failures.
+ * Only retries idempotent methods for server errors.
+ * Retries all methods for network failures (request never reached server).
+ */
 apiClient.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
+  (response) => response,
+  async (error) => {
+    const config = error.config;
+
+    // Don't retry if config is missing or retries exhausted
+    if (!config) {
+      return Promise.reject(error);
+    }
+    config.__retryCount = config.__retryCount || 0;
+
+    const isNetworkError = !error.response && error.request;
+    const isServerError =
+      error.response && RETRY_CONFIG.retryableStatuses.includes(error.response.status);
+    const isIdempotent = RETRY_CONFIG.idempotentMethods.includes(
+      (config.method || 'get').toLowerCase()
+    );
+
+    const shouldRetry =
+      config.__retryCount < RETRY_CONFIG.maxRetries &&
+      (isNetworkError || (isServerError && isIdempotent));
+
+    if (shouldRetry) {
+      config.__retryCount += 1;
+      const delay = RETRY_CONFIG.baseDelay * Math.pow(2, config.__retryCount - 1);
+
+      log.warn(
+        `Retry ${config.__retryCount}/${RETRY_CONFIG.maxRetries} for ${config.method?.toUpperCase()} ${config.url} in ${delay}ms`
+      );
+
+      // Lazy-load toast to avoid circular dependency
+      if (config.__retryCount === 1) {
+        try {
+          const { toast } = await import('sonner');
+          toast.loading('Proever paa nytt...', { id: 'api-retry', duration: delay + 1000 });
+        } catch {
+          // Toast unavailable — continue silently
+        }
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, delay));
+      return apiClient(config);
+    }
+
+    // All retries exhausted or non-retryable — show final error toast for network failures
+    if (isNetworkError && config.__retryCount > 0) {
+      try {
+        const { toast } = await import('sonner');
+        toast.error('Kunne ikke naa serveren. Proev igjen senere.', {
+          id: 'api-retry',
+        });
+      } catch {
+        // Toast unavailable
+      }
+    }
+
+    // Standard error handling
     if (error.response) {
-      // Server responded with error status
       const { status, data } = error.response;
 
       switch (status) {
         case 401:
-          // Unauthorized - log warning (desktop mode has no external login page)
           log.warn('401 Unauthorized - session may have expired');
           break;
         case 403:
-          // Forbidden
           log.error('Access denied', { message: data.message });
           break;
         case 404:
-          // Not found
           log.warn('Resource not found', { message: data.message });
           break;
         case 429:
-          // Rate limit exceeded
           log.warn('Too many requests', { message: data.message });
           break;
         case 500:
-          // Server error
           log.error('Server error', { message: data.message });
           break;
         default:
           log.error('API error', { status, message: data.message });
       }
     } else if (error.request) {
-      // Request made but no response
       log.error('Network error: No response from server');
     } else {
-      // Something else happened
       log.error('Request error', { message: error.message });
     }
 

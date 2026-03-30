@@ -32,6 +32,7 @@ import DesktopStatusBar from '../desktop/DesktopStatusBar';
 import useTheme from '../../hooks/useTheme';
 import CommandPalette from '../common/CommandPalette';
 import NotificationDropdown from '../common/NotificationDropdown';
+import { OfflineIndicator } from '../ui/OfflineIndicator';
 
 // Mock user for development
 const devUser = {
@@ -379,6 +380,11 @@ export default function DashboardLayout() {
           <div className="w-px h-6 bg-gray-200 dark:bg-gray-700 mx-1" />
           <NotificationDropdown />
         </div>
+      </div>
+
+      {/* Offline indicator — toast variant, minimal disruption */}
+      <div className="md:ml-64">
+        <OfflineIndicator variant="toast" lang="no" />
       </div>
 
       {/* Main content - full width on mobile, with left margin on desktop */}
