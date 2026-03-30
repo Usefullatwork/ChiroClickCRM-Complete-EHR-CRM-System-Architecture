@@ -174,22 +174,29 @@ export const moderateRateLimit = async (req, res, next) => {
 
 /**
  * Security headers using Helmet
- * CSP allows connections to Ollama (localhost:11434) for AI features
+ * Explicit CSP directives — do not rely on Helmet defaults.
+ * connectSrc allows Ollama (localhost:11434) for AI features.
+ * crossOriginEmbedderPolicy disabled for Electron compatibility.
  */
 export const securityHeaders = helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
-      connectSrc: ["'self'", 'http://localhost:11434', 'http://127.0.0.1:11434'],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", 'data:', 'blob:'],
       fontSrc: ["'self'"],
-      objectSrc: ["'none'"],
-      mediaSrc: ["'self'"],
+      connectSrc: ["'self'", 'http://localhost:11434'],
       frameSrc: ["'none'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
     },
   },
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
+  crossOriginResourcePolicy: { policy: 'same-site' },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' },
   hsts: {
     maxAge: 31536000,
     includeSubDomains: true,
@@ -202,6 +209,15 @@ export const securityHeaders = helmet({
     action: 'deny',
   },
 });
+
+/**
+ * Permissions-Policy header
+ * Deny access to browser features not needed by the EHR application.
+ */
+export const permissionsPolicy = (req, res, next) => {
+  res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+  next();
+};
 
 /**
  * AI-specific rate limit: 10 requests/minute per user
@@ -359,6 +375,7 @@ export default {
   strictRateLimit,
   moderateRateLimit,
   securityHeaders,
+  permissionsPolicy,
   sanitizeInput,
   validateOrganization,
   requireHTTPS,

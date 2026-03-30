@@ -21,6 +21,7 @@ import { requireAuth, requireRole } from './middleware/auth.js';
 import circuitBreakerRegistry from './infrastructure/resilience/CircuitBreakerRegistry.js';
 import {
   securityHeaders,
+  permissionsPolicy,
   csrfProtection,
   sendCsrfToken,
   sanitizeInput,
@@ -77,8 +78,9 @@ app.use(correlationId);
 // Backup guard — 503 all API requests while backup is in progress
 app.use(backupGuard);
 
-// Security headers
+// Security headers + Permissions-Policy
 app.use(securityHeaders);
+app.use(permissionsPolicy);
 
 // CORS configuration - supports multiple origins
 const corsOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:5174')
