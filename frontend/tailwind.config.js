@@ -47,6 +47,27 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: [
+          "'Inter Variable'",
+          "'Inter'",
+          '-apple-system',
+          'BlinkMacSystemFont',
+          "'Segoe UI'",
+          'Roboto',
+          'sans-serif',
+        ],
+        mono: [
+          "'JetBrains Mono Variable'",
+          "'JetBrains Mono'",
+          'ui-monospace',
+          'SFMono-Regular',
+          'Menlo',
+          'Monaco',
+          'Consolas',
+          'monospace',
+        ],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
