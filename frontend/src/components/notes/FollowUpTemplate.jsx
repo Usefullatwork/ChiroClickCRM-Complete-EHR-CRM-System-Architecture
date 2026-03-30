@@ -807,8 +807,12 @@ export default function FollowUpTemplate({
                 >
                   {code}
                   {!readOnly && (
-                    <button onClick={() => removeCode(code)} className="ml-1 hover:text-blue-600">
-                      <X className="w-3 h-3" />
+                    <button
+                      onClick={() => removeCode(code)}
+                      className="ml-1 hover:text-blue-600"
+                      aria-label="Fjern kode"
+                    >
+                      <X className="w-3 h-3" aria-hidden="true" />
                     </button>
                   )}
                 </span>

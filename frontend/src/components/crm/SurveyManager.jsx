@@ -410,14 +410,23 @@ const SurveyManager = () => {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
-                    <Edit className="w-4 h-4" />
+                  <button
+                    className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    aria-label="Rediger undersokelse"
+                  >
+                    <Edit className="w-4 h-4" aria-hidden="true" />
                   </button>
-                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
-                    <Send className="w-4 h-4" />
+                  <button
+                    className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    aria-label="Send undersokelse"
+                  >
+                    <Send className="w-4 h-4" aria-hidden="true" />
                   </button>
-                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
-                    <BarChart2 className="w-4 h-4" />
+                  <button
+                    className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    aria-label="Vis statistikk"
+                  >
+                    <BarChart2 className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -556,15 +565,17 @@ const SurveyManager = () => {
                         <button
                           className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 rounded-lg"
                           title={t('viewDetails')}
+                          aria-label={t('viewDetails')}
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye className="w-4 h-4" aria-hidden="true" />
                         </button>
                         {response.category === 'DETRACTOR' && (
                           <button
                             className="p-2 text-gray-400 dark:text-gray-300 hover:text-orange-500 rounded-lg"
                             title={t('followUp')}
+                            aria-label={t('followUp')}
                           >
-                            <Mail className="w-4 h-4" />
+                            <Mail className="w-4 h-4" aria-hidden="true" />
                           </button>
                         )}
                       </div>

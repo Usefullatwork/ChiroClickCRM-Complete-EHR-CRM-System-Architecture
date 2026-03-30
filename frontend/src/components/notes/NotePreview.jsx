@@ -230,12 +230,17 @@ export default function NotePreview({
                 onClick={() => onDelete(note?.id)}
                 className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
                 title={t('notePreviewDelete', 'Slett notat')}
+                aria-label="Slett notat"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-4 h-4" aria-hidden="true" />
               </button>
             )}
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg"
+              aria-label="Lukk"
+            >
+              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
             </button>
           </div>
         </div>

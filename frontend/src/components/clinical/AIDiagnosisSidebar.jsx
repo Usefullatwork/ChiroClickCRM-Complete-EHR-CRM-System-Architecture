@@ -119,15 +119,20 @@ export default function AIDiagnosisSidebar({
             disabled={isLoading}
             className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-indigo-600 hover:bg-indigo-50 rounded transition-colors"
             title="Oppdater forslag"
+            aria-label="Oppdater forslag"
           >
-            <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw
+              className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`}
+              aria-hidden="true"
+            />
           </button>
           <button
             onClick={onToggle}
             className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded transition-colors"
             title="Skjul panel"
+            aria-label="Skjul detaljer"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </div>

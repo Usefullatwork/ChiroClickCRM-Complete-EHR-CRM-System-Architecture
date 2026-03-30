@@ -78,8 +78,12 @@ export function DiagnosisPanel({
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-100 text-amber-800 text-sm font-medium"
             >
               <span className="font-mono">{code}</span>
-              <button onClick={() => onRemoveCode(code)} className="ml-1 hover:text-amber-900">
-                <X className="h-3.5 w-3.5" />
+              <button
+                onClick={() => onRemoveCode(code)}
+                className="ml-1 hover:text-amber-900"
+                aria-label="Fjern diagnosekode"
+              >
+                <X className="h-3.5 w-3.5" aria-hidden="true" />
               </button>
             </span>
           ))}

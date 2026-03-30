@@ -200,8 +200,12 @@ export default function PortalAppointments() {
           <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-xl border border-red-200">
             <AlertCircle className="w-5 h-5 flex-shrink-0" />
             <span className="text-sm">{error}</span>
-            <button onClick={() => setError(null)} className="ml-auto">
-              <X className="w-4 h-4" />
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto"
+              aria-label="Lukk feilmelding"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         )}

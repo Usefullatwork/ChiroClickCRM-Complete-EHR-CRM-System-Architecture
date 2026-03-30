@@ -106,8 +106,9 @@ export default function PortalDashboard() {
             onClick={handleLogout}
             className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
             title={t('logout')}
+            aria-label="Logg ut"
           >
-            <LogOut className="w-5 h-5" />
+            <LogOut className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
       </header>

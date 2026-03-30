@@ -442,8 +442,8 @@ function TreatmentProtocol({ protocol, lang, onClose }) {
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-medium text-teal-800">{protocol.name}</h4>
         {onClose && (
-          <button onClick={onClose} className="text-teal-600 hover:text-teal-800">
-            <XCircle className="w-5 h-5" />
+          <button onClick={onClose} className="text-teal-600 hover:text-teal-800" aria-label="Lukk">
+            <XCircle className="w-5 h-5" aria-hidden="true" />
           </button>
         )}
       </div>

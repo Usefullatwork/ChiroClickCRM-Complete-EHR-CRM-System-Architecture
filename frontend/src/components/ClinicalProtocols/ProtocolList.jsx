@@ -11,7 +11,20 @@ export default function ProtocolList({ protocols, onSelect }) {
       </p>
       <div className="protocol-selector">
         {Object.values(protocols).map((protocol) => (
-          <div key={protocol.id} className="protocol-card" onClick={() => onSelect(protocol)}>
+          <div
+            key={protocol.id}
+            className="protocol-card"
+            onClick={() => onSelect(protocol)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onSelect(protocol);
+              }
+            }}
+            aria-label={`Velg protokoll: ${protocol.name}`}
+          >
             <h3>{protocol.name}</h3>
             <p>{protocol.description}</p>
             <div style={{ marginTop: '12px', fontSize: '12px', color: '#888' }}>

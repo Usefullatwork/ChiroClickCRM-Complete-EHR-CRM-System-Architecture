@@ -199,8 +199,12 @@ export default function PrescriptionPreview({
             </button>
 
             {/* Close Button / Lukk-knapp */}
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-              <X className="w-5 h-5" />
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg"
+              aria-label="Lukk"
+            >
+              <X className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
         </div>

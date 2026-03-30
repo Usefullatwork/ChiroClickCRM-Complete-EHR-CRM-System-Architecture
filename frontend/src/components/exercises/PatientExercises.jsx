@@ -133,8 +133,8 @@ const LogComplianceModal = ({ prescription, date, onClose, onSave, isLoading }) 
               {prescription.exercise_name} - {date}
             </p>
           </div>
-          <button onClick={onClose} className="p-1 rounded hover:bg-slate-100">
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="p-1 rounded hover:bg-slate-100" aria-label="Lukk">
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 

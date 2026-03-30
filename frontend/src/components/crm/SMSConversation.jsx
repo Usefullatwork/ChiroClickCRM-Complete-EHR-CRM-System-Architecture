@@ -356,8 +356,11 @@ export default function SMSConversation({
                     {language === 'no' ? 'Se Pasient' : 'View Patient'}
                   </button>
                 )}
-                <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600">
-                  <MoreVertical className="w-5 h-5" />
+                <button
+                  className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600"
+                  aria-label="Flere handlinger"
+                >
+                  <MoreVertical className="w-5 h-5" aria-hidden="true" />
                 </button>
               </div>
             </div>

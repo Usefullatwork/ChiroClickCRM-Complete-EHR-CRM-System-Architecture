@@ -129,30 +129,34 @@ const PrescriptionCard = ({
                   disabled={!canMoveUp}
                   className="p-1.5 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed"
                   title={t('moveUp', 'Flytt opp')}
+                  aria-label={t('moveUp', 'Flytt opp')}
                 >
-                  <ChevronUp className="w-4 h-4" />
+                  <ChevronUp className="w-4 h-4" aria-hidden="true" />
                 </button>
                 <button
                   onClick={onMoveDown}
                   disabled={!canMoveDown}
                   className="p-1.5 hover:bg-gray-100 rounded disabled:opacity-30 disabled:cursor-not-allowed"
                   title={t('moveDown', 'Flytt ned')}
+                  aria-label={t('moveDown', 'Flytt ned')}
                 >
-                  <ChevronDown className="w-4 h-4" />
+                  <ChevronDown className="w-4 h-4" aria-hidden="true" />
                 </button>
                 <button
                   onClick={onToggleExpand}
                   className={`p-1.5 rounded transition-colors ${isExpanded ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 text-gray-500 dark:text-gray-400'}`}
                   title={t('editBtn', 'Rediger')}
+                  aria-label={t('editBtn', 'Rediger')}
                 >
-                  <Edit2 className="w-4 h-4" />
+                  <Edit2 className="w-4 h-4" aria-hidden="true" />
                 </button>
                 <button
                   onClick={onRemove}
                   className="p-1.5 hover:bg-red-50 rounded text-gray-400 dark:text-gray-300 hover:text-red-500"
                   title={t('remove', 'Fjern')}
+                  aria-label={t('remove', 'Fjern')}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-4 h-4" aria-hidden="true" />
                 </button>
               </div>
             </div>

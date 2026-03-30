@@ -351,8 +351,16 @@ export default function Exercises() {
 
         {/* Tabs */}
         {patientId && (
-          <div className="flex gap-1 mt-4 border-b border-gray-200 -mb-4">
+          <div
+            role="tablist"
+            aria-label="Ovelser"
+            className="flex gap-1 mt-4 border-b border-gray-200 -mb-4"
+          >
             <button
+              role="tab"
+              id="tab-library"
+              aria-selected={activeTab === 'library'}
+              aria-controls="tabpanel-library"
               onClick={() => setActiveTab('library')}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'library'
@@ -366,6 +374,10 @@ export default function Exercises() {
               </div>
             </button>
             <button
+              role="tab"
+              id="tab-prescriptions"
+              aria-selected={activeTab === 'prescriptions'}
+              aria-controls="tabpanel-prescriptions"
               onClick={() => setActiveTab('prescriptions')}
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'prescriptions'
@@ -385,6 +397,10 @@ export default function Exercises() {
             </button>
             {selectedExercises.length > 0 && (
               <button
+                role="tab"
+                id="tab-create"
+                aria-selected={activeTab === 'create'}
+                aria-controls="tabpanel-create"
                 onClick={() => setActiveTab('create')}
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'create'
@@ -410,8 +426,8 @@ export default function Exercises() {
         <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
           <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
           <p className="text-red-700">{error}</p>
-          <button onClick={() => setError(null)} className="ml-auto">
-            <X className="w-4 h-4 text-red-500" />
+          <button onClick={() => setError(null)} className="ml-auto" aria-label="Lukk feilmelding">
+            <X className="w-4 h-4 text-red-500" aria-hidden="true" />
           </button>
         </div>
       )}
@@ -432,7 +448,12 @@ export default function Exercises() {
           </div>
         ) : activeTab === 'library' ? (
           /* Exercise Library Tab */
-          <div className="bg-white rounded-lg shadow-sm">
+          <div
+            role="tabpanel"
+            id="tabpanel-library"
+            aria-labelledby="tab-library"
+            className="bg-white rounded-lg shadow-sm"
+          >
             <ExerciseLibrary
               exercises={exercises}
               categories={categories}
@@ -444,7 +465,12 @@ export default function Exercises() {
           </div>
         ) : activeTab === 'prescriptions' ? (
           /* Prescriptions Tab */
-          <div className="bg-white rounded-lg shadow-sm">
+          <div
+            role="tabpanel"
+            id="tabpanel-prescriptions"
+            aria-labelledby="tab-prescriptions"
+            className="bg-white rounded-lg shadow-sm"
+          >
             <div className="p-4 border-b border-gray-200">
               <div className="flex items-center gap-2">
                 <History className="w-5 h-5 text-blue-600" />
@@ -544,7 +570,12 @@ export default function Exercises() {
           </div>
         ) : activeTab === 'create' ? (
           /* Create Prescription Tab */
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div
+            role="tabpanel"
+            id="tabpanel-create"
+            aria-labelledby="tab-create"
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6"
+          >
             {/* Selected exercises */}
             <div className="bg-white rounded-lg shadow-sm">
               <ExercisePrescription

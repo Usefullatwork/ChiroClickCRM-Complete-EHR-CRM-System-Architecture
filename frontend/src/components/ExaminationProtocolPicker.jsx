@@ -167,8 +167,12 @@ export default function ExaminationProtocolPicker({ onSelectProtocol, isOpen, on
           <h3 className="text-sm font-semibold">
             {t('examinationProtocol', 'Undersøkelsesprotokoll')}
           </h3>
-          <button onClick={onClose} className="p-1 hover:bg-blue-700 rounded transition-colors">
-            <X className="w-5 h-5" />
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-blue-700 rounded transition-colors"
+            aria-label="Lukk"
+          >
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 

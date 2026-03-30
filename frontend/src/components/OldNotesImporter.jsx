@@ -242,8 +242,18 @@ export default function OldNotesImporter({ patientId, onClose }) {
                 )}
               </p>
             </div>
-            <button onClick={onClose} className="text-white hover:bg-blue-800 rounded-full p-2">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button
+              onClick={onClose}
+              className="text-white hover:bg-blue-800 rounded-full p-2"
+              aria-label="Lukk"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"

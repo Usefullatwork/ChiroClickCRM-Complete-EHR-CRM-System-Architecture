@@ -62,8 +62,9 @@ export default function SALTBanner({
             onClick={onDismiss}
             className="p-1.5 text-blue-400 hover:text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
             title="Lukk"
+            aria-label="Lukk"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
       </div>

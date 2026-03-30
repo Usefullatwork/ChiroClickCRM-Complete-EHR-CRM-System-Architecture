@@ -429,23 +429,26 @@ function FeedbackRow({
               disabled={isApproving}
               className="p-1.5 text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20 rounded"
               title="Godkjenn"
+              aria-label="Godkjenn"
             >
-              <CheckCircle2 className="w-4 h-4" />
+              <CheckCircle2 className="w-4 h-4" aria-hidden="true" />
             </button>
             <button
               onClick={onStartEdit}
               className="p-1.5 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded"
               title="Rediger og godkjenn"
+              aria-label="Rediger og godkjenn"
             >
-              <Edit3 className="w-4 h-4" />
+              <Edit3 className="w-4 h-4" aria-hidden="true" />
             </button>
             <button
               onClick={onReject}
               disabled={isRejecting}
               className="p-1.5 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded"
               title="Avvis"
+              aria-label="Avvis"
             >
-              <XCircle className="w-4 h-4" />
+              <XCircle className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         </td>

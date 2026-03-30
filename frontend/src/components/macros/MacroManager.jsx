@@ -524,8 +524,8 @@ function MacroModal({ macro, onSave, onClose, isSaving }) {
       <div className="bg-white rounded-lg shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between p-4 border-b">
           <h3 className="text-lg font-bold">{macro ? 'Rediger makro' : 'Ny makro'}</h3>
-          <button onClick={onClose} className="p-1 rounded hover:bg-gray-100">
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="p-1 rounded hover:bg-gray-100" aria-label="Lukk">
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 

@@ -448,8 +448,11 @@ const PatientLifecycle = () => {
                           </button>
                         );
                       })}
-                      <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg">
-                        <MoreVertical className="w-4 h-4" />
+                      <button
+                        className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
+                        aria-label="Flere handlinger"
+                      >
+                        <MoreVertical className="w-4 h-4" aria-hidden="true" />
                       </button>
                     </div>
                   </td>

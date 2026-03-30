@@ -362,14 +362,21 @@ const ExerciseTemplates = () => {
                   <button
                     onClick={() => setSelectedTemplate(template)}
                     className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    aria-label="Vis mal"
                   >
-                    <Eye className="w-4 h-4" />
+                    <Eye className="w-4 h-4" aria-hidden="true" />
                   </button>
-                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
-                    <Edit className="w-4 h-4" />
+                  <button
+                    className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    aria-label="Rediger mal"
+                  >
+                    <Edit className="w-4 h-4" aria-hidden="true" />
                   </button>
-                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
-                    <Copy className="w-4 h-4" />
+                  <button
+                    className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    aria-label="Kopier mal"
+                  >
+                    <Copy className="w-4 h-4" aria-hidden="true" />
                   </button>
                 </div>
               </div>
@@ -666,8 +673,11 @@ const ExerciseTemplates = () => {
                         ({file.size})
                       </span>
                     </div>
-                    <button className="p-1 text-gray-400 dark:text-gray-300 hover:text-blue-500">
-                      <Download className="w-4 h-4" />
+                    <button
+                      className="p-1 text-gray-400 dark:text-gray-300 hover:text-blue-500"
+                      aria-label="Last ned"
+                    >
+                      <Download className="w-4 h-4" aria-hidden="true" />
                     </button>
                   </div>
                 ))}

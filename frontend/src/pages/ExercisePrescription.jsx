@@ -530,8 +530,8 @@ export default function ExercisePrescription() {
         <div className="mx-6 mt-4 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3">
           <AlertTriangle className="w-5 h-5 text-red-500 flex-shrink-0" />
           <p className="text-red-700 flex-1">{error}</p>
-          <button onClick={() => setError(null)}>
-            <X className="w-4 h-4 text-red-500 hover:text-red-700" />
+          <button onClick={() => setError(null)} aria-label="Lukk feilmelding">
+            <X className="w-4 h-4 text-red-500 hover:text-red-700" aria-hidden="true" />
           </button>
         </div>
       )}

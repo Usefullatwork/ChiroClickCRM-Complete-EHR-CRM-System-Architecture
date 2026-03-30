@@ -287,9 +287,10 @@ export default function EnhancedBodyDiagram({
             <button
               onClick={clearAll}
               className="flex items-center gap-1 px-2 py-1 text-xs text-red-600 hover:text-red-800"
-              title="Fjern alle"
+              title="Tilbakestill visning"
+              aria-label="Tilbakestill visning"
             >
-              <RotateCcw className="w-3 h-3" />
+              <RotateCcw className="w-3 h-3" aria-hidden="true" />
             </button>
           )}
         </div>

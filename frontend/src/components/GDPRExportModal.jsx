@@ -3,7 +3,7 @@
  * Export patient data in compliance with GDPR Articles 15 & 20
  */
 
-import { useState } from 'react';
+import { useState, useId } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { gdprAPI } from '../services/api';
 import { X, Download, Shield, FileText, Database, Loader2 } from 'lucide-react';
@@ -13,6 +13,7 @@ import logger from '../utils/logger';
 export default function GDPRExportModal({ patient, onClose }) {
   const [exportType, setExportType] = useState('data-access'); // 'data-access' or 'data-portability'
   const [exportedData, setExportedData] = useState(null);
+  const titleId = useId();
 
   // Export mutation
   const exportMutation = useMutation({
@@ -57,20 +58,27 @@ export default function GDPRExportModal({ patient, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col"
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center gap-3">
             <Shield className="w-6 h-6 text-blue-600" />
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">GDPR Data Export</h2>
+              <h2 id={titleId} className="text-2xl font-bold text-gray-900">
+                GDPR Data Export
+              </h2>
               <p className="text-sm text-gray-600 dark:text-gray-300">
                 {patient.first_name} {patient.last_name}
               </p>
             </div>
           </div>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-            <X className="w-5 h-5" />
+          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg" aria-label="Lukk">
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 

@@ -343,8 +343,8 @@ const FieldPropertiesEditor = ({ field, onUpdate, onClose, t }) => {
     <div className="bg-white rounded-lg border border-gray-200 p-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="font-semibold text-gray-900">{t('fieldProperties', 'Feltegenskaper')}</h3>
-        <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
-          <X className="w-4 h-4" />
+        <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded" aria-label="Lukk">
+          <X className="w-4 h-4" aria-hidden="true" />
         </button>
       </div>
 
@@ -761,8 +761,12 @@ const DragDropFormBuilder = ({ initialFields = [], onChange, onSave, formName })
                     {field.type === 'rating' && (
                       <div className="flex gap-1">
                         {[1, 2, 3, 4, 5].map((n) => (
-                          <button key={n} className="p-1 hover:text-yellow-500">
-                            <Star className="w-6 h-6" />
+                          <button
+                            key={n}
+                            className="p-1 hover:text-yellow-500"
+                            aria-label={`${n} av 5 stjerner`}
+                          >
+                            <Star className="w-6 h-6" aria-hidden="true" />
                           </button>
                         ))}
                       </div>

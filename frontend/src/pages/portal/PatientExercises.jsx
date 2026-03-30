@@ -323,13 +323,19 @@ const ExerciseCard = ({
             <h4 className="font-medium text-slate-700 mb-2">{t('portalHowUseful')}</h4>
             <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
-                <button key={star} onClick={() => onRate(prescription.id, star)} className="p-1">
+                <button
+                  key={star}
+                  onClick={() => onRate(prescription.id, star)}
+                  className="p-1"
+                  aria-label={`${star} av 5 stjerner`}
+                >
                   <Star
                     className={`w-8 h-8 transition-colors ${
                       (prescription.patient_rating || 0) >= star
                         ? 'fill-yellow-400 text-yellow-400'
                         : 'text-slate-300 hover:text-yellow-300'
                     }`}
+                    aria-hidden="true"
                   />
                 </button>
               ))}

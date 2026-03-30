@@ -311,8 +311,12 @@ const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSa
               )}
               {downloadingPDF ? 'Laster...' : 'PDF-handout'}
             </button>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-              <X className="w-5 h-5" />
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg"
+              aria-label="Lukk"
+            >
+              <X className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -322,8 +326,12 @@ const ExercisePanel = ({ patient, encounterId, isOpen, onClose, onPrescriptionSa
           <div className="mx-6 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
             <AlertCircle className="w-4 h-4" />
             <span className="text-sm">{error}</span>
-            <button onClick={() => setError(null)} className="ml-auto">
-              <X className="w-4 h-4" />
+            <button
+              onClick={() => setError(null)}
+              className="ml-auto"
+              aria-label="Lukk feilmelding"
+            >
+              <X className="w-4 h-4" aria-hidden="true" />
             </button>
           </div>
         )}

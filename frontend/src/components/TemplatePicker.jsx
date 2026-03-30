@@ -184,8 +184,12 @@ export default function TemplatePicker({ onSelectTemplate, _soapSection, isOpen,
       <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-gray-900">Kliniske Maler</h3>
-          <button onClick={onClose} className="p-1 hover:bg-gray-200 rounded transition-colors">
-            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+          <button
+            onClick={onClose}
+            className="p-1 hover:bg-gray-200 rounded transition-colors"
+            aria-label="Lukk"
+          >
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
           </button>
         </div>
 

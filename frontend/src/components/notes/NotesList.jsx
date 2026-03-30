@@ -291,8 +291,9 @@ export default function NotesList({
                       }}
                       className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                       title="Se notat"
+                      aria-label="Se notat"
                     >
-                      <Eye className="w-4 h-4" />
+                      <Eye className="w-4 h-4" aria-hidden="true" />
                     </button>
                     {!isLocked && (
                       <button
@@ -302,8 +303,9 @@ export default function NotesList({
                         }}
                         className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                         title="Rediger notat"
+                        aria-label="Rediger notat"
                       >
-                        <Edit className="w-4 h-4" />
+                        <Edit className="w-4 h-4" aria-hidden="true" />
                       </button>
                     )}
                     <button
@@ -313,8 +315,9 @@ export default function NotesList({
                       }}
                       className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                       title="Skriv ut"
+                      aria-label="Skriv ut"
                     >
-                      <Printer className="w-4 h-4" />
+                      <Printer className="w-4 h-4" aria-hidden="true" />
                     </button>
                     <button
                       onClick={(e) => {
@@ -323,8 +326,9 @@ export default function NotesList({
                       }}
                       className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                       title="Last ned"
+                      aria-label="Last ned"
                     >
-                      <Download className="w-4 h-4" />
+                      <Download className="w-4 h-4" aria-hidden="true" />
                     </button>
                     {!isLocked && (
                       <button
@@ -334,8 +338,9 @@ export default function NotesList({
                         }}
                         className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
                         title="Slett notat"
+                        aria-label="Slett notat"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <Trash2 className="w-4 h-4" aria-hidden="true" />
                       </button>
                     )}
                     <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300 ml-2" />

@@ -5,7 +5,19 @@
 
 export default function EducationCard({ material, onClick }) {
   return (
-    <div className="material-card" onClick={() => onClick(material)}>
+    <div
+      className="material-card"
+      onClick={() => onClick(material)}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick(material);
+        }
+      }}
+      aria-label={`Vis materiale: ${material.title}`}
+    >
       <div className="material-header">
         <div className="material-category">{material.category}</div>
         <h3 className="material-title">{material.title}</h3>

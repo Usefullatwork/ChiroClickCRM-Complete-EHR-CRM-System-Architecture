@@ -416,9 +416,10 @@ export default function Spine3DViewer({
           <button
             onClick={resetCamera}
             className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 border border-gray-200 rounded"
-            title="Nullstill kamera"
+            title="Tilbakestill visning"
+            aria-label="Tilbakestill visning"
           >
-            <RotateCcw className="w-4 h-4" />
+            <RotateCcw className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       </div>

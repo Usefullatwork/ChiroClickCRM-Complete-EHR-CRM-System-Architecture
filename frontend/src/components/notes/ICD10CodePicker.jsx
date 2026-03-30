@@ -370,9 +370,14 @@ export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] 
         <p className="text-sm text-gray-900">{code.descriptionNo}</p>
         <p className="text-xs text-gray-500 dark:text-gray-400">{code.description}</p>
       </div>
-      <button onClick={(e) => toggleFavorite(code, e)} className="p-1 hover:bg-gray-100 rounded">
+      <button
+        onClick={(e) => toggleFavorite(code, e)}
+        className="p-1 hover:bg-gray-100 rounded"
+        aria-label={isFavorite(code) ? 'Fjern fra favoritter' : 'Legg til i favoritter'}
+      >
         <Star
           className={`w-4 h-4 ${isFavorite(code) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'}`}
+          aria-hidden="true"
         />
       </button>
     </button>
@@ -387,8 +392,12 @@ export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] 
             <h3 className="text-lg font-semibold text-gray-900">
               {t('selectICD10Code', 'Velg ICD-10 kode')}
             </h3>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg"
+              aria-label="Lukk"
+            >
+              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" aria-hidden="true" />
             </button>
           </div>
 

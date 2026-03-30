@@ -168,8 +168,8 @@ const AutoAcceptSettings = () => {
         <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700">
           <AlertCircle className="w-4 h-4" />
           <span>{error}</span>
-          <button onClick={() => setError(null)} className="ml-auto">
-            <X className="w-4 h-4" />
+          <button onClick={() => setError(null)} className="ml-auto" aria-label="Lukk feilmelding">
+            <X className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
       )}

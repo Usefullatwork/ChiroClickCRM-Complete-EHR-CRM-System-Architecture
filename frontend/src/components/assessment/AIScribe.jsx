@@ -545,8 +545,9 @@ export default function AIScribe({
                 onClick={clearAll}
                 className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-red-500 rounded"
                 title={t.clear}
+                aria-label="Slett"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
           )}

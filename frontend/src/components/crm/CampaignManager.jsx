@@ -436,36 +436,41 @@ const CampaignManager = () => {
                     <button
                       className="p-2 text-gray-400 dark:text-gray-300 hover:text-green-500 hover:bg-green-50 rounded-lg"
                       title={t('actionStart', 'Start')}
+                      aria-label={t('actionStart', 'Start')}
                     >
-                      <Play className="w-4 h-4" />
+                      <Play className="w-4 h-4" aria-hidden="true" />
                     </button>
                   )}
                   {campaign.status === 'ACTIVE' && !campaign.isAutomated && (
                     <button
                       className="p-2 text-gray-400 dark:text-gray-300 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg"
                       title={t('actionPause', 'Pause')}
+                      aria-label={t('actionPause', 'Pause')}
                     >
-                      <Pause className="w-4 h-4" />
+                      <Pause className="w-4 h-4" aria-hidden="true" />
                     </button>
                   )}
                   <button
                     className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
                     title={t('actionEdit', 'Rediger')}
+                    aria-label={t('actionEdit', 'Rediger')}
                   >
-                    <Edit className="w-4 h-4" />
+                    <Edit className="w-4 h-4" aria-hidden="true" />
                   </button>
                   <button
                     className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
                     title={t('actionCopy', 'Kopier')}
+                    aria-label={t('actionCopy', 'Kopier')}
                   >
-                    <Copy className="w-4 h-4" />
+                    <Copy className="w-4 h-4" aria-hidden="true" />
                   </button>
                   {campaign.status === 'DRAFT' && (
                     <button
                       className="p-2 text-gray-400 dark:text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-lg"
                       title={t('actionDelete', 'Slett')}
+                      aria-label={t('actionDelete', 'Slett')}
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-4 h-4" aria-hidden="true" />
                     </button>
                   )}
                 </div>

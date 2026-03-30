@@ -405,8 +405,11 @@ export default function LeadManagement({ language: _language }) {
                       )}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <button className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600">
-                        <MoreVertical className="w-4 h-4" />
+                      <button
+                        className="p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600"
+                        aria-label="Flere handlinger"
+                      >
+                        <MoreVertical className="w-4 h-4" aria-hidden="true" />
                       </button>
                     </td>
                   </tr>

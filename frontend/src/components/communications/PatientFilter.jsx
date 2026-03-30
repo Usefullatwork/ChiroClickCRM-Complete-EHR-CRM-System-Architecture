@@ -421,9 +421,10 @@ export default function PatientFilter({
             <button
               onClick={clearFilters}
               className="px-3 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700"
-              title={language === 'no' ? 'Nullstill filtre' : 'Clear filters'}
+              title={language === 'no' ? 'Tilbakestill filter' : 'Clear filters'}
+              aria-label="Tilbakestill filter"
             >
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-4 h-4" aria-hidden="true" />
             </button>
           )}
         </div>

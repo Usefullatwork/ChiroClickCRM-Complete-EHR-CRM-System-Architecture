@@ -366,16 +366,18 @@ const DraggableSoapSections = ({
             <button
               onClick={expandAll}
               className="p-1.5 hover:bg-gray-100 rounded-l-lg border-r border-gray-200"
-              title="Utvid alle"
+              title="Maksimer"
+              aria-label="Maksimer"
             >
-              <Maximize2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <Maximize2 className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" />
             </button>
             <button
               onClick={collapseAll}
               className="p-1.5 hover:bg-gray-100 rounded-r-lg"
-              title="Minimer alle"
+              title="Minimer"
+              aria-label="Minimer"
             >
-              <Minimize2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <Minimize2 className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" />
             </button>
           </div>
 

@@ -385,16 +385,21 @@ export default function IntakeParser({
                       onClick={handleCopy}
                       className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded"
                       title={t.copy}
+                      aria-label="Kopier"
                     >
-                      <Copy className="w-4 h-4" />
+                      <Copy className="w-4 h-4" aria-hidden="true" />
                     </button>
                     <button
                       onClick={handleGenerate}
                       disabled={isLoading}
                       className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded"
                       title={t.regenerate}
+                      aria-label="Oppdater"
                     >
-                      <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
+                      <RefreshCw
+                        className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`}
+                        aria-hidden="true"
+                      />
                     </button>
                   </div>
                 </div>

@@ -510,18 +510,27 @@ export default function RecallManager({
                       >
                         {campaign.active ? t.active : t.paused}
                       </span>
-                      <button className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600">
+                      <button
+                        className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600"
+                        aria-label={campaign.active ? 'Pause kampanje' : 'Start kampanje'}
+                      >
                         {campaign.active ? (
-                          <Pause className="w-4 h-4" />
+                          <Pause className="w-4 h-4" aria-hidden="true" />
                         ) : (
-                          <Play className="w-4 h-4" />
+                          <Play className="w-4 h-4" aria-hidden="true" />
                         )}
                       </button>
-                      <button className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600">
-                        <Edit3 className="w-4 h-4" />
+                      <button
+                        className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600"
+                        aria-label="Rediger kampanje"
+                      >
+                        <Edit3 className="w-4 h-4" aria-hidden="true" />
                       </button>
-                      <button className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-red-500">
-                        <Trash2 className="w-4 h-4" />
+                      <button
+                        className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-red-500"
+                        aria-label="Slett kampanje"
+                      >
+                        <Trash2 className="w-4 h-4" aria-hidden="true" />
                       </button>
                     </div>
                   </div>
