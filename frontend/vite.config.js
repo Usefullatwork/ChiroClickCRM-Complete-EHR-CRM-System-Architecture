@@ -43,10 +43,26 @@ export default defineConfig({
     sourcemap: false,
     rollupOptions: {
       output: {
-        manualChunks: {
-          'socket-vendor': ['socket.io-client'],
-          'chart-vendor': ['recharts'],
-          'ui-vendor': ['react', 'react-dom', 'react-router-dom'],
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            // Existing splits
+            if (id.includes('socket.io-client')) return 'socket-vendor';
+            if (id.includes('recharts')) return 'chart-vendor';
+            if (id.includes('react-dom') || (id.includes('/react/') && !id.includes('react-')))
+              return 'react-vendor';
+            if (id.includes('react-router')) return 'react-vendor';
+
+            // New splits — large vendors extracted from index chunk
+            if (id.includes('lucide-react')) return 'icon-vendor';
+            if (id.includes('@radix-ui')) return 'radix-vendor';
+            if (id.includes('@tanstack')) return 'query-vendor';
+            if (id.includes('date-fns')) return 'date-vendor';
+            if (id.includes('@dnd-kit')) return 'dnd-vendor';
+            if (id.includes('react-hook-form') || id.includes('@hookform') || id.includes('zod'))
+              return 'form-vendor';
+            if (id.includes('three') || id.includes('@react-three')) return 'three-vendor';
+            if (id.includes('zustand')) return 'state-vendor';
+          }
         },
       },
     },
