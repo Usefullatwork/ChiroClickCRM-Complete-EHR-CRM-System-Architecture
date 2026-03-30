@@ -154,8 +154,12 @@ export default function Communications() {
 
       {/* Tabs */}
       <div className="mb-6 border-b border-gray-200">
-        <nav className="-mb-px flex gap-6">
+        <div role="tablist" aria-label="Kommunikasjon" className="-mb-px flex gap-6">
           <button
+            role="tab"
+            id="tab-compose"
+            aria-selected={activeTab === 'compose'}
+            aria-controls="tabpanel-compose"
             onClick={() => setActiveTab('compose')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'compose'
@@ -169,6 +173,10 @@ export default function Communications() {
             </div>
           </button>
           <button
+            role="tab"
+            id="tab-history"
+            aria-selected={activeTab === 'history'}
+            aria-controls="tabpanel-history"
             onClick={() => setActiveTab('history')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'history'
@@ -181,12 +189,17 @@ export default function Communications() {
               {t('history')}
             </div>
           </button>
-        </nav>
+        </div>
       </div>
 
       {/* Compose Tab */}
       {activeTab === 'compose' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div
+          role="tabpanel"
+          id="tabpanel-compose"
+          aria-labelledby="tab-compose"
+          className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+        >
           {/* Main Composer */}
           <div className="lg:col-span-2 space-y-6">
             {/* Message Type Selector */}
@@ -417,7 +430,12 @@ export default function Communications() {
 
       {/* History Tab */}
       {activeTab === 'history' && (
-        <div className="bg-white rounded-lg border border-gray-200">
+        <div
+          role="tabpanel"
+          id="tabpanel-history"
+          aria-labelledby="tab-history"
+          className="bg-white rounded-lg border border-gray-200"
+        >
           {/* Filter + View Toggle */}
           <div className="px-6 py-4 border-b border-gray-200">
             <div className="flex items-center justify-between">

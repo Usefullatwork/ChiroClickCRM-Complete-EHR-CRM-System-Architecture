@@ -388,14 +388,18 @@ export default function Automations() {
 
       {/* Tabs */}
       <div className="mb-6 border-b border-gray-200">
-        <nav className="-mb-px flex gap-6">
+        <div role="tablist" aria-label="Automatiseringer" className="-mb-px flex gap-6">
           {[
             { id: 'workflows', label: t('workflows', 'Arbeidsflyter'), icon: Zap },
-            { id: 'executions', label: t('executions', 'Utførelseshistorikk'), icon: History },
+            { id: 'executions', label: t('executions', 'Utforelseshistorikk'), icon: History },
             { id: 'stats', label: t('stats', 'Statistikk'), icon: BarChart2 },
           ].map((tab) => (
             <button
               key={tab.id}
+              role="tab"
+              id={`tab-${tab.id}`}
+              aria-selected={activeTab === tab.id}
+              aria-controls={`tabpanel-${tab.id}`}
               onClick={() => setActiveTab(tab.id)}
               className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
                 activeTab === tab.id
@@ -407,66 +411,72 @@ export default function Automations() {
               {tab.label}
             </button>
           ))}
-        </nav>
+        </div>
       </div>
 
       {/* Tab Content */}
       {activeTab === 'workflows' && (
-        <WorkflowListTab
-          filteredWorkflows={filteredWorkflows}
-          workflowsLoading={workflowsLoading}
-          filters={filters}
-          setFilters={setFilters}
-          t={labels}
-          language={language}
-          triggerIcons={TRIGGER_ICONS}
-          triggerColors={TRIGGER_COLORS}
-          getTriggerLabel={getTriggerLabel}
-          onToggle={(id) => toggleMutation.mutate(id)}
-          onEdit={handleEditWorkflow}
-          onDelete={handleDeleteWorkflow}
-          onViewHistory={handleViewHistory}
-          onCreateNew={() => setShowBuilder(true)}
-        />
-      )}
-
-      {activeTab === 'executions' && (
-        <Suspense
-          fallback={
-            <div className="text-gray-500 dark:text-gray-400 p-4">
-              {t('loadingExecutionHistory')}
-            </div>
-          }
-        >
-          <ExecutionHistoryTab
-            executions={executions}
-            executionsLoading={executionsLoading}
-            executionFilters={executionFilters}
-            setExecutionFilters={setExecutionFilters}
-            workflows={workflows}
-            t={labels}
-            language={language}
-            getTriggerLabel={getTriggerLabel}
-          />
-        </Suspense>
-      )}
-
-      {activeTab === 'stats' && (
-        <Suspense
-          fallback={
-            <div className="text-gray-500 dark:text-gray-400 p-4">{t('loadingStatistics')}</div>
-          }
-        >
-          <AutomationStatsTab
-            stats={stats}
-            statsLoading={statsLoading}
+        <div role="tabpanel" id="tabpanel-workflows" aria-labelledby="tab-workflows">
+          <WorkflowListTab
+            filteredWorkflows={filteredWorkflows}
+            workflowsLoading={workflowsLoading}
+            filters={filters}
+            setFilters={setFilters}
             t={labels}
             language={language}
             triggerIcons={TRIGGER_ICONS}
             triggerColors={TRIGGER_COLORS}
             getTriggerLabel={getTriggerLabel}
+            onToggle={(id) => toggleMutation.mutate(id)}
+            onEdit={handleEditWorkflow}
+            onDelete={handleDeleteWorkflow}
+            onViewHistory={handleViewHistory}
+            onCreateNew={() => setShowBuilder(true)}
           />
-        </Suspense>
+        </div>
+      )}
+
+      {activeTab === 'executions' && (
+        <div role="tabpanel" id="tabpanel-executions" aria-labelledby="tab-executions">
+          <Suspense
+            fallback={
+              <div className="text-gray-500 dark:text-gray-400 p-4">
+                {t('loadingExecutionHistory')}
+              </div>
+            }
+          >
+            <ExecutionHistoryTab
+              executions={executions}
+              executionsLoading={executionsLoading}
+              executionFilters={executionFilters}
+              setExecutionFilters={setExecutionFilters}
+              workflows={workflows}
+              t={labels}
+              language={language}
+              getTriggerLabel={getTriggerLabel}
+            />
+          </Suspense>
+        </div>
+      )}
+
+      {activeTab === 'stats' && (
+        <div role="tabpanel" id="tabpanel-stats" aria-labelledby="tab-stats">
+          <Suspense
+            fallback={
+              <div className="text-gray-500 dark:text-gray-400 p-4">{t('loadingStatistics')}</div>
+            }
+          >
+            <AutomationStatsTab
+              stats={stats}
+              statsLoading={statsLoading}
+              t={labels}
+              language={language}
+              triggerIcons={TRIGGER_ICONS}
+              triggerColors={TRIGGER_COLORS}
+              getTriggerLabel={getTriggerLabel}
+            />
+          </Suspense>
+        </div>
       )}
     </div>
   );

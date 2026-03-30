@@ -289,10 +289,18 @@ export default function EasyAssessment() {
                   Back
                 </button>
 
-                <div className="flex gap-1 bg-white rounded-lg p-1 shadow-sm">
+                <div
+                  role="tablist"
+                  aria-label="SOAP-journalnotater"
+                  className="flex gap-1 bg-white rounded-lg p-1 shadow-sm"
+                >
                   {tabs.map((tab) => (
                     <button
                       key={tab.id}
+                      role="tab"
+                      id={`tab-${tab.id}`}
+                      aria-selected={activeTab === tab.id}
+                      aria-controls={`tabpanel-${tab.id}`}
                       onClick={() => setActiveTab(tab.id)}
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                         activeTab === tab.id
@@ -320,62 +328,68 @@ export default function EasyAssessment() {
                 </button>
               </div>
 
-              <Suspense fallback={<div className="animate-pulse bg-gray-50 rounded-lg h-64" />}>
-                {activeTab === 'subjective' && (
-                  <SubjectiveTab
-                    encounterData={encounterData}
-                    viewMode={viewMode}
-                    language={language}
-                    aiAvailable={aiAvailable}
-                    updateField={updateField}
-                    updateQuickSelect={updateQuickSelect}
-                    buildAIContext={buildAIContext}
-                    setShowBodyChart={setShowBodyChart}
-                  />
-                )}
+              <div
+                role="tabpanel"
+                id={`tabpanel-${activeTab}`}
+                aria-labelledby={`tab-${activeTab}`}
+              >
+                <Suspense fallback={<div className="animate-pulse bg-gray-50 rounded-lg h-64" />}>
+                  {activeTab === 'subjective' && (
+                    <SubjectiveTab
+                      encounterData={encounterData}
+                      viewMode={viewMode}
+                      language={language}
+                      aiAvailable={aiAvailable}
+                      updateField={updateField}
+                      updateQuickSelect={updateQuickSelect}
+                      buildAIContext={buildAIContext}
+                      setShowBodyChart={setShowBodyChart}
+                    />
+                  )}
 
-                {activeTab === 'objective' && (
-                  <ObjectiveTab
-                    encounterData={encounterData}
-                    viewMode={viewMode}
-                    language={language}
-                    aiAvailable={aiAvailable}
-                    updateField={updateField}
-                    updateQuickSelect={updateQuickSelect}
-                    buildAIContext={buildAIContext}
-                  />
-                )}
+                  {activeTab === 'objective' && (
+                    <ObjectiveTab
+                      encounterData={encounterData}
+                      viewMode={viewMode}
+                      language={language}
+                      aiAvailable={aiAvailable}
+                      updateField={updateField}
+                      updateQuickSelect={updateQuickSelect}
+                      buildAIContext={buildAIContext}
+                    />
+                  )}
 
-                {activeTab === 'assessment' && (
-                  <AssessmentTab
-                    encounterData={encounterData}
-                    setEncounterData={setEncounterData}
-                    language={language}
-                    aiAvailable={aiAvailable}
-                    updateField={updateField}
-                    addDiagnosisCode={addDiagnosisCode}
-                    removeDiagnosisCode={removeDiagnosisCode}
-                    commonDiagnoses={commonDiagnoses}
-                    buildAIContext={buildAIContext}
-                    showOutcomeAssessment={showOutcomeAssessment}
-                    setShowOutcomeAssessment={setShowOutcomeAssessment}
-                    outcomeType={outcomeType}
-                    setOutcomeType={setOutcomeType}
-                  />
-                )}
+                  {activeTab === 'assessment' && (
+                    <AssessmentTab
+                      encounterData={encounterData}
+                      setEncounterData={setEncounterData}
+                      language={language}
+                      aiAvailable={aiAvailable}
+                      updateField={updateField}
+                      addDiagnosisCode={addDiagnosisCode}
+                      removeDiagnosisCode={removeDiagnosisCode}
+                      commonDiagnoses={commonDiagnoses}
+                      buildAIContext={buildAIContext}
+                      showOutcomeAssessment={showOutcomeAssessment}
+                      setShowOutcomeAssessment={setShowOutcomeAssessment}
+                      outcomeType={outcomeType}
+                      setOutcomeType={setOutcomeType}
+                    />
+                  )}
 
-                {activeTab === 'plan' && (
-                  <PlanTab
-                    encounterData={encounterData}
-                    viewMode={viewMode}
-                    language={language}
-                    aiAvailable={aiAvailable}
-                    updateField={updateField}
-                    updateQuickSelect={updateQuickSelect}
-                    buildAIContext={buildAIContext}
-                  />
-                )}
-              </Suspense>
+                  {activeTab === 'plan' && (
+                    <PlanTab
+                      encounterData={encounterData}
+                      viewMode={viewMode}
+                      language={language}
+                      aiAvailable={aiAvailable}
+                      updateField={updateField}
+                      updateQuickSelect={updateQuickSelect}
+                      buildAIContext={buildAIContext}
+                    />
+                  )}
+                </Suspense>
+              </div>
             </div>
           )}
         </div>

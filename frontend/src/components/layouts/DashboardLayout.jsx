@@ -148,6 +148,14 @@ export default function DashboardLayout() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
+      {/* Skip to content link for accessibility — must be first focusable element */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-teal-600 focus:text-white focus:rounded-lg"
+      >
+        {t('skipToContent', 'Hopp til innhold')}
+      </a>
+
       {/* Mobile top bar */}
       <div className="md:hidden sticky top-0 z-30 flex items-center justify-between px-4 h-14 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <h1 className="text-lg font-semibold text-gray-900 dark:text-white">ChiroClickEHR</h1>
@@ -328,14 +336,6 @@ export default function DashboardLayout() {
         </div>
       </div>
 
-      {/* Skip to content link for accessibility */}
-      <a
-        href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[60] focus:px-4 focus:py-2 focus:bg-teal-600 focus:text-white focus:rounded-lg"
-      >
-        {t('skipToContent', 'Hopp til innhold')}
-      </a>
-
       {/* Desktop top bar with quick actions */}
       <div className="hidden md:flex md:ml-64 items-center justify-between px-6 h-12 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-20">
         {/* Search trigger */}
@@ -382,9 +382,9 @@ export default function DashboardLayout() {
       </div>
 
       {/* Main content - full width on mobile, with left margin on desktop */}
-      <div id="main-content" className="md:ml-64 flex-1">
+      <main id="main-content" className="md:ml-64 flex-1">
         <Outlet />
-      </div>
+      </main>
 
       {/* Desktop status bar */}
       <div className="md:ml-64">

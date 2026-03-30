@@ -177,8 +177,12 @@ export default function FollowUps() {
 
       {/* Tabs */}
       <div className="mb-6 border-b border-gray-200">
-        <nav className="-mb-px flex gap-6">
+        <div role="tablist" aria-label="Oppfolginger" className="-mb-px flex gap-6">
           <button
+            role="tab"
+            id="tab-all"
+            aria-selected={activeTab === 'all'}
+            aria-controls="tabpanel-all"
             onClick={() => setActiveTab('all')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'all'
@@ -192,6 +196,10 @@ export default function FollowUps() {
             </div>
           </button>
           <button
+            role="tab"
+            id="tab-pending"
+            aria-selected={activeTab === 'pending'}
+            aria-controls="tabpanel-pending"
             onClick={() => setActiveTab('pending')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'pending'
@@ -210,6 +218,10 @@ export default function FollowUps() {
             </div>
           </button>
           <button
+            role="tab"
+            id="tab-completed"
+            aria-selected={activeTab === 'completed'}
+            aria-controls="tabpanel-completed"
             onClick={() => setActiveTab('completed')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'completed'
@@ -223,6 +235,10 @@ export default function FollowUps() {
             </div>
           </button>
           <button
+            role="tab"
+            id="tab-needed"
+            aria-selected={activeTab === 'needed'}
+            aria-controls="tabpanel-needed"
             onClick={() => setActiveTab('needed')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'needed'
@@ -241,6 +257,10 @@ export default function FollowUps() {
             </div>
           </button>
           <button
+            role="tab"
+            id="tab-recall"
+            aria-selected={activeTab === 'recall'}
+            aria-controls="tabpanel-recall"
             onClick={() => setActiveTab('recall')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'recall'
@@ -253,7 +273,7 @@ export default function FollowUps() {
               Recall
             </div>
           </button>
-        </nav>
+        </div>
       </div>
 
       {/* Filters */}
@@ -314,10 +334,17 @@ export default function FollowUps() {
 
       {/* Content */}
       {activeTab === 'recall' ? (
-        <RecallDashboard />
+        <div role="tabpanel" id="tabpanel-recall" aria-labelledby="tab-recall">
+          <RecallDashboard />
+        </div>
       ) : activeTab === 'needed' ? (
         /* Patients Needing Follow-up List */
-        <div className="bg-white rounded-lg border border-gray-200">
+        <div
+          role="tabpanel"
+          id="tabpanel-needed"
+          aria-labelledby="tab-needed"
+          className="bg-white rounded-lg border border-gray-200"
+        >
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">{t('patientsFlagged')}</h2>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -398,7 +425,12 @@ export default function FollowUps() {
         </div>
       ) : (
         /* Follow-ups List */
-        <div className="bg-white rounded-lg border border-gray-200">
+        <div
+          role="tabpanel"
+          id={`tabpanel-${activeTab}`}
+          aria-labelledby={`tab-${activeTab}`}
+          className="bg-white rounded-lg border border-gray-200"
+        >
           <div className="divide-y divide-gray-100">
             {isLoading ? (
               <div className="px-6 py-12 text-center">

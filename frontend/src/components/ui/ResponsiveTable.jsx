@@ -44,6 +44,7 @@ export default function ResponsiveTable({
   mobileView = 'auto',
   stickyHeader = true,
   striped = false,
+  ariaLabel,
   className = '',
 }) {
   const { t } = useTranslation('common');
@@ -254,12 +255,13 @@ export default function ResponsiveTable({
           WebkitOverflowScrolling: 'touch',
         }}
       >
-        <table className="w-full min-w-full">
+        <table className="w-full min-w-full" aria-label={ariaLabel}>
           <thead className={stickyHeader ? 'sticky top-0 z-10' : ''}>
             <tr className="bg-gray-50 border-b border-gray-200">
               {visibleColumns.map((col, _index) => (
                 <th
                   key={col.key}
+                  scope="col"
                   className={`px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider whitespace-nowrap ${
                     col.sticky ? 'sticky left-0 z-20 bg-gray-50' : ''
                   }`}
@@ -272,7 +274,10 @@ export default function ResponsiveTable({
                 </th>
               ))}
               {hasActions && (
-                <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider w-24 sm:w-32">
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-right text-xs font-semibold text-gray-600 dark:text-gray-300 uppercase tracking-wider w-24 sm:w-32"
+                >
                   <span className="sr-only">{t('actionsScreenReader', 'Handlinger')}</span>
                 </th>
               )}

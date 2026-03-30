@@ -197,10 +197,11 @@ export default function Appointments() {
               data-testid="appointments-list"
               className="bg-white rounded-lg shadow overflow-hidden"
             >
-              <div className="divide-y divide-gray-200">
+              <div role="list" className="divide-y divide-gray-200">
                 {appointments.map((appointment) => (
                   <div
                     key={appointment.id}
+                    role="listitem"
                     data-testid="appointment-row"
                     className="p-6 hover:bg-gray-50 transition-colors"
                   >

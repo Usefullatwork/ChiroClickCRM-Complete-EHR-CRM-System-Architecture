@@ -237,6 +237,8 @@ function OfflineBanner({
 }) {
   return (
     <div
+      role="status"
+      aria-live="polite"
       className={`
         w-full px-4 py-3 transition-all duration-300
         ${
@@ -389,6 +391,8 @@ function OfflineToast({
 
   return (
     <div
+      role="status"
+      aria-live="polite"
       className={`
         fixed z-50 ${positionClasses}
         flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg

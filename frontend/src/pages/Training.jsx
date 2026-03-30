@@ -106,12 +106,20 @@ export default function Training() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-fit">
+      <div
+        role="tablist"
+        aria-label="AI-modellbehandling"
+        className="flex gap-1 mb-6 bg-gray-100 dark:bg-gray-800 rounded-lg p-1 w-fit"
+      >
         {TABS.map((tab) => {
           const Icon = TAB_ICONS[tab.id];
           return (
             <button
               key={tab.id}
+              role="tab"
+              id={`tab-${tab.id}`}
+              aria-selected={activeTab === tab.id}
+              aria-controls={`tabpanel-${tab.id}`}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 activeTab === tab.id
@@ -127,7 +135,7 @@ export default function Training() {
       </div>
 
       {activeTab === 'models' && (
-        <>
+        <div role="tabpanel" id="tabpanel-models" aria-labelledby="tab-models">
           <ModelsTab
             statusQuery={statusQuery}
             dataQuery={dataQuery}
@@ -155,39 +163,45 @@ export default function Training() {
               <AnalyticsTab />
             </Suspense>
           </div>
-        </>
+        </div>
       )}
 
       {activeTab === 'curation' && (
-        <Suspense
-          fallback={
-            <div className="text-gray-500 dark:text-gray-400 p-4">{t('loadingDataCuration')}</div>
-          }
-        >
-          <DataCurationTab />
-        </Suspense>
+        <div role="tabpanel" id="tabpanel-curation" aria-labelledby="tab-curation">
+          <Suspense
+            fallback={
+              <div className="text-gray-500 dark:text-gray-400 p-4">{t('loadingDataCuration')}</div>
+            }
+          >
+            <DataCurationTab />
+          </Suspense>
+        </div>
       )}
 
       {activeTab === 'pipeline' && (
-        <Suspense
-          fallback={
-            <div className="text-gray-500 dark:text-gray-400 p-4">
-              {t('loadingTrainingPipeline')}
-            </div>
-          }
-        >
-          <PipelineTab />
-        </Suspense>
+        <div role="tabpanel" id="tabpanel-pipeline" aria-labelledby="tab-pipeline">
+          <Suspense
+            fallback={
+              <div className="text-gray-500 dark:text-gray-400 p-4">
+                {t('loadingTrainingPipeline')}
+              </div>
+            }
+          >
+            <PipelineTab />
+          </Suspense>
+        </div>
       )}
 
       {activeTab === 'playground' && (
-        <Suspense
-          fallback={
-            <div className="text-gray-500 dark:text-gray-400 p-4">{t('loadingPlayground')}</div>
-          }
-        >
-          <PlaygroundTab />
-        </Suspense>
+        <div role="tabpanel" id="tabpanel-playground" aria-labelledby="tab-playground">
+          <Suspense
+            fallback={
+              <div className="text-gray-500 dark:text-gray-400 p-4">{t('loadingPlayground')}</div>
+            }
+          >
+            <PlaygroundTab />
+          </Suspense>
+        </div>
       )}
     </div>
   );

@@ -16,7 +16,7 @@ function PageErrorFallback({ pageName }) {
   const { t } = useTranslation('common');
 
   return (
-    <div className="flex items-center justify-center min-h-[50vh] px-4">
+    <div role="alert" className="flex items-center justify-center min-h-[50vh] px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
         <div className="w-14 h-14 mx-auto mb-4 flex items-center justify-center rounded-full bg-amber-100">
           <svg

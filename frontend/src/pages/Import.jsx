@@ -159,8 +159,16 @@ export default function Import() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-gray-200">
+      <div
+        className="flex gap-2 mb-6 border-b border-gray-200"
+        role="tablist"
+        aria-label="Importmetode"
+      >
         <button
+          role="tab"
+          id="tab-excel"
+          aria-selected={activeTab === 'excel'}
+          aria-controls="tabpanel-excel"
           onClick={() => setActiveTab('excel')}
           className={`px-6 py-3 font-medium transition-colors ${
             activeTab === 'excel'
@@ -174,6 +182,10 @@ export default function Import() {
           </div>
         </button>
         <button
+          role="tab"
+          id="tab-text"
+          aria-selected={activeTab === 'text'}
+          aria-controls="tabpanel-text"
           onClick={() => setActiveTab('text')}
           className={`px-6 py-3 font-medium transition-colors ${
             activeTab === 'text'
@@ -190,7 +202,7 @@ export default function Import() {
 
       {/* Excel Upload Tab */}
       {activeTab === 'excel' && (
-        <div className="space-y-6">
+        <div role="tabpanel" id="tabpanel-excel" aria-labelledby="tab-excel" className="space-y-6">
           {/* Download Template */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start gap-3">
@@ -275,7 +287,7 @@ export default function Import() {
 
       {/* Text Paste Tab */}
       {activeTab === 'text' && (
-        <div className="space-y-6">
+        <div role="tabpanel" id="tabpanel-text" aria-labelledby="tab-text" className="space-y-6">
           {/* Instructions */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div className="flex items-start gap-3">
@@ -324,10 +336,18 @@ export default function Import() {
                     <table className="w-full text-sm">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-3 py-2 text-left">ID</th>
-                          <th className="px-3 py-2 text-left">Name</th>
-                          <th className="px-3 py-2 text-left">Phone</th>
-                          <th className="px-3 py-2 text-left">Email</th>
+                          <th scope="col" className="px-3 py-2 text-left">
+                            ID
+                          </th>
+                          <th scope="col" className="px-3 py-2 text-left">
+                            Name
+                          </th>
+                          <th scope="col" className="px-3 py-2 text-left">
+                            Phone
+                          </th>
+                          <th scope="col" className="px-3 py-2 text-left">
+                            Email
+                          </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">

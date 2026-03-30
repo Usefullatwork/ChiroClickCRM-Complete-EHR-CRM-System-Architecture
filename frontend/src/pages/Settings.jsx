@@ -286,13 +286,17 @@ export default function Settings() {
 
       {/* Tabs */}
       <div className="mb-6 border-b border-gray-200">
-        <nav className="-mb-px flex gap-6">
+        <div role="tablist" aria-label="Innstillinger" className="-mb-px flex gap-6">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
+                role="tab"
+                id={`tab-${tab.id}`}
+                aria-selected={isActive}
+                aria-controls={`tabpanel-${tab.id}`}
                 onClick={() => {
                   setActiveTab(tab.id);
                   setEditMode(false);
@@ -310,82 +314,84 @@ export default function Settings() {
               </button>
             );
           })}
-        </nav>
+        </div>
       </div>
 
       {/* Tab Content */}
-      <Suspense fallback={<TabLoading />}>
-        {activeTab === 'organization' && (
-          <OrganizationSettings
-            t={t}
-            organization={organization}
-            orgLoading={orgLoading}
-            editMode={editMode}
-            formData={formData}
-            setFormData={setFormData}
-            handleEdit={handleEdit}
-            handleCancel={handleCancel}
-            handleSave={handleSave}
-            updateOrgMutation={updateOrgMutation}
-          />
-        )}
+      <div role="tabpanel" id={`tabpanel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
+        <Suspense fallback={<TabLoading />}>
+          {activeTab === 'organization' && (
+            <OrganizationSettings
+              t={t}
+              organization={organization}
+              orgLoading={orgLoading}
+              editMode={editMode}
+              formData={formData}
+              setFormData={setFormData}
+              handleEdit={handleEdit}
+              handleCancel={handleCancel}
+              handleSave={handleSave}
+              updateOrgMutation={updateOrgMutation}
+            />
+          )}
 
-        {activeTab === 'profile' && (
-          <ProfileSettings
-            t={t}
-            currentUser={currentUser}
-            userLoading={userLoading}
-            editMode={editMode}
-            formData={formData}
-            setFormData={setFormData}
-            handleEdit={handleEdit}
-            handleCancel={handleCancel}
-            handleSave={handleSave}
-            updateUserMutation={updateUserMutation}
-          />
-        )}
+          {activeTab === 'profile' && (
+            <ProfileSettings
+              t={t}
+              currentUser={currentUser}
+              userLoading={userLoading}
+              editMode={editMode}
+              formData={formData}
+              setFormData={setFormData}
+              handleEdit={handleEdit}
+              handleCancel={handleCancel}
+              handleSave={handleSave}
+              updateUserMutation={updateUserMutation}
+            />
+          )}
 
-        {activeTab === 'users' && (
-          <UserManagement
-            t={t}
-            organizationUsers={organizationUsers}
-            usersLoading={usersLoading}
-            handleInviteUser={handleInviteUser}
-            inviteUserMutation={inviteUserMutation}
-          />
-        )}
+          {activeTab === 'users' && (
+            <UserManagement
+              t={t}
+              organizationUsers={organizationUsers}
+              usersLoading={usersLoading}
+              handleInviteUser={handleInviteUser}
+              inviteUserMutation={inviteUserMutation}
+            />
+          )}
 
-        {activeTab === 'notifications' && <NotificationSettings t={t} />}
+          {activeTab === 'notifications' && <NotificationSettings t={t} />}
 
-        {activeTab === 'integrations' && <IntegrationSettings t={t} />}
+          {activeTab === 'integrations' && <IntegrationSettings t={t} />}
 
-        {activeTab === 'ai' && (
-          <>
-            <AISettings />
-            <div className="mt-6">
-              <TrainingDataExport />
-            </div>
-          </>
-        )}
+          {activeTab === 'ai' && (
+            <>
+              <AISettings />
+              <div className="mt-6">
+                <TrainingDataExport />
+              </div>
+            </>
+          )}
 
-        {activeTab === 'clinical' && (
-          <ClinicalSettings
-            t={t}
-            clinicalPrefs={clinicalPrefs}
-            onClinicalPrefChange={handleClinicalPrefChange}
-          />
-        )}
+          {activeTab === 'clinical' && (
+            <ClinicalSettings
+              t={t}
+              clinicalPrefs={clinicalPrefs}
+              onClinicalPrefChange={handleClinicalPrefChange}
+            />
+          )}
 
-        {activeTab === 'exercises' && <ExerciseSettings lang={lang} />}
+          {activeTab === 'exercises' && <ExerciseSettings lang={lang} />}
 
-        {activeTab === 'autoaccept' && <AutoAcceptSettings />}
+          {activeTab === 'autoaccept' && <AutoAcceptSettings />}
 
-        {activeTab === 'reminders' && <AutomatedRemindersSettings />}
+          {activeTab === 'reminders' && <AutomatedRemindersSettings />}
 
-        {activeTab === 'modules' && <ModuleManager />}
+          {activeTab === 'modules' && <ModuleManager />}
 
-        {activeTab === 'backup' && <BackupManager />}
-      </Suspense>
+          {activeTab === 'backup' && <BackupManager />}
+        </Suspense>
+      </div>
 
       {/* Invite User Modal */}
       {inviteModalOpen && (

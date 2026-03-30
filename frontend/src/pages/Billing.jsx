@@ -279,8 +279,12 @@ export default function Billing() {
 
       {/* Tabs / Faner */}
       <div className="mb-6 border-b border-gray-200">
-        <nav className="-mb-px flex gap-6">
+        <div role="tablist" aria-label="Fakturering" className="-mb-px flex gap-6">
           <button
+            role="tab"
+            id="tab-invoices"
+            aria-selected={activeTab === 'invoices'}
+            aria-controls="tabpanel-invoices"
             onClick={() => setActiveTab('invoices')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
               activeTab === 'invoices'
@@ -292,6 +296,10 @@ export default function Billing() {
             {t('invoices')}
           </button>
           <button
+            role="tab"
+            id="tab-takst"
+            aria-selected={activeTab === 'takst'}
+            aria-controls="tabpanel-takst"
             onClick={() => setActiveTab('takst')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
               activeTab === 'takst'
@@ -303,6 +311,10 @@ export default function Billing() {
             {t('takstCodesTab')}
           </button>
           <button
+            role="tab"
+            id="tab-reports"
+            aria-selected={activeTab === 'reports'}
+            aria-controls="tabpanel-reports"
             onClick={() => setActiveTab('reports')}
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
               activeTab === 'reports'
@@ -313,17 +325,24 @@ export default function Billing() {
             <TrendingUp className="w-4 h-4" />
             {t('reportsTab')}
           </button>
-        </nav>
+        </div>
       </div>
 
       {/* Invoices Tab / Faktura-fane */}
       {activeTab === 'invoices' && (
-        <InvoiceList onViewInvoice={handleViewInvoice} onRecordPayment={handleRecordPayment} />
+        <div role="tabpanel" id="tabpanel-invoices" aria-labelledby="tab-invoices">
+          <InvoiceList onViewInvoice={handleViewInvoice} onRecordPayment={handleRecordPayment} />
+        </div>
       )}
 
       {/* Takst Codes Tab / Takstkoder-fane */}
       {activeTab === 'takst' && (
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <div
+          role="tabpanel"
+          id="tabpanel-takst"
+          aria-labelledby="tab-takst"
+          className="bg-white rounded-lg border border-gray-200 p-6"
+        >
           <div className="mb-4">
             <h3 className="text-lg font-semibold text-gray-900">{t('norwegianTakstCodes')}</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -340,7 +359,12 @@ export default function Billing() {
 
       {/* Reports Tab / Rapporter-fane */}
       {activeTab === 'reports' && (
-        <div className="space-y-6">
+        <div
+          role="tabpanel"
+          id="tabpanel-reports"
+          aria-labelledby="tab-reports"
+          className="space-y-6"
+        >
           <div className="bg-white rounded-lg border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('financialReports')}</h3>
 

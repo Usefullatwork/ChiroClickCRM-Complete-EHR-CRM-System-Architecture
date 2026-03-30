@@ -104,10 +104,10 @@ describe('Training Page', () => {
   it('should render four tab buttons', () => {
     renderPage();
 
-    expect(screen.getByRole('button', { name: /tabModels/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /tabDataCuration/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /tabTraining/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /tabPlayground/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /tabModels/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /tabDataCuration/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /tabTraining/i })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: /tabPlayground/i })).toBeInTheDocument();
   });
 
   it('should show models tab by default', async () => {
@@ -130,7 +130,7 @@ describe('Training Page', () => {
   it('should switch to data curation tab on click', async () => {
     renderPage();
 
-    const curationTab = screen.getByRole('button', { name: /tabDataCuration/i });
+    const curationTab = screen.getByRole('tab', { name: /tabDataCuration/i });
     fireEvent.click(curationTab);
 
     await waitFor(() => {
@@ -141,7 +141,7 @@ describe('Training Page', () => {
   it('should switch to pipeline tab on click', async () => {
     renderPage();
 
-    const pipelineTab = screen.getByRole('button', { name: /tabTraining/i });
+    const pipelineTab = screen.getByRole('tab', { name: /tabTraining/i });
     fireEvent.click(pipelineTab);
 
     await waitFor(() => {
@@ -152,7 +152,7 @@ describe('Training Page', () => {
   it('should switch to playground tab on click', async () => {
     renderPage();
 
-    const playgroundTab = screen.getByRole('button', { name: /tabPlayground/i });
+    const playgroundTab = screen.getByRole('tab', { name: /tabPlayground/i });
     fireEvent.click(playgroundTab);
 
     await waitFor(() => {

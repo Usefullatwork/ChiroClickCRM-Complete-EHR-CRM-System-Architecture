@@ -21,9 +21,14 @@ export const Alert = ({ children, variant = 'info', title, onClose, className = 
   };
 
   const config = variants[variant];
+  const isUrgent = variant === 'danger' || variant === 'warning';
 
   return (
-    <div className={`border rounded-lg p-4 ${config.container} ${className}`}>
+    <div
+      role={isUrgent ? 'alert' : 'status'}
+      aria-live={isUrgent ? 'assertive' : 'polite'}
+      className={`border rounded-lg p-4 ${config.container} ${className}`}
+    >
       <div className="flex gap-3">
         <div className="flex-shrink-0">{config.icon}</div>
         <div className="flex-1">

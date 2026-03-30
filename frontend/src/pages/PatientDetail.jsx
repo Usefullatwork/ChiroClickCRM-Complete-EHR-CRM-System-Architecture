@@ -247,10 +247,18 @@ export default function PatientDetail() {
           className="flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-gray-900"
         >
           {/* Tab bar */}
-          <div className="flex items-center gap-1 px-6 pt-4 pb-0">
+          <div
+            role="tablist"
+            aria-label="Pasientdetaljer"
+            className="flex items-center gap-1 px-6 pt-4 pb-0"
+          >
             {TABS.map((tab) => (
               <button
                 key={tab.key}
+                role="tab"
+                id={`tab-${tab.key}`}
+                aria-selected={activeTab === tab.key}
+                aria-controls={`tabpanel-${tab.key}`}
                 onClick={() => setActiveTab(tab.key)}
                 className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
                   activeTab === tab.key
@@ -264,7 +272,12 @@ export default function PatientDetail() {
           </div>
 
           {/* Tab content */}
-          <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mx-6 mb-6 rounded-b-lg rounded-tr-lg shadow-sm">
+          <div
+            role="tabpanel"
+            id={`tabpanel-${activeTab}`}
+            aria-labelledby={`tab-${activeTab}`}
+            className="flex-1 overflow-y-auto bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mx-6 mb-6 rounded-b-lg rounded-tr-lg shadow-sm"
+          >
             {/* Overview Tab */}
             {activeTab === 'overview' && (
               <div className="p-6 space-y-6">

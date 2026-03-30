@@ -75,7 +75,7 @@ describe('Import Page', () => {
   it('should switch to text paste tab on click', () => {
     renderPage();
 
-    const textTab = screen.getByRole('button', { name: /pasteText/i });
+    const textTab = screen.getByRole('tab', { name: /pasteText/i });
     fireEvent.click(textTab);
 
     expect(screen.getByText('pastePatientData')).toBeInTheDocument();
@@ -116,7 +116,7 @@ describe('Import Page', () => {
   it('should render parse button disabled when text area is empty', () => {
     renderPage();
 
-    const textTab = screen.getByRole('button', { name: /pasteText/i });
+    const textTab = screen.getByRole('tab', { name: /pasteText/i });
     fireEvent.click(textTab);
 
     const parseBtn = screen.getByRole('button', { name: 'parseData' });
@@ -126,7 +126,7 @@ describe('Import Page', () => {
   it('should enable parse button when text is entered', () => {
     renderPage();
 
-    const textTab = screen.getByRole('button', { name: /pasteText/i });
+    const textTab = screen.getByRole('tab', { name: /pasteText/i });
     fireEvent.click(textTab);
 
     const textarea = screen.getByPlaceholderText('pasteHere');
