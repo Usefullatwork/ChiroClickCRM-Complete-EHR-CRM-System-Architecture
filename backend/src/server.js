@@ -121,6 +121,35 @@ app.use(sanitizeInput);
 // Compression
 app.use(compression());
 
+// Cache-Control headers (Normen compliance — PHI endpoints must use no-store)
+app.use((req, res, next) => {
+  // Static assets served by Express in desktop mode
+  if (req.path.match(/\.(js|css|png|jpg|svg|woff2?)$/)) {
+    res.set('Cache-Control', 'public, max-age=31536000, immutable');
+    return next();
+  }
+
+  // Template/reference data endpoints (read-heavy, rarely change)
+  if (
+    req.method === 'GET' &&
+    (req.path.includes('/templates') ||
+      req.path.includes('/exercise-library') ||
+      req.path.includes('/icpc-codes') ||
+      req.path.includes('/spine-templates'))
+  ) {
+    res.set('Cache-Control', 'private, max-age=300');
+    return next();
+  }
+
+  // All other GET API responses: no-store for patient data (PHI) by default
+  if (req.method === 'GET') {
+    res.set('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    res.set('Pragma', 'no-cache');
+  }
+
+  next();
+});
+
 // HTTP request logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
