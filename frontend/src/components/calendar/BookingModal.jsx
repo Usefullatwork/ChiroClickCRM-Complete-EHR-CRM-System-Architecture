@@ -14,7 +14,7 @@
  * - Norwegian labels
  */
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef, useId } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { patientsAPI } from '../../services/api';
 import { format, parseISO, addMinutes } from 'date-fns';
@@ -220,6 +220,8 @@ export default function BookingModal({
 }) {
   const confirm = useConfirm();
   const { t } = useTranslation('appointments');
+  const titleId = useId();
+  const dialogRef = useRef(null);
 
   // Form state
   const [selectedPatient, setSelectedPatient] = useState(null);
@@ -375,17 +377,37 @@ export default function BookingModal({
     setCancelReason('');
   };
 
+  // ESC key handler
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onClose]);
+
   if (!isOpen) {
     return null;
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-      <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col">
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-hidden flex flex-col"
+      >
         {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
           <div>
-            <h2 className="text-lg font-bold text-gray-900">
+            <h2 id={titleId} className="text-lg font-bold text-gray-900">
               {editingAppointment ? 'Rediger avtale' : 'Ny avtale'}
             </h2>
             {appointmentDate && (
@@ -397,6 +419,7 @@ export default function BookingModal({
           <button
             onClick={onClose}
             className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            aria-label="Lukk"
           >
             <X className="w-5 h-5" />
           </button>

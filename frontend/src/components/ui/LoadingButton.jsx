@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { Loader2 } from 'lucide-react';
 
 /**
@@ -14,17 +15,20 @@ import { Loader2 } from 'lucide-react';
  * @param {React.ElementType} [props.icon] — Left icon component
  * @param {React.ReactNode}   props.children
  */
-export default function LoadingButton({
-  loading = false,
-  loadingText,
-  variant = 'primary',
-  size = 'md',
-  icon: Icon,
-  children,
-  className = '',
-  disabled,
-  ...rest
-}) {
+const LoadingButton = forwardRef(function LoadingButton(
+  {
+    loading = false,
+    loadingText,
+    variant = 'primary',
+    size = 'md',
+    icon: Icon,
+    children,
+    className = '',
+    disabled,
+    ...rest
+  },
+  ref
+) {
   const baseClasses =
     'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50';
 
@@ -44,6 +48,7 @@ export default function LoadingButton({
 
   return (
     <button
+      ref={ref}
       className={`${baseClasses} ${variantClasses[variant] || variantClasses.primary} ${sizeClasses[size] || sizeClasses.md} ${className}`}
       disabled={disabled || loading}
       {...rest}
@@ -61,4 +66,6 @@ export default function LoadingButton({
       )}
     </button>
   );
-}
+});
+
+export default LoadingButton;

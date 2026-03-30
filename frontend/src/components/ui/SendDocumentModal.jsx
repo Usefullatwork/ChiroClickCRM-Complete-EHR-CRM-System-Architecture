@@ -3,7 +3,7 @@
  * Allows sending documents to patients via email, SMS, or both
  */
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Mail, Phone, Send, X, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { pdfAPI, exercisesAPI } from '../../services/api';
 import { useTranslation } from '../../i18n';
@@ -31,6 +31,68 @@ export default function SendDocumentModal({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const dialogRef = useRef(null);
+  const triggerRef = useRef(null);
+
+  // Focus restoration
+  useEffect(() => {
+    if (isOpen) {
+      triggerRef.current = document.activeElement;
+    }
+    return () => {
+      if (triggerRef.current && typeof triggerRef.current.focus === 'function') {
+        triggerRef.current.focus();
+      }
+    };
+  }, [isOpen]);
+
+  // Auto-focus, ESC handler, focus trap
+  useEffect(() => {
+    if (!isOpen || !dialogRef.current) {
+      return;
+    }
+
+    const focusableSelector =
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+    // Auto-focus first interactive element
+    const timer = setTimeout(() => {
+      const focusable = dialogRef.current?.querySelectorAll(focusableSelector);
+      if (focusable?.length) {
+        focusable[0].focus();
+      }
+    }, 50);
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        if (!sending) {
+          onClose();
+        }
+        return;
+      }
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll(focusableSelector);
+        if (!focusable.length) {
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, sending, onClose]);
 
   if (!isOpen) {
     return null;
@@ -77,6 +139,7 @@ export default function SendDocumentModal({
       onClick={handleClose}
     >
       <div
+        ref={dialogRef}
         className="bg-white rounded-2xl shadow-xl w-full max-w-md"
         onClick={(e) => e.stopPropagation()}
         role="dialog"

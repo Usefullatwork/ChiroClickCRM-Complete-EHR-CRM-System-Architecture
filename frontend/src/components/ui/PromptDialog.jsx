@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect, createContext, useContext } from 'react';
+import { useState, useCallback, useRef, useEffect, useId, createContext, useContext } from 'react';
 import { X } from 'lucide-react';
 import { useTranslation } from '../../i18n';
 
@@ -28,10 +28,25 @@ export default function PromptDialog({
   const { t } = useTranslation();
   const [value, setValue] = useState(defaultValue);
   const inputRef = useRef(null);
+  const dialogRef = useRef(null);
+  const triggerRef = useRef(null);
+  const titleId = useId();
 
   const resolvedTitle = title ?? t('enter');
   const resolvedConfirm = confirmText ?? t('confirm');
   const resolvedCancel = cancelText ?? t('cancel');
+
+  // Focus restoration
+  useEffect(() => {
+    if (open) {
+      triggerRef.current = document.activeElement;
+    }
+    return () => {
+      if (triggerRef.current && typeof triggerRef.current.focus === 'function') {
+        triggerRef.current.focus();
+      }
+    };
+  }, [open]);
 
   // Reset value when dialog opens with a new defaultValue
   useEffect(() => {
@@ -50,6 +65,38 @@ export default function PromptDialog({
       }, 50);
       return () => clearTimeout(timer);
     }
+  }, [open]);
+
+  // Focus trap
+  useEffect(() => {
+    if (!open || !dialogRef.current) {
+      return;
+    }
+
+    const focusableSelector =
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+    const handleTab = (e) => {
+      if (e.key !== 'Tab' || !dialogRef.current) {
+        return;
+      }
+      const focusable = dialogRef.current.querySelectorAll(focusableSelector);
+      if (!focusable.length) {
+        return;
+      }
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleTab);
+    return () => document.removeEventListener('keydown', handleTab);
   }, [open]);
 
   if (!open) {
@@ -78,9 +125,10 @@ export default function PromptDialog({
 
       {/* Dialog */}
       <div
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="prompt-title"
+        aria-labelledby={titleId}
         className="relative z-50 w-full max-w-md mx-4 bg-white dark:bg-gray-900 rounded-xl shadow-soft-lg p-6 animate-slide-up"
         onKeyDown={handleKeyDown}
       >
@@ -92,10 +140,7 @@ export default function PromptDialog({
           <X className="w-4 h-4" />
         </button>
 
-        <h2
-          id="prompt-title"
-          className="text-base font-semibold text-gray-900 dark:text-white mb-4"
-        >
+        <h2 id={titleId} className="text-base font-semibold text-gray-900 dark:text-white mb-4">
           {resolvedTitle}
         </h2>
 

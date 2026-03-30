@@ -1,5 +1,6 @@
 import { useEffect, useRef, useId } from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 export const Modal = ({ isOpen, onClose, title, description, children, size = 'md', footer }) => {
   const { t } = useTranslation('common');
@@ -14,25 +15,42 @@ export const Modal = ({ isOpen, onClose, title, description, children, size = 'm
   const titleId = useId();
   const descId = useId();
   const modalRef = useRef(null);
+  const triggerRef = useRef(null);
+
+  // Focus restoration
+  useEffect(() => {
+    if (isOpen) {
+      triggerRef.current = document.activeElement;
+    }
+    return () => {
+      if (triggerRef.current && typeof triggerRef.current.focus === 'function') {
+        triggerRef.current.focus();
+      }
+    };
+  }, [isOpen]);
 
   // Focus trap
   useEffect(() => {
     if (!isOpen || !modalRef.current) {
       return;
     }
-    const focusable = modalRef.current.querySelectorAll(
-      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-    );
+    const focusableSelector =
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    const focusable = modalRef.current.querySelectorAll(focusableSelector);
     if (focusable.length) {
       focusable[0].focus();
     }
 
     const handleTab = (e) => {
-      if (e.key !== 'Tab' || !focusable.length) {
+      if (e.key !== 'Tab') {
         return;
       }
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
+      const currentFocusable = modalRef.current.querySelectorAll(focusableSelector);
+      if (!currentFocusable.length) {
+        return;
+      }
+      const first = currentFocusable[0];
+      const last = currentFocusable[currentFocusable.length - 1];
       if (e.shiftKey && document.activeElement === first) {
         e.preventDefault();
         last.focus();

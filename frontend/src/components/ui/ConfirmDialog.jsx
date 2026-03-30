@@ -1,4 +1,4 @@
-import { useState, useCallback, createContext, useContext } from 'react';
+import { useState, useCallback, useEffect, useRef, useId, createContext, useContext } from 'react';
 import { AlertTriangle, Trash2, X } from 'lucide-react';
 import LoadingButton from './LoadingButton';
 import { useTranslation } from '../../i18n';
@@ -27,10 +27,70 @@ export default function ConfirmDialog({
   loading = false,
 }) {
   const { t } = useTranslation();
+  const dialogRef = useRef(null);
+  const triggerRef = useRef(null);
+  const confirmBtnRef = useRef(null);
+  const titleId = useId();
+  const descId = useId();
 
   const resolvedTitle = title ?? t('areYouSure');
   const resolvedConfirm = confirmText ?? t('confirm');
   const resolvedCancel = cancelText ?? t('cancel');
+
+  // Focus restoration
+  useEffect(() => {
+    if (open) {
+      triggerRef.current = document.activeElement;
+    }
+    return () => {
+      if (triggerRef.current && typeof triggerRef.current.focus === 'function') {
+        triggerRef.current.focus();
+      }
+    };
+  }, [open]);
+
+  // Auto-focus confirm button + ESC handler + focus trap
+  useEffect(() => {
+    if (!open || !dialogRef.current) {
+      return;
+    }
+
+    // Auto-focus the confirm button
+    const timer = setTimeout(() => {
+      confirmBtnRef.current?.focus();
+    }, 50);
+
+    const focusableSelector =
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        onCancel();
+        return;
+      }
+      if (e.key === 'Tab' && dialogRef.current) {
+        const focusable = dialogRef.current.querySelectorAll(focusableSelector);
+        if (!focusable.length) {
+          return;
+        }
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+          e.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open, onCancel]);
 
   if (!open) {
     return null;
@@ -59,10 +119,11 @@ export default function ConfirmDialog({
 
       {/* Dialog */}
       <div
+        ref={dialogRef}
         role="alertdialog"
         aria-modal="true"
-        aria-labelledby="confirm-title"
-        aria-describedby="confirm-desc"
+        aria-labelledby={titleId}
+        aria-describedby={description ? descId : undefined}
         className="relative z-50 w-full max-w-md mx-4 bg-white dark:bg-gray-900 rounded-xl shadow-soft-lg p-6 animate-slide-up"
       >
         <button
@@ -80,14 +141,11 @@ export default function ConfirmDialog({
             <Icon className={`w-5 h-5 ${iconColor}`} aria-hidden="true" />
           </div>
           <div className="min-w-0">
-            <h2
-              id="confirm-title"
-              className="text-base font-semibold text-gray-900 dark:text-white"
-            >
+            <h2 id={titleId} className="text-base font-semibold text-gray-900 dark:text-white">
               {resolvedTitle}
             </h2>
             {description && (
-              <p id="confirm-desc" className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <p id={descId} className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {description}
               </p>
             )}
@@ -101,7 +159,13 @@ export default function ConfirmDialog({
           >
             {resolvedCancel}
           </button>
-          <LoadingButton onClick={onConfirm} variant={variant} size="md" loading={loading}>
+          <LoadingButton
+            ref={confirmBtnRef}
+            onClick={onConfirm}
+            variant={variant}
+            size="md"
+            loading={loading}
+          >
             {resolvedConfirm}
           </LoadingButton>
         </div>

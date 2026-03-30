@@ -2,6 +2,7 @@
  * KeyboardShortcutsModal - Extracted from ClinicalEncounter.jsx
  * Shows keyboard shortcuts and macro reference
  */
+import { useId } from 'react';
 import { X } from 'lucide-react';
 
 export function KeyboardShortcutsModal({
@@ -10,6 +11,8 @@ export function KeyboardShortcutsModal({
   keyboardShortcuts,
   macros,
 }) {
+  const titleId = useId();
+
   if (!showKeyboardHelp) {
     return null;
   }
@@ -18,13 +21,17 @@ export function KeyboardShortcutsModal({
     <div
       className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
       onClick={() => setShowKeyboardHelp(false)}
+      aria-hidden="true"
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
         className="bg-white rounded-xl shadow-2xl p-6 max-w-md w-full mx-4"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-slate-800">
+          <h3 id={titleId} className="text-lg font-semibold text-slate-800">
             {'\u2328\uFE0F'} Tastatursnarveier
           </h3>
           <button

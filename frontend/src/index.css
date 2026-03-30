@@ -7,6 +7,10 @@
 @tailwind utilities;
 
 @layer base {
+  :focus-visible {
+    outline: var(--focus-ring-width, 2px) solid hsl(var(--ring));
+    outline-offset: var(--focus-ring-offset, 2px);
+  }
   * {
     @apply border-border;
   }
