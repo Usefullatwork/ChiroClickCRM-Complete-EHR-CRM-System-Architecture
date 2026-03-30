@@ -1,3 +1,4 @@
+import { useTranslation } from '../../i18n';
 import SmartTextInput, { CLINICAL_REASONING_PHRASES } from '../assessment/SmartTextInput';
 import { VASComparisonDisplay } from '../assessment/VASPainScale';
 import { QUESTIONNAIRE_TYPES } from '../assessment/OutcomeAssessment';
@@ -23,7 +24,7 @@ export default function AssessmentTab({
       <div className="lg:col-span-2 space-y-4">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Diagnosis (ICPC-2 / ICD-10)
+            {t('diagnosis', 'Diagnose (ICPC-2 / ICD-10)')}
           </label>
           <select
             onChange={(e) => {
@@ -34,7 +35,7 @@ export default function AssessmentTab({
             }}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-2"
           >
-            <option value="">Select diagnosis...</option>
+            <option value="">{t('selectDiagnosis', 'Velg diagnose...')}</option>
             {commonDiagnoses?.data?.map((code) => (
               <option key={code.code} value={code.code}>
                 {code.code} - {code.description_no || code.description_en}
@@ -58,10 +59,10 @@ export default function AssessmentTab({
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <SmartTextInput
-            label="Clinical Reasoning"
+            label={t('clinicalReasoning', 'Klinisk resonnement')}
             value={encounterData.assessment.clinical_reasoning}
             onChange={(val) => updateField('assessment', 'clinical_reasoning', val)}
-            placeholder={t('yourClinicalReasoningPlaceholder', 'Your clinical reasoning...')}
+            placeholder={t('yourClinicalReasoningPlaceholder', 'Ditt kliniske resonnement...')}
             quickPhrases={CLINICAL_REASONING_PHRASES}
             rows={4}
             aiEnabled={true}
@@ -75,13 +76,10 @@ export default function AssessmentTab({
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <SmartTextInput
-              label="Differential Diagnosis"
+              label={t('differentialDiagnosis', 'Differensialdiagnose')}
               value={encounterData.assessment.differential_diagnosis}
               onChange={(val) => updateField('assessment', 'differential_diagnosis', val)}
-              placeholder={t(
-                'otherDiagnosesConsideredPlaceholder',
-                'Other diagnoses considered...'
-              )}
+              placeholder={t('otherDiagnosesConsideredPlaceholder', 'Andre diagnoser vurdert...')}
               rows={2}
               aiEnabled={true}
               aiFieldType="differential_diagnosis"
@@ -92,10 +90,10 @@ export default function AssessmentTab({
           </div>
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <SmartTextInput
-              label="Prognosis"
+              label={t('prognosis', 'Prognose')}
               value={encounterData.assessment.prognosis}
               onChange={(val) => updateField('assessment', 'prognosis', val)}
-              placeholder={t('expectedRecoveryPlaceholder', 'Expected recovery...')}
+              placeholder={t('expectedRecoveryPlaceholder', 'Forventet bedring...')}
               rows={2}
               aiEnabled={true}
               aiFieldType="prognosis"
@@ -114,7 +112,9 @@ export default function AssessmentTab({
         />
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Outcome Assessment</h4>
+          <h4 className="text-sm font-medium text-gray-700 mb-3">
+            {t('outcomeAssessment', 'Resultatm\u00e5ling')}
+          </h4>
           <div className="grid grid-cols-3 gap-2">
             {Object.values(QUESTIONNAIRE_TYPES).map((type) => (
               <button

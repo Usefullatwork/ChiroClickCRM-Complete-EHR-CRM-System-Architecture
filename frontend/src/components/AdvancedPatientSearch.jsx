@@ -136,7 +136,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('minAge')}</label>
               <input
                 type="number"
-                placeholder="e.g., 18"
+                placeholder="f.eks. 18"
                 value={filters.ageMin}
                 onChange={(e) => setFilters((prev) => ({ ...prev, ageMin: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -147,7 +147,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
               <label className="block text-sm font-medium text-gray-700 mb-1">{t('maxAge')}</label>
               <input
                 type="number"
-                placeholder="e.g., 65"
+                placeholder="f.eks. 65"
                 value={filters.ageMax}
                 onChange={(e) => setFilters((prev) => ({ ...prev, ageMax: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -176,7 +176,7 @@ export default function AdvancedPatientSearch({ onClose, onSelect }) {
                 <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                 <input
                   type="text"
-                  placeholder="e.g., Oslo"
+                  placeholder="f.eks. Oslo"
                   value={filters.city}
                   onChange={(e) => setFilters((prev) => ({ ...prev, city: e.target.value }))}
                   className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"

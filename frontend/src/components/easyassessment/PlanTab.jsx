@@ -1,3 +1,4 @@
+import { useTranslation } from '../../i18n';
 import QuickCheckboxGrid, {
   TREATMENT_OPTIONS,
   EXERCISE_OPTIONS,
@@ -19,7 +20,7 @@ export default function PlanTab({
       {viewMode === 'easy' ? (
         <>
           <QuickCheckboxGrid
-            title="Treatment Performed"
+            title={t('treatmentPerformed', 'Utf\u00f8rt behandling')}
             categories={TREATMENT_OPTIONS}
             selectedValues={encounterData.treatments_selected}
             onChange={(vals) => updateQuickSelect('treatments_selected', vals)}
@@ -27,7 +28,7 @@ export default function PlanTab({
           />
 
           <QuickCheckboxGrid
-            title="Home Exercises"
+            title={t('homeExercises', 'Hjemme\u00f8velser')}
             categories={EXERCISE_OPTIONS}
             selectedValues={encounterData.exercises_selected}
             onChange={(vals) => updateQuickSelect('exercises_selected', vals)}
@@ -38,10 +39,10 @@ export default function PlanTab({
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <SmartTextInput
-              label="Treatment"
+              label={t('treatment', 'Behandling')}
               value={encounterData.plan.treatment}
               onChange={(val) => updateField('plan', 'treatment', val)}
-              placeholder={t('treatmentPerformedPlaceholder', 'Treatment performed...')}
+              placeholder={t('treatmentPerformedPlaceholder', 'Utf\u00f8rt behandling...')}
               rows={4}
               aiEnabled={true}
               aiFieldType="treatment"
@@ -52,10 +53,10 @@ export default function PlanTab({
           </div>
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
             <SmartTextInput
-              label="Exercises"
+              label={t('exercises', '\u00d8velser')}
               value={encounterData.plan.exercises}
               onChange={(val) => updateField('plan', 'exercises', val)}
-              placeholder={t('homeExercisesPlaceholder2', 'Home exercises...')}
+              placeholder={t('homeExercisesPlaceholder2', 'Hjemme\u00f8velser...')}
               rows={4}
               aiEnabled={true}
               aiFieldType="exercises"
@@ -70,10 +71,10 @@ export default function PlanTab({
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <SmartTextInput
-            label="Advice"
+            label={t('advice', 'R\u00e5d')}
             value={encounterData.plan.advice}
             onChange={(val) => updateField('plan', 'advice', val)}
-            placeholder={t('patientEducationPlaceholder2', 'Patient education...')}
+            placeholder={t('patientEducationPlaceholder2', 'Pasientoppl\u00e6ring...')}
             quickPhrases={ADVICE_PHRASES}
             rows={3}
             aiEnabled={true}
@@ -85,10 +86,10 @@ export default function PlanTab({
         </div>
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <SmartTextInput
-            label="Follow-up"
+            label={t('followUp', 'Oppf\u00f8lging')}
             value={encounterData.plan.follow_up}
             onChange={(val) => updateField('plan', 'follow_up', val)}
-            placeholder={t('nextAppointmentPlaceholder2', 'Next appointment...')}
+            placeholder={t('nextAppointmentPlaceholder2', 'Neste avtale...')}
             quickPhrases={FOLLOW_UP_PHRASES}
             rows={3}
             aiEnabled={true}

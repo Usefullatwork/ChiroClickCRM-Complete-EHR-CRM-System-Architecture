@@ -82,31 +82,34 @@ export default function NewAppointment() {
     const newErrors = {};
 
     if (!formData.patient_id) {
-      newErrors.patient_id = 'Patient is required';
+      newErrors.patient_id = t('patientRequired', 'Pasient er p\u00e5krevd');
     }
     if (!formData.practitioner_id) {
-      newErrors.practitioner_id = 'Practitioner is required';
+      newErrors.practitioner_id = t('practitionerRequired', 'Behandler er p\u00e5krevd');
     }
     if (!formData.start_time) {
-      newErrors.start_time = 'Start time is required';
+      newErrors.start_time = t('startTimeRequired', 'Starttid er p\u00e5krevd');
     }
     if (!formData.end_time) {
-      newErrors.end_time = 'End time is required';
+      newErrors.end_time = t('endTimeRequired', 'Sluttid er p\u00e5krevd');
     }
     if (!formData.appointment_type) {
-      newErrors.appointment_type = 'Appointment type is required';
+      newErrors.appointment_type = t('appointmentTypeRequired', 'Avtaletype er p\u00e5krevd');
     }
 
     // Validate end time is after start time
     if (formData.start_time && formData.end_time) {
       if (new Date(formData.end_time) <= new Date(formData.start_time)) {
-        newErrors.end_time = 'End time must be after start time';
+        newErrors.end_time = t('endAfterStart', 'Sluttid m\u00e5 v\u00e6re etter starttid');
       }
     }
 
     // Validate recurring end date if pattern is set
     if (formData.recurring_pattern && !formData.recurring_end_date) {
-      newErrors.recurring_end_date = 'Recurring end date is required for recurring appointments';
+      newErrors.recurring_end_date = t(
+        'recurringEndRequired',
+        'Sluttdato er p\u00e5krevd for gjentakende avtaler'
+      );
     }
 
     setErrors(newErrors);
@@ -135,9 +138,9 @@ export default function NewAppointment() {
     <div className="p-6 max-w-4xl mx-auto">
       <Breadcrumbs
         items={[
-          { label: 'Dashboard', href: '/' },
-          { label: t('appointments') || 'Appointments', href: '/appointments' },
-          { label: t('newAppointment') || 'New Appointment' },
+          { label: t('dashboard', 'Oversikt'), href: '/' },
+          { label: t('appointments', 'Avtaler'), href: '/appointments' },
+          { label: t('newAppointment', 'Ny avtale') },
         ]}
       />
 

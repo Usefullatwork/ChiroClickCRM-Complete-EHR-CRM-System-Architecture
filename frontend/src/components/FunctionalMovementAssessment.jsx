@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from '../i18n';
 
 /**
  * Functional Movement Assessment Component
@@ -595,7 +596,7 @@ const FunctionalMovementAssessment = ({ onSave }) => {
 
             <div className="test-notes">
               <textarea
-                placeholder={t('clinicalNotesPlaceholder', 'Clinical notes and observations...')}
+                placeholder={t('clinicalNotesPlaceholder', 'Kliniske notater og observasjoner...')}
                 value={notes[test.id] || ''}
                 onChange={(e) => handleNoteChange(test.id, e.target.value)}
               />
@@ -617,7 +618,7 @@ const FunctionalMovementAssessment = ({ onSave }) => {
                       value={scores[item.id] || ''}
                       onChange={(e) => handleScoreChange(item.id, e.target.value)}
                     >
-                      <option value="">Select...</option>
+                      <option value="">Velg...</option>
                       {item.options.map((opt) => (
                         <option key={opt} value={opt}>
                           {opt}

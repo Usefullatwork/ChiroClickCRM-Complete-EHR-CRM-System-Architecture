@@ -79,7 +79,11 @@ export default function NewPatient() {
         });
         setErrors(backendErrors);
       } else {
-        setErrors({ general: error.response?.data?.message || 'Failed to create patient' });
+        setErrors({
+          general:
+            error.response?.data?.message ||
+            t('failedToCreate', 'Kunne ikke opprette pasient. Sjekk skjemaet og pr\u00f8v igjen.'),
+        });
       }
     },
   });
@@ -175,9 +179,9 @@ export default function NewPatient() {
       <UnsavedChangesDialog isBlocked={isBlocked} onProceed={proceed} onCancel={reset} />
       <Breadcrumbs
         items={[
-          { label: 'Dashboard', href: '/' },
-          { label: t('patients') || 'Patients', href: '/patients' },
-          { label: t('newPatient') || 'New Patient' },
+          { label: t('dashboard', 'Oversikt'), href: '/' },
+          { label: t('patients', 'Pasienter'), href: '/patients' },
+          { label: t('newPatient', 'Ny pasient') },
         ]}
       />
 
@@ -232,7 +236,7 @@ export default function NewPatient() {
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.solvit_id ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="e.g., SOLV12345"
+                placeholder="f.eks. SOLV12345"
               />
               {errors.solvit_id && <p className="text-red-600 text-sm mt-1">{errors.solvit_id}</p>}
             </div>
@@ -268,7 +272,7 @@ export default function NewPatient() {
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.first_name ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder={t('firstNamePlaceholder', 'First name')}
+                placeholder={t('firstNamePlaceholder', 'Fornavn')}
               />
               {errors.first_name && (
                 <p className="text-red-600 text-sm mt-1">{errors.first_name}</p>
@@ -287,7 +291,7 @@ export default function NewPatient() {
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.last_name ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder={t('lastNamePlaceholder', 'Last name')}
+                placeholder={t('lastNamePlaceholder', 'Etternavn')}
               />
               {errors.last_name && <p className="text-red-600 text-sm mt-1">{errors.last_name}</p>}
             </div>
@@ -350,7 +354,7 @@ export default function NewPatient() {
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.phone ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="e.g., +47 12345678"
+                placeholder="f.eks. +47 12345678"
               />
               {errors.phone && <p className="text-red-600 text-sm mt-1">{errors.phone}</p>}
             </div>
@@ -365,7 +369,7 @@ export default function NewPatient() {
                 className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors.email ? 'border-red-500' : 'border-gray-300'
                 }`}
-                placeholder="email@example.com"
+                placeholder="epost@eksempel.no"
               />
               {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
             </div>
@@ -421,7 +425,7 @@ export default function NewPatient() {
                 value={formData.address.street}
                 onChange={(e) => handleAddressChange('street', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder={t('streetAddressPlaceholder', 'Street address')}
+                placeholder={t('streetAddressPlaceholder', 'Gateadresse')}
               />
             </div>
 
@@ -434,7 +438,7 @@ export default function NewPatient() {
                 value={formData.address.postal_code}
                 onChange={(e) => handleAddressChange('postal_code', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., 0123"
+                placeholder="f.eks. 0123"
               />
             </div>
 
@@ -445,7 +449,7 @@ export default function NewPatient() {
                 value={formData.address.city}
                 onChange={(e) => handleAddressChange('city', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder={t('cityPlaceholder', 'City')}
+                placeholder={t('cityPlaceholder', 'By')}
               />
             </div>
           </div>
@@ -468,7 +472,7 @@ export default function NewPatient() {
                 value={formData.main_problem}
                 onChange={(e) => handleChange('main_problem', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Nakke smerter, Rygg problemer"
+                placeholder="f.eks. Nakkesmerter, ryggproblemer"
               />
             </div>
 
@@ -511,7 +515,7 @@ export default function NewPatient() {
                 value={formData.referral_source}
                 onChange={(e) => handleChange('referral_source', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="e.g., Doctor, Friend, Google"
+                placeholder="f.eks. Fastlege, bekjent, Google"
               />
             </div>
 
@@ -524,7 +528,7 @@ export default function NewPatient() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder={t(
                   'patientNotesPlaceholder',
-                  'Any additional notes about the patient...'
+                  'Eventuelle tilleggsnotater om pasienten...'
                 )}
               />
             </div>

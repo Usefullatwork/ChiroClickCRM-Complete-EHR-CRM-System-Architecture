@@ -41,7 +41,7 @@ function PageErrorFallback({ pageName }) {
         <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm">
           {t(
             'pageErrorDesc',
-            'An error occurred on this page. The rest of the application still works normally.'
+            'En feil oppstod p\u00e5 denne siden. Resten av applikasjonen fungerer fortsatt normalt.'
           )}
         </p>
 

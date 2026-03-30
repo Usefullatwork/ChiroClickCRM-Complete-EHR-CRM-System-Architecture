@@ -571,7 +571,7 @@ export default function BodyChart({
               value={textInput.value}
               onChange={(e) => setTextInput((prev) => ({ ...prev, value: e.target.value }))}
               onKeyDown={(e) => e.key === 'Enter' && handleTextSubmit()}
-              placeholder={t('enterTextPlaceholder', 'Enter text...')}
+              placeholder={t('enterTextPlaceholder', 'Skriv inn tekst...')}
               className="px-2 py-1 border rounded text-sm"
               autoFocus
             />
@@ -580,13 +580,13 @@ export default function BodyChart({
                 onClick={() => setTextInput({ show: false, x: 0, y: 0, value: '' })}
                 className="px-2 py-1 text-xs text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded"
               >
-                Cancel
+                {t('cancel', 'Avbryt')}
               </button>
               <button
                 onClick={handleTextSubmit}
                 className="px-2 py-1 text-xs bg-blue-600 text-white rounded hover:bg-blue-700"
               >
-                Add
+                {t('add', 'Legg til')}
               </button>
             </div>
           </div>
@@ -597,7 +597,7 @@ export default function BodyChart({
       {markers.length > 0 && (
         <div className="p-3 border-t bg-gray-50">
           <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-300 mb-2">
-            Marker Legend
+            {t('markerLegend', 'Mark\u00f8rforklaring')}
           </h4>
           <div className="space-y-1">
             {markers.map((marker) => (

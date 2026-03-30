@@ -245,7 +245,7 @@ export default function Automations() {
       toast.success(t('saveSuccess', 'Arbeidsflyt lagret'));
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to create workflow');
+      toast.error(error.message || t('failedToCreate', 'Kunne ikke opprette arbeidsflyt'));
     },
   });
 
@@ -258,7 +258,7 @@ export default function Automations() {
       toast.success(t('saveSuccess', 'Arbeidsflyt lagret'));
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to update workflow');
+      toast.error(error.message || t('failedToUpdate', 'Kunne ikke oppdatere arbeidsflyt'));
     },
   });
 
@@ -269,7 +269,7 @@ export default function Automations() {
       toast.success(t('deleteSuccess', 'Arbeidsflyt slettet'));
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to delete workflow');
+      toast.error(error.message || t('failedToDelete', 'Kunne ikke slette arbeidsflyt'));
     },
   });
 
@@ -280,7 +280,7 @@ export default function Automations() {
       toast.success(t('toggleSuccess', 'Arbeidsflyt status oppdatert'));
     },
     onError: (error) => {
-      toast.error(error.message || 'Failed to toggle workflow');
+      toast.error(error.message || t('failedToToggle', 'Kunne ikke endre status for arbeidsflyt'));
     },
   });
 

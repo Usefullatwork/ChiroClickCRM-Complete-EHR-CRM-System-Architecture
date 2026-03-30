@@ -28,11 +28,13 @@ export default function Login() {
         setOrganizationId(response.data.user.organization_id);
       }
 
-      toast.success('Successfully logged in');
+      toast.success(t('loginSuccess', 'Innlogging vellykket'));
       navigate('/');
     } catch (error) {
       logger.error('Login error:', error);
-      const msg = error.response?.data?.message || 'Failed to login';
+      const msg =
+        error.response?.data?.message ||
+        t('loginFailed', 'Kunne ikke logge inn. Sjekk e-post og passord.');
       setErrorMessage(msg);
       toast.error(msg);
     } finally {
@@ -45,7 +47,7 @@ export default function Login() {
       <div className="max-w-md w-full space-y-8">
         <div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
+            {t('signIn', 'Logg inn p\u00e5 kontoen din')}
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-300">
             ChiroClick EHR
@@ -61,7 +63,7 @@ export default function Login() {
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="email-address" className="sr-only">
-                Email address
+                {t('emailAddressLabel', 'E-postadresse')}
               </label>
               <input
                 id="email-address"
@@ -71,14 +73,14 @@ export default function Login() {
                 required
                 data-testid="login-email-input"
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder={t('emailAddressPlaceholder', 'Email address')}
+                placeholder={t('emailAddressPlaceholder', 'E-postadresse')}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
             <div>
               <label htmlFor="password" className="sr-only">
-                Password
+                {t('passwordLabel', 'Passord')}
               </label>
               <input
                 id="password"
@@ -88,7 +90,7 @@ export default function Login() {
                 required
                 data-testid="login-password-input"
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm"
-                placeholder={t('passwordPlaceholder', 'Password')}
+                placeholder={t('passwordPlaceholder', 'Passord')}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
@@ -102,7 +104,7 @@ export default function Login() {
               data-testid="login-submit-button"
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {loading ? t('signingIn', 'Logger inn...') : t('signInButton', 'Logg inn')}
             </button>
           </div>
 
@@ -120,11 +122,11 @@ export default function Login() {
                     } else if (response.data.user.organization_id) {
                       setOrganizationId(response.data.user.organization_id);
                     }
-                    toast.success('Dev Login Successful');
+                    toast.success(t('devLoginSuccess', 'Utviklerinnlogging vellykket'));
                     navigate('/');
                   } catch (error) {
                     logger.error('Dev login failed', error);
-                    toast.error('Dev Login Failed');
+                    toast.error(t('devLoginFailed', 'Utviklerinnlogging feilet'));
                   } finally {
                     setLoading(false);
                   }

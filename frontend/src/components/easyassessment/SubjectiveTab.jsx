@@ -1,3 +1,4 @@
+import { useTranslation } from '../../i18n';
 import { Sparkles } from 'lucide-react';
 import QuickCheckboxGrid, {
   PAIN_QUALITY_OPTIONS,
@@ -55,10 +56,10 @@ export default function SubjectiveTab({
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <SmartTextInput
-            label="Chief Complaint"
+            label={t('chiefComplaint', 'Hovedklage')}
             value={encounterData.subjective.chief_complaint}
             onChange={(val) => updateField('subjective', 'chief_complaint', val)}
-            placeholder={t('whatBringsYouPlaceholder', 'What brings you in today?')}
+            placeholder={t('chiefComplaintPlaceholder', 'Hva er grunnen til at du kommer i dag?')}
             quickPhrases={CHIEF_COMPLAINT_PHRASES}
             rows={2}
             required
@@ -72,10 +73,10 @@ export default function SubjectiveTab({
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <SmartTextInput
-            label="History"
+            label={t('history', 'Sykehistorie')}
             value={encounterData.subjective.history}
             onChange={(val) => updateField('subjective', 'history', val)}
-            placeholder={t('problemDevelopedPlaceholder', 'Describe how the problem developed...')}
+            placeholder={t('historyPlaceholder', 'Beskriv hvordan problemet utviklet seg...')}
             quickPhrases={HISTORY_PHRASES}
             rows={3}
             aiEnabled={true}
@@ -88,10 +89,10 @@ export default function SubjectiveTab({
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <SmartTextInput
-            label="Onset"
+            label={t('onset', 'Debut')}
             value={encounterData.subjective.onset}
             onChange={(val) => updateField('subjective', 'onset', val)}
-            placeholder={t('whenStartedPlaceholder', 'When did it start?')}
+            placeholder={t('onsetPlaceholder', 'N\u00e5r startet det?')}
             quickPhrases={ONSET_PHRASES}
             rows={1}
             aiEnabled={true}
@@ -136,12 +137,12 @@ export default function SubjectiveTab({
         {/* Body Chart Gallery Preview */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium text-gray-900">Body Chart</h4>
+            <h4 className="font-medium text-gray-900">{t('bodyChart', 'Kroppskart')}</h4>
             <button
               onClick={() => setShowBodyChart(true)}
               className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
             >
-              Open Full Chart
+              {t('openFullChart', '\u00c5pne fullstendig kart')}
             </button>
           </div>
           <BodyChartGallery

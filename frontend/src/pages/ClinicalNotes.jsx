@@ -332,7 +332,7 @@ export default function ClinicalNotes() {
       printWindow.print();
     } catch (error) {
       logger.error('Error printing note:', error);
-      toast.error('Kunne ikke generere utskrift. Prosv igjen.');
+      toast.error('Kunne ikke generere utskrift. Pr\u00f8v igjen.');
     }
   };
 
@@ -369,7 +369,7 @@ export default function ClinicalNotes() {
       window.URL.revokeObjectURL(url);
     } catch (error) {
       logger.error('Error exporting note:', error);
-      toast.error('Kunne ikke eksportere PDF. Vennligst prov igjen.');
+      toast.error('Kunne ikke eksportere PDF. Vennligst pr\u00f8v igjen.');
     }
   };
 
