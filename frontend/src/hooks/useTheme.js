@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 
-const THEME_KEY = 'chiroclickcrm_theme';
+const THEME_KEY = 'chiroclickehr_theme';
 
 export const useTheme = () => {
   const [theme, setThemeState] = useState(() => {

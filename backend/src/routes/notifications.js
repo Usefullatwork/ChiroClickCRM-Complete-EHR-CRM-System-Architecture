@@ -5,7 +5,7 @@
 
 import express from 'express';
 import { requireAuth, requireOrganization } from '../middleware/auth.js';
-import * as notificationService from '../services/notifications.js';
+import * as notificationService from '../services/communication/notifications.js';
 import validate from '../middleware/validation.js';
 import {
   listNotificationsSchema,

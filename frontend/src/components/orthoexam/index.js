@@ -8,8 +8,8 @@ export const OrthopedicExamCompact = ({ _patientId, _encounterId, _onDataChange 
     <div className="p-3 border rounded-lg bg-white">
       <h4 className="text-md font-medium mb-2">Ortopedisk (kompakt)</h4>
       <div className="grid grid-cols-2 gap-2 text-sm">
-        <div className="text-gray-600">ROM: Innenfor normalomrade</div>
-        <div className="text-gray-600">Provokasjonstester: Negative</div>
+        <div className="text-gray-600 dark:text-gray-300">ROM: Innenfor normalomrade</div>
+        <div className="text-gray-600 dark:text-gray-300">Provokasjonstester: Negative</div>
       </div>
     </div>
   );

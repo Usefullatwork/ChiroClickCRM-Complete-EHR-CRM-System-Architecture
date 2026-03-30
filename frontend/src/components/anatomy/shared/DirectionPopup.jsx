@@ -87,7 +87,7 @@ export default function DirectionPopup({
           <span className="text-sm font-semibold text-slate-800">{segment}</span>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-600 text-lg leading-none"
+            className="text-slate-400 dark:text-slate-300 hover:text-slate-600 text-lg leading-none"
           >
             ×
           </button>
@@ -114,7 +114,7 @@ export default function DirectionPopup({
           </div>
 
           {/* Quick hint */}
-          <p className="text-[10px] text-slate-400 text-center mt-2">
+          <p className="text-[10px] text-slate-400 dark:text-slate-300 text-center mt-2">
             {language === 'NO' ? 'Klikk for å sette inn tekst' : 'Click to insert text'}
           </p>
         </div>
@@ -127,7 +127,7 @@ export default function DirectionPopup({
             <div key={key}>
               <div className="flex items-center gap-1.5 mb-1">
                 <div className="w-2.5 h-2.5 rounded" style={{ backgroundColor: type.color }} />
-                <span className="text-[10px] font-medium text-slate-600">
+                <span className="text-[10px] font-medium text-slate-600 dark:text-slate-300">
                   {language === 'NO' ? type.labelNo : type.label}
                 </span>
               </div>
@@ -139,7 +139,7 @@ export default function DirectionPopup({
                       onSelect({ segment, type: key, side });
                       onClose();
                     }}
-                    className="flex-1 px-1.5 py-1 text-[10px] font-medium rounded bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors"
+                    className="flex-1 px-1.5 py-1 text-[10px] font-medium rounded bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors"
                   >
                     {side === 'left'
                       ? 'V'

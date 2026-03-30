@@ -24,6 +24,14 @@ vi.mock('../../services/api', () => ({
   },
 }));
 
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({
+    t: (key, fallback) => fallback || key,
+    lang: 'en',
+    setLang: vi.fn(),
+  }),
+}));
+
 vi.mock('lucide-react', () => ({
   X: () => <span aria-hidden="true" />,
   Search: () => <span aria-hidden="true" />,
@@ -93,24 +101,24 @@ describe('AdvancedPatientSearch Component', () => {
 
   it('should render the search modal with title', () => {
     renderWithProviders();
-    expect(screen.getByText('Advanced Patient Search')).toBeInTheDocument();
-    expect(screen.getByText('Search patients using multiple criteria')).toBeInTheDocument();
+    expect(screen.getByText('advancedPatientSearch')).toBeInTheDocument();
+    expect(screen.getByText('searchMultipleCriteria')).toBeInTheDocument();
   });
 
   it('should render all filter fields', () => {
     renderWithProviders();
-    expect(screen.getByText('Name, Email, or Phone')).toBeInTheDocument();
-    expect(screen.getByText('Min Age')).toBeInTheDocument();
-    expect(screen.getByText('Max Age')).toBeInTheDocument();
-    expect(screen.getByText('Gender')).toBeInTheDocument();
-    expect(screen.getByText('City')).toBeInTheDocument();
+    expect(screen.getByText('nameEmailPhone')).toBeInTheDocument();
+    expect(screen.getByText('minAge')).toBeInTheDocument();
+    expect(screen.getByText('maxAge')).toBeInTheDocument();
+    expect(screen.getByText('gender')).toBeInTheDocument();
+    expect(screen.getByText('city')).toBeInTheDocument();
   });
 
   it('should have Search and Clear Filters buttons', () => {
     renderWithProviders();
     // Search button text (not the icon)
-    expect(screen.getByRole('button', { name: /Search/ })).toBeInTheDocument();
-    expect(screen.getByText('Clear Filters')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /search/ })).toBeInTheDocument();
+    expect(screen.getByText('clearFilters')).toBeInTheDocument();
   });
 
   it('should show initial state message before searching', () => {
@@ -122,7 +130,7 @@ describe('AdvancedPatientSearch Component', () => {
 
   it('should allow typing in search input', () => {
     renderWithProviders();
-    const searchInput = screen.getByPlaceholderText('Search by name, email, or phone...');
+    const searchInput = screen.getByPlaceholderText('searchByNameEmailPhone');
     fireEvent.change(searchInput, { target: { value: 'Ola' } });
     expect(searchInput.value).toBe('Ola');
   });
@@ -150,31 +158,31 @@ describe('AdvancedPatientSearch Component', () => {
 
   it('should clear all filters when Clear Filters is clicked', () => {
     renderWithProviders();
-    const searchInput = screen.getByPlaceholderText('Search by name, email, or phone...');
+    const searchInput = screen.getByPlaceholderText('searchByNameEmailPhone');
     fireEvent.change(searchInput, { target: { value: 'test' } });
     expect(searchInput.value).toBe('test');
 
-    fireEvent.click(screen.getByText('Clear Filters'));
+    fireEvent.click(screen.getByText('clearFilters'));
     expect(searchInput.value).toBe('');
   });
 
   it('should call onClose when Close button is clicked', () => {
     const onClose = vi.fn();
     renderWithProviders({ onClose });
-    fireEvent.click(screen.getByText('Close'));
+    fireEvent.click(screen.getByText('close'));
     expect(onClose).toHaveBeenCalled();
   });
 
   it('should render consent filter options', () => {
     renderWithProviders();
-    expect(screen.getByText('Treatment Consent')).toBeInTheDocument();
-    expect(screen.getByText('Marketing Consent')).toBeInTheDocument();
-    expect(screen.getByText('Follow-up Required')).toBeInTheDocument();
+    expect(screen.getByText('treatmentConsent')).toBeInTheDocument();
+    expect(screen.getByText('marketingConsent')).toBeInTheDocument();
+    expect(screen.getByText('followUpRequired')).toBeInTheDocument();
   });
 
   it('should render last visit date range filters', () => {
     renderWithProviders();
-    expect(screen.getByText('Last Visit From')).toBeInTheDocument();
-    expect(screen.getByText('Last Visit To')).toBeInTheDocument();
+    expect(screen.getByText('lastVisitFrom')).toBeInTheDocument();
+    expect(screen.getByText('lastVisitTo')).toBeInTheDocument();
   });
 });

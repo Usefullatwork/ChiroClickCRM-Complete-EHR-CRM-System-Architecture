@@ -25,55 +25,21 @@ import {
   CreditCard,
 } from 'lucide-react';
 import { billingAPI } from '../../services/api';
+import { useTranslation } from '../../i18n/useTranslation';
 
 import logger from '../../utils/logger';
 /**
- * Get status badge styling and label
+ * Get status badge styling — labels resolved via t() inside component
  */
-const getStatusConfig = (status) => {
-  const configs = {
-    draft: {
-      label: 'Utkast',
-      color: 'bg-gray-100 text-gray-700',
-      icon: FileText,
-    },
-    pending: {
-      label: 'Venter',
-      color: 'bg-yellow-100 text-yellow-800',
-      icon: Clock,
-    },
-    sent: {
-      label: 'Sendt',
-      color: 'bg-blue-100 text-blue-800',
-      icon: Send,
-    },
-    paid: {
-      label: 'Betalt',
-      color: 'bg-green-100 text-green-800',
-      icon: CheckCircle,
-    },
-    partial: {
-      label: 'Delvis betalt',
-      color: 'bg-orange-100 text-orange-800',
-      icon: CreditCard,
-    },
-    overdue: {
-      label: 'Forfalt',
-      color: 'bg-red-100 text-red-800',
-      icon: AlertTriangle,
-    },
-    cancelled: {
-      label: 'Kansellert',
-      color: 'bg-gray-100 text-gray-500',
-      icon: XCircle,
-    },
-    credited: {
-      label: 'Kreditert',
-      color: 'bg-purple-100 text-purple-800',
-      icon: Ban,
-    },
-  };
-  return configs[status] || configs.pending;
+const STATUS_COLORS = {
+  draft: { color: 'bg-gray-100 text-gray-700', icon: FileText },
+  pending: { color: 'bg-yellow-100 text-yellow-800', icon: Clock },
+  sent: { color: 'bg-blue-100 text-blue-800', icon: Send },
+  paid: { color: 'bg-green-100 text-green-800', icon: CheckCircle },
+  partial: { color: 'bg-orange-100 text-orange-800', icon: CreditCard },
+  overdue: { color: 'bg-red-100 text-red-800', icon: AlertTriangle },
+  cancelled: { color: 'bg-gray-100 text-gray-500 dark:text-gray-400', icon: XCircle },
+  credited: { color: 'bg-purple-100 text-purple-800', icon: Ban },
 };
 
 /**
@@ -83,7 +49,34 @@ const getStatusConfig = (status) => {
  * @param {Function} props.onRecordPayment - Callback to open payment recording
  */
 export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
+  const { t } = useTranslation('financial');
   const queryClient = useQueryClient();
+
+  const getStatusConfig = (status) => {
+    const labelKeys = {
+      draft: 'statusDraft',
+      pending: 'statusPending',
+      sent: 'statusSent',
+      paid: 'statusPaid',
+      partial: 'statusPartial',
+      overdue: 'statusOverdue',
+      cancelled: 'statusCancelled',
+      credited: 'statusCredited',
+    };
+    const fallbacks = {
+      draft: 'Utkast',
+      pending: 'Venter',
+      sent: 'Sendt',
+      paid: 'Betalt',
+      partial: 'Delvis betalt',
+      overdue: 'Forfalt',
+      cancelled: 'Kansellert',
+      credited: 'Kreditert',
+    };
+    const base = STATUS_COLORS[status] || STATUS_COLORS.pending;
+    const key = labelKeys[status] || labelKeys.pending;
+    return { ...base, label: t(key, fallbacks[status] || status) };
+  };
 
   // State for filtering
   const [searchTerm, setSearchTerm] = useState('');
@@ -94,6 +87,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
   const [page, setPage] = useState(1);
   const [limit] = useState(20);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [cancelModal, setCancelModal] = useState({ open: false, invoiceId: null, reason: '' });
 
   // Fetch invoices
   const { data, isLoading, error } = useQuery({
@@ -167,17 +161,23 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
   };
 
   /**
-   * Handle cancel invoice
+   * Handle cancel invoice — opens modal to collect reason
    */
-  const handleCancelInvoice = async (invoiceId) => {
-    const reason = window.prompt('Angi grunn for kansellering:');
-    if (!reason) {
+  const handleCancelInvoice = (invoiceId) => {
+    setCancelModal({ open: true, invoiceId, reason: '' });
+    setActiveDropdown(null);
+  };
+
+  const handleCancelConfirm = async () => {
+    if (!cancelModal.reason.trim()) {
       return;
     }
-
     try {
-      await cancelMutation.mutateAsync({ invoiceId, reason });
-      setActiveDropdown(null);
+      await cancelMutation.mutateAsync({
+        invoiceId: cancelModal.invoiceId,
+        reason: cancelModal.reason,
+      });
+      setCancelModal({ open: false, invoiceId: null, reason: '' });
     } catch (error) {
       logger.error('Failed to cancel invoice:', error);
     }
@@ -216,7 +216,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
   if (error) {
     return (
       <div className="bg-red-50 text-red-700 p-4 rounded-lg">
-        Kunne ikke laste fakturaer: {error.message}
+        {t('couldNotLoadInvoices', 'Kunne ikke laste fakturaer')}: {error.message}
       </div>
     );
   }
@@ -228,10 +228,10 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-[200px]">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Sok etter pasient eller fakturanummer..."
+                placeholder={t('searchInvoices', 'Søk etter pasient eller fakturanummer...')}
                 value={searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -249,14 +249,14 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
           >
-            <option value="">Alle statuser</option>
-            <option value="draft">Utkast</option>
-            <option value="pending">Venter</option>
-            <option value="sent">Sendt</option>
-            <option value="paid">Betalt</option>
-            <option value="partial">Delvis betalt</option>
-            <option value="overdue">Forfalt</option>
-            <option value="cancelled">Kansellert</option>
+            <option value="">{t('allStatuses', 'Alle statuser')}</option>
+            <option value="draft">{t('statusDraft', 'Utkast')}</option>
+            <option value="pending">{t('statusPending', 'Venter')}</option>
+            <option value="sent">{t('statusSent', 'Sendt')}</option>
+            <option value="paid">{t('statusPaid', 'Betalt')}</option>
+            <option value="partial">{t('statusPartial', 'Delvis betalt')}</option>
+            <option value="overdue">{t('statusOverdue', 'Forfalt')}</option>
+            <option value="cancelled">{t('statusCancelled', 'Kansellert')}</option>
           </select>
           <input
             type="date"
@@ -266,7 +266,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
               setPage(1);
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Fra dato"
+            placeholder={t('fromDatePlaceholder', 'Fra dato')}
           />
           <input
             type="date"
@@ -276,7 +276,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
               setPage(1);
             }}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Til dato"
+            placeholder={t('toDatePlaceholder', 'Til dato')}
           />
         </div>
       </div>
@@ -288,45 +288,45 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('invoice_number')}
                 >
-                  Faktura
+                  {t('invoiceHeader', 'Faktura')}
                   {sortBy === 'invoice_number' && (sortOrder === 'ASC' ? ' ▲' : ' ▼')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Pasient
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {t('patientHeader', 'Pasient')}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('patient_amount')}
                 >
-                  Belop
+                  {t('amountHeader', 'Beløp')}
                   {sortBy === 'patient_amount' && (sortOrder === 'ASC' ? ' ▲' : ' ▼')}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('status')}
                 >
-                  Status
+                  {t('statusHeader', 'Status')}
                   {sortBy === 'status' && (sortOrder === 'ASC' ? ' ▲' : ' ▼')}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('invoice_date')}
                 >
-                  Dato
+                  {t('dateHeader', 'Dato')}
                   {sortBy === 'invoice_date' && (sortOrder === 'ASC' ? ' ▲' : ' ▼')}
                 </th>
                 <th
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
                   onClick={() => handleSort('due_date')}
                 >
-                  Forfall
+                  {t('dueHeader', 'Forfall')}
                   {sortBy === 'due_date' && (sortOrder === 'ASC' ? ' ▲' : ' ▼')}
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Handlinger
+                <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                  {t('actionsHeader', 'Handlinger')}
                 </th>
               </tr>
             </thead>
@@ -335,7 +335,9 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                 <tr>
                   <td colSpan="7" className="px-6 py-12 text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="text-sm text-gray-500 mt-3">Laster fakturaer...</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+                      {t('loadingInvoices', 'Laster fakturaer...')}
+                    </p>
                   </td>
                 </tr>
               ) : invoices.length > 0 ? (
@@ -365,8 +367,8 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                             {formatCurrency(invoice.patient_amount)}
                           </span>
                           {invoice.amount_paid > 0 && invoice.status !== 'paid' && (
-                            <span className="text-sm text-gray-500 block">
-                              Betalt: {formatCurrency(invoice.amount_paid)}
+                            <span className="text-sm text-gray-500 dark:text-gray-400 block">
+                              {t('paidAmount', 'Betalt')}: {formatCurrency(invoice.amount_paid)}
                             </span>
                           )}
                         </div>
@@ -379,11 +381,11 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                           {statusConfig.label}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                      <td className="px-6 py-4 whitespace-nowrap text-gray-500 dark:text-gray-400">
                         {formatDate(invoice.invoice_date)}
                       </td>
                       <td
-                        className={`px-6 py-4 whitespace-nowrap ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-500'}`}
+                        className={`px-6 py-4 whitespace-nowrap ${isOverdue ? 'text-red-600 font-medium' : 'text-gray-500 dark:text-gray-400'}`}
                       >
                         {formatDate(invoice.due_date)}
                         {isOverdue &&
@@ -399,7 +401,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                               e.stopPropagation();
                               setActiveDropdown(activeDropdown === invoice.id ? null : invoice.id);
                             }}
-                            className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+                            className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                           >
                             <MoreVertical className="w-4 h-4" />
                           </button>
@@ -415,7 +417,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                                 className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
                               >
                                 <Eye className="w-4 h-4" />
-                                Se faktura
+                                {t('viewInvoice', 'Se faktura')}
                               </button>
                               {invoice.status === 'draft' && (
                                 <button
@@ -426,7 +428,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                                   className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-blue-600"
                                 >
                                   <Send className="w-4 h-4" />
-                                  Send faktura
+                                  {t('sendInvoice', 'Send faktura')}
                                 </button>
                               )}
                               {['pending', 'sent', 'partial', 'overdue'].includes(
@@ -441,7 +443,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                                   className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-green-600"
                                 >
                                   <CheckCircle className="w-4 h-4" />
-                                  Registrer betaling
+                                  {t('recordPayment', 'Registrer betaling')}
                                 </button>
                               )}
                               <button
@@ -452,7 +454,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                                 className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
                               >
                                 <Printer className="w-4 h-4" />
-                                Skriv ut
+                                {t('print', 'Skriv ut')}
                               </button>
                               {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
                                 <button
@@ -463,7 +465,7 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                                   className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2 text-red-600"
                                 >
                                   <XCircle className="w-4 h-4" />
-                                  Kanseller
+                                  {t('cancel', 'Kanseller')}
                                 </button>
                               )}
                             </div>
@@ -477,11 +479,13 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                 <tr>
                   <td colSpan="7" className="px-6 py-12 text-center">
                     <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-1">Ingen fakturaer</h3>
-                    <p className="text-sm text-gray-500">
+                    <h3 className="text-lg font-medium text-gray-900 mb-1">
+                      {t('noInvoices', 'Ingen fakturaer')}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {searchTerm || statusFilter
-                        ? 'Ingen fakturaer matcher soket ditt'
-                        : 'Opprett din forste faktura for a komme i gang'}
+                        ? t('noInvoicesMatchSearch', 'Ingen fakturaer matcher søket ditt')
+                        : t('createFirstInvoice', 'Opprett din første faktura for å komme i gang')}
                     </p>
                   </td>
                 </tr>
@@ -493,9 +497,11 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
         {/* Pagination */}
         {pagination.pages > 1 && (
           <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
-            <p className="text-sm text-gray-500">
-              Viser {(page - 1) * limit + 1}-{Math.min(page * limit, pagination.total)} av{' '}
-              {pagination.total} fakturaer
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t('showingInvoices', 'Viser {from}-{to} av {total} fakturaer')
+                .replace('{from}', (page - 1) * limit + 1)
+                .replace('{to}', Math.min(page * limit, pagination.total))
+                .replace('{total}', pagination.total)}
             </p>
             <div className="flex items-center gap-2">
               <button
@@ -506,7 +512,9 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
                 <ChevronLeft className="w-4 h-4" />
               </button>
               <span className="px-4 py-2 text-sm">
-                Side {page} av {pagination.pages}
+                {t('pageOf', 'Side {page} av {pages}')
+                  .replace('{page}', page)
+                  .replace('{pages}', pagination.pages)}
               </span>
               <button
                 onClick={() => setPage(Math.min(pagination.pages, page + 1))}
@@ -523,6 +531,43 @@ export default function InvoiceList({ onViewInvoice, onRecordPayment }) {
       {/* Click outside to close dropdown */}
       {activeDropdown && (
         <div className="fixed inset-0 z-0" onClick={() => setActiveDropdown(null)} />
+      )}
+
+      {/* Cancel invoice modal */}
+      {cancelModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              {t('cancelInvoiceTitle', 'Kanseller faktura')}
+            </h2>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              {t('cancelReason', 'Angi grunn for kansellering:')}
+            </p>
+            <textarea
+              value={cancelModal.reason}
+              onChange={(e) => setCancelModal({ ...cancelModal, reason: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              rows={3}
+              placeholder={t('cancelReasonPlaceholder', 'Skriv inn grunn...')}
+              autoFocus
+            />
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => setCancelModal({ open: false, invoiceId: null, reason: '' })}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
+                {t('cancelBtn', 'Avbryt')}
+              </button>
+              <button
+                onClick={handleCancelConfirm}
+                disabled={!cancelModal.reason.trim() || cancelMutation.isPending}
+                className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {t('confirmCancelBtn', 'Kanseller faktura')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

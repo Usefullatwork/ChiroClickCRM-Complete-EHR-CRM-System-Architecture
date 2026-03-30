@@ -91,6 +91,8 @@ const api = typeof automationsAPI !== 'undefined' ? automationsAPI : automations
 // CONSTANTS
 // =============================================================================
 
+// Note: LABELS and TRIGGER_LABELS removed — now served by i18n 'automations' namespace.
+
 const TRIGGER_ICONS = {
   PATIENT_CREATED: UserPlus,
   APPOINTMENT_SCHEDULED: Calendar,
@@ -116,126 +118,12 @@ const TRIGGER_COLORS = {
 };
 
 // =============================================================================
-// LABELS
-// =============================================================================
-
-const LABELS = {
-  en: {
-    title: 'Workflow Automations',
-    subtitle: 'Automate patient engagement and follow-ups',
-    workflows: 'Workflows',
-    executions: 'Execution History',
-    stats: 'Statistics',
-    createWorkflow: 'Create Workflow',
-    allStatuses: 'All Statuses',
-    activeOnly: 'Active Only',
-    inactiveOnly: 'Inactive Only',
-    allTriggers: 'All Triggers',
-    searchPlaceholder: 'Search workflows...',
-    noWorkflows: 'No workflows found',
-    noWorkflowsDesc: 'Create your first workflow to automate patient engagement.',
-    enabled: 'Enabled',
-    disabled: 'Disabled',
-    lastRun: 'Last run',
-    never: 'Never',
-    totalRuns: 'Total runs',
-    successRate: 'Success rate',
-    edit: 'Edit',
-    delete: 'Delete',
-    viewHistory: 'View History',
-    confirmDelete: 'Are you sure you want to delete this workflow?',
-    deleteSuccess: 'Workflow deleted successfully',
-    toggleSuccess: 'Workflow status updated',
-    saveSuccess: 'Workflow saved successfully',
-    noExecutions: 'No executions found',
-    patient: 'Patient',
-    status: 'Status',
-    started: 'Started',
-    completed: 'Completed',
-    duration: 'Duration',
-    actions: 'Actions',
-    triggerStats: 'Trigger Statistics',
-    upcomingTriggers: 'Upcoming Triggers',
-    birthdays: 'Birthdays',
-    recalls: 'Recalls',
-    hasActiveWorkflow: 'Has active workflow',
-    noActiveWorkflow: 'No active workflow',
-  },
-  no: {
-    title: 'Automatiserte Arbeidsflyter',
-    subtitle: 'Automatiser pasientengasjement og oppfolginger',
-    workflows: 'Arbeidsflyter',
-    executions: 'Utforelseshistorikk',
-    stats: 'Statistikk',
-    createWorkflow: 'Opprett arbeidsflyt',
-    allStatuses: 'Alle statuser',
-    activeOnly: 'Kun aktive',
-    inactiveOnly: 'Kun inaktive',
-    allTriggers: 'Alle triggere',
-    searchPlaceholder: 'Sok i arbeidsflyter...',
-    noWorkflows: 'Ingen arbeidsflyter funnet',
-    noWorkflowsDesc: 'Opprett din forste arbeidsflyt for a automatisere pasientengasjement.',
-    enabled: 'Aktivert',
-    disabled: 'Deaktivert',
-    lastRun: 'Sist kjort',
-    never: 'Aldri',
-    totalRuns: 'Totalt kjort',
-    successRate: 'Suksessrate',
-    edit: 'Rediger',
-    delete: 'Slett',
-    viewHistory: 'Se historikk',
-    confirmDelete: 'Er du sikker pa at du vil slette denne arbeidsflyten?',
-    deleteSuccess: 'Arbeidsflyt slettet',
-    toggleSuccess: 'Arbeidsflyt status oppdatert',
-    saveSuccess: 'Arbeidsflyt lagret',
-    noExecutions: 'Ingen utforelser funnet',
-    patient: 'Pasient',
-    status: 'Status',
-    started: 'Startet',
-    completed: 'Fullfort',
-    duration: 'Varighet',
-    actions: 'Handlinger',
-    triggerStats: 'Trigger-statistikk',
-    upcomingTriggers: 'Kommende triggere',
-    birthdays: 'Bursdager',
-    recalls: 'Tilbakekallinger',
-    hasActiveWorkflow: 'Har aktiv arbeidsflyt',
-    noActiveWorkflow: 'Ingen aktiv arbeidsflyt',
-  },
-};
-
-const TRIGGER_LABELS = {
-  en: {
-    PATIENT_CREATED: 'New Patient',
-    APPOINTMENT_SCHEDULED: 'Appointment Booked',
-    APPOINTMENT_COMPLETED: 'Appointment Done',
-    APPOINTMENT_MISSED: 'No Show',
-    APPOINTMENT_CANCELLED: 'Cancelled',
-    DAYS_SINCE_VISIT: 'Recall',
-    BIRTHDAY: 'Birthday',
-    LIFECYCLE_CHANGE: 'Lifecycle',
-    CUSTOM: 'Custom',
-  },
-  no: {
-    PATIENT_CREATED: 'Ny pasient',
-    APPOINTMENT_SCHEDULED: 'Time bestilt',
-    APPOINTMENT_COMPLETED: 'Time fullfort',
-    APPOINTMENT_MISSED: 'Uteblitt',
-    APPOINTMENT_CANCELLED: 'Avbestilt',
-    DAYS_SINCE_VISIT: 'Tilbakekalling',
-    BIRTHDAY: 'Bursdag',
-    LIFECYCLE_CHANGE: 'Livssyklus',
-    CUSTOM: 'Egendefinert',
-  },
-};
-
-// =============================================================================
 // MAIN COMPONENT
 // =============================================================================
 
 export default function Automations() {
   const queryClient = useQueryClient();
-  const { lang: language, setLang: setLanguage } = useTranslation();
+  const { t, lang: language, setLang: setLanguage } = useTranslation('automations');
   const confirm = useConfirm();
 
   // UI State
@@ -253,9 +141,53 @@ export default function Automations() {
     workflowId: '',
   });
 
-  const t = LABELS[language] || LABELS.no;
+  const getTriggerLabel = (triggerType) => t(`trigger_${triggerType}`, triggerType);
 
-  const getTriggerLabel = (triggerType) => TRIGGER_LABELS[language]?.[triggerType] || triggerType;
+  // Build a labels object for child components that still expect an object-style t prop
+  const labels = {
+    title: t('title', 'Automatiserte Arbeidsflyter'),
+    subtitle: t('subtitle', 'Automatiser pasientengasjement og oppfølginger'),
+    workflows: t('workflows', 'Arbeidsflyter'),
+    executions: t('executions', 'Utførelseshistorikk'),
+    stats: t('stats', 'Statistikk'),
+    createWorkflow: t('createWorkflow', 'Opprett arbeidsflyt'),
+    allStatuses: t('allStatuses', 'Alle statuser'),
+    activeOnly: t('activeOnly', 'Kun aktive'),
+    inactiveOnly: t('inactiveOnly', 'Kun inaktive'),
+    allTriggers: t('allTriggers', 'Alle triggere'),
+    searchPlaceholder: t('searchPlaceholder', 'Søk i arbeidsflyter...'),
+    noWorkflows: t('noWorkflows', 'Ingen arbeidsflyter funnet'),
+    noWorkflowsDesc: t(
+      'noWorkflowsDesc',
+      'Opprett din første arbeidsflyt for å automatisere pasientengasjement.'
+    ),
+    enabled: t('enabled', 'Aktivert'),
+    disabled: t('disabled', 'Deaktivert'),
+    lastRun: t('lastRun', 'Sist kjørt'),
+    never: t('never', 'Aldri'),
+    totalRuns: t('totalRuns', 'Totalt kjørt'),
+    successRate: t('successRate', 'Suksessrate'),
+    edit: t('edit', 'Rediger'),
+    delete: t('delete', 'Slett'),
+    viewHistory: t('viewHistory', 'Se historikk'),
+    confirmDelete: t('confirmDelete', 'Er du sikker på at du vil slette denne arbeidsflyten?'),
+    deleteSuccess: t('deleteSuccess', 'Arbeidsflyt slettet'),
+    toggleSuccess: t('toggleSuccess', 'Arbeidsflyt status oppdatert'),
+    saveSuccess: t('saveSuccess', 'Arbeidsflyt lagret'),
+    noExecutions: t('noExecutions', 'Ingen utførelser funnet'),
+    patient: t('patient', 'Pasient'),
+    status: t('status', 'Status'),
+    started: t('started', 'Startet'),
+    completed: t('completed', 'Fullført'),
+    duration: t('duration', 'Varighet'),
+    actions: t('actions', 'Handlinger'),
+    triggerStats: t('triggerStats', 'Trigger-statistikk'),
+    upcomingTriggers: t('upcomingTriggers', 'Kommende triggere'),
+    birthdays: t('birthdays', 'Bursdager'),
+    recalls: t('recalls', 'Tilbakekallinger'),
+    hasActiveWorkflow: t('hasActiveWorkflow', 'Har aktiv arbeidsflyt'),
+    noActiveWorkflow: t('noActiveWorkflow', 'Ingen aktiv arbeidsflyt'),
+  };
 
   // Queries
   const { data: workflowsData, isLoading: workflowsLoading } = useQuery({
@@ -301,7 +233,8 @@ export default function Automations() {
   const executions = executionsData?.executions || [];
   const stats = statsData || {};
   const testPatients = patientsData?.data?.patients || [];
-  const staff = staffData?.data || [];
+  const staffRaw = staffData?.data?.data || staffData?.data;
+  const staff = Array.isArray(staffRaw) ? staffRaw : [];
 
   // Mutations
   const createMutation = useMutation({
@@ -309,7 +242,7 @@ export default function Automations() {
     onSuccess: () => {
       queryClient.invalidateQueries(['workflows']);
       setShowBuilder(false);
-      toast.success(t.saveSuccess);
+      toast.success(t('saveSuccess', 'Arbeidsflyt lagret'));
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to create workflow');
@@ -322,7 +255,7 @@ export default function Automations() {
       queryClient.invalidateQueries(['workflows']);
       setShowBuilder(false);
       setEditingWorkflow(null);
-      toast.success(t.saveSuccess);
+      toast.success(t('saveSuccess', 'Arbeidsflyt lagret'));
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to update workflow');
@@ -333,7 +266,7 @@ export default function Automations() {
     mutationFn: (id) => api.deleteWorkflow(id),
     onSuccess: () => {
       queryClient.invalidateQueries(['workflows']);
-      toast.success(t.deleteSuccess);
+      toast.success(t('deleteSuccess', 'Arbeidsflyt slettet'));
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to delete workflow');
@@ -344,7 +277,7 @@ export default function Automations() {
     mutationFn: (id) => api.toggleWorkflow(id),
     onSuccess: () => {
       queryClient.invalidateQueries(['workflows']);
-      toast.success(t.toggleSuccess);
+      toast.success(t('toggleSuccess', 'Arbeidsflyt status oppdatert'));
     },
     onError: (error) => {
       toast.error(error.message || 'Failed to toggle workflow');
@@ -371,7 +304,10 @@ export default function Automations() {
   };
 
   const handleDeleteWorkflow = async (workflow) => {
-    const ok = await confirm({ title: t.confirmDelete, variant: 'destructive' });
+    const ok = await confirm({
+      title: t('confirmDelete', 'Er du sikker på at du vil slette denne arbeidsflyten?'),
+      variant: 'destructive',
+    });
     if (ok) {
       deleteMutation.mutate(workflow.id);
     }
@@ -427,9 +363,11 @@ export default function Automations() {
         <div>
           <h1 className="text-2xl font-semibold text-gray-900 flex items-center gap-2">
             <Zap className="w-7 h-7 text-blue-600" />
-            {t.title}
+            {t('title', 'Automatiserte Arbeidsflyter')}
           </h1>
-          <p className="text-sm text-gray-500 mt-1">{t.subtitle}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {t('subtitle', 'Automatiser pasientengasjement og oppfølginger')}
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -443,7 +381,7 @@ export default function Automations() {
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             <Plus className="w-4 h-4" />
-            {t.createWorkflow}
+            {t('createWorkflow', 'Opprett arbeidsflyt')}
           </button>
         </div>
       </div>
@@ -452,9 +390,9 @@ export default function Automations() {
       <div className="mb-6 border-b border-gray-200">
         <nav className="-mb-px flex gap-6">
           {[
-            { id: 'workflows', label: t.workflows, icon: Zap },
-            { id: 'executions', label: t.executions, icon: History },
-            { id: 'stats', label: t.stats, icon: BarChart2 },
+            { id: 'workflows', label: t('workflows', 'Arbeidsflyter'), icon: Zap },
+            { id: 'executions', label: t('executions', 'Utførelseshistorikk'), icon: History },
+            { id: 'stats', label: t('stats', 'Statistikk'), icon: BarChart2 },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -462,7 +400,7 @@ export default function Automations() {
               className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
                 activeTab === tab.id
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
               <tab.icon className="w-4 h-4" />
@@ -479,7 +417,7 @@ export default function Automations() {
           workflowsLoading={workflowsLoading}
           filters={filters}
           setFilters={setFilters}
-          t={t}
+          t={labels}
           language={language}
           triggerIcons={TRIGGER_ICONS}
           triggerColors={TRIGGER_COLORS}
@@ -493,14 +431,20 @@ export default function Automations() {
       )}
 
       {activeTab === 'executions' && (
-        <Suspense fallback={<div className="text-gray-500 p-4">Loading execution history...</div>}>
+        <Suspense
+          fallback={
+            <div className="text-gray-500 dark:text-gray-400 p-4">
+              {t('loadingExecutionHistory')}
+            </div>
+          }
+        >
           <ExecutionHistoryTab
             executions={executions}
             executionsLoading={executionsLoading}
             executionFilters={executionFilters}
             setExecutionFilters={setExecutionFilters}
             workflows={workflows}
-            t={t}
+            t={labels}
             language={language}
             getTriggerLabel={getTriggerLabel}
           />
@@ -508,11 +452,15 @@ export default function Automations() {
       )}
 
       {activeTab === 'stats' && (
-        <Suspense fallback={<div className="text-gray-500 p-4">Loading statistics...</div>}>
+        <Suspense
+          fallback={
+            <div className="text-gray-500 dark:text-gray-400 p-4">{t('loadingStatistics')}</div>
+          }
+        >
           <AutomationStatsTab
             stats={stats}
             statsLoading={statsLoading}
-            t={t}
+            t={labels}
             language={language}
             triggerIcons={TRIGGER_ICONS}
             triggerColors={TRIGGER_COLORS}

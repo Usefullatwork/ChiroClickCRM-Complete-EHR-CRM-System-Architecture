@@ -169,7 +169,7 @@ export default function Analytics() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">{t('analyticsTitle')}</h1>
-          <p className="text-sm text-gray-500 mt-1">{t('analyticsSubtitle')}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('analyticsSubtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           {/* Export dropdown */}
@@ -222,7 +222,7 @@ export default function Analytics() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-gray-400" />
+              <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
               <span className="text-sm font-medium text-gray-700">{t('period')}:</span>
             </div>
             <div className="flex gap-2">
@@ -233,7 +233,7 @@ export default function Analytics() {
                   className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                     dateRange === range
                       ? 'bg-blue-100 text-blue-700'
-                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                      : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
                   }`}
                 >
                   {DATE_RANGE_LABELS[range]}
@@ -249,7 +249,7 @@ export default function Analytics() {
                 onClick={() => handleMonthChange(-1)}
                 className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <ChevronLeft className="w-5 h-5 text-gray-600" />
+                <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               </button>
               <span className="text-sm font-semibold text-gray-900 min-w-[160px] text-center capitalize">
                 {formatDateRange()}
@@ -258,7 +258,7 @@ export default function Analytics() {
                 onClick={() => handleMonthChange(1)}
                 className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
               >
-                <ChevronRight className="w-5 h-5 text-gray-600" />
+                <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
               </button>
             </div>
           )}
@@ -331,25 +331,27 @@ export default function Analytics() {
         <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('quickStats')}</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">{t('activePatients')}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('activePatients')}</p>
             <p className="text-xl font-bold text-gray-900">
               {isLoading ? '-' : patients.activePatients || 0}
             </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">{t('appointmentsToday')}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              {t('appointmentsToday')}
+            </p>
             <p className="text-xl font-bold text-gray-900">
               {isLoading ? '-' : appointments.today?.total || 0}
             </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">{t('thisWeekLabel')}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('thisWeekLabel')}</p>
             <p className="text-xl font-bold text-gray-900">
               {isLoading ? '-' : appointments.thisWeek?.total || 0}
             </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">{t('noShowRateLabel')}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">{t('noShowRateLabel')}</p>
             <p className="text-xl font-bold text-gray-900">
               {isLoading
                 ? '-'
@@ -363,7 +365,9 @@ export default function Analytics() {
             </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">{t('revenueThisMonthShort')}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              {t('revenueThisMonthShort')}
+            </p>
             <p className="text-xl font-bold text-green-600">
               {isLoading
                 ? '-'
@@ -375,7 +379,9 @@ export default function Analytics() {
             </p>
           </div>
           <div className="text-center p-4 bg-gray-50 rounded-lg">
-            <p className="text-xs text-gray-500 mb-1">{t('revenueChangeLabel')}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+              {t('revenueChangeLabel')}
+            </p>
             <p
               className={`text-xl font-bold ${
                 (revenue.changePercent || 0) >= 0 ? 'text-green-600' : 'text-red-600'

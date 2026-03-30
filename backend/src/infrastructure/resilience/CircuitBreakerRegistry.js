@@ -13,7 +13,7 @@ class CircuitBreakerRegistry {
       failureThreshold: 5,
       resetTimeout: 30000,
       halfOpenRequests: 3,
-      successThreshold: 3
+      successThreshold: 3,
     };
   }
 
@@ -28,7 +28,7 @@ class CircuitBreakerRegistry {
       const breakerConfig = {
         name,
         ...this.defaultConfig,
-        ...config
+        ...config,
       };
       this.breakers.set(name, new CircuitBreaker(breakerConfig));
       logger.info('Circuit breaker registered', { name, config: breakerConfig });
@@ -51,7 +51,7 @@ class CircuitBreakerRegistry {
     const breakerConfig = {
       name,
       ...this.defaultConfig,
-      ...config
+      ...config,
     };
 
     const breaker = new CircuitBreaker(breakerConfig);
@@ -163,7 +163,7 @@ class CircuitBreakerRegistry {
       services[name] = {
         state: breaker.state,
         healthy: isHealthy,
-        failureCount: breaker.failureCount
+        failureCount: breaker.failures,
       };
     }
 
@@ -172,7 +172,7 @@ class CircuitBreakerRegistry {
       healthyCount,
       totalCount,
       unhealthyServices: this.getUnhealthyServices(),
-      services
+      services,
     };
   }
 
@@ -215,16 +215,16 @@ const registry = new CircuitBreakerRegistry();
 // Pre-register common services with custom config
 registry.register('ollama', {
   failureThreshold: 5,
-  resetTimeout: 30000,  // 30 seconds
+  resetTimeout: 30000, // 30 seconds
   halfOpenRequests: 3,
-  successThreshold: 3
+  successThreshold: 3,
 });
 
 registry.register('openai', {
   failureThreshold: 3,
-  resetTimeout: 60000,  // 1 minute
+  resetTimeout: 60000, // 1 minute
   halfOpenRequests: 2,
-  successThreshold: 2
+  successThreshold: 2,
 });
 
 export { CircuitBreakerRegistry, CircuitState };

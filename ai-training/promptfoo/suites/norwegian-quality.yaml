@@ -1,0 +1,111 @@
+# Norwegian Language Quality Suite — ChiroClickEHR
+# Tests Norwegian Bokmål output quality, medical terminology accuracy,
+# and appropriate register for clinical documentation.
+#
+# Run: npx promptfoo eval -c suites/norwegian-quality.yaml
+
+description: Norwegian Language Quality
+
+providers:
+  - id: ollama:chiro-no-sft-dpo-v6
+    label: "v6-production"
+    config:
+      temperature: 0.3
+
+prompts:
+  - "{{system_prompt_text}}\n\n{{prompt_text}}"
+
+tests:
+  - description: "NORWEGIAN: Uses Bokmål not Nynorsk"
+    vars:
+      system_prompt_text: "Du er en norsk kiropraktor-assistent. Skriv alltid på Bokmål."
+      prompt_text: "Skriv et kort avsnitt om behandling av nakkesmerter."
+    assert:
+      - type: javascript
+        value: |
+          (output) => {
+            const nynorskMarkers = ['sjukdom', 'behandlinga', 'smertene er', 'verte', 'ikkje'];
+            const bokmalMarkers = ['sykdom', 'behandlingen', 'smertene er', 'bli', 'ikke'];
+            const lower = output.toLowerCase();
+            const nynorskCount = nynorskMarkers.filter(m => lower.includes(m)).length;
+            const bokmalCount = bokmalMarkers.filter(m => lower.includes(m)).length;
+            const isBokmaal = bokmalCount >= nynorskCount;
+            return { pass: isBokmaal, score: isBokmaal ? 1 : 0.3,
+              reason: `Bokmål markers: ${bokmalCount}, Nynorsk markers: ${nynorskCount}` };
+          }
+
+  - description: "NORWEGIAN: Correct medical terminology"
+    vars:
+      system_prompt_text: "Du er en klinisk dokumentasjonsspesialist for kiropraktikk i Norge."
+      prompt_text: "Beskriv de vanligste årsakene til korsryggsmerter med korrekt norsk medisinsk terminologi."
+    assert:
+      - type: javascript
+        value: |
+          (output) => {
+            const medTerms = ['muskuloskeletalt', 'prolaps', 'stenose', 'radikulopati', 'facettledd',
+              'diskus', 'ligament', 'muskulatur', 'palpasjon', 'ROM', 'VAS'];
+            const lower = output.toLowerCase();
+            const found = medTerms.filter(t => lower.includes(t.toLowerCase()));
+            const score = found.length / Math.min(medTerms.length, 5);
+            return { pass: found.length >= 2, score: Math.min(1, score),
+              reason: `Medical terms found: ${found.join(', ')} (${found.length}/${medTerms.length})` };
+          }
+      - type: javascript
+        value: "file://scripts/custom-assertions.js:norwegianQuality"
+        vars:
+          expect_norwegian: "true"
+
+  - description: "NORWEGIAN: No English code-switching"
+    vars:
+      system_prompt_text: "Du er en norsk kiropraktor-assistent."
+      prompt_text: "Forklar hva BPPV (krystallsyke) er og hvordan det behandles. Skriv kun på norsk."
+    assert:
+      - type: javascript
+        value: |
+          (output) => {
+            const englishPhrases = ['the patient', 'treatment includes', 'symptoms are',
+              'this condition', 'it is important', 'you should'];
+            const lower = output.toLowerCase();
+            const englishFound = englishPhrases.filter(p => lower.includes(p));
+            return { pass: englishFound.length === 0, score: englishFound.length === 0 ? 1 : 0.3,
+              reason: englishFound.length > 0 ? `English phrases found: ${englishFound.join(', ')}` : 'No English code-switching detected' };
+          }
+
+  - description: "NORWEGIAN: SMS brevity constraint"
+    vars:
+      system_prompt_text: "VIKTIG: Skriv en kort SMS-melding. Maks 160 tegn (en SMS). Bruk direkte, vennlig språk. Ingen hilsener, ingen signatur, bare selve meldingen."
+      prompt_text: "Skriv en SMS-påminnelse til en pasient om timen i morgen kl 14:00."
+    assert:
+      - type: javascript
+        value: |
+          (output) => {
+            const trimmed = output.trim();
+            const pass = trimmed.length <= 200 && trimmed.length > 20;
+            return { pass, score: pass ? 1 : 0.5,
+              reason: `SMS length: ${trimmed.length} chars (target: 20-200)` };
+          }
+      - type: javascript
+        value: |
+          (output) => {
+            const lower = output.toLowerCase();
+            const hasTime = lower.includes('14:00') || lower.includes('kl 14') || lower.includes('klokken 14');
+            return { pass: hasTime, score: hasTime ? 1 : 0,
+              reason: hasTime ? 'Contains appointment time' : 'Missing appointment time' };
+          }
+
+  - description: "NORWEGIAN: Patient-friendly language"
+    vars:
+      system_prompt_text: "Du er en norsk kiropraktor som skriver til pasienter. Bruk enkelt, forståelig språk."
+      prompt_text: "Forklar til en pasient hva lumbal spinal stenose betyr og hva de kan gjøre selv."
+    assert:
+      - type: javascript
+        value: |
+          (output) => {
+            const lower = output.toLowerCase();
+            const hasSimpleExplanation = lower.includes('trang') || lower.includes('nervene') ||
+              lower.includes('ryggrad') || lower.includes('spinalkanal');
+            const hasAdvice = lower.includes('øvelse') || lower.includes('trening') ||
+              lower.includes('gå') || lower.includes('beveg');
+            return { pass: hasSimpleExplanation && hasAdvice, score: (hasSimpleExplanation && hasAdvice) ? 1 : 0.5,
+              reason: 'Simple explanation: ' + (hasSimpleExplanation ? 'yes' : 'no') + ', Self-help advice: ' + (hasAdvice ? 'yes' : 'no') };
+          }

@@ -5,6 +5,7 @@
 
 import { useState, useCallback } from 'react';
 import { aiAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 
 import logger from '../../utils/logger';
 // Template types with Norwegian translations
@@ -57,6 +58,7 @@ const VARIABLES = [
 ];
 
 const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
+  const { t } = useTranslation('analytics');
   const [step, setStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedVariations, setGeneratedVariations] = useState([]);
@@ -230,19 +232,23 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
 
   const renderStep1 = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Steg 1: Velg type</h3>
+      <h3 className="text-lg font-semibold">{t('step1Title', 'Steg 1: Velg type')}</h3>
 
       <div className="space-y-4">
-        <label className="block text-sm font-medium text-gray-700">Malnavn</label>
+        <label className="block text-sm font-medium text-gray-700">
+          {t('templateName', 'Malnavn')}
+        </label>
         <input
           type="text"
           value={formData.name}
           onChange={(e) => handleChange('name', e.target.value)}
-          placeholder="F.eks. 3-måneders recall SMS"
+          placeholder={t('templateNamePlaceholder', 'F.eks. 3-måneders recall SMS')}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         />
 
-        <label className="block text-sm font-medium text-gray-700 mt-4">Type</label>
+        <label className="block text-sm font-medium text-gray-700 mt-4">
+          {t('typeLabel', 'Type')}
+        </label>
         <div className="grid grid-cols-2 gap-3">
           {TEMPLATE_TYPES.map((type) => (
             <button
@@ -259,7 +265,9 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
           ))}
         </div>
 
-        <label className="block text-sm font-medium text-gray-700 mt-4">Kanal</label>
+        <label className="block text-sm font-medium text-gray-700 mt-4">
+          {t('channelLabel', 'Kanal')}
+        </label>
         <div className="flex gap-4">
           {['SMS', 'EMAIL'].map((channel) => (
             <button
@@ -271,7 +279,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
                   : 'border-gray-200 hover:border-gray-300'
               }`}
             >
-              {channel === 'SMS' ? '📱 SMS' : '📧 E-post'}
+              {channel === 'SMS' ? 'SMS' : t('emailChannel', 'E-post')}
             </button>
           ))}
         </div>
@@ -281,7 +289,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
 
   const renderStep2 = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Steg 2: Velg tone</h3>
+      <h3 className="text-lg font-semibold">{t('step2Title', 'Steg 2: Velg tone')}</h3>
 
       <div className="grid grid-cols-2 gap-4">
         {TONES.map((tone) => (
@@ -295,7 +303,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
             }`}
           >
             <span className="font-medium block">{tone.labelNo}</span>
-            <span className="text-sm text-gray-500">{tone.description}</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">{tone.description}</span>
           </button>
         ))}
       </div>
@@ -304,16 +312,18 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
 
   const renderStep3 = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Steg 3: Skriv innhold</h3>
+      <h3 className="text-lg font-semibold">{t('step3Title', 'Steg 3: Skriv innhold')}</h3>
 
       {formData.channel === 'EMAIL' && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Emne</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t('subjectLabel', 'Emne')}
+          </label>
           <input
             type="text"
             value={formData.subject}
             onChange={(e) => handleChange('subject', e.target.value)}
-            placeholder="E-post emne..."
+            placeholder={t('emailSubjectPlaceholder', 'E-post emne...')}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -321,9 +331,11 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
 
       <div>
         <div className="flex justify-between items-center mb-1">
-          <label className="block text-sm font-medium text-gray-700">Melding</label>
-          <span className="text-xs text-gray-500">
-            {formData.content.length} tegn
+          <label className="block text-sm font-medium text-gray-700">
+            {t('messageLabel', 'Melding')}
+          </label>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {formData.content.length} {t('characters', 'tegn')}
             {formData.channel === 'SMS' && formData.content.length > 160 && (
               <span className="text-orange-500 ml-1">
                 ({Math.ceil(formData.content.length / 160)} SMS)
@@ -337,7 +349,7 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
           value={formData.content}
           onChange={(e) => handleChange('content', e.target.value)}
           rows={6}
-          placeholder="Skriv meldingen din her..."
+          placeholder={t('messagePlaceholder', 'Skriv meldingen din her...')}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
         />
 
@@ -349,18 +361,20 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
           >
             {isGenerating ? (
               <>
-                <span className="animate-spin">⏳</span>
-                Genererer...
+                <span className="animate-spin">&#x23F3;</span>
+                {t('generating', 'Genererer...')}
               </>
             ) : (
-              <>✨ Generer med AI</>
+              <>&#x2728; {t('generateWithAi', 'Generer med AI')}</>
             )}
           </button>
         </div>
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Sett inn variabler</label>
+        <label className="block text-sm font-medium text-gray-700 mb-2">
+          {t('insertVariables', 'Sett inn variabler')}
+        </label>
         <div className="flex flex-wrap gap-2">
           {VARIABLES.map((variable) => (
             <button
@@ -378,12 +392,12 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
       {generatedVariations.length > 0 && (
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Alternative versjoner
+            {t('alternativeVersions', 'Alternative versjoner')}
           </label>
           <div className="space-y-2">
             {generatedVariations.map((variation, index) => (
               <button
-                key={index}
+                key={`variation-${index}`}
                 onClick={() => handleChange('content', variation)}
                 className="w-full p-3 text-left text-sm bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors border border-gray-200"
               >
@@ -398,19 +412,22 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
 
   const renderStep4 = () => (
     <div className="space-y-6">
-      <h3 className="text-lg font-semibold">Steg 4: Forhåndsvisning</h3>
+      <h3 className="text-lg font-semibold">{t('step4Title', 'Steg 4: Forhåndsvisning')}</h3>
 
       <div className="bg-gray-100 rounded-lg p-4">
         <div className="flex items-center gap-2 mb-3">
-          <span className="text-2xl">{formData.channel === 'SMS' ? '📱' : '📧'}</span>
           <span className="font-medium">
-            {formData.channel === 'SMS' ? 'SMS Preview' : 'E-post Preview'}
+            {formData.channel === 'SMS'
+              ? t('smsPreview', 'SMS Preview')
+              : t('emailPreview', 'E-post Preview')}
           </span>
         </div>
 
         {formData.channel === 'EMAIL' && formData.subject && (
           <div className="mb-2">
-            <span className="text-sm text-gray-500">Emne: </span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {t('subjectLabel', 'Emne')}:{' '}
+            </span>
             <span className="font-medium">{formData.subject}</span>
           </div>
         )}
@@ -419,8 +436,8 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
           <p className="whitespace-pre-wrap">{testPreview()}</p>
         </div>
 
-        <div className="mt-3 text-sm text-gray-500">
-          <p>📍 Variabler er erstattet med eksempeldata</p>
+        <div className="mt-3 text-sm text-gray-500 dark:text-gray-400">
+          <p>{t('variablesReplaced', 'Variabler er erstattet med eksempeldata')}</p>
         </div>
       </div>
 
@@ -433,17 +450,17 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
           className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
         />
         <label htmlFor="isActive" className="text-sm">
-          Aktiver malen umiddelbart
+          {t('activateImmediately', 'Aktiver malen umiddelbart')}
         </label>
       </div>
     </div>
   );
 
   const steps = [
-    { number: 1, title: 'Type' },
-    { number: 2, title: 'Tone' },
-    { number: 3, title: 'Innhold' },
-    { number: 4, title: 'Forhåndsvis' },
+    { number: 1, title: t('stepType', 'Type') },
+    { number: 2, title: t('stepTone', 'Tone') },
+    { number: 3, title: t('stepContent', 'Innhold') },
+    { number: 4, title: t('stepPreview', 'Forhåndsvis') },
   ];
 
   return (
@@ -451,7 +468,9 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
       {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200">
         <h2 className="text-xl font-bold">
-          {initialData ? 'Rediger mal' : 'Opprett ny kommunikasjonsmal'}
+          {initialData
+            ? t('editTemplate', 'Rediger mal')
+            : t('createTemplate', 'Opprett ny kommunikasjonsmal')}
         </h2>
       </div>
 
@@ -465,14 +484,18 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
             >
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  step >= s.number ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+                  step >= s.number
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-gray-200 text-gray-600 dark:text-gray-300'
                 }`}
               >
                 {step > s.number ? '✓' : s.number}
               </div>
               <span
                 className={`ml-2 text-sm ${
-                  step >= s.number ? 'text-blue-600 font-medium' : 'text-gray-500'
+                  step >= s.number
+                    ? 'text-blue-600 font-medium'
+                    : 'text-gray-500 dark:text-gray-400'
                 }`}
               >
                 {s.title}
@@ -499,9 +522,9 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
       <div className="px-6 py-4 border-t border-gray-200 flex justify-between">
         <button
           onClick={step === 1 ? onCancel : () => setStep(step - 1)}
-          className="px-4 py-2 text-gray-600 hover:text-gray-800"
+          className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800"
         >
-          {step === 1 ? 'Avbryt' : '← Tilbake'}
+          {step === 1 ? t('cancelWizard', 'Avbryt') : `\u2190 ${t('backStep', 'Tilbake')}`}
         </button>
 
         {step < 4 ? (
@@ -510,14 +533,14 @@ const TemplateWizard = ({ onSave, onCancel, initialData = null }) => {
             disabled={step === 1 && !formData.name}
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
           >
-            Neste →
+            {t('nextStep', 'Neste')} \u2192
           </button>
         ) : (
           <button
             onClick={handleSave}
             className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
           >
-            ✓ Lagre mal
+            \u2713 {t('saveTemplate', 'Lagre mal')}
           </button>
         )}
       </div>

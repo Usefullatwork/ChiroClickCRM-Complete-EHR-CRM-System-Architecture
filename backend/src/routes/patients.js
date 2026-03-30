@@ -10,6 +10,7 @@ import * as exercisesController from '../controllers/exercises.js';
 import * as pdfController from '../controllers/pdf.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import { validate } from '../middleware/validation.js';
+import { readLimiter, searchLimiter } from '../middleware/rateLimiting.js';
 import {
   createPatientSchema,
   updatePatientSchema,
@@ -55,7 +56,7 @@ router.use(requireOrganization);
  *       401:
  *         description: Unauthorized
  */
-router.get('/', validate(listPatientsSchema), patientController.getPatients);
+router.get('/', readLimiter, validate(listPatientsSchema), patientController.getPatients);
 
 /**
  * @swagger
@@ -75,7 +76,12 @@ router.get('/', validate(listPatientsSchema), patientController.getPatients);
  *       401:
  *         description: Unauthorized
  */
-router.get('/search', validate(quickSearchPatientsSchema), patientController.searchPatients);
+router.get(
+  '/search',
+  searchLimiter,
+  validate(quickSearchPatientsSchema),
+  patientController.searchPatients
+);
 
 /**
  * @swagger
@@ -122,6 +128,7 @@ router.get('/search', validate(quickSearchPatientsSchema), patientController.sea
  */
 router.get(
   '/search/advanced',
+  searchLimiter,
   validate(searchPatientsSchema),
   patientController.advancedSearchPatients
 );
@@ -143,6 +150,27 @@ router.get(
   requireRole(['ADMIN', 'PRACTITIONER']),
   patientController.getPatientsNeedingFollowUp
 );
+
+/**
+ * @swagger
+ * /patients/export/vcf:
+ *   get:
+ *     summary: Export active patient contacts as VCF file
+ *     tags: [Patients]
+ *     description: Generates a multi-contact .vcf (vCard) file with patient names and phone numbers only. No health data is included. GDPR-compliant — only name + mobile number.
+ *     responses:
+ *       200:
+ *         description: VCF file download
+ *         content:
+ *           text/vcard:
+ *             schema:
+ *               type: string
+ *       401:
+ *         description: Unauthorized
+ *       403:
+ *         description: Insufficient role
+ */
+router.get('/export/vcf', requireRole(['ADMIN', 'PRACTITIONER']), patientController.exportVcf);
 
 /**
  * @swagger
@@ -190,6 +218,27 @@ router.get(
   validate(getPatientStatisticsSchema),
   patientController.getPatientStatistics
 );
+
+/**
+ * @swagger
+ * /patients/{id}/vcf:
+ *   get:
+ *     summary: Export single patient contact as VCF
+ *     tags: [Patients]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: uuid
+ *     responses:
+ *       200:
+ *         description: Single-contact VCF file
+ *       404:
+ *         description: Patient not found
+ */
+router.get('/:id/vcf', requireRole(['ADMIN', 'PRACTITIONER']), patientController.exportSingleVcf);
 
 /**
  * @swagger

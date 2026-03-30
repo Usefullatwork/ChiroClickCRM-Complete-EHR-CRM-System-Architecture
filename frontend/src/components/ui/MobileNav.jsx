@@ -30,6 +30,7 @@ import {
   Phone,
 } from 'lucide-react';
 import useMediaQuery from '../../hooks/useMediaQuery';
+import { useTranslation } from '../../i18n';
 
 /**
  * MobileNav Component
@@ -54,25 +55,26 @@ export default function MobileNav({
   const navigate = useNavigate();
   const location = useLocation();
   const { isMobile, prefersReducedMotion } = useMediaQuery();
+  const { t } = useTranslation('common');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef(null);
   const [touchStart, setTouchStart] = useState(null);
 
   // Default navigation items for clinic staff
   const defaultClinicNav = [
-    { icon: Home, label: 'Hjem', path: '/dashboard' },
-    { icon: Calendar, label: 'Kalender', path: '/calendar' },
-    { icon: Users, label: 'Pasienter', path: '/patients' },
-    { icon: FileText, label: 'Notater', path: '/notes' },
-    { icon: Menu, label: 'Meny', action: 'menu' },
+    { icon: Home, label: t('navHome', 'Hjem'), path: '/dashboard' },
+    { icon: Calendar, label: t('navCalendar', 'Kalender'), path: '/calendar' },
+    { icon: Users, label: t('navPatients', 'Pasienter'), path: '/patients' },
+    { icon: FileText, label: t('navNotes', 'Notater'), path: '/notes' },
+    { icon: Menu, label: t('navMenu', 'Meny'), action: 'menu' },
   ];
 
   // Default navigation items for patient portal
   const defaultPortalNav = [
-    { icon: Dumbbell, label: 'Ovelser', path: '/portal/ovelser' },
-    { icon: Calendar, label: 'Timer', path: '/portal/timer' },
-    { icon: User, label: 'Profil', path: '/portal/profil' },
-    { icon: Phone, label: 'Kontakt', action: 'contact' },
+    { icon: Dumbbell, label: t('navExercises', 'Øvelser'), path: '/portal/ovelser' },
+    { icon: Calendar, label: t('navAppointments', 'Timer'), path: '/portal/timer' },
+    { icon: User, label: t('navProfile', 'Profil'), path: '/portal/profil' },
+    { icon: Phone, label: t('navContact', 'Kontakt'), action: 'contact' },
   ];
 
   // Use provided items or defaults
@@ -81,10 +83,10 @@ export default function MobileNav({
 
   // Default menu items
   const defaultMenuItems = [
-    { icon: BarChart3, label: 'Statistikk', path: '/statistics' },
-    { icon: Dumbbell, label: 'Ovelsesbibliotek', path: '/exercises' },
-    { icon: Settings, label: 'Innstillinger', path: '/settings' },
-    { icon: HelpCircle, label: 'Hjelp', path: '/help' },
+    { icon: BarChart3, label: t('navStatistics', 'Statistikk'), path: '/statistics' },
+    { icon: Dumbbell, label: t('navExerciseLibrary', 'Øvelsesbibliotek'), path: '/exercises' },
+    { icon: Settings, label: t('navSettings', 'Innstillinger'), path: '/settings' },
+    { icon: HelpCircle, label: t('navHelp', 'Hjelp'), path: '/help' },
   ];
 
   const drawerMenuItems = menuItems.length > 0 ? menuItems : defaultMenuItems;
@@ -179,18 +181,18 @@ export default function MobileNav({
           }}
         >
           <div className="flex items-stretch justify-around">
-            {bottomNavItems.map((item, index) => {
+            {bottomNavItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
 
               return (
                 <button
-                  key={index}
+                  key={item.path || item.label}
                   onClick={() => handleNavClick(item)}
                   className={`flex flex-col items-center justify-center flex-1 py-2 min-h-[56px] transition-colors ${
                     active
                       ? 'text-blue-600'
-                      : 'text-gray-500 hover:text-gray-700 active:bg-gray-100'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 active:bg-gray-100'
                   }`}
                   aria-label={item.label}
                   aria-current={active ? 'page' : undefined}
@@ -231,18 +233,20 @@ export default function MobileNav({
         onTouchEnd={handleTouchEnd}
         role="dialog"
         aria-modal="true"
-        aria-label="Navigasjonsmeny"
+        aria-label={t('navMenu2', 'Navigasjonsmeny')}
       >
         {/* Menu Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-gray-50">
           <div className="flex-1 min-w-0">
             {userName && <p className="font-semibold text-gray-900 truncate">{userName}</p>}
-            {clinicName && <p className="text-sm text-gray-500 truncate">{clinicName}</p>}
+            {clinicName && (
+              <p className="text-sm text-gray-500 dark:text-gray-400 truncate">{clinicName}</p>
+            )}
           </div>
           <button
             onClick={() => setIsMenuOpen(false)}
-            className="p-2 -mr-2 text-gray-500 hover:bg-gray-200 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-            aria-label="Lukk meny"
+            className="p-2 -mr-2 text-gray-500 dark:text-gray-400 hover:bg-gray-200 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+            aria-label={t('navCloseMenu', 'Lukk meny')}
           >
             <X className="w-6 h-6" />
           </button>
@@ -253,10 +257,10 @@ export default function MobileNav({
           {/* Search (optional) */}
           <div className="px-4 py-2">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300" />
               <input
                 type="search"
-                placeholder="Sok..."
+                placeholder={t('navSearch', 'Søk...')}
                 className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -264,13 +268,13 @@ export default function MobileNav({
 
           {/* Menu Items */}
           <div className="px-2 py-2">
-            {drawerMenuItems.map((item, index) => {
+            {drawerMenuItems.map((item) => {
               const Icon = item.icon;
               const active = isActive(item.path);
 
               return (
                 <button
-                  key={index}
+                  key={item.path || item.label}
                   onClick={() => {
                     if (item.path) {
                       navigate(item.path);
@@ -286,10 +290,10 @@ export default function MobileNav({
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 flex-shrink-0 ${active ? 'text-blue-600' : 'text-gray-500'}`}
+                    className={`w-5 h-5 flex-shrink-0 ${active ? 'text-blue-600' : 'text-gray-500 dark:text-gray-400'}`}
                   />
                   <span className="flex-1 font-medium">{item.label}</span>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                 </button>
               );
             })}
@@ -309,7 +313,7 @@ export default function MobileNav({
                 className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-red-600 hover:bg-red-50 active:bg-red-100 transition-colors min-h-[48px]"
               >
                 <LogOut className="w-5 h-5 flex-shrink-0" />
-                <span className="font-medium">Logg ut</span>
+                <span className="font-medium">{t('navLogout', 'Logg ut')}</span>
               </button>
             </div>
           )}
@@ -317,12 +321,12 @@ export default function MobileNav({
 
         {/* Menu Footer */}
         <div
-          className="p-4 border-t border-gray-200 bg-gray-50 text-center text-xs text-gray-500"
+          className="p-4 border-t border-gray-200 bg-gray-50 text-center text-xs text-gray-500 dark:text-gray-400"
           style={{
             paddingBottom: 'calc(env(safe-area-inset-bottom, 0px) + 1rem)',
           }}
         >
-          <p>ChiroClick CRM</p>
+          <p>ChiroClick EHR</p>
         </div>
       </div>
 
@@ -352,6 +356,7 @@ export function MobileHeader({
   onBack,
   className = '',
 }) {
+  const { t } = useTranslation('common');
   const navigate = useNavigate();
   const { _prefersReducedMotion } = useMediaQuery();
 
@@ -376,8 +381,8 @@ export function MobileHeader({
           {showBack ? (
             <button
               onClick={handleBack}
-              className="p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
-              aria-label="Tilbake"
+              className="p-2 -ml-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-full transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label={t('navBack', 'Tilbake')}
             >
               <ChevronRight className="w-6 h-6 rotate-180" />
             </button>
@@ -389,7 +394,9 @@ export function MobileHeader({
         {/* Title */}
         <div className="flex-1 text-center min-w-0 px-2">
           <h1 className="font-semibold text-gray-900 truncate text-lg">{title}</h1>
-          {subtitle && <p className="text-xs text-gray-500 truncate">{subtitle}</p>}
+          {subtitle && (
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{subtitle}</p>
+          )}
         </div>
 
         {/* Right Action */}

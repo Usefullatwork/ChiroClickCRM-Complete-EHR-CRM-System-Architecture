@@ -1,6 +1,9 @@
 ---
 name: norwegian-medical
 description: Norwegian Bokmål medical content standards. Auto-activates when writing or editing Norwegian UI text, patient communications, consent forms, error messages, medical terminology, SOAP notes, or any patient-facing strings.
+user-invocable: true
+model: sonnet
+effort: medium
 ---
 
 # Norwegian Medical Content Standards for ChiroClickCRM

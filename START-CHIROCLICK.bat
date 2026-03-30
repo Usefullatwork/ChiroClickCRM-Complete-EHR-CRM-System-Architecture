@@ -1,25 +1,26 @@
 @echo off
-title ChiroClick CRM - Starting...
+title ChiroClickEHR - Starting...
 color 0A
 setlocal enabledelayedexpansion
 
 echo.
 echo  ========================================
-echo   ChiroClick CRM - Starting Application
+echo   ChiroClickEHR - Starting Application
 echo  ========================================
 echo.
 
-:: Ask user if they want to load AI models
-echo  AI Models require ~4-14GB RAM and slow startup.
-echo.
-echo  [A] Start with AI (full features)
-echo  [S] Skip AI (faster startup, no AI features)
-echo.
-choice /C AS /N /M "  Choose option [A/S]: "
-if errorlevel 2 goto SKIP_AI
-if errorlevel 1 goto WITH_AI
+:: Auto-detect Ollama
+where ollama >nul 2>&1
+if %ERRORLEVEL% EQU 0 (
+    set AI_ENABLED=true
+    echo   Ollama detected - AI features enabled
+) else (
+    set AI_ENABLED=false
+    echo   Ollama not found - starting without AI
+)
 
-:WITH_AI
+if "%AI_ENABLED%"=="false" goto SKIP_AI
+
 set AI_MODE=enabled
 echo.
 echo  Starting with AI enabled...
@@ -100,6 +101,15 @@ echo [1/4] Skipping Ollama AI (disabled)
 goto START_BACKEND
 
 :START_BACKEND
+:: Clean up stale processes on required ports
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :3000 ^| findstr LISTENING 2^>nul') do (
+    echo  Killed stale process on port 3000 (PID: %%a)
+    taskkill /PID %%a /F >nul 2>&1
+)
+for /f "tokens=5" %%a in ('netstat -ano ^| findstr :5173 ^| findstr LISTENING 2^>nul') do (
+    echo  Killed stale process on port 5173 (PID: %%a)
+    taskkill /PID %%a /F >nul 2>&1
+)
 :: Backup PGlite database before starting
 if exist "%~dp0data\pglite\PG_VERSION" (
     echo.
@@ -115,7 +125,7 @@ if "%AI_MODE%"=="enabled" (
     echo [2/4] Starting Backend Server...
 )
 cd /d "%~dp0\backend"
-start "ChiroClick Backend" cmd /k "npm start"
+start "ChiroClickEHR Backend" cmd /k "npm start"
 timeout /t 5 /nobreak >nul
 
 :: Start Frontend
@@ -126,7 +136,7 @@ if "%AI_MODE%"=="enabled" (
     echo [3/4] Starting Frontend...
 )
 cd /d "%~dp0\frontend"
-start "ChiroClick Frontend" cmd /k "npm run dev"
+start "ChiroClickEHR Frontend" cmd /k "npm run dev"
 timeout /t 8 /nobreak >nul
 
 :: Open Browser
@@ -136,11 +146,11 @@ if "%AI_MODE%"=="enabled" (
 ) else (
     echo [4/4] Opening Browser...
 )
-start msedge "http://localhost:5173"
+start "" "http://localhost:5173"
 
 echo.
 echo  ========================================
-echo   ChiroClick CRM is now running!
+echo   ChiroClickEHR is now running!
 echo  ========================================
 echo.
 echo   Frontend: http://localhost:5173

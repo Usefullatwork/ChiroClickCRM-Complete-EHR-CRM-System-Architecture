@@ -1,15 +1,15 @@
 @echo off
 REM ============================================================================
-REM ChiroClick AI Models - Standalone Build Script
+REM ChiroClickEHR AI Models - Standalone Build Script
 REM ============================================================================
-REM This script builds all ChiroClick AI models using Ollama.
+REM This script builds all ChiroClickEHR AI models using Ollama.
 REM No backend access, coding tools, or special permissions required.
 REM Just needs Ollama installed and running.
 REM ============================================================================
 
 echo.
 echo ============================================================
-echo    ChiroClick AI Models - Build Script
+echo    ChiroClickEHR AI Models - Build Script
 echo ============================================================
 echo.
 
@@ -31,7 +31,7 @@ echo.
 REM Get the directory where this script is located
 set SCRIPT_DIR=%~dp0
 
-echo Building ChiroClick AI Models...
+echo Building ChiroClickEHR AI Models...
 echo This may take 10-30 minutes depending on your internet speed.
 echo.
 
@@ -161,7 +161,7 @@ echo   ollama run chiro-norwegian "Skriv SOAP-notat"
 echo   ollama run chiro-medical "Klinisk vurdering"
 echo   ollama run chiro-no "General prompt"
 echo.
-echo From ChiroClick app:
+echo From ChiroClickEHR app:
 echo   Models are automatically used by the AI features.
 echo   chiro-fast: Quick fields (chief complaint, onset)
 echo   chiro-norwegian: Narrative fields (history, subjective)

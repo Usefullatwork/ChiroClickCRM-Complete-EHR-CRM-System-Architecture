@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 :: ============================================================
-:: ChiroClickCRM - Overnight AI Model Training Pipeline
+:: ChiroClickEHR - Overnight AI Model Training Pipeline
 :: ============================================================
 ::
 :: This script runs unattended for ~10-12 hours:
@@ -44,7 +44,7 @@ if not exist "%DATA_DIR%" mkdir "%DATA_DIR%"
 :: Logging function
 :: ============================================================
 call :log "============================================================"
-call :log "ChiroClickCRM Overnight Training Pipeline"
+call :log "ChiroClickEHR Overnight Training Pipeline"
 call :log "Started: %date% %time%"
 call :log "Log file: %LOGFILE%"
 call :log "============================================================"

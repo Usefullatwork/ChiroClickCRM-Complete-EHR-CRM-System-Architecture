@@ -52,98 +52,53 @@ const ExerciseTemplates = lazy(() => import('../components/crm/ExerciseTemplates
 const CRMSettings = lazy(() => import('../components/crm/CRMSettings'));
 
 const CRM_MODULES = [
-  {
-    id: 'overview',
-    name: { no: 'Oversikt', en: 'Overview' },
-    icon: BarChart3,
-    color: 'blue',
-    description: { no: 'CRM dashbord og nøkkeltall', en: 'CRM dashboard and key metrics' },
-  },
-  {
-    id: 'leads',
-    name: { no: 'Leads', en: 'Leads' },
-    icon: UserPlus,
-    color: 'purple',
-    description: { no: 'Administrer potensielle pasienter', en: 'Manage potential patients' },
-  },
+  { id: 'overview', nameKey: 'overview', descKey: 'overviewDesc', icon: BarChart3, color: 'blue' },
+  { id: 'leads', nameKey: 'leads', descKey: 'leadsDesc', icon: UserPlus, color: 'purple' },
   {
     id: 'lifecycle',
-    name: { no: 'Pasientlivssyklus', en: 'Patient Lifecycle' },
+    nameKey: 'patientLifecycle',
+    descKey: 'lifecycleDesc',
     icon: Users,
     color: 'teal',
-    description: {
-      no: 'Spor pasientstatus og engasjement',
-      en: 'Track patient status and engagement',
-    },
   },
-  {
-    id: 'referrals',
-    name: { no: 'Henvisninger', en: 'Referrals' },
-    icon: Gift,
-    color: 'orange',
-    description: { no: 'Henvisningsprogram og belønninger', en: 'Referral program and rewards' },
-  },
-  {
-    id: 'surveys',
-    name: { no: 'Undersøkelser', en: 'Surveys' },
-    icon: Star,
-    color: 'yellow',
-    description: { no: 'NPS og tilfredshetsmålinger', en: 'NPS and satisfaction tracking' },
-  },
+  { id: 'referrals', nameKey: 'referrals', descKey: 'referralsDesc', icon: Gift, color: 'orange' },
+  { id: 'surveys', nameKey: 'surveys', descKey: 'surveysDesc', icon: Star, color: 'yellow' },
   {
     id: 'communications',
-    name: { no: 'Kommunikasjon', en: 'Communications' },
+    nameKey: 'communications',
+    descKey: 'communicationsDesc',
     icon: MessageSquare,
     color: 'green',
-    description: { no: 'Meldingshistorikk og samtaler', en: 'Message history and conversations' },
   },
-  {
-    id: 'campaigns',
-    name: { no: 'Kampanjer', en: 'Campaigns' },
-    icon: Send,
-    color: 'pink',
-    description: { no: 'Markedsføring og tilbakekalling', en: 'Marketing and recall campaigns' },
-  },
+  { id: 'campaigns', nameKey: 'campaigns', descKey: 'campaignsDesc', icon: Send, color: 'pink' },
   {
     id: 'workflows',
-    name: { no: 'Automatisering', en: 'Automation' },
+    nameKey: 'automation',
+    descKey: 'automationDesc',
     icon: Workflow,
     color: 'indigo',
-    description: { no: 'Automatiske arbeidsflyter', en: 'Automated workflows' },
   },
   {
     id: 'retention',
-    name: { no: 'Retensjon', en: 'Retention' },
+    nameKey: 'retention',
+    descKey: 'retentionDesc',
     icon: TrendingUp,
     color: 'emerald',
-    description: { no: 'Retensjonsanalyse og churn', en: 'Retention analysis and churn' },
   },
-  {
-    id: 'waitlist',
-    name: { no: 'Venteliste', en: 'Waitlist' },
-    icon: Clock,
-    color: 'amber',
-    description: { no: 'Administrer avbestillingsventeliste', en: 'Manage cancellation waitlist' },
-  },
+  { id: 'waitlist', nameKey: 'waitlist', descKey: 'waitlistDesc', icon: Clock, color: 'amber' },
   {
     id: 'exercises',
-    name: { no: 'Øvelsesmaler', en: 'Exercise Templates' },
+    nameKey: 'exerciseTemplates',
+    descKey: 'exerciseTemplatesDesc',
     icon: FileText,
     color: 'cyan',
-    description: { no: 'Send øvelsesPDF-er til pasienter', en: 'Send exercise PDFs to patients' },
   },
-  {
-    id: 'settings',
-    name: { no: 'Innstillinger', en: 'Settings' },
-    icon: Settings,
-    color: 'gray',
-    description: { no: 'CRM-innstillinger og frekvenser', en: 'CRM settings and frequencies' },
-  },
+  { id: 'settings', nameKey: 'settings', descKey: 'settingsDesc', icon: Settings, color: 'gray' },
 ];
 
 export default function CRM() {
   const [activeModule, setActiveModule] = useState('overview');
-  const { lang: language, setLang: setLanguage } = useTranslation();
+  const { t, lang: language, setLang: setLanguage } = useTranslation('crm');
   const [_loading, setLoading] = useState(true);
   const [overviewStats, setOverviewStats] = useState({
     newLeads: 0,
@@ -159,8 +114,6 @@ export default function CRM() {
   const [waitlistData, setWaitlistData] = useState([]);
   const [patientsList, setPatientsList] = useState([]);
 
-  const t = (obj) => obj[language] || obj.en;
-
   // Fetch waitlist data when module is active
   useEffect(() => {
     if (activeModule !== 'waitlist') {
@@ -172,7 +125,8 @@ export default function CRM() {
           crmAPI.getWaitlist(),
           patientsAPI.getAll({ limit: 1000 }),
         ]);
-        const entries = wRes.data?.entries || wRes.data || [];
+        const wData = wRes.data?.data || wRes.data;
+        const entries = wData?.entries || (Array.isArray(wData) ? wData : []);
         setWaitlistData(
           entries.map((e) => ({
             id: e.id,
@@ -188,7 +142,8 @@ export default function CRM() {
             notificationsSent: e.notification_count || 0,
           }))
         );
-        const patients = pRes.data?.patients || pRes.data || [];
+        const pData = pRes.data?.data || pRes.data;
+        const patients = pData?.patients || (Array.isArray(pData) ? pData : []);
         setPatientsList(patients);
       } catch (err) {
         logger.error('Failed to fetch waitlist:', err);
@@ -315,27 +270,27 @@ export default function CRM() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           icon={UserPlus}
-          label={t({ no: 'Nye Leads', en: 'New Leads' })}
+          label={t('newLeads', 'Nye Leads')}
           value={overviewStats.newLeads}
           color="purple"
           trend="+3 denne uken"
         />
         <StatCard
           icon={Users}
-          label={t({ no: 'Aktive Pasienter', en: 'Active Patients' })}
+          label={t('activePatients', 'Aktive Pasienter')}
           value={overviewStats.activePatients}
           color="teal"
         />
         <StatCard
           icon={Bell}
-          label={t({ no: 'I Faresonen', en: 'At Risk' })}
+          label={t('atRisk', 'I Faresonen')}
           value={overviewStats.atRiskPatients}
           color="red"
           alert
         />
         <StatCard
           icon={Star}
-          label={t({ no: 'NPS Score', en: 'NPS Score' })}
+          label={t('npsScore', 'NPS Score')}
           value={overviewStats.avgNPS}
           color="yellow"
           suffix="%"
@@ -349,35 +304,20 @@ export default function CRM() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-gray-900 flex items-center gap-2">
               <Target className="w-5 h-5 text-purple-500" />
-              {t({ no: 'Lead Pipeline', en: 'Lead Pipeline' })}
+              {t('leadPipeline', 'Lead Pipeline')}
             </h3>
             <button
               onClick={() => setActiveModule('leads')}
               className="text-sm text-purple-600 hover:text-purple-700"
             >
-              {t({ no: 'Se alle', en: 'View all' })} →
+              {t('viewAll', 'Se alle')} →
             </button>
           </div>
           <div className="space-y-2">
-            <PipelineBar label={t({ no: 'Nye', en: 'New' })} count={5} total={12} color="blue" />
-            <PipelineBar
-              label={t({ no: 'Kontaktet', en: 'Contacted' })}
-              count={4}
-              total={12}
-              color="yellow"
-            />
-            <PipelineBar
-              label={t({ no: 'Booket', en: 'Booked' })}
-              count={2}
-              total={12}
-              color="green"
-            />
-            <PipelineBar
-              label={t({ no: 'Konvertert', en: 'Converted' })}
-              count={1}
-              total={12}
-              color="teal"
-            />
+            <PipelineBar label={t('new', 'Nye')} count={5} total={12} color="blue" />
+            <PipelineBar label={t('contacted', 'Kontaktet')} count={4} total={12} color="yellow" />
+            <PipelineBar label={t('booked', 'Booket')} count={2} total={12} color="green" />
+            <PipelineBar label={t('converted', 'Konvertert')} count={1} total={12} color="teal" />
           </div>
         </div>
 
@@ -386,32 +326,32 @@ export default function CRM() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-gray-900 flex items-center gap-2">
               <MessageSquare className="w-5 h-5 text-green-500" />
-              {t({ no: 'Siste Meldinger', en: 'Recent Messages' })}
+              {t('recentMessages', 'Siste Meldinger')}
             </h3>
             <button
               onClick={() => setActiveModule('communications')}
               className="text-sm text-green-600 hover:text-green-700"
             >
-              {t({ no: 'Se alle', en: 'View all' })} →
+              {t('viewAll', 'Se alle')} →
             </button>
           </div>
           <div className="space-y-3">
             <MessagePreview
               name="Kari Nordmann"
-              message="Takk for påminnelsen! Jeg booker time nå."
-              time="10 min"
+              message={t('demoMessage1', 'Takk for påminnelsen! Jeg booker time nå.')}
+              time={t('demoTime10min', '10 min')}
               type="inbound"
             />
             <MessagePreview
               name="Ole Hansen"
-              message="Hei! Det er en stund siden sist..."
-              time="2 timer"
+              message={t('demoMessage2', 'Hei! Det er en stund siden sist...')}
+              time={t('demoTime2hrs', '2 timer')}
               type="outbound"
             />
             <MessagePreview
               name="Anna Berg"
-              message="Ja, tirsdag kl 14:00 passer fint!"
-              time="3 timer"
+              message={t('demoMessage3', 'Ja, tirsdag kl 14:00 passer fint!')}
+              time={t('demoTime3hrs', '3 timer')}
               type="inbound"
             />
           </div>
@@ -422,13 +362,13 @@ export default function CRM() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-gray-900 flex items-center gap-2">
               <Gift className="w-5 h-5 text-orange-500" />
-              {t({ no: 'Ventende Henvisninger', en: 'Pending Referrals' })}
+              {t('pendingReferrals', 'Ventende Henvisninger')}
             </h3>
             <button
               onClick={() => setActiveModule('referrals')}
               className="text-sm text-orange-600 hover:text-orange-700"
             >
-              {t({ no: 'Se alle', en: 'View all' })} →
+              {t('viewAll', 'Se alle')} →
             </button>
           </div>
           <div className="space-y-3">
@@ -446,9 +386,8 @@ export default function CRM() {
             />
           </div>
           <div className="mt-4 pt-3 border-t border-gray-100">
-            <p className="text-sm text-gray-500">
-              {overviewStats.pendingReferrals}{' '}
-              {t({ no: 'ventende belønninger', en: 'pending rewards' })}
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {overviewStats.pendingReferrals} {t('pendingRewards', 'ventende belønninger')}
             </p>
           </div>
         </div>
@@ -458,13 +397,13 @@ export default function CRM() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-gray-900 flex items-center gap-2">
               <Send className="w-5 h-5 text-pink-500" />
-              {t({ no: 'Aktive Kampanjer', en: 'Active Campaigns' })}
+              {t('activeCampaigns', 'Aktive Kampanjer')}
             </h3>
             <button
               onClick={() => setActiveModule('campaigns')}
               className="text-sm text-pink-600 hover:text-pink-700"
             >
-              {t({ no: 'Se alle', en: 'View all' })} →
+              {t('viewAll', 'Se alle')} →
             </button>
           </div>
           <div className="space-y-3">
@@ -478,13 +417,13 @@ export default function CRM() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-gray-900 flex items-center gap-2">
               <Zap className="w-5 h-5 text-indigo-500" />
-              {t({ no: 'Automatisering', en: 'Automation' })}
+              {t('automation', 'Automatisering')}
             </h3>
             <button
               onClick={() => setActiveModule('workflows')}
               className="text-sm text-indigo-600 hover:text-indigo-700"
             >
-              {t({ no: 'Administrer', en: 'Manage' })} →
+              {t('manage', 'Administrer')} →
             </button>
           </div>
           <div className="space-y-3">
@@ -499,23 +438,23 @@ export default function CRM() {
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-gray-900 flex items-center gap-2">
               <ListChecks className="w-5 h-5 text-amber-500" />
-              {t({ no: 'Venteliste', en: 'Waitlist' })}
+              {t('waitlist', 'Venteliste')}
             </h3>
             <button
               onClick={() => setActiveModule('waitlist')}
               className="text-sm text-amber-600 hover:text-amber-700"
             >
-              {t({ no: 'Se alle', en: 'View all' })} →
+              {t('viewAll', 'Se alle')} →
             </button>
           </div>
           <div className="text-center py-4">
             <p className="text-3xl font-bold text-amber-600">{overviewStats.waitlistCount}</p>
-            <p className="text-sm text-gray-500">
-              {t({ no: 'pasienter venter', en: 'patients waiting' })}
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {t('patientsWaiting', 'pasienter venter')}
             </p>
           </div>
           <button className="w-full mt-2 px-3 py-2 bg-amber-50 text-amber-700 rounded-lg text-sm font-medium hover:bg-amber-100">
-            {t({ no: 'Sjekk ledige tider', en: 'Check available slots' })}
+            {t('checkAvailableSlots', 'Sjekk ledige tider')}
           </button>
         </div>
       </div>
@@ -529,24 +468,23 @@ export default function CRM() {
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-red-900">
-                {overviewStats.atRiskPatients}{' '}
-                {t({ no: 'pasienter i faresonen', en: 'patients at risk' })}
+                {overviewStats.atRiskPatients} {t('patientsAtRisk', 'pasienter i faresonen')}
               </h3>
               <p className="text-sm text-red-700 mt-1">
-                {t({
-                  no: 'Disse pasientene har ikke vært innom på over 6 uker. Vurder å sende en påminnelse.',
-                  en: "These patients haven't visited in over 6 weeks. Consider sending a reminder.",
-                })}
+                {t(
+                  'atRiskDescription',
+                  'Disse pasientene har ikke vært innom på over 6 uker. Vurder å sende en påminnelse.'
+                )}
               </p>
               <div className="flex gap-2 mt-3">
                 <button
                   onClick={() => setActiveModule('lifecycle')}
                   className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700"
                 >
-                  {t({ no: 'Se pasienter', en: 'View patients' })}
+                  {t('viewPatients', 'Se pasienter')}
                 </button>
                 <button className="px-3 py-1.5 bg-white text-red-700 border border-red-300 rounded-lg text-sm font-medium hover:bg-red-50">
-                  {t({ no: 'Send kampanje', en: 'Send campaign' })}
+                  {t('sendCampaign', 'Send kampanje')}
                 </button>
               </div>
             </div>
@@ -563,13 +501,10 @@ export default function CRM() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">
-              {t({ no: 'Kunderelasjonshåndtering', en: 'Customer Relationship Management' })}
+              {t('customerRelationshipManagement', 'Kunderelasjonshåndtering')}
             </h1>
-            <p className="text-sm text-gray-500 mt-1">
-              {t({
-                no: 'Administrer pasienter, leads, kampanjer og kommunikasjon',
-                en: 'Manage patients, leads, campaigns and communication',
-              })}
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {t('crmSubtitle', 'Administrer pasienter, leads, kampanjer og kommunikasjon')}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -581,7 +516,7 @@ export default function CRM() {
             </button>
             <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
               <Plus className="w-4 h-4" />
-              {t({ no: 'Ny Lead', en: 'New Lead' })}
+              {t('newLead', 'Ny lead')}
             </button>
           </div>
         </div>
@@ -603,13 +538,13 @@ export default function CRM() {
                     ${
                       isActive
                         ? `bg-${module.color}-50 text-${module.color}-700 border border-${module.color}-200`
-                        : 'text-gray-600 hover:bg-gray-50'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                     }`}
                 >
                   <Icon
-                    className={`w-5 h-5 ${isActive ? `text-${module.color}-500` : 'text-gray-400'}`}
+                    className={`w-5 h-5 ${isActive ? `text-${module.color}-500` : 'text-gray-400 dark:text-gray-300'}`}
                   />
-                  <span className="text-sm font-medium">{t(module.name)}</span>
+                  <span className="text-sm font-medium">{t(module.nameKey, module.nameKey)}</span>
                 </button>
               );
             })}
@@ -618,7 +553,13 @@ export default function CRM() {
 
         {/* Main Content */}
         <div className="flex-1 p-6">
-          <Suspense fallback={<div className="p-6 text-gray-500">Laster modul...</div>}>
+          <Suspense
+            fallback={
+              <div className="p-6 text-gray-500 dark:text-gray-400">
+                {t('loadingAutomations', 'Laster modul...')}
+              </div>
+            }
+          >
             {renderModuleContent()}
           </Suspense>
         </div>
@@ -646,7 +587,7 @@ function StatCard({ icon: Icon, label, value, color, suffix = '', trend, alert }
         {value}
         {suffix}
       </p>
-      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
       {trend && <p className="text-xs text-green-600 mt-1">{trend}</p>}
     </div>
   );
@@ -657,7 +598,7 @@ function PipelineBar({ label, count, total, color }) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-xs text-gray-500 w-20">{label}</span>
+      <span className="text-xs text-gray-500 dark:text-gray-400 w-20">{label}</span>
       <div className="flex-1 bg-gray-100 rounded-full h-2">
         <div className={`h-2 rounded-full bg-${color}-500`} style={{ width: `${percentage}%` }} />
       </div>
@@ -674,9 +615,9 @@ function MessagePreview({ name, message, time, type }) {
       />
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-gray-900">{name}</p>
-        <p className="text-xs text-gray-500 truncate">{message}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{message}</p>
       </div>
-      <span className="text-xs text-gray-400">{time}</span>
+      <span className="text-xs text-gray-400 dark:text-gray-300">{time}</span>
     </div>
   );
 }
@@ -692,11 +633,11 @@ function ReferralPreview({ referrer, referred, status, reward }) {
     <div className="flex items-center justify-between">
       <div>
         <p className="text-sm font-medium text-gray-900">{referred}</p>
-        <p className="text-xs text-gray-500">fra {referrer}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">fra {referrer}</p>
       </div>
       <div className="text-right">
         <span className={`px-2 py-0.5 text-xs rounded-full ${statusColors[status]}`}>{status}</span>
-        <p className="text-xs text-gray-500 mt-1">{reward}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{reward}</p>
       </div>
     </div>
   );
@@ -709,11 +650,11 @@ function CampaignPreview({ name, type, sent, responded }) {
     <div>
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-gray-900">{name}</p>
-        <span className="text-xs text-gray-500">{type}</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">{type}</span>
       </div>
       <div className="flex items-center gap-4 mt-1">
-        <span className="text-xs text-gray-500">Sendt: {sent}</span>
-        <span className="text-xs text-gray-500">Svart: {responded}</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">Sendt: {sent}</span>
+        <span className="text-xs text-gray-500 dark:text-gray-400">Svart: {responded}</span>
         <span className="text-xs text-green-600">{responseRate}% respons</span>
       </div>
     </div>
@@ -729,7 +670,7 @@ function WorkflowStatus({ name, status, runsToday }) {
         />
         <p className="text-sm text-gray-700">{name}</p>
       </div>
-      <span className="text-xs text-gray-500">{runsToday} i dag</span>
+      <span className="text-xs text-gray-500 dark:text-gray-400">{runsToday} i dag</span>
     </div>
   );
 }

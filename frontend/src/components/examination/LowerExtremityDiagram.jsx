@@ -607,7 +607,7 @@ export default function LowerExtremityDiagram({
     <div className={`flex ${compact ? 'gap-2' : 'gap-4'}`}>
       {/* Controls */}
       <div className={compact ? 'w-28 space-y-2' : 'w-36 space-y-3'}>
-        <h4 className="text-xs font-semibold text-gray-600">
+        <h4 className="text-xs font-semibold text-gray-600 dark:text-gray-300">
           {lang === 'no' ? 'Marker symptomer' : 'Mark symptoms'}
         </h4>
 
@@ -652,7 +652,7 @@ export default function LowerExtremityDiagram({
 
         {/* Marker counts */}
         {markers.length > 0 && (
-          <div className="text-[10px] text-gray-500 space-y-0.5">
+          <div className="text-[10px] text-gray-500 dark:text-gray-400 space-y-0.5">
             <div>
               V/L: {leftMarkers} {lang === 'no' ? 'markering' : 'marker'}(s)
             </div>
@@ -665,7 +665,7 @@ export default function LowerExtremityDiagram({
 
       {/* Diagram */}
       <div className="flex-1 border border-gray-200 rounded-lg bg-white p-2">
-        <div className="text-center text-xs text-gray-400 mb-1">
+        <div className="text-center text-xs text-gray-400 dark:text-gray-300 mb-1">
           {lang === 'no' ? 'Bakfra (Posterior)' : 'Posterior View'}
         </div>
         <svg
@@ -735,7 +735,7 @@ export default function LowerExtremityDiagram({
       {/* Dermatome legend */}
       {showDermatomes && (
         <div className={compact ? 'w-16' : 'w-20'}>
-          <h4 className="text-[10px] font-semibold text-gray-500 mb-2">
+          <h4 className="text-[10px] font-semibold text-gray-500 dark:text-gray-400 mb-2">
             {lang === 'no' ? 'Dermatom' : 'Dermatome'}
           </h4>
           <div className="space-y-1">
@@ -745,7 +745,9 @@ export default function LowerExtremityDiagram({
                   className="w-3 h-3 rounded"
                   style={{ backgroundColor: colors.fill, border: `1px solid ${colors.stroke}` }}
                 />
-                <span className="text-[10px] font-mono text-gray-600">{level}</span>
+                <span className="text-[10px] font-mono text-gray-600 dark:text-gray-300">
+                  {level}
+                </span>
               </div>
             ))}
           </div>

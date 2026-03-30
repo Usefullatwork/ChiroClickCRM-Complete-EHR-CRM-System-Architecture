@@ -1,5 +1,5 @@
 /**
- * ChiroClickCRM Desktop - Electron Main Process
+ * ChiroClickEHR Desktop - Electron Main Process
  * Manages the browser window, backend server lifecycle, and application menus.
  */
 
@@ -9,13 +9,67 @@ const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const ElectronStore = require('electron-store');
+const { isFirstRun, ensureDataDirectories, getSplashHTML, setDataDir } = require('./first-run');
+
+// ============================================================================
+// Crash Handling — log to file, show dialog, survive unexpected errors
+// ============================================================================
+
+const CRASH_LOG_MAX_BYTES = 100 * 1024; // 100KB
+
+/**
+ * Rotate crash.log if it exceeds CRASH_LOG_MAX_BYTES.
+ * Keeps only the tail of the file so the most recent entries survive.
+ */
+function rotateCrashLog(crashLogPath) {
+  try {
+    if (!fs.existsSync(crashLogPath)) return;
+    const stats = fs.statSync(crashLogPath);
+    if (stats.size <= CRASH_LOG_MAX_BYTES) return;
+    const content = fs.readFileSync(crashLogPath, 'utf8');
+    // Keep the last ~80KB worth of entries
+    const trimmed = content.slice(content.length - Math.floor(CRASH_LOG_MAX_BYTES * 0.8));
+    // Start at the next full line to avoid a partial first entry
+    const firstNewline = trimmed.indexOf('\n');
+    fs.writeFileSync(crashLogPath, firstNewline > -1 ? trimmed.slice(firstNewline + 1) : trimmed);
+  } catch {
+    // Best-effort — don't crash the crash handler
+  }
+}
+
+process.on('uncaughtException', (error) => {
+  try {
+    const crashLog = path.join(app.getPath('userData'), 'crash.log');
+    const entry = `[${new Date().toISOString()}] UNCAUGHT: ${error.stack || error.message}\n`;
+    fs.appendFileSync(crashLog, entry);
+  } catch {
+    // userData may not be available yet during very early startup
+  }
+
+  if (mainWindow) {
+    dialog.showErrorBox('Uventet feil',
+      'ChiroClickEHR opplevde en uventet feil.\n\n' +
+      'Programmet vil prove a starte pa nytt.\n\n' +
+      `Feilmelding: ${error.message}`);
+  }
+});
+
+process.on('unhandledRejection', (reason) => {
+  try {
+    const crashLog = path.join(app.getPath('userData'), 'crash.log');
+    const entry = `[${new Date().toISOString()}] REJECTION: ${reason?.stack || reason}\n`;
+    fs.appendFileSync(crashLog, entry);
+  } catch {
+    // Best-effort
+  }
+});
 
 // ============================================================================
 // Settings Store - persists window position/size across sessions
 // ============================================================================
 
 const store = new ElectronStore({
-  name: 'chiroclickcrm-settings',
+  name: 'chiroclickehr-settings',
   defaults: {
     windowBounds: { x: undefined, y: undefined, width: 1280, height: 800 },
     maximized: false,
@@ -25,6 +79,7 @@ const store = new ElectronStore({
 const BACKEND_PORT = 3000;
 let mainWindow = null;
 let backendProcess = null;
+let isShuttingDown = false;
 
 // ============================================================================
 // Backend Server Management
@@ -76,21 +131,62 @@ function waitForBackendHealth(port, maxRetries = 30, interval = 500) {
 }
 
 /**
+ * Resolve the correct base directory for backend/frontend.
+ * In dev: relative to desktop/ (../backend).
+ * In packaged app: inside process.resourcesPath.
+ */
+function getResourcePath(subPath) {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, subPath);
+  }
+  return path.join(__dirname, '..', subPath);
+}
+
+/**
  * Start the backend by forking the Express server as a child process.
  */
 function startBackend() {
-  const backendDir = path.join(__dirname, '..', 'backend');
+  const backendDir = getResourcePath('backend');
   const serverPath = path.join(backendDir, 'src', 'server.js');
+
+  // Diagnostic logging for packaged-mode path debugging
+  console.log('[desktop] Packaged:', app.isPackaged);
+  console.log('[desktop] resourcesPath:', process.resourcesPath);
+  console.log('[desktop] backendDir:', backendDir);
+  console.log('[desktop] serverPath:', serverPath);
+  console.log('[desktop] serverPath exists:', fs.existsSync(serverPath));
+
+  // Data directory: writable location for PGlite, uploads, etc.
+  const dataDir = app.isPackaged
+    ? path.join(app.getPath('userData'), 'data')
+    : path.join(__dirname, '..', 'data');
+
+  // Ensure data dir exists
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+
+  // Generate a stable machine-specific encryption key for desktop mode
+  const crypto = require('crypto');
+  const machineId = `${require('os').hostname()}-${require('os').userInfo().username}`;
+  const defaultKey = crypto.createHash('sha256').update(machineId).digest('hex').slice(0, 32);
 
   const env = {
     ...process.env,
+    ELECTRON_RUN_AS_NODE: '1',
     DESKTOP_MODE: 'true',
     NODE_ENV: 'production',
     PORT: String(BACKEND_PORT),
     DB_ENGINE: 'pglite',
     CACHE_ENGINE: 'memory',
+    DATA_DIR: dataDir,
+    FRONTEND_DIST: getResourcePath('frontend/dist'),
+    ENCRYPTION_KEY: process.env.ENCRYPTION_KEY || defaultKey,
+    DEV_SKIP_AUTH: 'false',
   };
 
+  console.log('[desktop] FRONTEND_DIST:', env.FRONTEND_DIST);
+  console.log('[desktop] DATA_DIR:', env.DATA_DIR);
   console.log(`[desktop] Starting backend server on port ${BACKEND_PORT}...`);
 
   backendProcess = fork(serverPath, [], {
@@ -108,8 +204,21 @@ function startBackend() {
   });
 
   backendProcess.on('exit', (code) => {
-    console.log(`[desktop] Backend process exited with code ${code}`);
+    process.stdout.write(`[desktop] Backend process exited with code ${code}\n`);
     backendProcess = null;
+    // Auto-restart on unexpected exit (not during intentional shutdown)
+    if (code !== 0 && !isShuttingDown) {
+      process.stdout.write('[desktop] Backend crashed — restarting in 2s...\n');
+      setTimeout(() => {
+        startBackend();
+        waitForBackendHealth(BACKEND_PORT).then((ready) => {
+          if (ready && mainWindow) {
+            mainWindow.webContents.send('backend-ready');
+            mainWindow.reload();
+          }
+        });
+      }, 2000);
+    }
   });
 
   backendProcess.on('error', (err) => {
@@ -126,6 +235,7 @@ function startBackend() {
  * Kill the backend process gracefully, then force-kill after timeout.
  */
 function stopBackend() {
+  isShuttingDown = true;
   return new Promise((resolve) => {
     if (!backendProcess) {
       resolve();
@@ -165,8 +275,8 @@ function createWindow() {
     height,
     minWidth: 1024,
     minHeight: 700,
-    title: 'ChiroClickCRM',
-    icon: path.join(__dirname, 'icons', 'icon.png'),
+    title: 'ChiroClickEHR',
+    icon: path.join(__dirname, 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -223,7 +333,7 @@ function createMenu() {
           click: async () => {
             const { filePath } = await dialog.showSaveDialog(mainWindow, {
               title: 'Export Data',
-              defaultPath: `chiroclickcrm-export-${new Date().toISOString().split('T')[0]}.sql`,
+              defaultPath: `chiroclickehr-export-${new Date().toISOString().split('T')[0]}.sql`,
               filters: [
                 { name: 'SQL Backup', extensions: ['sql'] },
                 { name: 'All Files', extensions: ['*'] },
@@ -268,12 +378,12 @@ function createMenu() {
       label: 'Help',
       submenu: [
         {
-          label: 'About ChiroClickCRM',
+          label: 'About ChiroClickEHR',
           click: () => {
             dialog.showMessageBox(mainWindow, {
               type: 'info',
-              title: 'About ChiroClickCRM',
-              message: `ChiroClickCRM v${app.getVersion()}`,
+              title: 'About ChiroClickEHR',
+              message: `ChiroClickEHR v${app.getVersion()}`,
               detail: 'Standalone Desktop Edition\nEHR-CRM for Chiropractors\n\nOffline-first. Your data. Your machine.',
             });
           },
@@ -281,7 +391,9 @@ function createMenu() {
         {
           label: 'Documentation',
           click: () => {
-            shell.openExternal('https://github.com/ChiroClick/chiroclickcrm/wiki');
+            if (mainWindow) {
+              mainWindow.loadURL(`http://localhost:${BACKEND_PORT}/help`);
+            }
           },
         },
         { type: 'separator' },
@@ -316,12 +428,15 @@ ipcMain.handle('open-external-link', (_, url) => {
 });
 
 ipcMain.handle('get-data-path', () => {
+  if (app.isPackaged) {
+    return path.join(app.getPath('userData'), 'data');
+  }
   return path.join(__dirname, '..', 'data');
 });
 
 ipcMain.handle('restart-backend', async () => {
-  console.log('[desktop] Restarting backend...');
   await stopBackend();
+  isShuttingDown = false; // Reset — this is an intentional restart, not a shutdown
   startBackend();
   const ready = await waitForBackendHealth(BACKEND_PORT);
   if (ready && mainWindow) {
@@ -365,14 +480,44 @@ ipcMain.handle('check-ollama-status', async () => {
 // ============================================================================
 
 app.whenReady().then(async () => {
+  // Rotate crash log if it grew too large
+  rotateCrashLog(path.join(app.getPath('userData'), 'crash.log'));
+
   // Set up menu
   createMenu();
+
+  // Set data directory for packaged builds (writable user data location)
+  if (app.isPackaged) {
+    setDataDir(path.join(app.getPath('userData'), 'data'));
+  }
+
+  // Ensure data directories exist (critical for PGlite on first launch)
+  ensureDataDirectories();
 
   // Create the main window (hidden until ready-to-show)
   createWindow();
 
+  // Show splash screen on first run while database initializes
+  const firstRun = isFirstRun();
+  if (firstRun) {
+    mainWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(getSplashHTML())}`);
+    mainWindow.show();
+  }
+
   // Start the backend server
   startBackend();
+
+  // Auto-detect and start Ollama (non-blocking, AI is optional)
+  try {
+    const { checkOllama, startOllama } = require('./ollama-manager');
+    checkOllama().then(status => {
+      if (!status.running) {
+        startOllama().catch(() => {});
+      }
+    }).catch(() => {});
+  } catch (e) {
+    // ollama-manager not available
+  }
 
   // Wait for the backend to become healthy
   const healthy = await waitForBackendHealth(BACKEND_PORT);
@@ -416,6 +561,7 @@ app.on('activate', () => {
 
 // Graceful shutdown
 app.on('before-quit', async (event) => {
+  isShuttingDown = true;
   if (backendProcess) {
     event.preventDefault();
     await stopBackend();

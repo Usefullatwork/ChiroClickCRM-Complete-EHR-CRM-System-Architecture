@@ -62,7 +62,7 @@ const {
   listBatches,
   scoreTrainingData,
   batchDailySummaries,
-} = await import('../../src/services/batchProcessor.js');
+} = await import('../../src/services/practice/batchProcessor.js');
 
 describe('BatchProcessor', () => {
   beforeEach(() => {

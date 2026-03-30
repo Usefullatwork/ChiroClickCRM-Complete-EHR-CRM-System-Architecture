@@ -64,7 +64,7 @@ export default function GDPRExportModal({ patient, onClose }) {
             <Shield className="w-6 h-6 text-blue-600" />
             <div>
               <h2 className="text-2xl font-bold text-gray-900">GDPR Data Export</h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {patient.first_name} {patient.last_name}
               </p>
             </div>
@@ -120,12 +120,12 @@ export default function GDPRExportModal({ patient, onClose }) {
                           Data Access Request (Article 15)
                         </h5>
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
                         Export all patient data including medical records, appointments,
                         communications, and consent history. Includes metadata and processing
                         information.
                       </p>
-                      <div className="mt-2 text-xs text-gray-500">
+                      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                         <strong>Includes:</strong> Patient profile, clinical encounters,
                         appointments, communications, consent records, audit trail
                       </div>
@@ -157,11 +157,11 @@ export default function GDPRExportModal({ patient, onClose }) {
                           Data Portability (Article 20)
                         </h5>
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
                         Export patient data in a structured, machine-readable format for transfer to
                         another healthcare provider or service.
                       </p>
-                      <div className="mt-2 text-xs text-gray-500">
+                      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
                         <strong>Includes:</strong> Patient profile, clinical records, treatment
                         history (optimized for data transfer)
                       </div>
@@ -175,23 +175,23 @@ export default function GDPRExportModal({ patient, onClose }) {
                 <h4 className="font-semibold text-gray-900 mb-3">Patient Information</h4>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <span className="text-gray-600">Name:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Name:</span>
                     <span className="ml-2 font-medium">
                       {patient.first_name} {patient.last_name}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-600">ID:</span>
+                    <span className="text-gray-600 dark:text-gray-300">ID:</span>
                     <span className="ml-2 font-medium">{patient.solvit_id}</span>
                   </div>
                   <div>
-                    <span className="text-gray-600">Date of Birth:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Date of Birth:</span>
                     <span className="ml-2 font-medium">
                       {new Date(patient.date_of_birth).toLocaleDateString('no-NO')}
                     </span>
                   </div>
                   <div>
-                    <span className="text-gray-600">Gender:</span>
+                    <span className="text-gray-600 dark:text-gray-300">Gender:</span>
                     <span className="ml-2 font-medium">{patient.gender}</span>
                   </div>
                 </div>
@@ -262,7 +262,7 @@ export default function GDPRExportModal({ patient, onClose }) {
 
         {/* Footer */}
         <div className="p-6 border-t bg-gray-50 flex justify-between items-center">
-          <p className="text-xs text-gray-600">
+          <p className="text-xs text-gray-600 dark:text-gray-300">
             Export processed in compliance with GDPR Articles 15 & 20
           </p>
           <button

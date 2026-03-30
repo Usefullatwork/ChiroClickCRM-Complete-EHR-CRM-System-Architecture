@@ -8,6 +8,7 @@
 
 import { useState } from 'react';
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 import {
   FileText,
   Wand2,
@@ -65,6 +66,7 @@ export default function MedicalCertificateGenerator({
   onSave,
   className = '',
 }) {
+  const { t } = useTranslation('letters');
   const [selectedType, setSelectedType] = useState('MEDICAL_CERTIFICATE');
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -263,7 +265,7 @@ export default function MedicalCertificateGenerator({
                 onChange={(e) =>
                   setAdditionalFields({ ...additionalFields, institution: e.target.value })
                 }
-                placeholder="F.eks. Universitetet i Oslo"
+                placeholder={t('institutionPlaceholder', 'F.eks. Universitetet i Oslo')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -275,7 +277,7 @@ export default function MedicalCertificateGenerator({
                 onChange={(e) =>
                   setAdditionalFields({ ...additionalFields, purpose: e.target.value })
                 }
-                placeholder="F.eks. Utsatt eksamen i PSYC1000"
+                placeholder={t('purposePlaceholder', 'F.eks. Utsatt eksamen i PSYC1000')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -293,7 +295,7 @@ export default function MedicalCertificateGenerator({
                 onChange={(e) =>
                   setAdditionalFields({ ...additionalFields, recipient: e.target.value })
                 }
-                placeholder="F.eks. SATS Majorstuen"
+                placeholder={t('facilityPlaceholder', 'F.eks. SATS Majorstuen')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -305,7 +307,7 @@ export default function MedicalCertificateGenerator({
                 onChange={(e) =>
                   setAdditionalFields({ ...additionalFields, duration: e.target.value })
                 }
-                placeholder="F.eks. 6 uker"
+                placeholder={t('durationExamplePlaceholder', 'F.eks. 6 uker')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -341,7 +343,10 @@ export default function MedicalCertificateGenerator({
                 onChange={(e) =>
                   setAdditionalFields({ ...additionalFields, restrictions: e.target.value })
                 }
-                placeholder="F.eks. Unngå tunge løft, behov for hyppige pauser"
+                placeholder={t(
+                  'restrictionsPlaceholder',
+                  'F.eks. Unngå tunge løft, behov for hyppige pauser'
+                )}
                 rows={2}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
@@ -354,7 +359,7 @@ export default function MedicalCertificateGenerator({
                 onChange={(e) =>
                   setAdditionalFields({ ...additionalFields, duration: e.target.value })
                 }
-                placeholder="F.eks. 2-4 uker"
+                placeholder={t('recoveryTimePlaceholder', 'F.eks. 2-4 uker')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -370,7 +375,10 @@ export default function MedicalCertificateGenerator({
               onChange={(e) =>
                 setAdditionalFields({ ...additionalFields, purpose: e.target.value })
               }
-              placeholder="Beskriv formålet med erklæringen..."
+              placeholder={t(
+                'certificatePurposePlaceholder',
+                'Beskriv formålet med erklæringen...'
+              )}
               rows={2}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
@@ -387,7 +395,7 @@ export default function MedicalCertificateGenerator({
           <Wand2 className="w-5 h-5 text-purple-500" />
           <h3 className="font-semibold text-gray-900">{t.title}</h3>
         </div>
-        <p className="text-sm text-gray-500 mt-1">{t.subtitle}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t.subtitle}</p>
       </div>
 
       <div className="p-6 space-y-6">
@@ -401,15 +409,17 @@ export default function MedicalCertificateGenerator({
             >
               <div className="flex items-center gap-3">
                 {selectedTypeConfig && (
-                  <selectedTypeConfig.icon className="w-5 h-5 text-gray-500" />
+                  <selectedTypeConfig.icon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 )}
                 <div className="text-left">
                   <p className="font-medium text-gray-900">{selectedTypeConfig?.name}</p>
-                  <p className="text-xs text-gray-500">{selectedTypeConfig?.description}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {selectedTypeConfig?.description}
+                  </p>
                 </div>
               </div>
               <ChevronDown
-                className={`w-5 h-5 text-gray-400 transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`}
+                className={`w-5 h-5 text-gray-400 dark:text-gray-300 transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`}
               />
             </button>
 
@@ -426,10 +436,10 @@ export default function MedicalCertificateGenerator({
                     className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg
                       ${selectedType === type.id ? 'bg-blue-50' : ''}`}
                   >
-                    <type.icon className="w-5 h-5 text-gray-500" />
+                    <type.icon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     <div className="text-left">
                       <p className="font-medium text-gray-900">{type.name}</p>
-                      <p className="text-xs text-gray-500">{type.description}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{type.description}</p>
                     </div>
                   </button>
                 ))}
@@ -498,7 +508,7 @@ export default function MedicalCertificateGenerator({
               <div className="flex gap-2">
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 bg-gray-100 rounded-lg transition-colors"
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 bg-gray-100 rounded-lg transition-colors"
                 >
                   {copied ? (
                     <>

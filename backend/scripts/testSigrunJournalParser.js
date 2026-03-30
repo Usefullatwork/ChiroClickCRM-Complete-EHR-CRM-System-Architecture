@@ -5,7 +5,7 @@
  * Usage: node scripts/testSigrunJournalParser.js
  */
 
-import sigrunJournalParser from '../src/services/sigrunJournalParser.js';
+import sigrunJournalParser from '../src/services/training/sigrunJournalParser.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -62,7 +62,8 @@ function testParseSigrunTreatment() {
   console.log('TEST 2: Parse Sigrun Treatment Techniques');
   console.log('========================================\n');
 
-  const behandlingText = 'beh cx mob supine. c2 prs. t5p. is-ledd ve. tp øvre traps bilat. mass nakke. tøy hlb';
+  const behandlingText =
+    'beh cx mob supine. c2 prs. t5p. is-ledd ve. tp øvre traps bilat. mass nakke. tøy hlb';
 
   const techniques = sigrunJournalParser.parseSigrunTreatment(behandlingText);
 
@@ -136,7 +137,7 @@ function testCreateSigrunTrainingExamples() {
   const entry = {
     anamnese: 'bedre. klart bedre i nakke siden sist.',
     behandling: 'cx mob supine. c2 prs. t5p. tp øvre traps bilat.',
-    practitioner: 'Sigrun'
+    practitioner: 'Sigrun',
   };
 
   const examples = sigrunJournalParser.createSigrunTrainingExamples(entry);
@@ -171,7 +172,9 @@ function testCreateSigrunTrainingDataset() {
     console.log('Response:', example.response.substring(0, 100) + '...');
   });
 
-  console.log(`\n✓ Created ${result.examples.length} training examples from ${result.statistics.total_entries} Sigrun entries`);
+  console.log(
+    `\n✓ Created ${result.examples.length} training examples from ${result.statistics.total_entries} Sigrun entries`
+  );
 }
 
 /**
@@ -182,17 +185,31 @@ function testSigrunPatternsDictionary() {
   console.log('TEST 7: Sigrun Patterns Dictionary');
   console.log('========================================\n');
 
-  console.log('Treatment Patterns:', Object.keys(sigrunJournalParser.SIGRUN_TREATMENT_PATTERNS).length);
-  console.log('Assessment Patterns:', Object.keys(sigrunJournalParser.SIGRUN_ASSESSMENT_PATTERNS).length);
+  console.log(
+    'Treatment Patterns:',
+    Object.keys(sigrunJournalParser.SIGRUN_TREATMENT_PATTERNS).length
+  );
+  console.log(
+    'Assessment Patterns:',
+    Object.keys(sigrunJournalParser.SIGRUN_ASSESSMENT_PATTERNS).length
+  );
 
   console.log('\nSample Treatment Patterns:');
-  Object.entries(sigrunJournalParser.SIGRUN_TREATMENT_PATTERNS).slice(0, 5).forEach(([abbr, meaning]) => {
-    console.log(`  ${abbr}: ${meaning}`);
-  });
+  Object.entries(sigrunJournalParser.SIGRUN_TREATMENT_PATTERNS)
+    .slice(0, 5)
+    .forEach(([abbr, meaning]) => {
+      console.log(`  ${abbr}: ${meaning}`);
+    });
 
   console.log('\nSample Assessment Patterns:');
-  console.log('  Improvement:', sigrunJournalParser.SIGRUN_ASSESSMENT_PATTERNS.improvement.slice(0, 5).join(', '));
-  console.log('  No change:', sigrunJournalParser.SIGRUN_ASSESSMENT_PATTERNS.no_change.slice(0, 3).join(', '));
+  console.log(
+    '  Improvement:',
+    sigrunJournalParser.SIGRUN_ASSESSMENT_PATTERNS.improvement.slice(0, 5).join(', ')
+  );
+  console.log(
+    '  No change:',
+    sigrunJournalParser.SIGRUN_ASSESSMENT_PATTERNS.no_change.slice(0, 3).join(', ')
+  );
 
   console.log('\n✓ Sigrun patterns dictionary loaded successfully');
 }
@@ -239,7 +256,6 @@ function runAllTests() {
     console.log('\n╔════════════════════════════════════════╗');
     console.log('║  All Tests Completed Successfully! ✓  ║');
     console.log('╚════════════════════════════════════════╝\n');
-
   } catch (error) {
     console.error('\n✗ Test failed with error:');
     console.error(error);

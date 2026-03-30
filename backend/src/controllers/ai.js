@@ -4,16 +4,20 @@
  */
 
 import crypto from 'crypto';
-import * as aiService from '../services/ai.js';
-import { generateCompletionStream, getModelForField, buildFieldPrompt } from '../services/ai.js';
+import * as aiService from '../services/ai/index.js';
+import {
+  generateCompletionStream,
+  getModelForField,
+  buildFieldPrompt,
+} from '../services/ai/index.js';
 import {
   analyzeWithThinking,
   differentialDiagnosis,
   analyzeRedFlagsWithThinking,
-} from '../services/extendedThinking.js';
-import { analyzeImage as analyzeVisionImage } from '../services/clinicalVision.js';
-import { extractSOAP, extractDiagnoses } from '../services/structuredExtraction.js';
-import { orchestrate } from '../services/clinicalOrchestrator.js';
+} from '../services/training/extendedThinking.js';
+import { analyzeImage as analyzeVisionImage } from '../services/clinical/clinicalVision.js';
+import { extractSOAP, extractDiagnoses } from '../services/clinical/structuredExtraction.js';
+import { orchestrate } from '../services/clinical/clinicalOrchestrator.js';
 import logger from '../utils/logger.js';
 import cache from '../utils/cache.js';
 import {

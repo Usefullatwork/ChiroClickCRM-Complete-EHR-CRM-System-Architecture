@@ -22,8 +22,10 @@ import {
 import { crmAPI } from '../../services/api';
 import toast from '../../utils/toast';
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 
 const WorkflowBuilder = () => {
+  const { t } = useTranslation('crm');
   const [activeTab, setActiveTab] = useState('active');
   const [showNewWorkflow, setShowNewWorkflow] = useState(false);
   const [selectedWorkflow, setSelectedWorkflow] = useState(null);
@@ -35,39 +37,49 @@ const WorkflowBuilder = () => {
   const triggerTypes = [
     {
       id: 'NEW_PATIENT',
-      label: 'Ny Pasient',
+      label: t('triggerNewPatient', 'Ny Pasient'),
       icon: UserPlus,
-      description: 'Når en ny pasient registreres',
+      description: t('triggerNewPatientDesc', 'Når en ny pasient registreres'),
     },
     {
       id: 'APPOINTMENT_BOOKED',
-      label: 'Time Booket',
+      label: t('triggerAppointmentBooked', 'Time Booket'),
       icon: Calendar,
-      description: 'Når en time blir bestilt',
+      description: t('triggerAppointmentBookedDesc', 'Når en time blir bestilt'),
     },
     {
       id: 'APPOINTMENT_COMPLETED',
-      label: 'Behandling Fullført',
+      label: t('triggerAppointmentCompleted', 'Behandling Fullført'),
       icon: CheckCircle,
-      description: 'Etter en behandling',
+      description: t('triggerAppointmentCompletedDesc', 'Etter en behandling'),
     },
-    { id: 'NO_VISIT', label: 'Ingen Besøk', icon: Clock, description: 'X dager uten besøk' },
-    { id: 'BIRTHDAY', label: 'Bursdag', icon: Star, description: 'På pasientens bursdag' },
+    {
+      id: 'NO_VISIT',
+      label: t('triggerNoVisit', 'Ingen Besøk'),
+      icon: Clock,
+      description: t('triggerNoVisitDesc', 'X dager uten besøk'),
+    },
+    {
+      id: 'BIRTHDAY',
+      label: t('triggerBirthday', 'Bursdag'),
+      icon: Star,
+      description: t('triggerBirthdayDesc', 'På pasientens bursdag'),
+    },
     {
       id: 'LIFECYCLE_CHANGE',
-      label: 'Statusendring',
+      label: t('triggerLifecycleChange', 'Statusendring'),
       icon: Activity,
-      description: 'Når livssyklus endres',
+      description: t('triggerLifecycleChangeDesc', 'Når livssyklus endres'),
     },
   ];
 
   // Action types
   const actionTypes = [
-    { id: 'SEND_EMAIL', label: 'Send E-post', icon: Mail },
-    { id: 'SEND_SMS', label: 'Send SMS', icon: MessageSquare },
-    { id: 'CREATE_TASK', label: 'Opprett Oppgave', icon: CheckCircle },
-    { id: 'WAIT', label: 'Vent', icon: Clock },
-    { id: 'UPDATE_PATIENT', label: 'Oppdater Pasient', icon: UserPlus },
+    { id: 'SEND_EMAIL', label: t('actionSendEmail', 'Send E-post'), icon: Mail },
+    { id: 'SEND_SMS', label: t('actionSendSms', 'Send SMS'), icon: MessageSquare },
+    { id: 'CREATE_TASK', label: t('actionCreateTask', 'Opprett Oppgave'), icon: CheckCircle },
+    { id: 'WAIT', label: t('actionWait', 'Vent'), icon: Clock },
+    { id: 'UPDATE_PATIENT', label: t('actionUpdatePatient', 'Oppdater Pasient'), icon: UserPlus },
   ];
 
   // Fetch workflows from API
@@ -127,9 +139,13 @@ const WorkflowBuilder = () => {
 
   // Status config
   const statusConfig = {
-    ACTIVE: { label: 'Aktiv', color: 'bg-green-100 text-green-700', icon: Play },
-    PAUSED: { label: 'Pauset', color: 'bg-yellow-100 text-yellow-700', icon: Pause },
-    DRAFT: { label: 'Utkast', color: 'bg-gray-100 text-gray-700', icon: Edit },
+    ACTIVE: { label: t('statusActive', 'Aktiv'), color: 'bg-green-100 text-green-700', icon: Play },
+    PAUSED: {
+      label: t('statusPaused', 'Pauset'),
+      color: 'bg-yellow-100 text-yellow-700',
+      icon: Pause,
+    },
+    DRAFT: { label: t('statusDraft', 'Utkast'), color: 'bg-gray-100 text-gray-700', icon: Edit },
   };
 
   // Filter workflows
@@ -170,7 +186,9 @@ const WorkflowBuilder = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        <span className="ml-2 text-gray-600">Laster automatiseringer...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">
+          {t('loadingAutomations', 'Laster automatiseringer...')}
+        </span>
       </div>
     );
   }
@@ -185,7 +203,7 @@ const WorkflowBuilder = () => {
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
         >
-          Prøv igjen
+          {t('tryAgain', 'Prøv igjen')}
         </button>
       </div>
     );
@@ -196,15 +214,19 @@ const WorkflowBuilder = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Automatiseringer</h2>
-          <p className="text-gray-600">Sett opp automatiske arbeidsflyter for pasientoppfølging</p>
+          <h2 className="text-2xl font-bold text-gray-900">
+            {t('automationsTitle', 'Automatiseringer')}
+          </h2>
+          <p className="text-gray-600 dark:text-gray-300">
+            {t('automationsSubtitle', 'Sett opp automatiske arbeidsflyter for pasientoppfølging')}
+          </p>
         </div>
         <button
           onClick={() => setShowNewWorkflow(true)}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          Ny Automatisering
+          {t('newAutomation', 'Ny Automatisering')}
         </button>
       </div>
 
@@ -217,7 +239,9 @@ const WorkflowBuilder = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-          <p className="text-sm text-gray-600">Totalt Arbeidsflyter</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {t('totalWorkflows', 'Totalt Arbeidsflyter')}
+          </p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -227,7 +251,7 @@ const WorkflowBuilder = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
-          <p className="text-sm text-gray-600">Aktive</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">{t('tabActive', 'Aktive')}</p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -239,7 +263,9 @@ const WorkflowBuilder = () => {
           <p className="text-2xl font-bold text-gray-900">
             {stats.totalExecutions.toLocaleString('nb-NO')}
           </p>
-          <p className="text-sm text-gray-600">Totalt Kjøringer</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {t('totalExecutions', 'Totalt Kjøringer')}
+          </p>
         </div>
 
         <div className="bg-white rounded-xl border border-gray-200 p-4">
@@ -249,7 +275,9 @@ const WorkflowBuilder = () => {
             </div>
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats.avgSuccessRate}%</p>
-          <p className="text-sm text-gray-600">Gj.snitt Suksessrate</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300">
+            {t('avgSuccessRate', 'Gj.snitt Suksessrate')}
+          </p>
         </div>
       </div>
 
@@ -258,20 +286,20 @@ const WorkflowBuilder = () => {
         {[
           {
             id: 'active',
-            label: 'Aktive',
+            label: t('tabActive', 'Aktive'),
             count: workflows.filter((w) => w.status === 'ACTIVE').length,
           },
           {
             id: 'paused',
-            label: 'Pauset',
+            label: t('statusPaused', 'Pauset'),
             count: workflows.filter((w) => w.status === 'PAUSED').length,
           },
           {
             id: 'draft',
-            label: 'Utkast',
+            label: t('statusDraft', 'Utkast'),
             count: workflows.filter((w) => w.status === 'DRAFT').length,
           },
-          { id: 'all', label: 'Alle', count: workflows.length },
+          { id: 'all', label: t('tabAll', 'Alle'), count: workflows.length },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -279,11 +307,11 @@ const WorkflowBuilder = () => {
             className={`px-4 py-2 border-b-2 transition-colors flex items-center gap-2 ${
               activeTab === tab.id
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900'
             }`}
           >
             {tab.label}
-            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 text-xs rounded-full">
+            <span className="px-2 py-0.5 bg-gray-100 text-gray-600 dark:text-gray-300 text-xs rounded-full">
               {tab.count}
             </span>
           </button>
@@ -321,7 +349,9 @@ const WorkflowBuilder = () => {
                       {status.label}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-500 mb-3">{workflow.description}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                    {workflow.description}
+                  </p>
 
                   {/* Workflow steps preview */}
                   <div className="flex items-center gap-2 flex-wrap">
@@ -333,8 +363,8 @@ const WorkflowBuilder = () => {
                       const action = actionTypes.find((a) => a.id === step.type);
                       const ActionIcon = action?.icon || Zap;
                       return (
-                        <React.Fragment key={index}>
-                          <ArrowRight className="w-3 h-3 text-gray-400" />
+                        <React.Fragment key={`${step.type}-${index}`}>
+                          <ArrowRight className="w-3 h-3 text-gray-400 dark:text-gray-300" />
                           <div className="flex items-center gap-1 px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
                             <ActionIcon className="w-3 h-3" />
                             {action?.label}
@@ -343,8 +373,8 @@ const WorkflowBuilder = () => {
                       );
                     })}
                     {workflow.steps.length > 4 && (
-                      <span className="text-xs text-gray-500">
-                        +{workflow.steps.length - 4} mer
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        +{workflow.steps.length - 4} {t('more', 'mer')}
                       </span>
                     )}
                   </div>
@@ -354,7 +384,9 @@ const WorkflowBuilder = () => {
                 <div className="flex gap-6 text-center flex-shrink-0">
                   <div>
                     <p className="text-lg font-bold text-gray-900">{workflow.executionCount}</p>
-                    <p className="text-xs text-gray-500">Kjøringer</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('executions', 'Kjøringer')}
+                    </p>
                   </div>
                   <div>
                     <p
@@ -368,7 +400,9 @@ const WorkflowBuilder = () => {
                     >
                       {workflow.successRate}%
                     </p>
-                    <p className="text-xs text-gray-500">Suksess</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('success', 'Suksess')}
+                    </p>
                   </div>
                 </div>
 
@@ -376,28 +410,28 @@ const WorkflowBuilder = () => {
                 <div className="flex gap-1 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
                   {workflow.status === 'ACTIVE' ? (
                     <button
-                      className="p-2 text-gray-400 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg"
-                      title="Pause"
+                      className="p-2 text-gray-400 dark:text-gray-300 hover:text-yellow-500 hover:bg-yellow-50 rounded-lg"
+                      title={t('actionPause', 'Pause')}
                     >
                       <Pause className="w-4 h-4" />
                     </button>
                   ) : (
                     <button
-                      className="p-2 text-gray-400 hover:text-green-500 hover:bg-green-50 rounded-lg"
-                      title="Aktiver"
+                      className="p-2 text-gray-400 dark:text-gray-300 hover:text-green-500 hover:bg-green-50 rounded-lg"
+                      title={t('actionActivate', 'Aktiver')}
                     >
                       <Play className="w-4 h-4" />
                     </button>
                   )}
                   <button
-                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
-                    title="Rediger"
+                    className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    title={t('actionEdit', 'Rediger')}
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
-                    className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
-                    title="Kopier"
+                    className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg"
+                    title={t('actionCopy', 'Kopier')}
                   >
                     <Copy className="w-4 h-4" />
                   </button>
@@ -406,11 +440,11 @@ const WorkflowBuilder = () => {
 
               {/* Last executed */}
               <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-sm">
-                <span className="text-gray-500">
-                  Sist kjørt: {formatDateTime(workflow.lastExecuted)}
+                <span className="text-gray-500 dark:text-gray-400">
+                  {t('lastRun', 'Sist kjørt')}: {formatDateTime(workflow.lastExecuted)}
                 </span>
                 <button className="text-blue-500 hover:underline flex items-center gap-1">
-                  Se detaljer <ChevronRight className="w-4 h-4" />
+                  {t('viewDetails', 'Se detaljer')} <ChevronRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -422,30 +456,39 @@ const WorkflowBuilder = () => {
       {showNewWorkflow && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Ny Automatisering</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">
+              {t('newAutomation', 'Ny Automatisering')}
+            </h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Navn</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('nameLabel', 'Navn')}
+                </label>
                 <input
                   type="text"
-                  placeholder="F.eks. 'Velkomstsekvens'"
+                  placeholder={t('namePlaceholder', "F.eks. 'Velkomstsekvens'")}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Beskrivelse</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('description', 'Beskrivelse')}
+                </label>
                 <input
                   type="text"
-                  placeholder="Kort beskrivelse av automatiseringen..."
+                  placeholder={t(
+                    'descriptionPlaceholder',
+                    'Kort beskrivelse av automatiseringen...'
+                  )}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Utløser (Trigger)
+                  {t('triggerLabel', 'Utløser (Trigger)')}
                 </label>
                 <div className="space-y-2">
                   {triggerTypes.map((trigger) => {
@@ -456,11 +499,13 @@ const WorkflowBuilder = () => {
                         className="w-full p-3 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 flex items-center gap-3 text-left"
                       >
                         <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center">
-                          <Icon className="w-5 h-5 text-gray-600" />
+                          <Icon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                         </div>
                         <div>
                           <p className="font-medium text-gray-900">{trigger.label}</p>
-                          <p className="text-sm text-gray-500">{trigger.description}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {trigger.description}
+                          </p>
                         </div>
                       </button>
                     );
@@ -474,13 +519,13 @@ const WorkflowBuilder = () => {
                 onClick={() => setShowNewWorkflow(false)}
                 className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
               >
-                Avbryt
+                {t('cancel', 'Avbryt')}
               </button>
               <button
                 onClick={() => setShowNewWorkflow(false)}
                 className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
               >
-                Neste: Legg til Handlinger
+                {t('nextAddActions', 'Neste: Legg til Handlinger')}
               </button>
             </div>
           </div>
@@ -500,11 +545,11 @@ const WorkflowBuilder = () => {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <h3 className="text-xl font-bold text-gray-900">{selectedWorkflow.name}</h3>
-                <p className="text-gray-500">{selectedWorkflow.description}</p>
+                <p className="text-gray-500 dark:text-gray-400">{selectedWorkflow.description}</p>
               </div>
               <button
                 onClick={() => setSelectedWorkflow(null)}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
               >
                 ×
               </button>
@@ -512,7 +557,7 @@ const WorkflowBuilder = () => {
 
             {/* Workflow Steps Visual */}
             <div className="mb-6">
-              <h4 className="font-medium text-gray-700 mb-4">Arbeidsflyt</h4>
+              <h4 className="font-medium text-gray-700 mb-4">{t('workflow', 'Arbeidsflyt')}</h4>
               <div className="relative">
                 {/* Trigger */}
                 <div className="flex items-center gap-4 mb-4">
@@ -527,7 +572,9 @@ const WorkflowBuilder = () => {
                     <p className="font-medium text-gray-900">
                       {triggerTypes.find((t) => t.id === selectedWorkflow.trigger)?.label}
                     </p>
-                    <p className="text-sm text-gray-500">Utløser</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {t('trigger', 'Utløser')}
+                    </p>
                   </div>
                 </div>
 
@@ -536,21 +583,30 @@ const WorkflowBuilder = () => {
                   const action = actionTypes.find((a) => a.id === step.type);
                   const ActionIcon = action?.icon || Zap;
                   return (
-                    <div key={index} className="flex items-center gap-4 mb-4 ml-6">
+                    <div
+                      key={`step-${step.type}-${index}`}
+                      className="flex items-center gap-4 mb-4 ml-6"
+                    >
                       <div className="w-8 border-l-2 border-gray-200 h-8 -mt-8" />
                       <div className="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center -ml-5">
-                        <ActionIcon className="w-5 h-5 text-gray-600" />
+                        <ActionIcon className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">{action?.label}</p>
                         {step.config?.days && (
-                          <p className="text-sm text-gray-500">Vent {step.config.days} dag(er)</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {t('waitDays', 'Vent')} {step.config.days} {t('daysUnit', 'dag(er)')}
+                          </p>
                         )}
                         {step.config?.hours && (
-                          <p className="text-sm text-gray-500">Vent {step.config.hours} time(r)</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {t('waitDays', 'Vent')} {step.config.hours} {t('hoursUnit', 'time(r)')}
+                          </p>
                         )}
                         {step.config?.template && (
-                          <p className="text-sm text-gray-500">Mal: {step.config.template}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {t('templateLabel', 'Mal')}: {step.config.template}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -565,7 +621,9 @@ const WorkflowBuilder = () => {
                 <p className="text-2xl font-bold text-gray-900">
                   {selectedWorkflow.executionCount}
                 </p>
-                <p className="text-sm text-gray-500">Totalt Kjøringer</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t('totalExecutions', 'Totalt Kjøringer')}
+                </p>
               </div>
               <div className="text-center p-4 bg-gray-50 rounded-lg">
                 <p
@@ -575,13 +633,17 @@ const WorkflowBuilder = () => {
                 >
                   {selectedWorkflow.successRate}%
                 </p>
-                <p className="text-sm text-gray-500">Suksessrate</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t('successRate', 'Suksessrate')}
+                </p>
               </div>
               <div className="text-center p-4 bg-gray-50 rounded-lg">
                 <p className="text-sm font-medium text-gray-900">
                   {formatDateTime(selectedWorkflow.lastExecuted)}
                 </p>
-                <p className="text-sm text-gray-500">Sist Kjørt</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t('lastRunLabel', 'Sist Kjørt')}
+                </p>
               </div>
             </div>
 
@@ -590,11 +652,11 @@ const WorkflowBuilder = () => {
                 onClick={() => setSelectedWorkflow(null)}
                 className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
               >
-                Lukk
+                {t('close', 'Lukk')}
               </button>
               <button className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center justify-center gap-2">
                 <Edit className="w-4 h-4" />
-                Rediger
+                {t('actionEdit', 'Rediger')}
               </button>
             </div>
           </div>

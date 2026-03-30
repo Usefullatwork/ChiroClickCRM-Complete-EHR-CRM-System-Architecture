@@ -2,13 +2,13 @@
  * Communications Controller
  */
 
-import * as communicationService from '../services/communications.js';
+import * as communicationService from '../services/communication/communications.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
 export const getCommunications = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const options = {
       page: parseInt(req.query.page) || 1,
       limit: parseInt(req.query.limit) || 20,
@@ -19,6 +19,18 @@ export const getCommunications = async (req, res) => {
     };
 
     const result = await communicationService.getAllCommunications(organizationId, options);
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'READ',
+      resourceType: 'COMMUNICATIONS',
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json(result);
   } catch (error) {
     logger.error('Error in getCommunications controller:', error);
@@ -76,8 +88,20 @@ export const sendEmail = async (req, res) => {
 
 export const getTemplates = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const templates = await communicationService.getTemplates(organizationId, req.query.type);
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'READ',
+      resourceType: 'COMMUNICATIONS',
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json(templates);
   } catch (error) {
     logger.error('Error in getTemplates controller:', error);
@@ -87,8 +111,21 @@ export const getTemplates = async (req, res) => {
 
 export const createTemplate = async (req, res) => {
   try {
-    const { organizationId, _user } = req;
+    const { organizationId, user } = req;
     const template = await communicationService.createTemplate(organizationId, req.body);
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'CREATE',
+      resourceType: 'COMMUNICATIONS',
+      resourceId: template.id,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.status(201).json(template);
   } catch (error) {
     logger.error('Error in createTemplate controller:', error);
@@ -98,13 +135,25 @@ export const createTemplate = async (req, res) => {
 
 export const getStats = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const { startDate, endDate } = req.query;
     const stats = await communicationService.getCommunicationStats(
       organizationId,
       startDate,
       endDate
     );
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'READ',
+      resourceType: 'COMMUNICATIONS',
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json(stats);
   } catch (error) {
     logger.error('Error in getStats controller:', error);

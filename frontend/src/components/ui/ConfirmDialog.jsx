@@ -1,6 +1,7 @@
 import { useState, useCallback, createContext, useContext } from 'react';
 import { AlertTriangle, Trash2, X } from 'lucide-react';
 import LoadingButton from './LoadingButton';
+import { useTranslation } from '../../i18n';
 
 /**
  * ConfirmDialog — Replaces all browser confirm() calls.
@@ -18,13 +19,19 @@ export default function ConfirmDialog({
   open,
   onConfirm,
   onCancel,
-  title = 'Er du sikker?',
+  title,
   description = '',
-  confirmText = 'Bekreft',
-  cancelText = 'Avbryt',
+  confirmText,
+  cancelText,
   variant = 'destructive',
   loading = false,
 }) {
+  const { t } = useTranslation();
+
+  const resolvedTitle = title ?? t('areYouSure');
+  const resolvedConfirm = confirmText ?? t('confirm');
+  const resolvedCancel = cancelText ?? t('cancel');
+
   if (!open) {
     return null;
   }
@@ -60,8 +67,8 @@ export default function ConfirmDialog({
       >
         <button
           onClick={onCancel}
-          className="absolute top-4 right-4 p-1 rounded-lg text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800"
-          aria-label="Lukk"
+          className="absolute top-4 right-4 p-1 rounded-lg text-gray-400 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+          aria-label={t('close')}
         >
           <X className="w-4 h-4" />
         </button>
@@ -77,7 +84,7 @@ export default function ConfirmDialog({
               id="confirm-title"
               className="text-base font-semibold text-gray-900 dark:text-white"
             >
-              {title}
+              {resolvedTitle}
             </h2>
             {description && (
               <p id="confirm-desc" className="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -92,10 +99,10 @@ export default function ConfirmDialog({
             onClick={onCancel}
             className="px-4 py-2 text-sm font-medium rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
           >
-            {cancelText}
+            {resolvedCancel}
           </button>
           <LoadingButton onClick={onConfirm} variant={variant} size="md" loading={loading}>
-            {confirmText}
+            {resolvedConfirm}
           </LoadingButton>
         </div>
       </div>

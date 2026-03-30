@@ -129,7 +129,7 @@ export default function PainAssessment({ onNext, onBack, lang = 'no' }) {
       {/* Back button */}
       <button
         onClick={onBack}
-        className="self-start flex items-center gap-2 text-slate-500 hover:text-slate-700
+        className="self-start flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-700
                    transition-colors mb-4"
       >
         <ArrowLeft className="w-5 h-5" />
@@ -139,7 +139,7 @@ export default function PainAssessment({ onNext, onBack, lang = 'no' }) {
       {/* Header */}
       <div className="text-center mb-4">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-1">{t.title}</h1>
-        <p className="text-base text-slate-500">{t.subtitle}</p>
+        <p className="text-base text-slate-500 dark:text-slate-400">{t.subtitle}</p>
       </div>
 
       {/* Body map - Grid layout */}
@@ -202,7 +202,7 @@ export default function PainAssessment({ onNext, onBack, lang = 'no' }) {
             }}
           />
 
-          <div className="flex justify-between mt-2 text-sm text-slate-500">
+          <div className="flex justify-between mt-2 text-sm text-slate-500 dark:text-slate-400">
             <span>0 - {t.noPain}</span>
             <span>10 - {t.worstPain}</span>
           </div>

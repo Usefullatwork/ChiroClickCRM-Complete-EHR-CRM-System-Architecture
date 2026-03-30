@@ -6,6 +6,7 @@ import express from 'express';
 import * as appointmentController from '../controllers/appointments.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
 import validate from '../middleware/validation.js';
+import { readLimiter } from '../middleware/rateLimiting.js';
 import {
   listAppointmentsSchema,
   createAppointmentSchema,
@@ -51,6 +52,7 @@ router.use(requireOrganization);
  */
 router.get(
   '/',
+  readLimiter,
   requireRole(['ADMIN', 'PRACTITIONER', 'ASSISTANT']),
   validate(listAppointmentsSchema),
   appointmentController.getAppointments

@@ -22,6 +22,7 @@ import {
   XCircle,
   RefreshCw,
 } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 // =============================================================================
 // CONSTANTS & TRANSLATIONS
@@ -35,55 +36,14 @@ const COLUMNS = [
   { id: 'COMPLETED', color: 'green', icon: CheckCircle2 },
 ];
 
-const TRANSLATIONS = {
-  en: {
-    title: 'Patient Flow',
-    subtitle: 'Drag cards to update status',
-    SCHEDULED: 'Scheduled',
-    CONFIRMED: 'Confirmed',
-    ARRIVED: 'Arrived',
-    IN_PROGRESS: 'In Progress',
-    COMPLETED: 'Completed',
-    NO_SHOW: 'No Show',
-    CANCELLED: 'Cancelled',
-    noPatients: 'No patients',
-    viewChart: 'View Chart',
-    startVisit: 'Start Visit',
-    checkIn: 'Check In',
-    markNoShow: 'Mark No Show',
-    complete: 'Complete',
-    newPatient: 'New Patient',
-    followUp: 'Follow-up',
-    acute: 'Acute',
-    maintenance: 'Maintenance',
-    refresh: 'Refresh',
-    today: 'Today',
-    kioskCheckin: 'Kiosk check-in',
-  },
-  no: {
-    title: 'Pasientflyt',
-    subtitle: 'Dra kort for å oppdatere status',
-    SCHEDULED: 'Planlagt',
-    CONFIRMED: 'Bekreftet',
-    ARRIVED: 'Ankommet',
-    IN_PROGRESS: 'Pågår',
-    COMPLETED: 'Fullført',
-    NO_SHOW: 'Uteblitt',
-    CANCELLED: 'Avlyst',
-    noPatients: 'Ingen pasienter',
-    viewChart: 'Se journal',
-    startVisit: 'Start besøk',
-    checkIn: 'Sjekk inn',
-    markNoShow: 'Merk uteblitt',
-    complete: 'Fullfør',
-    newPatient: 'Ny pasient',
-    followUp: 'Oppfølging',
-    acute: 'Akutt',
-    maintenance: 'Vedlikehold',
-    refresh: 'Oppdater',
-    today: 'I dag',
-    kioskCheckin: 'Kiosk-innsjekking',
-  },
+const STATUS_KEYS = {
+  SCHEDULED: 'statusScheduled',
+  CONFIRMED: 'statusConfirmed',
+  ARRIVED: 'statusArrived',
+  IN_PROGRESS: 'statusInProgress',
+  COMPLETED: 'statusCompleted',
+  NO_SHOW: 'statusNoShow',
+  CANCELLED: 'statusCancelled',
 };
 
 const APPOINTMENT_TYPES = {
@@ -100,15 +60,8 @@ const APPOINTMENT_TYPES = {
 // PATIENT CARD COMPONENT
 // =============================================================================
 
-function PatientCard({
-  appointment,
-  lang,
-  onDragStart,
-  onStatusChange,
-  onViewChart,
-  onStartVisit,
-}) {
-  const t = TRANSLATIONS[lang];
+function PatientCard({ appointment, onDragStart, onStatusChange, onViewChart, onStartVisit }) {
+  const { t, lang } = useTranslation('dashboard');
   const [showMenu, setShowMenu] = useState(false);
 
   const typeInfo = APPOINTMENT_TYPES[appointment.appointmentType] ||
@@ -159,7 +112,7 @@ function PatientCard({
       {/* Header: Time + Type */}
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <Clock className="w-3.5 h-3.5 text-gray-400" />
+          <Clock className="w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />
           <span className="text-sm font-medium text-gray-900">{formattedTime}</span>
         </div>
         <span
@@ -177,7 +130,7 @@ function PatientCard({
       {/* Patient Name */}
       <div className="flex items-center gap-2 mb-2">
         <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-          <User className="w-4 h-4 text-gray-600" />
+          <User className="w-4 h-4 text-gray-600 dark:text-gray-300" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-semibold text-gray-900 truncate">
@@ -186,7 +139,7 @@ function PatientCard({
           {hasKioskIntake && (
             <p className="text-xs text-teal-600 flex items-center gap-1">
               <CheckCircle2 className="w-3 h-3" />
-              {t.kioskCheckin}
+              {t('flowKioskCheckin', 'Kiosk-innsjekking')}
             </p>
           )}
         </div>
@@ -200,7 +153,7 @@ function PatientCard({
                      rounded text-gray-700 transition-colors flex items-center justify-center gap-1"
         >
           <FileText className="w-3 h-3" />
-          {t.viewChart}
+          {t('flowViewChart', 'Se journal')}
         </button>
         {appointment.status === 'ARRIVED' && (
           <button
@@ -209,7 +162,7 @@ function PatientCard({
                        rounded text-purple-700 transition-colors flex items-center justify-center gap-1"
           >
             <Play className="w-3 h-3" />
-            {t.startVisit}
+            {t('flowStartVisit', 'Start besøk')}
           </button>
         )}
       </div>
@@ -220,7 +173,7 @@ function PatientCard({
         className="absolute top-2 right-2 p-1 rounded hover:bg-gray-100
                    opacity-0 group-hover:opacity-100 transition-opacity"
       >
-        <MoreVertical className="w-4 h-4 text-gray-400" />
+        <MoreVertical className="w-4 h-4 text-gray-400 dark:text-gray-300" />
       </button>
 
       {/* Context menu dropdown */}
@@ -236,7 +189,7 @@ function PatientCard({
             }}
             className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
           >
-            <FileText className="w-4 h-4" /> {t.viewChart}
+            <FileText className="w-4 h-4" /> {t('flowViewChart', 'Se journal')}
           </button>
           {appointment.status === 'CONFIRMED' && (
             <button
@@ -246,7 +199,7 @@ function PatientCard({
               }}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
             >
-              <User className="w-4 h-4" /> {t.checkIn}
+              <User className="w-4 h-4" /> {t('flowCheckIn', 'Sjekk inn')}
             </button>
           )}
           {appointment.status === 'ARRIVED' && (
@@ -257,7 +210,7 @@ function PatientCard({
               }}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
             >
-              <Play className="w-4 h-4" /> {t.startVisit}
+              <Play className="w-4 h-4" /> {t('flowStartVisit', 'Start besøk')}
             </button>
           )}
           {appointment.status === 'IN_PROGRESS' && (
@@ -268,7 +221,7 @@ function PatientCard({
               }}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
             >
-              <CheckCircle2 className="w-4 h-4" /> {t.complete}
+              <CheckCircle2 className="w-4 h-4" /> {t('flowComplete', 'Fullfør')}
             </button>
           )}
           {['SCHEDULED', 'CONFIRMED'].includes(appointment.status) && (
@@ -279,7 +232,7 @@ function PatientCard({
               }}
               className="w-full px-3 py-2 text-left text-sm hover:bg-gray-50 text-red-600 flex items-center gap-2"
             >
-              <XCircle className="w-4 h-4" /> {t.markNoShow}
+              <XCircle className="w-4 h-4" /> {t('flowMarkNoShow', 'Merk uteblitt')}
             </button>
           )}
         </div>
@@ -292,16 +245,8 @@ function PatientCard({
 // COLUMN COMPONENT
 // =============================================================================
 
-function FlowColumn({
-  column,
-  appointments,
-  lang,
-  onDrop,
-  onStatusChange,
-  onViewChart,
-  onStartVisit,
-}) {
-  const t = TRANSLATIONS[lang];
+function FlowColumn({ column, appointments, onDrop, onStatusChange, onViewChart, onStartVisit }) {
+  const { t } = useTranslation('dashboard');
   const [isDragOver, setIsDragOver] = useState(false);
 
   const handleDragOver = (e) => {
@@ -356,7 +301,9 @@ function FlowColumn({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <IconComponent className="w-4 h-4" />
-            <h3 className="font-semibold text-sm">{t[column.id]}</h3>
+            <h3 className="font-semibold text-sm">
+              {t(STATUS_KEYS[column.id] || column.id, column.id)}
+            </h3>
           </div>
           <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-white/50">
             {appointments.length}
@@ -371,16 +318,15 @@ function FlowColumn({
             <PatientCard
               key={apt.id}
               appointment={apt}
-              lang={lang}
               onStatusChange={onStatusChange}
               onViewChart={onViewChart}
               onStartVisit={onStartVisit}
             />
           ))
         ) : (
-          <div className="text-center py-8 text-gray-400">
+          <div className="text-center py-8 text-gray-400 dark:text-gray-300">
             <User className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">{t.noPatients}</p>
+            <p className="text-sm">{t('flowNoPatients', 'Ingen pasienter')}</p>
           </div>
         )}
       </div>
@@ -394,13 +340,12 @@ function FlowColumn({
 
 export default function PatientFlowBoard({
   appointments = [],
-  lang = 'no',
   onStatusChange,
   onRefresh,
   isLoading = false,
 }) {
   const navigate = useNavigate();
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('dashboard');
 
   // Group appointments by status
   const groupedAppointments = COLUMNS.reduce((acc, column) => {
@@ -452,23 +397,25 @@ export default function PatientFlowBoard({
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{t.title}</h1>
-          <p className="text-sm text-gray-500">{t.subtitle}</p>
+          <h1 className="text-2xl font-bold text-gray-900">{t('flowTitle', 'Pasientflyt')}</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {t('flowSubtitle', 'Dra kort for å oppdatere status')}
+          </p>
         </div>
         <div className="flex items-center gap-4">
           {/* Stats pills */}
           <div className="hidden md:flex items-center gap-2">
             <span className="px-3 py-1 bg-gray-100 rounded-full text-sm">
-              {t.today}: <strong>{totalToday}</strong>
+              {t('flowToday', 'I dag')}: <strong>{totalToday}</strong>
             </span>
             <span className="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm">
-              Waiting: <strong>{waiting}</strong>
+              {t('flowWaiting', 'Venter')}: <strong>{waiting}</strong>
             </span>
             <span className="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
-              In Progress: <strong>{inProgress}</strong>
+              {t('flowInProgress', 'Pågår')}: <strong>{inProgress}</strong>
             </span>
             <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-              Done: <strong>{completed}</strong>
+              {t('flowDone', 'Ferdig')}: <strong>{completed}</strong>
             </span>
           </div>
 
@@ -481,7 +428,7 @@ export default function PatientFlowBoard({
                        disabled:opacity-50"
           >
             <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin' : ''}`} />
-            {t.refresh}
+            {t('flowRefresh', 'Oppdater')}
           </button>
         </div>
       </div>
@@ -494,7 +441,6 @@ export default function PatientFlowBoard({
               key={column.id}
               column={column}
               appointments={groupedAppointments[column.id] || []}
-              lang={lang}
               onDrop={handleDrop}
               onStatusChange={(apt, status) => onStatusChange?.(apt.id, status)}
               onViewChart={handleViewChart}

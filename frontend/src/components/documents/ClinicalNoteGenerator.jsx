@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from 'react';
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 import {
   FileText,
   Wand2,
@@ -103,6 +104,7 @@ export default function ClinicalNoteGenerator({
   _onSave,
   className = '',
 }) {
+  const { t } = useTranslation('clinical');
   const [selectedType, setSelectedType] = useState('CLINICAL_NOTE');
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -362,7 +364,7 @@ export default function ClinicalNoteGenerator({
             <textarea
               value={clinicalFields.vng_notes}
               onChange={(e) => setClinicalFields({ ...clinicalFields, vng_notes: e.target.value })}
-              placeholder="VNG-funn, nystagmus karakteristikk..."
+              placeholder={t('vngFindingsPlaceholder', 'VNG-funn, nystagmus karakteristikk...')}
               rows={2}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
             />
@@ -405,7 +407,7 @@ export default function ClinicalNoteGenerator({
                 onChange={(e) =>
                   setClinicalFields({ ...clinicalFields, frequency: e.target.value })
                 }
-                placeholder="F.eks. 3-4 ganger/uke"
+                placeholder={t('frequencyExamplePlaceholder', 'F.eks. 3-4 ganger/uke')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
               />
             </div>
@@ -418,7 +420,7 @@ export default function ClinicalNoteGenerator({
                 onChange={(e) =>
                   setClinicalFields({ ...clinicalFields, intensity: e.target.value })
                 }
-                placeholder="F.eks. 7-8/10"
+                placeholder={t('painScaleExamplePlaceholder', 'F.eks. 7-8/10')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
               />
             </div>
@@ -429,7 +431,10 @@ export default function ClinicalNoteGenerator({
             <textarea
               value={clinicalFields.triggers}
               onChange={(e) => setClinicalFields({ ...clinicalFields, triggers: e.target.value })}
-              placeholder="Triggere, forverrende faktorer, ledsagende symptomer..."
+              placeholder={t(
+                'triggersPlaceholder',
+                'Triggere, forverrende faktorer, ledsagende symptomer...'
+              )}
               rows={2}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
             />
@@ -440,7 +445,7 @@ export default function ClinicalNoteGenerator({
             <textarea
               value={clinicalFields.red_flags}
               onChange={(e) => setClinicalFields({ ...clinicalFields, red_flags: e.target.value })}
-              placeholder="Røde flagg vurdering..."
+              placeholder={t('redFlagAssessmentPlaceholder', 'Røde flagg vurdering...')}
               rows={2}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
             />
@@ -460,7 +465,7 @@ export default function ClinicalNoteGenerator({
           <Clipboard className="w-5 h-5 text-blue-500" />
           <h3 className="font-semibold text-gray-900">{t.title}</h3>
         </div>
-        <p className="text-sm text-gray-500 mt-1">{t.subtitle}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t.subtitle}</p>
       </div>
 
       <div className="p-6 space-y-6">
@@ -474,15 +479,17 @@ export default function ClinicalNoteGenerator({
             >
               <div className="flex items-center gap-3">
                 {selectedTypeConfig && (
-                  <selectedTypeConfig.icon className="w-5 h-5 text-gray-500" />
+                  <selectedTypeConfig.icon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 )}
                 <div className="text-left">
                   <p className="font-medium text-gray-900">{selectedTypeConfig?.name}</p>
-                  <p className="text-xs text-gray-500">{selectedTypeConfig?.description}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {selectedTypeConfig?.description}
+                  </p>
                 </div>
               </div>
               <ChevronDown
-                className={`w-5 h-5 text-gray-400 transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`}
+                className={`w-5 h-5 text-gray-400 dark:text-gray-300 transition-transform ${showTypeDropdown ? 'rotate-180' : ''}`}
               />
             </button>
 
@@ -499,10 +506,10 @@ export default function ClinicalNoteGenerator({
                     className={`w-full px-4 py-3 flex items-center gap-3 hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg
                       ${selectedType === type.id ? 'bg-blue-50' : ''}`}
                   >
-                    <type.icon className="w-5 h-5 text-gray-500" />
+                    <type.icon className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                     <div className="text-left">
                       <p className="font-medium text-gray-900">{type.name}</p>
-                      <p className="text-xs text-gray-500">{type.description}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{type.description}</p>
                     </div>
                   </button>
                 ))}
@@ -519,7 +526,7 @@ export default function ClinicalNoteGenerator({
               type="text"
               value={clinicalFields.recipient}
               onChange={(e) => setClinicalFields({ ...clinicalFields, recipient: e.target.value })}
-              placeholder="F.eks. ØNH-avdeling"
+              placeholder={t('departmentPlaceholder', 'F.eks. ØNH-avdeling')}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -531,7 +538,7 @@ export default function ClinicalNoteGenerator({
               onChange={(e) =>
                 setClinicalFields({ ...clinicalFields, institution: e.target.value })
               }
-              placeholder="F.eks. Oslo universitetssykehus"
+              placeholder={t('hospitalPlaceholder', 'F.eks. Oslo universitetssykehus')}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -543,7 +550,7 @@ export default function ClinicalNoteGenerator({
           <textarea
             value={clinicalFields.history}
             onChange={(e) => setClinicalFields({ ...clinicalFields, history: e.target.value })}
-            placeholder="Sykehistorie, symptombeskrivelse..."
+            placeholder={t('medicalHistoryPlaceholder', 'Sykehistorie, symptombeskrivelse...')}
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
           />
@@ -558,7 +565,10 @@ export default function ClinicalNoteGenerator({
           <textarea
             value={clinicalFields.question}
             onChange={(e) => setClinicalFields({ ...clinicalFields, question: e.target.value })}
-            placeholder="Spørsmålsstilling/ønske om vurdering..."
+            placeholder={t(
+              'referralQuestionPlaceholder',
+              'Spørsmålsstilling/ønske om vurdering...'
+            )}
             rows={2}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
           />
@@ -604,7 +614,7 @@ export default function ClinicalNoteGenerator({
               <div className="flex gap-2">
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-800 bg-gray-100 rounded-lg transition-colors"
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800 bg-gray-100 rounded-lg transition-colors"
                 >
                   {copied ? (
                     <>

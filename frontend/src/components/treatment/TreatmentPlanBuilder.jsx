@@ -11,6 +11,7 @@
 import React, { useState } from 'react';
 import { treatmentPlansAPI } from '../../services/api';
 import { PLAN_TEMPLATES } from './TreatmentPlan';
+import { useTranslation } from '../../i18n';
 
 const STEPS = ['template', 'details', 'milestones', 'review'];
 
@@ -18,6 +19,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
   const [step, setStep] = useState(0);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const { t } = useTranslation('exercises');
 
   const [formData, setFormData] = useState({
     patientId,
@@ -34,79 +36,6 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
 
   const [milestones, setMilestones] = useState([]);
 
-  const t =
-    lang === 'no'
-      ? {
-          selectTemplate: 'Velg mal',
-          customPlan: 'Tilpasset plan',
-          planDetails: 'Plandetaljer',
-          milestonesTitle: 'Milepæler',
-          review: 'Gjennomgang',
-          title: 'Tittel',
-          condition: 'Tilstand',
-          diagnosisCode: 'Diagnosekode',
-          frequency: 'Frekvens',
-          totalSessions: 'Totalt antall besøk',
-          startDate: 'Startdato',
-          targetEndDate: 'Måldato',
-          goals: 'Mål',
-          addGoal: 'Legg til mål',
-          notes: 'Notater',
-          next: 'Neste',
-          back: 'Tilbake',
-          save: 'Lagre plan',
-          cancel: 'Avbryt',
-          milestoneTitle: 'Milepæltittel',
-          milestoneDescription: 'Beskrivelse',
-          targetDate: 'Måldato',
-          outcomeMeasure: 'Utfallsmål',
-          targetScore: 'Målscore',
-          addMilestone: 'Legg til milepæl',
-          removeMilestone: 'Fjern',
-          removeGoal: 'Fjern',
-          saving: 'Lagrer...',
-          errorCreating: 'Kunne ikke opprette plan',
-          perWeek: 'per uke',
-          sessions: 'besøk',
-          noMilestones: 'Ingen milepæler lagt til',
-          optional: '(valgfritt)',
-        }
-      : {
-          selectTemplate: 'Select Template',
-          customPlan: 'Custom Plan',
-          planDetails: 'Plan Details',
-          milestonesTitle: 'Milestones',
-          review: 'Review',
-          title: 'Title',
-          condition: 'Condition',
-          diagnosisCode: 'Diagnosis Code',
-          frequency: 'Frequency',
-          totalSessions: 'Total Sessions',
-          startDate: 'Start Date',
-          targetEndDate: 'Target End Date',
-          goals: 'Goals',
-          addGoal: 'Add Goal',
-          notes: 'Notes',
-          next: 'Next',
-          back: 'Back',
-          save: 'Save Plan',
-          cancel: 'Cancel',
-          milestoneTitle: 'Milestone Title',
-          milestoneDescription: 'Description',
-          targetDate: 'Target Date',
-          outcomeMeasure: 'Outcome Measure',
-          targetScore: 'Target Score',
-          addMilestone: 'Add Milestone',
-          removeMilestone: 'Remove',
-          removeGoal: 'Remove',
-          saving: 'Saving...',
-          errorCreating: 'Failed to create plan',
-          perWeek: 'per week',
-          sessions: 'sessions',
-          noMilestones: 'No milestones added',
-          optional: '(optional)',
-        };
-
   const handleTemplateSelect = (template) => {
     if (template) {
       const templateGoals = template.phases.flatMap((phase) =>
@@ -117,7 +46,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
         title: template.name[lang] || template.name.en,
         totalSessions: template.totalVisits,
         frequency: template.phases[0]?.frequency
-          ? `${template.phases[0].frequency}x ${t.perWeek}`
+          ? `${template.phases[0].frequency}x ${t('perWeek', 'per uke')}`
           : '',
         goals: templateGoals,
       }));
@@ -225,7 +154,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
         onCreated(plan);
       }
     } catch (err) {
-      setError(err.response?.data?.error || t.errorCreating);
+      setError(err.response?.data?.error || t('errorCreating', 'Kunne ikke opprette plan'));
     } finally {
       setSaving(false);
     }
@@ -235,7 +164,9 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
   if (step === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border border-gray-200 dark:border-gray-700">
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">{t.selectTemplate}</h2>
+        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6">
+          {t('selectTemplate', 'Velg mal')}
+        </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {Object.values(PLAN_TEMPLATES).map((template) => (
@@ -250,12 +181,12 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
               <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
                 {template.description[lang] || template.description.en}
               </p>
-              <div className="flex items-center gap-4 mt-3 text-sm text-gray-500">
+              <div className="flex items-center gap-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
                 <span>
-                  {template.duration} {lang === 'no' ? 'uker' : 'weeks'}
+                  {template.duration} {t('weeksLabel', 'uker')}
                 </span>
                 <span>
-                  {template.totalVisits} {t.sessions}
+                  {template.totalVisits} {t('sessionsLabel', 'besøk')}
                 </span>
               </div>
             </button>
@@ -265,16 +196,18 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
             onClick={() => handleTemplateSelect(null)}
             className="p-4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 text-left transition-all"
           >
-            <h4 className="font-semibold text-gray-900 dark:text-white">{t.customPlan}</h4>
+            <h4 className="font-semibold text-gray-900 dark:text-white">
+              {t('customPlan', 'Tilpasset plan')}
+            </h4>
           </button>
         </div>
 
         {onCancel && (
           <button
             onClick={onCancel}
-            className="mt-4 px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
+            className="mt-4 px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900"
           >
-            {t.cancel}
+            {t('cancelBtn', 'Avbryt')}
           </button>
         )}
       </div>
@@ -294,7 +227,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                     ? 'bg-green-500 text-white'
                     : i + 1 === step
                       ? 'bg-blue-500 text-white'
-                      : 'bg-gray-200 dark:bg-gray-700 text-gray-500'
+                      : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
                 }`}
               >
                 {i + 1 < step ? '✓' : i + 1}
@@ -308,7 +241,11 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
           ))}
         </div>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-          {step === 1 ? t.planDetails : step === 2 ? t.milestonesTitle : t.review}
+          {step === 1
+            ? t('planDetails', 'Plandetaljer')
+            : step === 2
+              ? t('milestonesTitle', 'Milepæler')
+              : t('reviewLabel', 'Gjennomgang')}
         </h2>
       </div>
 
@@ -324,7 +261,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
           <>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t.title}
+                {t('titleLabel', 'Tittel')}
               </label>
               <input
                 type="text"
@@ -337,7 +274,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t.condition}
+                  {t('conditionLabel', 'Tilstand')}
                 </label>
                 <input
                   type="text"
@@ -350,7 +287,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t.diagnosisCode} {t.optional}
+                  {t('diagnosisCode', 'Diagnosekode')} {t('optional', '(valgfritt)')}
                 </label>
                 <input
                   type="text"
@@ -358,7 +295,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                   onChange={(e) =>
                     setFormData((prev) => ({ ...prev, diagnosisCode: e.target.value }))
                   }
-                  placeholder="L03, L83..."
+                  placeholder={t('diagnosisCodePlaceholder', 'L03, L83...')}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
@@ -367,19 +304,19 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t.frequency}
+                  {t('visitFrequency', 'Besøksfrekvens')}
                 </label>
                 <input
                   type="text"
                   value={formData.frequency}
                   onChange={(e) => setFormData((prev) => ({ ...prev, frequency: e.target.value }))}
-                  placeholder={`2x ${t.perWeek}`}
+                  placeholder={`2x ${t('perWeek', 'per uke')}`}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t.totalSessions}
+                  {t('totalSessions', 'Totalt antall besøk')}
                 </label>
                 <input
                   type="number"
@@ -396,7 +333,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t.startDate}
+                  {t('startDate', 'Startdato')}
                 </label>
                 <input
                   type="date"
@@ -409,7 +346,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t.goals}
+                {t('goalsLabel', 'Mål')}
               </label>
               <div className="space-y-2">
                 {formData.goals.map((goal, i) => (
@@ -424,22 +361,22 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                       onClick={() => removeGoal(i)}
                       className="px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg"
                     >
-                      {t.removeGoal}
+                      {t('removeGoal', 'Fjern')}
                     </button>
                   </div>
                 ))}
                 <button
                   onClick={addGoal}
-                  className="px-4 py-2 text-sm border border-dashed border-gray-300 rounded-lg hover:border-blue-500 text-gray-600 hover:text-blue-600"
+                  className="px-4 py-2 text-sm border border-dashed border-gray-300 rounded-lg hover:border-blue-500 text-gray-600 dark:text-gray-300 hover:text-blue-600"
                 >
-                  + {t.addGoal}
+                  + {t('addGoal', 'Legg til mål')}
                 </button>
               </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                {t.notes} {t.optional}
+                {t('notesLabel', 'Notater')} {t('optional', '(valgfritt)')}
               </label>
               <textarea
                 value={formData.notes}
@@ -461,18 +398,20 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                   className="p-4 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-500">#{i + 1}</span>
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                      #{i + 1}
+                    </span>
                     <button
                       onClick={() => removeMilestone(i)}
                       className="text-sm text-red-500 hover:text-red-700"
                     >
-                      {t.removeMilestone}
+                      {t('removeMilestone', 'Fjern')}
                     </button>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
-                      {t.milestoneTitle}
+                    <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                      {t('milestoneTitle', 'Milepæltittel')}
                     </label>
                     <input
                       type="text"
@@ -484,8 +423,8 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        {t.targetDate}
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        {t('targetDate', 'Måldato')}
                       </label>
                       <input
                         type="date"
@@ -495,8 +434,8 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        {t.outcomeMeasure}
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        {t('outcomeMeasure', 'Utfallsmål')}
                       </label>
                       <select
                         value={m.outcomeMeasure}
@@ -512,8 +451,8 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                       </select>
                     </div>
                     <div>
-                      <label className="block text-xs font-medium text-gray-500 mb-1">
-                        {t.targetScore}
+                      <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                        {t('targetScore', 'Målscore')}
                       </label>
                       <input
                         type="number"
@@ -528,14 +467,16 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
               ))}
 
               {milestones.length === 0 && (
-                <p className="text-sm text-gray-500 text-center py-4">{t.noMilestones}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
+                  {t('noMilestones', 'Ingen milepæler lagt til')}
+                </p>
               )}
 
               <button
                 onClick={addMilestone}
-                className="w-full px-4 py-2 text-sm border border-dashed border-gray-300 rounded-lg hover:border-blue-500 text-gray-600 hover:text-blue-600"
+                className="w-full px-4 py-2 text-sm border border-dashed border-gray-300 rounded-lg hover:border-blue-500 text-gray-600 dark:text-gray-300 hover:text-blue-600"
               >
-                + {t.addMilestone}
+                + {t('addMilestone', 'Legg til milepæl')}
               </button>
             </div>
           </>
@@ -546,36 +487,48 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
-                <span className="text-gray-500">{t.title}:</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  {t('titleLabel', 'Tittel')}:
+                </span>
                 <p className="font-medium text-gray-900 dark:text-white">{formData.title}</p>
               </div>
               <div>
-                <span className="text-gray-500">{t.condition}:</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  {t('conditionLabel', 'Tilstand')}:
+                </span>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {formData.conditionDescription || '-'}
                 </p>
               </div>
               <div>
-                <span className="text-gray-500">{t.frequency}:</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  {t('visitFrequency', 'Besøksfrekvens')}:
+                </span>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {formData.frequency || '-'}
                 </p>
               </div>
               <div>
-                <span className="text-gray-500">{t.totalSessions}:</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  {t('totalSessions', 'Totalt antall besøk')}:
+                </span>
                 <p className="font-medium text-gray-900 dark:text-white">
                   {formData.totalSessions}
                 </p>
               </div>
               <div>
-                <span className="text-gray-500">{t.startDate}:</span>
+                <span className="text-gray-500 dark:text-gray-400">
+                  {t('startDate', 'Startdato')}:
+                </span>
                 <p className="font-medium text-gray-900 dark:text-white">{formData.startDate}</p>
               </div>
             </div>
 
             {formData.goals.length > 0 && (
               <div>
-                <span className="text-sm text-gray-500">{t.goals}:</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {t('goalsLabel', 'Mål')}:
+                </span>
                 <ul className="mt-1 space-y-1">
                   {formData.goals
                     .filter((g) => g.trim())
@@ -584,7 +537,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                         key={i}
                         className="text-sm text-gray-900 dark:text-white flex items-start gap-2"
                       >
-                        <span className="text-gray-400 mt-0.5">-</span> {g}
+                        <span className="text-gray-400 dark:text-gray-300 mt-0.5">-</span> {g}
                       </li>
                     ))}
                 </ul>
@@ -593,8 +546,8 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
 
             {milestones.length > 0 && (
               <div>
-                <span className="text-sm text-gray-500">
-                  {t.milestonesTitle} ({milestones.length}):
+                <span className="text-sm text-gray-500 dark:text-gray-400">
+                  {t('milestonesTitle', 'Milepæler')} ({milestones.length}):
                 </span>
                 <div className="mt-1 space-y-2">
                   {milestones
@@ -603,7 +556,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
                       <div key={i} className="text-sm p-2 bg-gray-50 dark:bg-gray-700 rounded">
                         <span className="font-medium">{m.title}</span>
                         {m.outcomeMeasure && (
-                          <span className="ml-2 text-gray-500">
+                          <span className="ml-2 text-gray-500 dark:text-gray-400">
                             {m.outcomeMeasure} {m.targetScore ? `<= ${m.targetScore}` : ''}
                           </span>
                         )}
@@ -622,16 +575,16 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
           onClick={step === 1 ? () => setStep(0) : () => setStep(step - 1)}
           className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
         >
-          {t.back}
+          {t('back', 'Tilbake')}
         </button>
 
         <div className="flex gap-2">
           {onCancel && (
             <button
               onClick={onCancel}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
+              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900"
             >
-              {t.cancel}
+              {t('cancelBtn', 'Avbryt')}
             </button>
           )}
 
@@ -641,7 +594,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
               disabled={step === 1 && !formData.title.trim()}
               className="px-6 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {t.next}
+              {t('next', 'Neste')}
             </button>
           ) : (
             <button
@@ -649,7 +602,7 @@ export default function TreatmentPlanBuilder({ patientId, onCreated, onCancel, l
               disabled={saving}
               className="px-6 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
             >
-              {saving ? t.saving : t.save}
+              {saving ? t('savingBtn', 'Lagrer...') : t('savePlan', 'Lagre plan')}
             </button>
           )}
         </div>

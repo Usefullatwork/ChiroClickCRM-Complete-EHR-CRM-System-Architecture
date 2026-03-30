@@ -11,51 +11,42 @@
  * - Norwegian and English text support
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { Check, X, Edit3, Star, Clock, Loader2, CheckCircle2, Send } from 'lucide-react';
 import { Card, CardBody } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Textarea } from '../ui/Textarea';
 import { AISuggestionCard } from './AISuggestionCard';
+import { useTranslation } from '../../i18n';
 
 import logger from '../../utils/logger';
-// Bilingual text support
-const TEXTS = {
-  NO: {
-    title: 'AI-forslag',
-    accept: 'Godkjenn',
-    editAccept: 'Rediger og godkjenn',
-    reject: 'Avvis',
-    rating: 'Hvor nyttig var forslaget?',
-    ratingLabels: ['Ikke nyttig', 'Lite nyttig', 'Ok', 'Nyttig', 'Veldig nyttig'],
-    correction: 'Din korreksjon (valgfritt)',
-    correctionPlaceholder: 'Skriv din korrigerte versjon her...',
-    submit: 'Send tilbakemelding',
-    submitting: 'Sender...',
-    submitted: 'Takk for tilbakemeldingen!',
-    timeSpent: 'Tid brukt',
-    feedback: 'Tilbakemelding',
-    additionalNotes: 'Ytterligere kommentarer',
-    notesPlaceholder: 'Legg til kommentarer for fremtidig forbedring...',
-  },
-  EN: {
-    title: 'AI Suggestion',
-    accept: 'Accept',
-    editAccept: 'Edit & Accept',
-    reject: 'Reject',
-    rating: 'How helpful was this suggestion?',
-    ratingLabels: ['Not helpful', 'Slightly helpful', 'OK', 'Helpful', 'Very helpful'],
-    correction: 'Your correction (optional)',
-    correctionPlaceholder: 'Write your corrected version here...',
-    submit: 'Submit Feedback',
-    submitting: 'Submitting...',
-    submitted: 'Thank you for your feedback!',
-    timeSpent: 'Time spent',
-    feedback: 'Feedback',
-    additionalNotes: 'Additional notes',
-    notesPlaceholder: 'Add comments for future improvement...',
-  },
-};
+
+// Build a t-based text object that matches the old TEXTS shape
+function buildFeedbackPanelTexts(t) {
+  return {
+    title: t('aiSuggestion', 'AI Suggestion'),
+    accept: t('accept', 'Accept'),
+    editAccept: t('editAccept', 'Edit & Accept'),
+    reject: t('reject', 'Reject'),
+    rating: t('ratingQuestion', 'How helpful was this suggestion?'),
+    ratingLabels: [
+      t('ratingNotHelpful', 'Not helpful'),
+      t('ratingSlightlyHelpful', 'Slightly helpful'),
+      t('ratingOk', 'OK'),
+      t('ratingHelpful', 'Helpful'),
+      t('ratingVeryHelpful', 'Very helpful'),
+    ],
+    correction: t('correctionLabel', 'Your correction (optional)'),
+    correctionPlaceholder: t('correctionPlaceholder', 'Write your corrected version here...'),
+    submit: t('submitFeedback', 'Submit Feedback'),
+    submitting: t('submitting', 'Submitting...'),
+    submitted: t('thankYouFeedback', 'Thank you for your feedback!'),
+    timeSpent: t('timeSpent', 'Time spent'),
+    feedback: t('feedback', 'Feedback'),
+    additionalNotes: t('additionalNotes', 'Additional notes'),
+    notesPlaceholder: t('notesPlaceholder', 'Add comments for future improvement...'),
+  };
+}
 
 /**
  * Star Rating Component
@@ -90,7 +81,7 @@ const StarRating = ({ value, onChange, labels, disabled = false }) => {
         ))}
       </div>
       {(hoverValue || value) > 0 && labels && (
-        <span className="text-sm text-slate-600 animate-fade-in">
+        <span className="text-sm text-slate-600 dark:text-slate-300 animate-fade-in">
           {labels[(hoverValue || value) - 1]}
         </span>
       )}
@@ -118,7 +109,7 @@ const TimeTracker = ({ startTime, text }) => {
   };
 
   return (
-    <div className="flex items-center gap-2 text-sm text-slate-500">
+    <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
       <Clock size={14} />
       <span>
         {text}: {formatTime(elapsed)}
@@ -138,7 +129,8 @@ export const AIFeedbackPanel = ({
   showTimeTracker = true,
   autoFocusCorrection = false,
 }) => {
-  const t = TEXTS[language] || TEXTS.NO;
+  const { t: translate } = useTranslation('analytics');
+  const t = useMemo(() => buildFeedbackPanelTexts(translate), [translate]);
 
   // State
   const [action, setAction] = useState(null); // 'accept' | 'edit' | 'reject'

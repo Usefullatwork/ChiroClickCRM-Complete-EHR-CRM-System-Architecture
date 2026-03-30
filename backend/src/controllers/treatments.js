@@ -2,7 +2,7 @@
  * Treatment Codes Controller
  */
 
-import * as treatmentService from '../services/treatments.js';
+import * as treatmentService from '../services/clinical/treatments.js';
 import logger from '../utils/logger.js';
 
 export const getAllTreatmentCodes = async (req, res) => {
@@ -71,7 +71,7 @@ export const getTreatmentStatistics = async (req, res) => {
     const stats = await treatmentService.getTreatmentStatistics(organizationId, {
       startDate,
       endDate,
-      limit: parseInt(limit) || 10
+      limit: parseInt(limit) || 10,
     });
 
     res.json(stats);
@@ -87,5 +87,5 @@ export default {
   getTreatmentCode,
   searchTreatmentCodes,
   calculatePrice,
-  getTreatmentStatistics
+  getTreatmentStatistics,
 };

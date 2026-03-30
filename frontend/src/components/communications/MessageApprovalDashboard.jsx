@@ -28,14 +28,15 @@ import {
 import { format, formatDistanceToNow } from 'date-fns';
 import { nb } from 'date-fns/locale';
 import { schedulerAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 
-// Message categories
-const MESSAGE_CATEGORIES = {
-  all: { label: 'Alle', color: 'gray' },
-  no_show: { label: 'No-show', color: 'red' },
-  follow_up: { label: 'Oppfølging', color: 'purple' },
-  reminder: { label: 'Påminnelse', color: 'amber' },
-  recall: { label: 'Recall', color: 'blue' },
+// Message categories - labels are set inside the component via t()
+const MESSAGE_CATEGORY_COLORS = {
+  all: 'gray',
+  no_show: 'red',
+  follow_up: 'purple',
+  reminder: 'amber',
+  recall: 'blue',
 };
 
 // Single message card component
@@ -47,6 +48,8 @@ function MessageCard({
   onReject,
   onEdit,
   isProcessing,
+  messageCategories,
+  t,
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editedContent, setEditedContent] = useState(message.content);
@@ -62,7 +65,10 @@ function MessageCard({
   };
 
   const TypeIcon = message.type === 'SMS' ? Phone : Mail;
-  const categoryColor = MESSAGE_CATEGORIES[message.category]?.color || 'gray';
+  const categoryColor =
+    messageCategories?.[message.category]?.color ||
+    MESSAGE_CATEGORY_COLORS[message.category] ||
+    'gray';
 
   return (
     <div
@@ -87,10 +93,10 @@ function MessageCard({
               <span
                 className={`px-2 py-0.5 text-xs font-medium rounded-full bg-${categoryColor}-100 text-${categoryColor}-700`}
               >
-                {MESSAGE_CATEGORIES[message.category]?.label || message.category}
+                {messageCategories?.[message.category]?.label || message.category}
               </span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-gray-500 mt-0.5">
+            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mt-0.5">
               <span>{message.type}</span>
               <span>•</span>
               <span>{message.recipient}</span>
@@ -100,17 +106,19 @@ function MessageCard({
 
         <div className="flex items-center gap-3">
           <div className="text-right text-sm">
-            <div className="text-gray-500">
+            <div className="text-gray-500 dark:text-gray-400">
               {formatDistanceToNow(new Date(message.created_at), { addSuffix: true, locale: nb })}
             </div>
             {message.trigger_event && (
-              <div className="text-xs text-gray-400">{message.trigger_event}</div>
+              <div className="text-xs text-gray-400 dark:text-gray-300">
+                {message.trigger_event}
+              </div>
             )}
           </div>
           {isExpanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
+            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           )}
         </div>
       </button>
@@ -131,15 +139,15 @@ function MessageCard({
                 <div className="flex justify-end gap-2">
                   <button
                     onClick={handleCancelEdit}
-                    className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-100 rounded"
+                    className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded"
                   >
-                    Avbryt
+                    {t('cancel', 'Avbryt')}
                   </button>
                   <button
                     onClick={handleSaveEdit}
                     className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
                   >
-                    Lagre endringer
+                    {t('saveChanges', 'Lagre endringer')}
                   </button>
                 </div>
               </div>
@@ -148,8 +156,8 @@ function MessageCard({
                 <p className="text-sm text-gray-700 whitespace-pre-wrap pr-8">{message.content}</p>
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="absolute top-0 right-0 p-1 text-gray-400 hover:text-gray-600"
-                  title="Rediger"
+                  className="absolute top-0 right-0 p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600"
+                  title={t('edit', 'Rediger')}
                 >
                   <Edit2 className="w-4 h-4" />
                 </button>
@@ -160,7 +168,9 @@ function MessageCard({
           {/* Message preview (phone mockup) */}
           {message.type === 'SMS' && (
             <div className="p-4 border-t border-gray-100">
-              <p className="text-xs text-gray-500 mb-2">Forhåndsvisning:</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                {t('preview', 'Forhåndsvisning')}:
+              </p>
               <div className="max-w-xs mx-auto">
                 <div className="bg-gray-900 rounded-2xl p-2">
                   <div className="bg-white rounded-xl p-3">
@@ -168,13 +178,13 @@ function MessageCard({
                       <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                         <User className="w-4 h-4 text-blue-600" />
                       </div>
-                      <span className="text-sm font-medium">Klinikken</span>
+                      <span className="text-sm font-medium">{t('clinicName', 'Klinikken')}</span>
                     </div>
                     <div className="pt-2">
                       <div className="inline-block bg-blue-500 text-white text-sm px-3 py-2 rounded-2xl rounded-bl-sm max-w-[85%]">
                         {editedContent || message.content}
                       </div>
-                      <div className="text-[10px] text-gray-400 mt-1">
+                      <div className="text-[10px] text-gray-400 dark:text-gray-300 mt-1">
                         {format(new Date(), 'HH:mm')}
                       </div>
                     </div>
@@ -186,7 +196,7 @@ function MessageCard({
 
           {/* Action buttons */}
           <div className="flex items-center justify-between p-4 bg-gray-50 border-t border-gray-200">
-            <div className="flex items-center gap-2 text-xs text-gray-500">
+            <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
               <Clock className="w-3.5 h-3.5" />
               <span>
                 Opprettet {format(new Date(message.created_at), 'dd.MM.yyyy HH:mm', { locale: nb })}
@@ -200,7 +210,7 @@ function MessageCard({
                 className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 disabled:opacity-50 transition-colors"
               >
                 <X className="w-4 h-4" />
-                Avvis
+                {t('reject', 'Avvis')}
               </button>
               <button
                 onClick={() => onApprove(message.id)}
@@ -210,12 +220,12 @@ function MessageCard({
                 {isProcessing ? (
                   <>
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    Sender...
+                    {t('sending', 'Sender...')}
                   </>
                 ) : (
                   <>
                     <Check className="w-4 h-4" />
-                    Godkjenn & Send
+                    {t('approveAndSend', 'Godkjenn & Send')}
                   </>
                 )}
               </button>
@@ -229,7 +239,16 @@ function MessageCard({
 
 // Main dashboard component
 export default function MessageApprovalDashboard({ className = '' }) {
+  const { t } = useTranslation('communications');
   const queryClient = useQueryClient();
+
+  const MESSAGE_CATEGORIES = {
+    all: { label: t('categoryAll', 'Alle'), color: 'gray' },
+    no_show: { label: t('categoryNoShow', 'No-show'), color: 'red' },
+    follow_up: { label: t('categoryFollowUp', 'Oppfølging'), color: 'purple' },
+    reminder: { label: t('categoryReminder', 'Påminnelse'), color: 'amber' },
+    recall: { label: t('categoryRecall', 'Recall'), color: 'blue' },
+  };
 
   // State
   const [selectedCategory, setSelectedCategory] = useState('all');
@@ -337,10 +356,12 @@ export default function MessageApprovalDashboard({ className = '' }) {
             <MessageSquare className="w-5 h-5 text-amber-600" />
           </div>
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">Meldingsgodkjenning</h1>
-            <p className="text-sm text-gray-500">
-              {filteredMessages.length} melding{filteredMessages.length !== 1 ? 'er' : ''} venter på
-              godkjenning
+            <h1 className="text-xl font-semibold text-gray-900">
+              {t('approvalTitle', 'Meldingsgodkjenning')}
+            </h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {filteredMessages.length}{' '}
+              {t('messagesAwaitingApproval', 'melding(er) venter på godkjenning')}
             </p>
           </div>
         </div>
@@ -348,8 +369,8 @@ export default function MessageApprovalDashboard({ className = '' }) {
         <div className="flex items-center gap-3">
           <button
             onClick={() => refetch()}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Oppdater"
+            className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            title={t('refresh', 'Oppdater')}
           >
             <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
           </button>
@@ -360,7 +381,7 @@ export default function MessageApprovalDashboard({ className = '' }) {
               className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <CheckCircle2 className="w-4 h-4" />
-              Godkjenn alle ({filteredMessages.length})
+              {t('approveAll', 'Godkjenn alle')} ({filteredMessages.length})
             </button>
           )}
         </div>
@@ -368,7 +389,7 @@ export default function MessageApprovalDashboard({ className = '' }) {
 
       {/* Category filters */}
       <div className="flex items-center gap-2 p-4 border-b border-gray-100 bg-gray-50">
-        <Filter className="w-4 h-4 text-gray-400" />
+        <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
         {Object.entries(MESSAGE_CATEGORIES).map(([key, config]) => {
           const count = categoryCounts[key] || 0;
           const isActive = selectedCategory === key;
@@ -380,7 +401,7 @@ export default function MessageApprovalDashboard({ className = '' }) {
               className={`flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
                 isActive
                   ? `bg-${config.color}-100 text-${config.color}-700 border border-${config.color}-200`
-                  : 'text-gray-600 hover:bg-gray-100'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
               }`}
             >
               {config.label}
@@ -407,8 +428,12 @@ export default function MessageApprovalDashboard({ className = '' }) {
         ) : filteredMessages.length === 0 ? (
           <div className="text-center py-12">
             <CheckCircle2 className="w-12 h-12 text-green-300 mx-auto mb-3" />
-            <p className="text-gray-500">Ingen meldinger venter på godkjenning</p>
-            <p className="text-sm text-gray-400 mt-1">Nye meldinger vil vises her automatisk</p>
+            <p className="text-gray-500 dark:text-gray-400">
+              {t('noMessagesWaiting', 'Ingen meldinger venter på godkjenning')}
+            </p>
+            <p className="text-sm text-gray-400 dark:text-gray-300 mt-1">
+              {t('newMessagesAppearHere', 'Nye meldinger vil vises her automatisk')}
+            </p>
           </div>
         ) : (
           filteredMessages.map((message) => (
@@ -421,6 +446,8 @@ export default function MessageApprovalDashboard({ className = '' }) {
               onReject={(id) => rejectMutation.mutate(id)}
               onEdit={(id, content) => editMutation.mutate({ messageId: id, content })}
               isProcessing={processingIds.has(message.id)}
+              messageCategories={MESSAGE_CATEGORIES}
+              t={t}
             />
           ))
         )}
@@ -429,7 +456,7 @@ export default function MessageApprovalDashboard({ className = '' }) {
       {/* Stats footer */}
       {messages.length > 0 && (
         <div className="flex items-center justify-between p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
-          <div className="flex items-center gap-4 text-sm text-gray-500">
+          <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
             <span className="flex items-center gap-1">
               <Phone className="w-4 h-4" />
               {messages.filter((m) => m.type === 'SMS').length} SMS
@@ -439,7 +466,9 @@ export default function MessageApprovalDashboard({ className = '' }) {
               {messages.filter((m) => m.type === 'EMAIL').length} e-post
             </span>
           </div>
-          <p className="text-xs text-gray-400">Oppdateres automatisk hvert 30. sekund</p>
+          <p className="text-xs text-gray-400 dark:text-gray-300">
+            {t('autoRefresh', 'Oppdateres automatisk hvert 30. sekund')}
+          </p>
         </div>
       )}
     </div>

@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useTranslation } from '../i18n';
 
 /**
  * Comprehensive Orthopedic and Neurological Testing Component
  * Provides structured clinical examination documentation
  */
 const OrthopedicNeurologicalTests = ({ onUpdate, initialData = {} }) => {
+  const { t } = useTranslation('clinical');
   const [testResults, setTestResults] = useState(initialData);
 
   // Orthopedic Tests Database
@@ -230,7 +232,10 @@ const OrthopedicNeurologicalTests = ({ onUpdate, initialData = {} }) => {
               </select>
               <input
                 type="text"
-                placeholder="Notes (e.g., pain at 45°, reproduction of symptoms)"
+                placeholder={t(
+                  'testNotesDetailedPlaceholder',
+                  'Notes (e.g., pain at 45°, reproduction of symptoms)'
+                )}
                 value={testResults[region]?.[test.id]?.notes || ''}
                 onChange={(e) => handleTestChange(region, test.id, 'notes', e.target.value)}
                 className="test-notes"
@@ -431,7 +436,7 @@ const OrthopedicNeurologicalTests = ({ onUpdate, initialData = {} }) => {
                   </select>
                   <input
                     type="text"
-                    placeholder="Notes"
+                    placeholder={t('testNotesPlaceholder', 'Notes')}
                     value={testResults.coordination?.[test.id]?.notes || ''}
                     onChange={(e) =>
                       handleTestChange('coordination', test.id, 'notes', e.target.value)

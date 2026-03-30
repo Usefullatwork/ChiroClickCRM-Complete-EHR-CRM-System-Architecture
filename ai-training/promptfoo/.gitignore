@@ -1,0 +1,4 @@
+# promptfoo cache and output
+.promptfoo/
+results/
+node_modules/

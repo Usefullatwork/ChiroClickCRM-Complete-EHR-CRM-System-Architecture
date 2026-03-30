@@ -738,7 +738,7 @@ export default function BodyDiagram({
                        ${
                          currentView === 'posterior'
                            ? 'bg-teal-600 text-white'
-                           : 'bg-white text-gray-600 hover:bg-gray-50'
+                           : 'bg-white text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                        }`}
           >
             {lang === 'no' ? 'Bakfra' : 'Posterior'}
@@ -750,7 +750,7 @@ export default function BodyDiagram({
                        ${
                          currentView === 'anterior'
                            ? 'bg-teal-600 text-white'
-                           : 'bg-white text-gray-600 hover:bg-gray-50'
+                           : 'bg-white text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                        }`}
           >
             {lang === 'no' ? 'Forfra' : 'Anterior'}
@@ -759,7 +759,7 @@ export default function BodyDiagram({
 
         {/* Category Tabs */}
         <div>
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
             {lang === 'no' ? 'Kategori' : 'Category'}
           </h3>
           <div className="flex flex-wrap gap-1">
@@ -772,7 +772,7 @@ export default function BodyDiagram({
                            ${
                              selectedCategory === key
                                ? 'bg-teal-100 text-teal-700 font-medium'
-                               : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                               : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
                            }`}
               >
                 {lang === 'no' ? cat.label : cat.labelEn}
@@ -783,7 +783,7 @@ export default function BodyDiagram({
 
         {/* Marker Types for selected category */}
         <div>
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+          <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
             {lang === 'no' ? 'Markeringstype' : 'Marker Type'}
           </h3>
           <div className="space-y-1 max-h-40 overflow-y-auto">
@@ -816,7 +816,7 @@ export default function BodyDiagram({
         {/* VAS Scale for pain markers */}
         {MARKER_TYPES[selectedType]?.category === 'pain' && (
           <div>
-            <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+            <h3 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
               VAS {lang === 'no' ? 'Intensitet' : 'Intensity'}: {vasIntensity}/10
             </h3>
             <input
@@ -828,7 +828,7 @@ export default function BodyDiagram({
               disabled={readOnly}
               className="w-full h-2 bg-gradient-to-r from-green-400 via-yellow-400 to-red-500 rounded-lg appearance-none cursor-pointer"
             />
-            <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+            <div className="flex justify-between text-[10px] text-gray-400 dark:text-gray-300 mt-1">
               <span>{lang === 'no' ? 'Mild' : 'Mild'}</span>
               <span>{lang === 'no' ? 'Moderat' : 'Moderate'}</span>
               <span>{lang === 'no' ? 'Alvorlig' : 'Severe'}</span>
@@ -840,14 +840,14 @@ export default function BodyDiagram({
           <div className="flex gap-1">
             <button
               onClick={() => setZoom((z) => Math.min(z + 0.2, 2))}
-              className="flex-1 p-1.5 text-gray-600 hover:bg-gray-100 rounded"
+              className="flex-1 p-1.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded"
               title="Zoom inn"
             >
               <ZoomIn className="w-4 h-4 mx-auto" />
             </button>
             <button
               onClick={() => setZoom((z) => Math.max(z - 0.2, 0.6))}
-              className="flex-1 p-1.5 text-gray-600 hover:bg-gray-100 rounded"
+              className="flex-1 p-1.5 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded"
               title="Zoom ut"
             >
               <ZoomOut className="w-4 h-4 mx-auto" />
@@ -868,7 +868,7 @@ export default function BodyDiagram({
 
         {/* Marker count */}
         {markers.length > 0 && (
-          <div className="text-xs text-gray-500 border-t pt-2">
+          <div className="text-xs text-gray-500 dark:text-gray-400 border-t pt-2">
             {markers.length} {lang === 'no' ? 'markering(er)' : 'marker(s)'}
           </div>
         )}
@@ -876,7 +876,7 @@ export default function BodyDiagram({
 
       {/* Body diagram SVG */}
       <div className="flex-1 border border-gray-200 rounded-lg bg-white p-2">
-        <div className="text-center text-xs text-gray-400 mb-1">
+        <div className="text-center text-xs text-gray-400 dark:text-gray-300 mb-1">
           {currentView === 'posterior'
             ? lang === 'no'
               ? 'Bakfra'
@@ -915,7 +915,7 @@ export default function BodyDiagram({
       </div>
 
       {/* Legend */}
-      <div className="w-40 text-xs text-gray-500">
+      <div className="w-40 text-xs text-gray-500 dark:text-gray-400">
         <h4 className="font-medium text-gray-700 mb-2">{lang === 'no' ? 'Legende' : 'Legend'}</h4>
         <div className="space-y-2 max-h-64 overflow-y-auto">
           {Object.entries(MARKER_CATEGORIES).map(([catKey, cat]) => {
@@ -926,7 +926,7 @@ export default function BodyDiagram({
             }
             return (
               <div key={catKey} className={hasMarkers ? 'opacity-100' : 'opacity-50'}>
-                <div className="font-medium text-gray-600 text-[10px] uppercase tracking-wide">
+                <div className="font-medium text-gray-600 dark:text-gray-300 text-[10px] uppercase tracking-wide">
                   {lang === 'no' ? cat.label : cat.labelEn}
                 </div>
                 <ul className="space-y-0.5 ml-1">
@@ -952,7 +952,9 @@ export default function BodyDiagram({
             <h4 className="font-medium text-gray-700 mb-1">
               {lang === 'no' ? 'Sammendrag' : 'Summary'}
             </h4>
-            <p className="text-gray-600 text-[10px] leading-relaxed">{generateSummary()}</p>
+            <p className="text-gray-600 dark:text-gray-300 text-[10px] leading-relaxed">
+              {generateSummary()}
+            </p>
 
             {/* VAS Summary for pain markers */}
             {markers.filter((m) => m.vas).length > 0 && (

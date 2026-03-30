@@ -2,8 +2,8 @@
  * Follow-ups Controller
  */
 
-import * as followUpService from '../services/followups.js';
-import * as recallEngine from '../services/recallEngine.js';
+import * as followUpService from '../services/practice/followups.js';
+import * as recallEngine from '../services/practice/recallEngine.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
@@ -251,10 +251,24 @@ export const getRecallRules = async (req, res) => {
 
 export const updateRecallRules = async (req, res) => {
   try {
-    const { organizationId } = req;
+    const { organizationId, user } = req;
     const rules = req.body;
 
     const updated = await recallEngine.updateRecallRules(organizationId, rules);
+
+    await logAudit({
+      organizationId,
+      userId: user.id,
+      userEmail: user.email,
+      userRole: user.role,
+      action: 'UPDATE',
+      resourceType: 'RECALL_RULES',
+      resourceId: organizationId,
+      changes: rules,
+      ipAddress: req.ip,
+      userAgent: req.get('user-agent'),
+    });
+
     res.json({ success: true, data: updated });
   } catch (error) {
     logger.error('Error in updateRecallRules controller:', error);

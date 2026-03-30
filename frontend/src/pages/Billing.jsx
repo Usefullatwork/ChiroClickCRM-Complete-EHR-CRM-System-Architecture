@@ -127,7 +127,12 @@ export default function Billing() {
       // Create CSV from report data
       const invoices = response.data.invoices || [];
       const csvContent = [
-        ['Fakturanummer', 'Dato', 'Pasient', 'HELFO-refusjon'].join(';'),
+        [
+          t('invoiceNumber', 'Fakturanummer'),
+          t('date', 'Dato'),
+          t('patient', 'Pasient'),
+          t('helfoRefund', 'HELFO-refusjon'),
+        ].join(';'),
         ...invoices.map((inv) =>
           [
             inv.invoice_number,
@@ -177,7 +182,7 @@ export default function Billing() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">{t('billingTitle')}</h1>
-          <p className="text-sm text-gray-500 mt-1">{t('billingSubtitle')}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('billingSubtitle')}</p>
         </div>
         <div className="flex items-center gap-3">
           <button
@@ -185,7 +190,7 @@ export default function Billing() {
             className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             title={t('refreshStatsTooltip')}
           >
-            <RefreshCw className="w-4 h-4 text-gray-600" />
+            <RefreshCw className="w-4 h-4 text-gray-600 dark:text-gray-300" />
           </button>
           <button
             onClick={handleExport}
@@ -209,11 +214,11 @@ export default function Billing() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">{t('outstandingAmount')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('outstandingAmount')}</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">
                 {statsLoading ? '...' : formatCurrency(stats.total_outstanding)}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {t('pendingInvoices').replace('{count}', stats.pending_count || 0)}
               </p>
             </div>
@@ -225,11 +230,11 @@ export default function Billing() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">{t('totalPaidAmount')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('totalPaidAmount')}</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">
                 {statsLoading ? '...' : formatCurrency(stats.total_paid)}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {t('paidInvoices').replace('{count}', stats.paid_count || 0)}
               </p>
             </div>
@@ -241,11 +246,11 @@ export default function Billing() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">{t('overdueCount')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('overdueCount')}</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">
                 {statsLoading ? '...' : stats.overdue_count || 0}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {t('outstandingBalance').replace('{amount}', formatCurrency(stats.total_overdue))}
               </p>
             </div>
@@ -257,11 +262,11 @@ export default function Billing() {
         <div className="bg-white rounded-lg border border-gray-200 p-5">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-600">{t('helfoRefund')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('helfoRefund')}</p>
               <p className="text-2xl font-semibold text-gray-900 mt-1">
                 {statsLoading ? '...' : formatCurrency(stats.total_helfo_refund)}
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 {t('totalInvoicesCount').replace('{count}', stats.total_invoices || 0)}
               </p>
             </div>
@@ -280,7 +285,7 @@ export default function Billing() {
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
               activeTab === 'invoices'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700'
             }`}
           >
             <FileText className="w-4 h-4" />
@@ -291,7 +296,7 @@ export default function Billing() {
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
               activeTab === 'takst'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700'
             }`}
           >
             <BarChart3 className="w-4 h-4" />
@@ -302,7 +307,7 @@ export default function Billing() {
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-2 ${
               activeTab === 'reports'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700'
             }`}
           >
             <TrendingUp className="w-4 h-4" />
@@ -321,7 +326,9 @@ export default function Billing() {
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <div className="mb-4">
             <h3 className="text-lg font-semibold text-gray-900">{t('norwegianTakstCodes')}</h3>
-            <p className="text-sm text-gray-500 mt-1">{t('takstCodesDescription')}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {t('takstCodesDescription')}
+            </p>
           </div>
           <TakstCodes
             selectedCodes={takstCodesReadOnly}
@@ -349,10 +356,12 @@ export default function Billing() {
                   </div>
                   <div>
                     <h4 className="font-medium text-gray-900">{t('helfoReport')}</h4>
-                    <p className="text-sm text-gray-500">{t('monthlyRefundReport')}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {t('monthlyRefundReport')}
+                    </p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">{t('exportHelfoDesc')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{t('exportHelfoDesc')}</p>
               </div>
 
               {/* Outstanding Report Card */}
@@ -363,10 +372,14 @@ export default function Billing() {
                   </div>
                   <div>
                     <h4 className="font-medium text-gray-900">{t('outstandingClaims')}</h4>
-                    <p className="text-sm text-gray-500">{t('unpaidInvoicesLabel')}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {t('unpaidInvoicesLabel')}
+                    </p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">{t('outstandingClaimsDesc')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">
+                  {t('outstandingClaimsDesc')}
+                </p>
               </div>
 
               {/* Revenue Report Card */}
@@ -377,10 +390,10 @@ export default function Billing() {
                   </div>
                   <div>
                     <h4 className="font-medium text-gray-900">{t('revenueReportTitle')}</h4>
-                    <p className="text-sm text-gray-500">{t('periodRevenue')}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('periodRevenue')}</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">{t('revenueReportDesc')}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">{t('revenueReportDesc')}</p>
               </div>
             </div>
           </div>
@@ -390,13 +403,13 @@ export default function Billing() {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">{t('statsOverview')}</h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <div>
-                <p className="text-sm text-gray-500">{t('totalBilled')}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t('totalBilled')}</p>
                 <p className="text-xl font-semibold text-gray-900 mt-1">
                   {formatCurrency((stats.total_paid || 0) + (stats.total_outstanding || 0))}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">{t('averageInvoice')}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t('averageInvoice')}</p>
                 <p className="text-xl font-semibold text-gray-900 mt-1">
                   {formatCurrency(
                     stats.total_invoices > 0
@@ -407,7 +420,7 @@ export default function Billing() {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">{t('paymentRateLabel')}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t('paymentRateLabel')}</p>
                 <p className="text-xl font-semibold text-green-600 mt-1">
                   {stats.total_invoices > 0
                     ? Math.round(((stats.paid_count || 0) / stats.total_invoices) * 100)
@@ -416,7 +429,7 @@ export default function Billing() {
                 </p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">{t('draftsCount')}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t('draftsCount')}</p>
                 <p className="text-xl font-semibold text-gray-900 mt-1">{stats.draft_count || 0}</p>
               </div>
             </div>

@@ -113,7 +113,9 @@ export default function SALTBanner({
           {/* Preview */}
           {previousEncounter.subjective?.chief_complaint && (
             <div className="mt-3 p-2 bg-white rounded-lg border border-blue-100">
-              <p className="text-xs text-gray-500 mb-1">Hovedklage fra forrige:</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">
+                Hovedklage fra forrige:
+              </p>
               <p className="text-sm text-gray-700">
                 {previousEncounter.subjective.chief_complaint}
               </p>

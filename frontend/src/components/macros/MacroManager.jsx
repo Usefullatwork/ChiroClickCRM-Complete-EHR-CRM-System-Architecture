@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { macrosAPI } from '../../services/api';
 import toast from '../../utils/toast';
+import { useTranslation } from '../../i18n';
 
 const CATEGORIES = [
   { value: '', label: 'Alle kategorier' },
@@ -70,6 +71,7 @@ const SOAP_SECTIONS = [
 ];
 
 export default function MacroManager() {
+  const { t } = useTranslation('clinical');
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -241,12 +243,12 @@ export default function MacroManager() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-lg shadow p-4">
           <div className="text-2xl font-bold text-blue-600">{allMacros.length}</div>
-          <div className="text-sm text-gray-500">Totalt makroer</div>
+          <div className="text-sm text-gray-500 dark:text-gray-400">Totalt makroer</div>
         </div>
         {CATEGORIES.filter((c) => c.value).map((cat) => (
           <div key={cat.value} className="bg-white rounded-lg shadow p-4">
             <div className="text-2xl font-bold text-gray-900">{categoryCounts[cat.value] || 0}</div>
-            <div className="text-sm text-gray-500">{cat.label}</div>
+            <div className="text-sm text-gray-500 dark:text-gray-400">{cat.label}</div>
           </div>
         ))}
       </div>
@@ -255,17 +257,17 @@ export default function MacroManager() {
       <div className="bg-white rounded-lg shadow p-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Sok i makroer..."
+              placeholder={t('searchMacros', 'Søk i makroer...')}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
           </div>
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+            <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
             <select
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
@@ -290,7 +292,7 @@ export default function MacroManager() {
 
       {/* Keyboard shortcut hint */}
       {filteredMacros.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-3 flex items-center gap-2 text-xs text-gray-500">
+        <div className="bg-white rounded-lg shadow p-3 flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
           <Keyboard className="w-4 h-4" />
           <span>Ctrl+1 til Ctrl+9 kopierer de forste 9 makroene raskt</span>
         </div>
@@ -299,13 +301,13 @@ export default function MacroManager() {
       {/* Macro list grouped by category */}
       <div className="space-y-4">
         {isLoading ? (
-          <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500">
+          <div className="bg-white rounded-lg shadow p-8 text-center text-gray-500 dark:text-gray-400">
             Laster makroer...
           </div>
         ) : filteredMacros.length === 0 ? (
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <Zap className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-gray-400">
               {searchQuery || categoryFilter
                 ? 'Ingen makroer matcher filteret.'
                 : 'Ingen makroer opprettet enda.'}
@@ -391,9 +393,11 @@ export default function MacroManager() {
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-600 line-clamp-2">{macro.text}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                              {macro.text}
+                            </p>
                             {macro.usageCount > 0 && (
-                              <p className="text-xs text-gray-400 mt-1">
+                              <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">
                                 Brukt {macro.usageCount} ganger
                               </p>
                             )}
@@ -402,7 +406,9 @@ export default function MacroManager() {
                             <button
                               onClick={() => favoriteMutation.mutate(macro.id)}
                               className={`p-1.5 rounded hover:bg-gray-100 transition-colors ${
-                                macro.isFavorite ? 'text-yellow-500' : 'text-gray-400'
+                                macro.isFavorite
+                                  ? 'text-yellow-500'
+                                  : 'text-gray-400 dark:text-gray-300'
                               }`}
                               title="Favoritt"
                             >
@@ -413,22 +419,22 @@ export default function MacroManager() {
                             </button>
                             <button
                               onClick={() => copyToClipboard(macro.text)}
-                              className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors"
+                              className="p-1.5 rounded hover:bg-gray-100 text-gray-400 dark:text-gray-300 hover:text-gray-600 transition-colors"
                               title="Kopier"
                             >
                               <Copy className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => handleEdit(macro)}
-                              className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-blue-600 transition-colors"
+                              className="p-1.5 rounded hover:bg-gray-100 text-gray-400 dark:text-gray-300 hover:text-blue-600 transition-colors"
                               title="Rediger"
                             >
                               <Edit2 className="w-4 h-4" />
                             </button>
                             <button
                               onClick={() => setDeleteTarget(macro)}
-                              className="p-1.5 rounded hover:bg-gray-100 text-gray-400 hover:text-red-600 transition-colors"
-                              title="Slett"
+                              className="p-1.5 rounded hover:bg-gray-100 text-gray-400 dark:text-gray-300 hover:text-red-600 transition-colors"
+                              title={t('delete', 'Slett')}
                             >
                               <Trash2 className="w-4 h-4" />
                             </button>
@@ -468,14 +474,14 @@ export default function MacroManager() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
             <h3 className="text-lg font-bold text-gray-900 mb-2">Slett makro</h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
               Er du sikker pa at du vil slette &quot;{deleteTarget.name}&quot;? Denne handlingen kan
               ikke angres.
             </p>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setDeleteTarget(null)}
-                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800"
               >
                 Avbryt
               </button>
@@ -530,7 +536,7 @@ function MacroModal({ macro, onSave, onClose, isSaving }) {
               type="text"
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="f.eks. Nakkesmerter - Subjektiv"
+              placeholder={t('macroNamePlaceholder', 'f.eks. Nakkesmerter - Subjektiv')}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
               required
             />
@@ -542,11 +548,14 @@ function MacroModal({ macro, onSave, onClose, isSaving }) {
               value={form.text}
               onChange={(e) => setForm({ ...form, text: e.target.value })}
               rows={5}
-              placeholder="Skriv inn makroteksten. Bruk {{patient.fullName}} for variabler."
+              placeholder={t(
+                'macroTextPlaceholder',
+                'Skriv inn makroteksten. Bruk {{patient.fullName}} for variabler.'
+              )}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm font-mono"
               required
             />
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-gray-400 dark:text-gray-300 mt-1">
               Variabler: {'{{patient.fullName}}'}, {'{{today}}'}, {'{{provider.name}}'}
             </p>
           </div>
@@ -589,7 +598,7 @@ function MacroModal({ macro, onSave, onClose, isSaving }) {
                 type="text"
                 value={form.subcategory}
                 onChange={(e) => setForm({ ...form, subcategory: e.target.value })}
-                placeholder="Valgfritt"
+                placeholder={t('optional', 'Valgfritt')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
               />
             </div>
@@ -599,7 +608,7 @@ function MacroModal({ macro, onSave, onClose, isSaving }) {
                 type="text"
                 value={form.shortcutKey}
                 onChange={(e) => setForm({ ...form, shortcutKey: e.target.value })}
-                placeholder="f.eks. Ctrl+Shift+N"
+                placeholder={t('shortcutKeyPlaceholder', 'f.eks. Ctrl+Shift+N')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
               />
             </div>
@@ -609,7 +618,7 @@ function MacroModal({ macro, onSave, onClose, isSaving }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800"
             >
               Avbryt
             </button>

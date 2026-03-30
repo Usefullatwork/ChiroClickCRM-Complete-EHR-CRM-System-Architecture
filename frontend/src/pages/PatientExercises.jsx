@@ -5,10 +5,12 @@
  * Displays and manages patient's customized exercise programs
  */
 
-import { useState } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
+import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Dumbbell, Plus, Search, ChevronRight } from 'lucide-react';
+import { exercisesAPI } from '../services/api';
+import { useTranslation } from '../i18n';
 
 /**
  * PatientExercises Component
@@ -19,18 +21,39 @@ import { Dumbbell, Plus, Search, ChevronRight } from 'lucide-react';
 export default function PatientExercises() {
   const { patientId } = useParams();
   const navigate = useNavigate();
-  const _queryClient = useQueryClient();
+  const { t } = useTranslation('exercises');
 
   // State for filters and search
-  // Tilstand for filtrering og sok
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
 
-  // Placeholder for exercise programs data
-  // Plassholder for treningsprogram-data
-  const exercisePrograms = [];
-  const isLoading = false;
+  // Fetch exercise programs from API
+  const { data: exercisesResponse, isLoading } = useQuery({
+    queryKey: ['patient-exercises', patientId],
+    queryFn: () => exercisesAPI.getPatientExercises(patientId),
+    enabled: !!patientId,
+  });
+
+  const allPrograms = exercisesResponse?.data?.data || exercisesResponse?.data || [];
+
+  // Filter programs based on search and filters
+  const exercisePrograms = useMemo(() => {
+    let filtered = Array.isArray(allPrograms) ? allPrograms : [];
+    if (searchTerm) {
+      const lower = searchTerm.toLowerCase();
+      filtered = filtered.filter(
+        (p) => p.name?.toLowerCase().includes(lower) || p.description?.toLowerCase().includes(lower)
+      );
+    }
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter((p) => p.status?.toLowerCase() === statusFilter);
+    }
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter((p) => p.category?.toLowerCase() === categoryFilter);
+    }
+    return filtered;
+  }, [allPrograms, searchTerm, statusFilter, categoryFilter]);
 
   /**
    * Handle creating new exercise prescription
@@ -53,9 +76,11 @@ export default function PatientExercises() {
       {/* Header / Overskrift */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Treningsprogram</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Administrer pasientens treningsprogram og ovelser
+          <h1 className="text-2xl font-semibold text-gray-900">
+            {t('exercisePrograms', 'Treningsprogram')}
+          </h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+            {t('managePatientExercisesDesc', 'Administrer pasientens treningsprogram og øvelser')}
           </p>
         </div>
         <button
@@ -63,7 +88,7 @@ export default function PatientExercises() {
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
         >
           <Plus className="w-4 h-4" />
-          Ny forskrivning
+          {t('newPrescription', 'Ny forskrivning')}
         </button>
       </div>
 
@@ -72,10 +97,10 @@ export default function PatientExercises() {
         <div className="flex flex-wrap gap-4">
           <div className="flex-1 min-w-[200px]">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
               <input
                 type="text"
-                placeholder="Sok etter ovelser..."
+                placeholder={t('searchExercisesPlaceholder', 'Søk etter øvelser...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -87,21 +112,21 @@ export default function PatientExercises() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="all">Alle statuser</option>
-            <option value="active">Aktive</option>
-            <option value="completed">Fullfort</option>
-            <option value="paused">Pauset</option>
+            <option value="all">{t('allStatuses', 'Alle statuser')}</option>
+            <option value="active">{t('statusActive', 'Aktive')}</option>
+            <option value="completed">{t('statusCompleted', 'Fullført')}</option>
+            <option value="paused">{t('statusPaused', 'Pauset')}</option>
           </select>
           <select
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <option value="all">Alle kategorier</option>
-            <option value="rehabilitation">Rehabilitering</option>
-            <option value="strengthening">Styrketrening</option>
-            <option value="mobility">Mobilitet</option>
-            <option value="vestibular">Vestibular</option>
+            <option value="all">{t('allCategories', 'Alle kategorier')}</option>
+            <option value="rehabilitation">{t('categoryRehabilitation', 'Rehabilitering')}</option>
+            <option value="strengthening">{t('categoryStrengthening', 'Styrketrening')}</option>
+            <option value="mobility">{t('mobility', 'Mobilitet')}</option>
+            <option value="vestibular">{t('categoryVestibular', 'Vestibular')}</option>
           </select>
         </div>
       </div>
@@ -111,7 +136,9 @@ export default function PatientExercises() {
         {isLoading ? (
           <div className="p-12 text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-sm text-gray-500 mt-3">Laster treningsprogrammer...</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+              {t('loadingExercisesEllipsis', 'Laster treningsprogrammer...')}
+            </p>
           </div>
         ) : exercisePrograms.length > 0 ? (
           <div className="divide-y divide-gray-100">
@@ -128,10 +155,12 @@ export default function PatientExercises() {
                     </div>
                     <div>
                       <h3 className="font-medium text-gray-900">{program.name}</h3>
-                      <p className="text-sm text-gray-500">{program.exerciseCount} ovelser</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {program.exerciseCount} {t('exercises', 'øvelser')}
+                      </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                 </div>
               </div>
             ))}
@@ -139,16 +168,21 @@ export default function PatientExercises() {
         ) : (
           <div className="p-12 text-center">
             <Dumbbell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 className="text-lg font-medium text-gray-900 mb-1">Ingen treningsprogrammer</h3>
-            <p className="text-sm text-gray-500 mb-4">
-              Opprett et nytt treningsprogram for denne pasienten
+            <h3 className="text-lg font-medium text-gray-900 mb-1">
+              {t('noExercisePrograms', 'Ingen treningsprogrammer')}
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              {t(
+                'createNewProgramForPatient',
+                'Opprett et nytt treningsprogram for denne pasienten'
+              )}
             </p>
             <button
               onClick={handleCreatePrescription}
               className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
               <Plus className="w-4 h-4" />
-              Opprett treningsprogram
+              {t('createExerciseProgram', 'Opprett treningsprogram')}
             </button>
           </div>
         )}

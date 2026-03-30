@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { X, Search, Star, Clock } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 /**
  * TemplateLibrary - Jane App-style chart template library
@@ -390,6 +391,7 @@ export default function TemplateLibrary({
   showHeader = true,
   embedded = false,
 }) {
+  const { t } = useTranslation('clinical');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDiscipline, setSelectedDiscipline] = useState('chiropractic');
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -532,12 +534,12 @@ export default function TemplateLibrary({
       {/* Search */}
       <div className="px-6 py-4 border-b border-gray-200">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-300" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search for a template..."
+            placeholder={t('searchForTemplatePlaceholder', 'Search for a template...')}
             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500"
           />
         </div>
@@ -546,7 +548,9 @@ export default function TemplateLibrary({
       <div className="flex flex-1 overflow-hidden">
         {/* Discipline Filter */}
         <div className="w-80 border-r border-gray-200 overflow-y-auto bg-gray-50 p-4">
-          <h3 className="text-sm font-medium text-gray-500 mb-3">Filter by Discipline</h3>
+          <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+            Filter by Discipline
+          </h3>
           <div className="grid grid-cols-2 gap-2">
             {DISCIPLINES.map((discipline) => (
               <button
@@ -562,7 +566,9 @@ export default function TemplateLibrary({
                 }`}
               >
                 <div className="font-medium text-sm truncate">{discipline.name}</div>
-                <div className="text-xs text-gray-500">{discipline.count} templates</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">
+                  {discipline.count} templates
+                </div>
               </button>
             ))}
           </div>
@@ -570,14 +576,16 @@ export default function TemplateLibrary({
           {/* Category Filter */}
           {categories.length > 0 && (
             <div className="mt-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-3">Categories</h3>
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
+                Categories
+              </h3>
               <div className="space-y-1">
                 <button
                   onClick={() => setSelectedCategory(null)}
                   className={`w-full px-3 py-2 rounded-lg text-left text-sm ${
                     !selectedCategory
                       ? 'bg-teal-100 text-teal-800 font-medium'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                   }`}
                 >
                   All Categories
@@ -589,7 +597,7 @@ export default function TemplateLibrary({
                     className={`w-full px-3 py-2 rounded-lg text-left text-sm ${
                       selectedCategory === category
                         ? 'bg-teal-100 text-teal-800 font-medium'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                     }`}
                   >
                     {category}
@@ -605,7 +613,7 @@ export default function TemplateLibrary({
           {/* Recently Used */}
           {recentlyUsed.length > 0 && !searchTerm && (
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-3 flex items-center gap-2">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 flex items-center gap-2">
                 <Clock className="w-4 h-4" />
                 Recently Used
               </h3>
@@ -617,7 +625,7 @@ export default function TemplateLibrary({
                     className="w-full p-3 bg-gray-50 rounded-lg text-left hover:bg-gray-100 transition-colors"
                   >
                     <div className="font-medium text-gray-900">{template.name}</div>
-                    <div className="text-sm text-gray-500 truncate">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
                       {template.text.slice(0, 80)}...
                     </div>
                   </button>
@@ -629,7 +637,7 @@ export default function TemplateLibrary({
           {/* Favorites */}
           {favorites.length > 0 && !searchTerm && (
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-500 mb-3 flex items-center gap-2">
+              <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 flex items-center gap-2">
                 <Star className="w-4 h-4" />
                 Favorites
               </h3>
@@ -641,7 +649,7 @@ export default function TemplateLibrary({
                     className="w-full p-3 bg-yellow-50 rounded-lg text-left hover:bg-yellow-100 transition-colors"
                   >
                     <div className="font-medium text-gray-900">{template.name}</div>
-                    <div className="text-sm text-gray-500 truncate">
+                    <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
                       {template.text.slice(0, 80)}...
                     </div>
                   </button>
@@ -652,12 +660,12 @@ export default function TemplateLibrary({
 
           {/* Template Results */}
           <div>
-            <h3 className="text-sm font-medium text-gray-500 mb-3">
+            <h3 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3">
               {searchTerm ? `Search Results (${filteredTemplates.length})` : 'Templates'}
             </h3>
             <div className="space-y-2">
               {filteredTemplates.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   Ingen maler funnet som matcher dine kriterier
                 </div>
               ) : (
@@ -671,7 +679,7 @@ export default function TemplateLibrary({
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-medium text-gray-900">{template.name}</span>
-                          <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 rounded">
+                          <span className="px-2 py-0.5 text-xs bg-gray-100 text-gray-600 dark:text-gray-300 rounded">
                             {template.category}
                           </span>
                           {template.subcategory && (
@@ -680,7 +688,9 @@ export default function TemplateLibrary({
                             </span>
                           )}
                         </div>
-                        <p className="text-sm text-gray-600 line-clamp-2">{template.text}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
+                          {template.text}
+                        </p>
                       </div>
                       <button
                         onClick={(e) => toggleFavorite(template, e)}
@@ -739,12 +749,12 @@ export function TemplateLibraryCompact({ onSelectTemplate, discipline = 'chiropr
   return (
     <div className="bg-white rounded-lg border p-3">
       <div className="flex items-center gap-2 mb-3">
-        <Search className="w-4 h-4 text-gray-400" />
+        <Search className="w-4 h-4 text-gray-400 dark:text-gray-300" />
         <input
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          placeholder="Search templates..."
+          placeholder={t('searchTemplatesPlaceholder2', 'Search templates...')}
           className="flex-1 text-sm border-none focus:outline-none"
         />
       </div>

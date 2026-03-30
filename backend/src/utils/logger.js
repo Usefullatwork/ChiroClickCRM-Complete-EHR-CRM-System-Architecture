@@ -27,7 +27,7 @@ const logger = winston.createLogger({
     timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
     isProduction ? json() : devFormat
   ),
-  defaultMeta: { service: 'chiroclickcrm' },
+  defaultMeta: { service: 'chiroclickehr' },
   transports: [
     // Console output
     new winston.transports.Console({

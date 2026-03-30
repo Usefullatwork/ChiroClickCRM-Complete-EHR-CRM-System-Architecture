@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { examinationsAPI } from '../services/api';
 import { X, Save, AlertTriangle, Info } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 export default function StructuredExaminationForm({
   protocol,
@@ -10,6 +11,7 @@ export default function StructuredExaminationForm({
   onClose,
   existingFinding = null,
 }) {
+  const { t } = useTranslation('clinical');
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     result: existingFinding?.result || 'not_tested',
@@ -223,7 +225,7 @@ export default function StructuredExaminationForm({
                   type="text"
                   value={formData.pain_location}
                   onChange={(e) => handleChange('pain_location', e.target.value)}
-                  placeholder="Beskriv hvor smerten oppstod"
+                  placeholder={t('describePainOnsetPlaceholder', 'Beskriv hvor smerten oppstod')}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
@@ -238,7 +240,7 @@ export default function StructuredExaminationForm({
                 value={formData.findings_text}
                 onChange={(e) => handleChange('findings_text', e.target.value)}
                 rows="3"
-                placeholder="Beskriv funnene..."
+                placeholder={t('describeFindingsPlaceholder', 'Beskriv funnene...')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -252,7 +254,7 @@ export default function StructuredExaminationForm({
                 value={formData.clinician_notes}
                 onChange={(e) => handleChange('clinician_notes', e.target.value)}
                 rows="3"
-                placeholder="Ekstra notater..."
+                placeholder={t('additionalNotesPlaceholder', 'Ekstra notater...')}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>

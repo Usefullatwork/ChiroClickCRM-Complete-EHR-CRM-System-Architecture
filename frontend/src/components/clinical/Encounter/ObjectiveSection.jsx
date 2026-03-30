@@ -8,6 +8,7 @@
  * - PainAndTissue: pain assessment, headache, tissue markers
  */
 import { useEncounter } from '../../../context/EncounterContext';
+import { useTranslation } from '../../../i18n';
 import PosturalAssessment from './PosturalAssessment';
 import SpecialTests from './SpecialTests';
 import NeurologicalFindings from './NeurologicalFindings';
@@ -18,6 +19,7 @@ export default function ObjectiveSection({
   onSetActiveField,
   quickPhrases,
 }) {
+  const { t } = useTranslation('clinical');
   const {
     encounterData,
     isSigned,
@@ -95,7 +97,7 @@ export default function ObjectiveSection({
               <button
                 key={phrase}
                 onClick={() => handleQuickPhrase(phrase, 'ortho_tests')}
-                className="px-2.5 py-1 text-xs rounded-full bg-slate-100 text-slate-600 hover:bg-emerald-100 hover:text-emerald-700 transition-colors"
+                className="px-2.5 py-1 text-xs rounded-full bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-emerald-100 hover:text-emerald-700 transition-colors"
               >
                 + {phrase}
               </button>
@@ -104,8 +106,8 @@ export default function ObjectiveSection({
         )}
 
         <textarea
-          aria-label="Ytterligere objektive funn"
-          placeholder="Ytterligere objektive funn..."
+          aria-label={t('additionalObjectiveFindings', 'Ytterligere objektive funn')}
+          placeholder={t('additionalObjectiveFindingsPlaceholder', 'Ytterligere objektive funn...')}
           value={encounterData.objective.neuro_tests}
           onChange={(e) => {
             if (!onTextInputWithMacros(e, 'objective', 'neuro_tests')) {
@@ -114,7 +116,7 @@ export default function ObjectiveSection({
           }}
           onFocus={() => onSetActiveField('objective.neuro_tests')}
           disabled={isSigned}
-          className="w-full min-h-[60px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+          className="w-full min-h-[60px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-emerald-500 resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
         />
       </div>
     </section>

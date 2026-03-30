@@ -332,6 +332,67 @@ export const socialApi = {
 };
 
 // ============================================
+// MESSAGE API (v2.1)
+// ============================================
+
+export const messageApi = {
+  getMessages: (params?: { page?: number; limit?: number }) => {
+    const queryParams = new URLSearchParams();
+    if (params?.page) queryParams.append('page', String(params.page));
+    if (params?.limit) queryParams.append('limit', String(params.limit));
+    return apiRequest<{
+      messages: Message[];
+      unread_count: number;
+      pagination: { page: number; limit: number; total: number };
+    }>(`/messages?${queryParams}`);
+  },
+
+  sendMessage: (body: string, subject?: string, parentMessageId?: string) =>
+    apiRequest<Message>('/messages', {
+      method: 'POST',
+      body: JSON.stringify({ body, subject, parent_message_id: parentMessageId })
+    }),
+
+  markRead: (messageId: string) =>
+    apiRequest<{ success: boolean }>(`/messages/${messageId}/read`, {
+      method: 'PATCH'
+    }),
+};
+
+// ============================================
+// DOCUMENT API (v2.1)
+// ============================================
+
+export const documentApi = {
+  getDocuments: () =>
+    apiRequest<{ documents: PatientDocument[] }>('/documents'),
+
+  getDownloadUrl: (token: string) =>
+    `${API_BASE_URL}/documents/${token}/download`,
+};
+
+// ============================================
+// BOOKING API (v2.1)
+// ============================================
+
+export const bookingApi = {
+  getAvailableSlots: (date: string, practitionerId?: string) => {
+    const queryParams = new URLSearchParams({ date });
+    if (practitionerId) queryParams.append('practitioner_id', practitionerId);
+    return apiRequest<{ slots: TimeSlot[] }>(`/appointments/available-slots?${queryParams}`);
+  },
+
+  requestAppointment: (data: { preferredDate: string; preferredTime?: string; reason?: string }) =>
+    apiRequest<{ id: string; status: string }>('/appointments/request', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    }),
+
+  getBookingRequests: () =>
+    apiRequest<BookingRequest[]>('/appointments/requests'),
+};
+
+// ============================================
 // TYPES
 // ============================================
 
@@ -469,4 +530,42 @@ export interface Achievement {
   description?: string;
   earned_at: string;
   metadata?: object;
+}
+
+// ============================================
+// CLINIC TYPES (v2.1)
+// ============================================
+
+export interface Message {
+  id: string;
+  sender_type: 'PATIENT' | 'CLINICIAN' | 'SYSTEM';
+  subject: string | null;
+  body: string;
+  is_read: boolean;
+  created_at: string;
+  parent_message_id: string | null;
+}
+
+export interface PatientDocument {
+  id: string;
+  title: string;
+  documentType: string;
+  downloadToken: string | null;
+  expired: boolean;
+  downloadedAt: string | null;
+  createdAt: string;
+}
+
+export interface TimeSlot {
+  time: string;
+  available: boolean;
+}
+
+export interface BookingRequest {
+  id: string;
+  preferred_date: string;
+  preferred_time_slot: string | null;
+  reason: string | null;
+  status: string;
+  created_at: string;
 }

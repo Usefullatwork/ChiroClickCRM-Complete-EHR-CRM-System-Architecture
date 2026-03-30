@@ -12,9 +12,9 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import sindreParser from '../src/services/sindreJournalParser.js';
-import sigrunParser from '../src/services/sigrunJournalParser.js';
-import * as trainingAnonymization from '../src/services/trainingAnonymization.js';
+import sindreParser from '../src/services/training/sindreJournalParser.js';
+import sigrunParser from '../src/services/training/sigrunJournalParser.js';
+import * as trainingAnonymization from '../src/services/training/trainingAnonymization.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +28,7 @@ const parseArgs = () => {
     format: 'jsonl', // jsonl, json, csv, all
     anonymize: false,
     verbose: false,
-    stats: true
+    stats: true,
   };
 
   for (let i = 2; i < process.argv.length; i++) {
@@ -135,20 +135,23 @@ const readJournalFiles = (inputPath) => {
   const stats = fs.statSync(inputPath);
 
   if (stats.isFile()) {
-    return [{
-      path: inputPath,
-      content: fs.readFileSync(inputPath, 'utf-8'),
-      name: path.basename(inputPath)
-    }];
+    return [
+      {
+        path: inputPath,
+        content: fs.readFileSync(inputPath, 'utf-8'),
+        name: path.basename(inputPath),
+      },
+    ];
   } else if (stats.isDirectory()) {
-    const files = fs.readdirSync(inputPath)
-      .filter(f => f.endsWith('.txt') || f.endsWith('.md'))
-      .map(f => {
+    const files = fs
+      .readdirSync(inputPath)
+      .filter((f) => f.endsWith('.txt') || f.endsWith('.md'))
+      .map((f) => {
         const filePath = path.join(inputPath, f);
         return {
           path: filePath,
           content: fs.readFileSync(filePath, 'utf-8'),
-          name: f
+          name: f,
         };
       });
     return files;
@@ -164,13 +167,15 @@ const processJournals = (content, practitionerType, verbose) => {
   const results = {
     sindre: null,
     sigrun: null,
-    combined: []
+    combined: [],
   };
 
   if (practitionerType === 'auto') {
     const detection = sigrunParser.detectPractitionerStyle(content);
     if (verbose) {
-      console.log(`  Detected: ${detection.practitioner} (confidence: ${(detection.confidence * 100).toFixed(1)}%)`);
+      console.log(
+        `  Detected: ${detection.practitioner} (confidence: ${(detection.confidence * 100).toFixed(1)}%)`
+      );
     }
     practitionerType = detection.practitioner.toLowerCase();
   }
@@ -208,17 +213,17 @@ const processJournals = (content, practitionerType, verbose) => {
 const anonymizeExamples = (examples, verbose) => {
   if (verbose) console.log('  Anonymizing data...');
 
-  return examples.map(example => {
+  return examples.map((example) => {
     return {
       ...example,
       prompt: trainingAnonymization.anonymizeSOAPNote(example.prompt, {
         preserveDates: false,
-        aggressive: true
+        aggressive: true,
       }),
       response: trainingAnonymization.anonymizeSOAPNote(example.response, {
         preserveDates: false,
-        aggressive: true
-      })
+        aggressive: true,
+      }),
     };
   });
 };
@@ -227,7 +232,7 @@ const anonymizeExamples = (examples, verbose) => {
  * Export as JSONL (Ollama format)
  */
 const exportJSONL = (examples, outputPath) => {
-  const jsonlContent = examples.map(ex => JSON.stringify(ex)).join('\n');
+  const jsonlContent = examples.map((ex) => JSON.stringify(ex)).join('\n');
   const filePath = outputPath.endsWith('.jsonl') ? outputPath : `${outputPath}.jsonl`;
   fs.writeFileSync(filePath, jsonlContent);
   return filePath;
@@ -242,8 +247,8 @@ const exportJSON = (examples, outputPath, includeStats = true) => {
     metadata: {
       total: examples.length,
       generated_at: new Date().toISOString(),
-      version: '1.0'
-    }
+      version: '1.0',
+    },
   };
 
   if (includeStats) {
@@ -262,13 +267,13 @@ const exportCSV = (examples, outputPath) => {
   const headers = ['type', 'practitioner', 'prompt', 'response', 'metadata'];
   const rows = [headers.join(',')];
 
-  examples.forEach(ex => {
+  examples.forEach((ex) => {
     const row = [
       `"${ex.type || ''}"`,
       `"${ex.practitioner || ''}"`,
       `"${(ex.prompt || '').replace(/"/g, '""')}"`,
       `"${(ex.response || '').replace(/"/g, '""')}"`,
-      `"${JSON.stringify(ex.metadata || {}).replace(/"/g, '""')}"`
+      `"${JSON.stringify(ex.metadata || {}).replace(/"/g, '""')}"`,
     ];
     rows.push(row.join(','));
   });
@@ -287,13 +292,13 @@ const calculateStatistics = (examples) => {
     by_type: {},
     by_practitioner: {},
     avg_prompt_length: 0,
-    avg_response_length: 0
+    avg_response_length: 0,
   };
 
   let totalPromptLength = 0;
   let totalResponseLength = 0;
 
-  examples.forEach(ex => {
+  examples.forEach((ex) => {
     // Count by type
     const type = ex.type || 'unknown';
     stats.by_type[type] = (stats.by_type[type] || 0) + 1;
@@ -390,9 +395,15 @@ const main = async () => {
 
     // Process each file
     const allResults = {
-      sindre: { examples: [], statistics: { total_entries: 0, total_examples: 0, example_types: {} } },
-      sigrun: { examples: [], statistics: { total_entries: 0, total_examples: 0, example_types: {} } },
-      combined: []
+      sindre: {
+        examples: [],
+        statistics: { total_entries: 0, total_examples: 0, example_types: {} },
+      },
+      sigrun: {
+        examples: [],
+        statistics: { total_entries: 0, total_examples: 0, example_types: {} },
+      },
+      combined: [],
     };
 
     for (const file of files) {
@@ -467,7 +478,6 @@ const main = async () => {
       console.log(`   3. Use training data: ${args.output}.jsonl`);
     }
     console.log('');
-
   } catch (error) {
     console.error('\n❌ Error:', error.message);
     if (args.verbose) {

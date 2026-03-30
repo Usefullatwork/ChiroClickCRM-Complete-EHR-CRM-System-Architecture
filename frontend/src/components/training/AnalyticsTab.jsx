@@ -37,16 +37,16 @@ const CHART_COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#e
 
 function StatCard({ label, value, color = 'gray' }) {
   const colorClasses = {
-    gray: 'text-gray-900',
+    gray: 'text-gray-900 dark:text-white',
     green: 'text-green-700',
     red: 'text-red-700',
     blue: 'text-blue-700',
   };
 
   return (
-    <div className="border rounded-lg p-4 text-center">
+    <div className="border dark:border-gray-600 rounded-lg p-4 text-center">
       <div className={`text-2xl font-bold ${colorClasses[color]}`}>{value}</div>
-      <div className="text-xs text-gray-500 mt-1">{label}</div>
+      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">{label}</div>
     </div>
   );
 }
@@ -203,7 +203,7 @@ export default function AnalyticsTab() {
   const isLoading = performanceQuery.isLoading || usageQuery.isLoading;
 
   if (isLoading) {
-    return <div className="text-gray-500 p-6">Laster analysedata...</div>;
+    return <div className="text-gray-500 dark:text-gray-400 p-6">Laster analysedata...</div>;
   }
 
   return (
@@ -212,11 +212,11 @@ export default function AnalyticsTab() {
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-bold">AI-analyse</h2>
         <div className="flex items-center gap-2">
-          <label className="text-sm text-gray-600">Periode:</label>
+          <label className="text-sm text-gray-600 dark:text-gray-300">Periode:</label>
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
+            className="px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
           >
             <option value="7">Siste 7 dager</option>
             <option value="30">Siste 30 dager</option>
@@ -227,7 +227,7 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Model Comparison Chart */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold flex items-center gap-2">
             <BarChart3 className="w-5 h-5" />
@@ -236,7 +236,7 @@ export default function AnalyticsTab() {
           {comparison.length > 0 && (
             <button
               onClick={exportComparisonCSV}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               <Download className="w-4 h-4" />
               CSV
@@ -244,7 +244,7 @@ export default function AnalyticsTab() {
           )}
         </div>
         {comparison.length === 0 ? (
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             Ingen data enna. AI-forslag vil vises her etter bruk.
           </p>
         ) : (
@@ -264,15 +264,15 @@ export default function AnalyticsTab() {
 
       {/* A/B Model Routing View */}
       {comparison.length > 0 && (
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
             <BarChart3 className="w-5 h-5" />
             A/B Modellsammenligning - Detaljert
           </h2>
 
           {comparison.some((c) => parseInt(c.total_feedback) < 30) && (
-            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm text-amber-800">
+            <div className="mb-4 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 rounded-lg">
+              <p className="text-sm text-amber-800 dark:text-amber-300">
                 <AlertCircle className="w-4 h-4 inline mr-1" />
                 Statistisk usikre resultater — noen modeller har under 30 tilbakemeldinger. Vent til
                 flere data er samlet inn for palitelige sammenligninger.
@@ -283,41 +283,50 @@ export default function AnalyticsTab() {
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b bg-gray-50">
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Modell</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Totale forslag</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">
+                <tr className="border-b bg-gray-50 dark:bg-gray-700">
+                  <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Modell
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Totale forslag
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
                     Godkjenningsrate
                   </th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
                     Gj.sn. vurdering
                   </th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Gj.sn. latens</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Gj.sn. latens
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
                     Tilbakemeldinger
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {comparison.map((c) => (
-                  <tr key={c.model_name} className="border-b hover:bg-gray-50">
+                  <tr
+                    key={c.model_name}
+                    className="border-b hover:bg-gray-50 dark:hover:bg-gray-700"
+                  >
                     <td className="py-3 px-4 font-mono text-sm font-medium">{c.model_name}</td>
                     <td className="py-3 px-4 text-right">{c.total_suggestions}</td>
                     <td className="py-3 px-4 text-right">
                       <span
                         className={`px-2 py-0.5 rounded text-xs font-medium ${
                           parseFloat(c.approval_rate) >= 80
-                            ? 'bg-green-100 text-green-700'
+                            ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
                             : parseFloat(c.approval_rate) >= 60
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-red-100 text-red-700'
+                              ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300'
+                              : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'
                         }`}
                       >
                         {c.approval_rate}%
                       </span>
                     </td>
                     <td className="py-3 px-4 text-right">{c.avg_user_rating || '-'}</td>
-                    <td className="py-3 px-4 text-right text-gray-600">
+                    <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
                       {c.avg_latency_ms ? `${c.avg_latency_ms}ms` : '-'}
                     </td>
                     <td className="py-3 px-4 text-right">
@@ -335,9 +344,11 @@ export default function AnalyticsTab() {
             </table>
           </div>
 
-          <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-800 font-medium mb-1">Modellruting (MODEL_ROUTING)</p>
-            <p className="text-xs text-blue-700">
+          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+            <p className="text-sm text-blue-800 dark:text-blue-300 font-medium mb-1">
+              Modellruting (MODEL_ROUTING)
+            </p>
+            <p className="text-xs text-blue-700 dark:text-blue-400">
               Oppgaver rutes automatisk til den best egnede modellen basert pa type: Norsk tekst
               &rarr; chiro-norwegian, Medisinsk &rarr; chiro-medical, Hurtig &rarr; chiro-fast,
               Generell &rarr; chiro-no. Konfigureres via miljovaribler.
@@ -349,13 +360,13 @@ export default function AnalyticsTab() {
       {/* Usage Volume + Task Distribution */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Daily Request Volume */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
             Daglig bruk
           </h2>
           {usage.daily.length === 0 ? (
-            <p className="text-gray-500 text-sm">Ingen data enna.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">Ingen data enna.</p>
           ) : (
             <ResponsiveContainer width="100%" height={250}>
               <LineChart data={[...usage.daily].reverse()}>
@@ -382,13 +393,13 @@ export default function AnalyticsTab() {
         </div>
 
         {/* Task Type Distribution */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
             <Activity className="w-5 h-5" />
             Oppgavefordeling
           </h2>
           {usage.taskTypes.length === 0 ? (
-            <p className="text-gray-500 text-sm">Ingen data enna.</p>
+            <p className="text-gray-500 dark:text-gray-400 text-sm">Ingen data enna.</p>
           ) : (
             <ResponsiveContainer width="100%" height={250}>
               <PieChart>
@@ -403,8 +414,11 @@ export default function AnalyticsTab() {
                     `${task_type} (${(percent * 100).toFixed(0)}%)`
                   }
                 >
-                  {usage.taskTypes.map((_, index) => (
-                    <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                  {usage.taskTypes.map((entry, index) => (
+                    <Cell
+                      key={`cell-${entry.task_type || index}`}
+                      fill={CHART_COLORS[index % CHART_COLORS.length]}
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -415,14 +429,16 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Red Flag Accuracy */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <Target className="w-5 h-5" />
           Red Flag - noyaktighet
         </h2>
         {!redFlag.summary?.total_red_flag_checks ||
         parseInt(redFlag.summary.total_red_flag_checks) === 0 ? (
-          <p className="text-gray-500 text-sm">Ingen red flag-analyser registrert enna.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Ingen red flag-analyser registrert enna.
+          </p>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <StatCard label="Totale analyser" value={redFlag.summary.total_red_flag_checks} />
@@ -446,13 +462,13 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Recent Suggestions Table */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-bold">Siste AI-forslag</h2>
           {suggestions.length > 0 && (
             <button
               onClick={exportSuggestionsCSV}
-              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
             >
               <Download className="w-4 h-4" />
               CSV
@@ -460,24 +476,36 @@ export default function AnalyticsTab() {
           )}
         </div>
         {suggestions.length === 0 ? (
-          <p className="text-gray-500 text-sm">Ingen forslag registrert enna.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Ingen forslag registrert enna.</p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b">
-                  <th className="text-left py-2 px-3 font-medium text-gray-600">Tidspunkt</th>
-                  <th className="text-left py-2 px-3 font-medium text-gray-600">Type</th>
-                  <th className="text-left py-2 px-3 font-medium text-gray-600">Modell</th>
-                  <th className="text-left py-2 px-3 font-medium text-gray-600">Konfidens</th>
-                  <th className="text-left py-2 px-3 font-medium text-gray-600">Latens</th>
-                  <th className="text-left py-2 px-3 font-medium text-gray-600">Status</th>
+                <tr className="border-b dark:border-gray-600">
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                    Tidspunkt
+                  </th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                    Type
+                  </th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                    Modell
+                  </th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                    Konfidens
+                  </th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                    Latens
+                  </th>
+                  <th className="text-left py-2 px-3 font-medium text-gray-600 dark:text-gray-300">
+                    Status
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {suggestions.map((s) => (
-                  <tr key={s.id} className="border-b hover:bg-gray-50">
-                    <td className="py-2 px-3 text-gray-600">
+                  <tr key={s.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td className="py-2 px-3 text-gray-600 dark:text-gray-300">
                       {new Date(s.created_at).toLocaleString('nb-NO', {
                         month: 'short',
                         day: 'numeric',
@@ -486,28 +514,30 @@ export default function AnalyticsTab() {
                       })}
                     </td>
                     <td className="py-2 px-3">
-                      <span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{s.task_type}</span>
+                      <span className="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 rounded text-xs">
+                        {s.task_type}
+                      </span>
                     </td>
                     <td className="py-2 px-3 font-mono text-xs">{s.model_name}</td>
                     <td className="py-2 px-3">
                       {s.confidence_score ? `${(s.confidence_score * 100).toFixed(0)}%` : '-'}
                     </td>
-                    <td className="py-2 px-3 text-gray-600">
+                    <td className="py-2 px-3 text-gray-600 dark:text-gray-300">
                       {s.latency_ms ? `${s.latency_ms}ms` : '-'}
                     </td>
                     <td className="py-2 px-3">
                       {s.accepted === true && (
-                        <span className="text-green-700 bg-green-50 px-2 py-0.5 rounded text-xs">
+                        <span className="text-green-700 dark:text-green-300 bg-green-50 dark:bg-green-900/30 px-2 py-0.5 rounded text-xs">
                           Godkjent
                         </span>
                       )}
                       {s.accepted === false && (
-                        <span className="text-red-700 bg-red-50 px-2 py-0.5 rounded text-xs">
+                        <span className="text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 px-2 py-0.5 rounded text-xs">
                           Avvist
                         </span>
                       )}
                       {s.accepted === null && (
-                        <span className="text-gray-500 bg-gray-50 px-2 py-0.5 rounded text-xs">
+                        <span className="text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-2 py-0.5 rounded text-xs">
                           Venter
                         </span>
                       )}
@@ -521,13 +551,13 @@ export default function AnalyticsTab() {
       </div>
 
       {/* A/B Testing Controls */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <FlaskConical className="w-5 h-5" />
           A/B-testing konfigurasjon
         </h2>
         {Object.keys(abTesting).length === 0 ? (
-          <p className="text-gray-500 text-sm">
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
             Ingen A/B-tester konfigurert. Sett miljovariabler som AB_SPLIT_V6=50 for a aktivere.
           </p>
         ) : (
@@ -535,17 +565,17 @@ export default function AnalyticsTab() {
             {Object.entries(abTesting).map(([model, config]) => (
               <div
                 key={model}
-                className={`border rounded-lg p-4 ${config.enabled ? 'border-teal-300 bg-teal-50' : 'border-gray-200'}`}
+                className={`border rounded-lg p-4 ${config.enabled ? 'border-teal-300 dark:border-teal-700 bg-teal-50 dark:bg-teal-900/20' : 'border-gray-200 dark:border-gray-600'}`}
               >
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-mono text-sm font-medium">{model}</span>
                   <span
-                    className={`px-2 py-0.5 rounded text-xs font-medium ${config.enabled ? 'bg-teal-100 text-teal-700' : 'bg-gray-100 text-gray-500'}`}
+                    className={`px-2 py-0.5 rounded text-xs font-medium ${config.enabled ? 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}
                   >
                     {config.enabled ? 'Aktiv' : 'Inaktiv'}
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                <div className="grid grid-cols-2 gap-2 text-sm text-gray-600 dark:text-gray-300">
                   <div>
                     Modell B: <span className="font-mono">{config.loraModel}</span>
                   </div>
@@ -557,7 +587,7 @@ export default function AnalyticsTab() {
                   </div>
                 </div>
                 {config.enabled && (
-                  <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                  <div className="mt-2 w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                     <div
                       className="bg-teal-600 h-2 rounded-full"
                       style={{ width: `${100 - config.loraPercent}%` }}
@@ -568,15 +598,17 @@ export default function AnalyticsTab() {
             ))}
 
             {comparison.length >= 2 && (
-              <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800 font-medium mb-1">Signifikansindikator</p>
+              <div className="mt-3 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-700 rounded-lg">
+                <p className="text-sm text-blue-800 dark:text-blue-300 font-medium mb-1">
+                  Signifikansindikator
+                </p>
                 {comparison.every((c) => parseInt(c.total_feedback) >= 30) ? (
-                  <p className="text-xs text-green-700">
+                  <p className="text-xs text-green-700 dark:text-green-400">
                     Tilstrekkelig data for sammenligning (
                     {comparison.map((c) => c.total_feedback).join(' / ')} tilbakemeldinger)
                   </p>
                 ) : (
-                  <p className="text-xs text-amber-700">
+                  <p className="text-xs text-amber-700 dark:text-amber-400">
                     Utilstrekkelig data — trenger minst 30 tilbakemeldinger per modell (na:{' '}
                     {comparison.map((c) => c.total_feedback).join(' / ')})
                   </p>
@@ -588,13 +620,15 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Cost per Suggestion */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <DollarSign className="w-5 h-5" />
           Kostnad per forslag
         </h2>
         {costData.length === 0 ? (
-          <p className="text-gray-500 text-sm">Ingen kostnadsdata tilgjengelig.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Ingen kostnadsdata tilgjengelig.
+          </p>
         ) : (
           <div className="space-y-2">
             {costData.map((item) => {
@@ -605,17 +639,21 @@ export default function AnalyticsTab() {
               const barWidth = ((parseFloat(item.avg_cost_usd) || 0) / maxCost) * 100;
               return (
                 <div key={item.task_type} className="flex items-center gap-3">
-                  <span className="text-sm text-gray-600 w-36 shrink-0">{item.task_type}</span>
-                  <div className="flex-1 bg-gray-100 rounded-full h-5 relative">
+                  <span className="text-sm text-gray-600 dark:text-gray-300 w-36 shrink-0">
+                    {item.task_type}
+                  </span>
+                  <div className="flex-1 bg-gray-100 dark:bg-gray-700 rounded-full h-5 relative">
                     <div
                       className="bg-blue-500 h-5 rounded-full"
                       style={{ width: `${Math.max(barWidth, 2)}%` }}
                     />
                   </div>
-                  <span className="text-sm font-mono text-gray-700 w-24 text-right">
+                  <span className="text-sm font-mono text-gray-700 dark:text-gray-200 w-24 text-right">
                     ${parseFloat(item.avg_cost_usd || 0).toFixed(4)}
                   </span>
-                  <span className="text-xs text-gray-400 w-16 text-right">{item.count} stk</span>
+                  <span className="text-xs text-gray-400 dark:text-gray-300 w-16 text-right">
+                    {item.count} stk
+                  </span>
                 </div>
               );
             })}
@@ -624,34 +662,46 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Provider Value Comparison */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <BarChart3 className="w-5 h-5" />
           Leverandorsammenligning
         </h2>
         {providerData.length === 0 ? (
-          <p className="text-gray-500 text-sm">Ingen leverandordata tilgjengelig.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">
+            Ingen leverandordata tilgjengelig.
+          </p>
         ) : (
           <div className="overflow-x-auto">
             <table className="min-w-full text-sm">
               <thead>
-                <tr className="border-b bg-gray-50">
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Leverandor</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Forslag</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Gj.sn. latens</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Godkjent %</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Total kostnad</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">
+                <tr className="border-b bg-gray-50 dark:bg-gray-700">
+                  <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Leverandor
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Forslag
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Gj.sn. latens
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Godkjent %
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Total kostnad
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
                     Kostnad/forslag
                   </th>
                 </tr>
               </thead>
               <tbody>
                 {providerData.map((p) => (
-                  <tr key={p.provider} className="border-b hover:bg-gray-50">
+                  <tr key={p.provider} className="border-b hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="py-3 px-4 font-medium capitalize">{p.provider}</td>
                     <td className="py-3 px-4 text-right">{p.total_suggestions}</td>
-                    <td className="py-3 px-4 text-right text-gray-600">
+                    <td className="py-3 px-4 text-right text-gray-600 dark:text-gray-300">
                       {p.avg_latency_ms ? `${p.avg_latency_ms}ms` : '-'}
                     </td>
                     <td className="py-3 px-4 text-right">
@@ -672,13 +722,13 @@ export default function AnalyticsTab() {
       </div>
 
       {/* Cache Trends */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
           <Database className="w-5 h-5" />
           Cache-trender
         </h2>
         {cacheData.length === 0 ? (
-          <p className="text-gray-500 text-sm">Ingen cache-data tilgjengelig.</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Ingen cache-data tilgjengelig.</p>
         ) : (
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={[...cacheData].reverse()}>

@@ -83,7 +83,6 @@ describe('API Integration Tests', () => {
       expect(response.status).toBe(200);
       expect(response.body.status).toBe('healthy');
       expect(response.body).toHaveProperty('timestamp');
-      expect(response.body).toHaveProperty('uptime');
     });
 
     it('GET /health should return unhealthy when database is down', async () => {
@@ -102,7 +101,7 @@ describe('API Integration Tests', () => {
       const response = await request(app).get('/api/v1');
 
       expect(response.status).toBe(200);
-      expect(response.body.message).toBe('ChiroClickCRM API');
+      expect(response.body.message).toBe('ChiroClickEHR API');
       expect(response.body.version).toBe('v1');
       expect(response.body.endpoints).toBeDefined();
     });

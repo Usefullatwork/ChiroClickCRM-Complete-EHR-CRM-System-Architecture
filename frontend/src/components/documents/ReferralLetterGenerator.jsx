@@ -11,7 +11,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { t } from '../assessment/translations';
+import { useTranslation } from '../../i18n';
 import {
   FileText,
   User,
@@ -146,9 +146,9 @@ function Section({ title, icon: Icon, children, defaultOpen = true }) {
           <span className="font-medium text-gray-900">{title}</span>
         </div>
         {isOpen ? (
-          <ChevronUp className="w-5 h-5 text-gray-500" />
+          <ChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-500" />
+          <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         )}
       </button>
       {isOpen && <div className="p-4 bg-white">{children}</div>}
@@ -188,13 +188,15 @@ function InputField({
 
 // Main Component
 export default function ReferralLetterGenerator({
-  language = 'no',
+  _language = 'no',
   initialData = null,
   patientData = null,
   senderData = null,
   onSave,
   _onSend,
 }) {
+  const { t, lang } = useTranslation('assessment');
+
   const [data, setData] = useState(() => {
     const defaultData = initialData || getDefaultReferralData();
     if (patientData) {
@@ -216,7 +218,7 @@ export default function ReferralLetterGenerator({
     }));
   }, []);
 
-  // Get referral type label
+  // Get referral type label — bilingual data lookup, kept as-is
   const getTypeLabel = useCallback(
     (type) => {
       const labels = {
@@ -226,113 +228,113 @@ export default function ReferralLetterGenerator({
         radiology: { en: 'Radiology/Imaging', no: 'Bildediagnostikk' },
         physio: { en: 'Physiotherapist', no: 'Fysioterapeut' },
       };
-      return labels[type]?.[language] || type;
+      return labels[type]?.[lang] || type;
     },
-    [language]
+    [lang]
   );
 
   // Generate document text
   const generateDocument = useCallback(() => {
     const isRadiology = data.type === 'radiology';
-    const today = new Date().toLocaleDateString(language === 'no' ? 'nb-NO' : 'en-GB');
+    const today = new Date().toLocaleDateString(lang === 'no' ? 'nb-NO' : 'en-GB');
 
     const priorityLabel =
-      PRIORITY_OPTIONS.find((p) => p.value === data.priority)?.label[language] || '';
+      PRIORITY_OPTIONS.find((p) => p.value === data.priority)?.label[lang] || '';
 
     let document = `
-${language === 'no' ? 'HENVISNING' : 'REFERRAL LETTER'}
+${t('referralDocHeading', 'HENVISNING')}
 ${'='.repeat(60)}
 
-${language === 'no' ? 'TIL' : 'TO'}: ${data.recipient.name || getTypeLabel(data.type)}
-${data.recipient.specialty ? `${language === 'no' ? 'Spesialitet' : 'Specialty'}: ${data.recipient.specialty}` : ''}
-${data.recipient.clinic ? `${language === 'no' ? 'Klinikk' : 'Clinic'}: ${data.recipient.clinic}` : ''}
+${t('referralDocTo', 'TIL')}: ${data.recipient.name || getTypeLabel(data.type)}
+${data.recipient.specialty ? `${t('referralDocSpecialty', 'Spesialitet')}: ${data.recipient.specialty}` : ''}
+${data.recipient.clinic ? `${t('referralDocClinic', 'Klinikk')}: ${data.recipient.clinic}` : ''}
 
-${language === 'no' ? 'PRIORITET' : 'PRIORITY'}: ${priorityLabel}
+${t('referralDocPriority', 'PRIORITET')}: ${priorityLabel}
 
-${language === 'no' ? 'GJELDER' : 'REGARDING'}
+${t('referralDocRegarding', 'GJELDER')}
 ${'-'.repeat(30)}
-${t('referral', 'patientDetails', language)}:
-${language === 'no' ? 'Navn' : 'Name'}: ${data.patient.name}
-${language === 'no' ? 'Fødselsnummer' : 'Personal ID'}: ${data.patient.personalId}
-${language === 'no' ? 'Fødselsdato' : 'Date of Birth'}: ${data.patient.dateOfBirth}
-${data.patient.address ? `${language === 'no' ? 'Adresse' : 'Address'}: ${data.patient.address}` : ''}
-${data.patient.phone ? `${language === 'no' ? 'Telefon' : 'Phone'}: ${data.patient.phone}` : ''}
+${t('referralPatientDetails', 'Pasientopplysninger')}:
+${t('referralDocName', 'Navn')}: ${data.patient.name}
+${t('referralDocPersonalId', 'Fødselsnummer')}: ${data.patient.personalId}
+${t('referralDocDateOfBirth', 'Fødselsdato')}: ${data.patient.dateOfBirth}
+${data.patient.address ? `${t('referralDocAddress', 'Adresse')}: ${data.patient.address}` : ''}
+${data.patient.phone ? `${t('referralDocPhone', 'Telefon')}: ${data.patient.phone}` : ''}
 
-${t('referral', 'reasonForReferral', language).toUpperCase()}
+${t('referralReasonForReferral', 'Henvisningsårsak').toUpperCase()}
 ${'-'.repeat(30)}
 ${data.clinical.reasonForReferral}
 `;
 
     if (isRadiology) {
       const imagingLabel =
-        IMAGING_OPTIONS.find((i) => i.value === data.imaging.type)?.label[language] ||
+        IMAGING_OPTIONS.find((i) => i.value === data.imaging.type)?.label[lang] ||
         data.imaging.type;
       document += `
-${language === 'no' ? 'ØNSKET UNDERSØKELSE' : 'REQUESTED IMAGING'}
+${t('referralDocRequestedImaging', 'ØNSKET UNDERSØKELSE')}
 ${'-'.repeat(30)}
-${language === 'no' ? 'Type' : 'Type'}: ${imagingLabel}
-${language === 'no' ? 'Klinisk indikasjon' : 'Clinical Indication'}: ${data.imaging.clinicalIndication}
-${data.imaging.specificQuestions ? `${language === 'no' ? 'Spesifikke spørsmål' : 'Specific Questions'}:\n${data.imaging.specificQuestions}` : ''}
+${t('referralDocType', 'Type')}: ${imagingLabel}
+${t('referralDocClinicalIndication', 'Klinisk indikasjon')}: ${data.imaging.clinicalIndication}
+${data.imaging.specificQuestions ? `${t('referralDocSpecificQuestions', 'Spesifikke spørsmål')}:\n${data.imaging.specificQuestions}` : ''}
 `;
     }
 
     document += `
-${t('referral', 'currentComplaints', language).toUpperCase()}
+${t('referralCurrentComplaints', 'Nåværende plager').toUpperCase()}
 ${'-'.repeat(30)}
 ${data.clinical.currentComplaints}
-${data.clinical.duration ? `${language === 'no' ? 'Varighet' : 'Duration'}: ${data.clinical.duration}` : ''}
+${data.clinical.duration ? `${t('referralDocDuration', 'Varighet')}: ${data.clinical.duration}` : ''}
 
 ${
   data.clinical.relevantHistory
-    ? `${t('referral', 'relevantHistory', language).toUpperCase()}
+    ? `${t('referralRelevantHistory', 'Relevant sykehistorie').toUpperCase()}
 ${'-'.repeat(30)}
 ${data.clinical.relevantHistory}
 `
     : ''
 }
 
-${t('referral', 'examinationFindings', language).toUpperCase()}
+${t('referralExaminationFindings', 'Undersøkelsesfunn').toUpperCase()}
 ${'-'.repeat(30)}
 ${data.clinical.examinationFindings}
 
 ${
   data.clinical.treatmentToDate
-    ? `${t('referral', 'treatmentToDate', language).toUpperCase()}
+    ? `${t('referralTreatmentToDate', 'Behandling så langt').toUpperCase()}
 ${'-'.repeat(30)}
 ${data.clinical.treatmentToDate}
-${data.clinical.response ? `${t('referral', 'response', language)}: ${data.clinical.response}` : ''}
+${data.clinical.response ? `${t('referralResponse', 'Respons på behandling')}: ${data.clinical.response}` : ''}
 `
     : ''
 }
 
 ${
   data.request.specificRequest
-    ? `${t('referral', 'requestedAction', language).toUpperCase()}
+    ? `${t('referralRequestedAction', 'Ønsket tiltak').toUpperCase()}
 ${'-'.repeat(30)}
 ${data.request.specificRequest}
 `
     : ''
 }
 
-${t('referral', 'thankYou', language)}.
-${t('referral', 'availableForDiscussion', language)}.
+${t('referralThankYou', 'Takk for at du ser denne pasienten')}.
+${t('referralAvailableForDiscussion', 'Tilgjengelig for diskusjon ved behov')}.
 
 ${'='.repeat(60)}
 
-${t('referral', 'from', language).toUpperCase()}
+${t('referralFrom', 'Fra').toUpperCase()}
 ${data.sender.name}
 ${data.sender.title}
 HPR: ${data.sender.hprNumber}
 ${data.sender.clinicName}
 ${data.sender.clinicAddress}
-${language === 'no' ? 'Telefon' : 'Phone'}: ${data.sender.phone}
+${t('referralDocPhone', 'Telefon')}: ${data.sender.phone}
 ${data.sender.email ? `E-post: ${data.sender.email}` : ''}
 
-${language === 'no' ? 'Dato' : 'Date'}: ${today}
+${t('referralDocDate', 'Dato')}: ${today}
     `.trim();
 
     return document;
-  }, [data, language, getTypeLabel]);
+  }, [data, lang, getTypeLabel, t]);
 
   // Copy to clipboard
   const copyToClipboard = useCallback(async () => {
@@ -345,7 +347,7 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
     printWindow.document.write(`
       <html>
         <head>
-          <title>${language === 'no' ? 'Henvisning' : 'Referral Letter'}</title>
+          <title>${t('referralTitle', 'Henvisning')}</title>
           <style>
             body { font-family: Arial, sans-serif; font-size: 12px; padding: 20px; line-height: 1.5; }
             pre { white-space: pre-wrap; font-family: inherit; }
@@ -356,7 +358,7 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
     `);
     printWindow.document.close();
     printWindow.print();
-  }, [generateDocument, language]);
+  }, [generateDocument, t]);
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
@@ -366,9 +368,11 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
           <div>
             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <Send className="w-7 h-7 text-indigo-600" />
-              {t('referral', 'title', language)}
+              {t('referralTitle', 'Henvisning')}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">{t('referral', 'subtitle', language)}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {t('referralSubtitle', 'Profesjonell medisinsk henvisning')}
+            </p>
           </div>
           <button
             onClick={() => setShowPreview(!showPreview)}
@@ -378,7 +382,7 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
                 : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
             }`}
           >
-            {language === 'no' ? 'Forhåndsvis' : 'Preview'}
+            {t('referralPreview', 'Forhåndsvis')}
           </button>
         </div>
 
@@ -421,12 +425,12 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
                     : option.value === 'soon'
                       ? 'bg-yellow-100 text-yellow-700 ring-1 ring-yellow-500'
                       : 'bg-gray-100 text-gray-700 ring-1 ring-gray-400'
-                  : 'bg-white text-gray-500 border border-gray-200'
+                  : 'bg-white text-gray-500 dark:text-gray-400 border border-gray-200'
               }`}
             >
               {option.value === 'urgent' && <AlertCircle className="w-3 h-3" />}
               {option.value === 'soon' && <Clock className="w-3 h-3" />}
-              {option.label[language]}
+              {option.label[lang]}
             </button>
           ))}
         </div>
@@ -444,19 +448,19 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
           <>
             {/* Recipient */}
             <Section
-              title={t('referral', 'to', language)}
+              title={t('referralTo', 'Til')}
               icon={Building2}
               defaultOpen={data.type !== 'radiology'}
             >
               <div className="grid grid-cols-2 gap-4">
                 <InputField
-                  label={language === 'no' ? 'Navn/Avdeling' : 'Name/Department'}
+                  label={t('referralNameDepartment', 'Navn/Avdeling')}
                   value={data.recipient.name}
                   onChange={(v) => updateSection('recipient', 'name', v)}
                   placeholder={getTypeLabel(data.type)}
                 />
                 <InputField
-                  label={language === 'no' ? 'Klinikk/Sykehus' : 'Clinic/Hospital'}
+                  label={t('referralClinicHospital', 'Klinikk/Sykehus')}
                   value={data.recipient.clinic}
                   onChange={(v) => updateSection('recipient', 'clinic', v)}
                 />
@@ -464,28 +468,28 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
             </Section>
 
             {/* Patient */}
-            <Section title={t('referral', 'patientDetails', language)} icon={User}>
+            <Section title={t('referralPatientDetails', 'Pasientopplysninger')} icon={User}>
               <div className="grid grid-cols-2 gap-4">
                 <InputField
-                  label={language === 'no' ? 'Navn' : 'Name'}
+                  label={t('referralPatientName', 'Navn')}
                   value={data.patient.name}
                   onChange={(v) => updateSection('patient', 'name', v)}
                   required
                 />
                 <InputField
-                  label={language === 'no' ? 'Fødselsnummer' : 'Personal ID'}
+                  label={t('referralPersonalId', 'Fødselsnummer')}
                   value={data.patient.personalId}
                   onChange={(v) => updateSection('patient', 'personalId', v)}
                   required
                 />
                 <InputField
-                  label={language === 'no' ? 'Fødselsdato' : 'Date of Birth'}
+                  label={t('referralDateOfBirth', 'Fødselsdato')}
                   type="date"
                   value={data.patient.dateOfBirth}
                   onChange={(v) => updateSection('patient', 'dateOfBirth', v)}
                 />
                 <InputField
-                  label={language === 'no' ? 'Telefon' : 'Phone'}
+                  label={t('referralPhone', 'Telefon')}
                   value={data.patient.phone}
                   onChange={(v) => updateSection('patient', 'phone', v)}
                 />
@@ -494,14 +498,11 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
 
             {/* Imaging (for radiology) */}
             {data.type === 'radiology' && (
-              <Section
-                title={language === 'no' ? 'Bildediagnostikk' : 'Imaging Request'}
-                icon={ImageIcon}
-              >
+              <Section title={t('referralImagingRequest', 'Bildediagnostikk')} icon={ImageIcon}>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {language === 'no' ? 'Type undersøkelse' : 'Imaging Type'}
+                      {t('referralImagingType', 'Type undersøkelse')}
                       <span className="text-red-500 ml-1">*</span>
                     </label>
                     <select
@@ -509,78 +510,76 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
                       onChange={(e) => updateSection('imaging', 'type', e.target.value)}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     >
-                      <option value="">{language === 'no' ? 'Velg...' : 'Select...'}</option>
+                      <option value="">{t('referralSelectOption', 'Velg...')}</option>
                       {IMAGING_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
-                          {option.label[language]}
+                          {option.label[lang]}
                         </option>
                       ))}
                     </select>
                   </div>
                   <InputField
-                    label={language === 'no' ? 'Klinisk indikasjon' : 'Clinical Indication'}
+                    label={t('referralClinicalIndication', 'Klinisk indikasjon')}
                     value={data.imaging.clinicalIndication}
                     onChange={(v) => updateSection('imaging', 'clinicalIndication', v)}
                     rows={2}
                     required
                   />
                   <InputField
-                    label={language === 'no' ? 'Spesifikke spørsmål' : 'Specific Questions'}
+                    label={t('referralSpecificQuestions', 'Spesifikke spørsmål')}
                     value={data.imaging.specificQuestions}
                     onChange={(v) => updateSection('imaging', 'specificQuestions', v)}
                     rows={2}
-                    placeholder={
-                      language === 'no' ? 'Hva ønsker du svar på?' : 'What do you want answered?'
-                    }
+                    placeholder={t('referralWhatAnswered', 'Hva ønsker du svar på?')}
                   />
                 </div>
               </Section>
             )}
 
             {/* Clinical Information */}
-            <Section title={t('referral', 'reasonForReferral', language)} icon={FileText}>
+            <Section title={t('referralReasonForReferral', 'Henvisningsårsak')} icon={FileText}>
               <div className="space-y-4">
                 <InputField
-                  label={t('referral', 'reasonForReferral', language)}
+                  label={t('referralReasonForReferral', 'Henvisningsårsak')}
                   value={data.clinical.reasonForReferral}
                   onChange={(v) => updateSection('clinical', 'reasonForReferral', v)}
                   rows={2}
                   required
                 />
                 <InputField
-                  label={t('referral', 'currentComplaints', language)}
+                  label={t('referralCurrentComplaints', 'Nåværende plager')}
                   value={data.clinical.currentComplaints}
                   onChange={(v) => updateSection('clinical', 'currentComplaints', v)}
                   rows={3}
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <InputField
-                    label={language === 'no' ? 'Varighet' : 'Duration'}
+                    label={t('referralDuration', 'Varighet')}
                     value={data.clinical.duration}
                     onChange={(v) => updateSection('clinical', 'duration', v)}
-                    placeholder={language === 'no' ? 'f.eks. 3 uker' : 'e.g. 3 weeks'}
+                    placeholder={t('referralDurationPlaceholder', 'f.eks. 3 uker')}
                   />
                 </div>
                 <InputField
-                  label={t('referral', 'relevantHistory', language)}
+                  label={t('referralRelevantHistory', 'Relevant sykehistorie')}
                   value={data.clinical.relevantHistory}
                   onChange={(v) => updateSection('clinical', 'relevantHistory', v)}
                   rows={2}
                 />
                 <InputField
-                  label={t('referral', 'examinationFindings', language)}
+                  label={t('referralExaminationFindings', 'Undersøkelsesfunn')}
                   value={data.clinical.examinationFindings}
                   onChange={(v) => updateSection('clinical', 'examinationFindings', v)}
                   rows={3}
                 />
                 <InputField
-                  label={t('referral', 'treatmentToDate', language)}
+                  label={t('referralTreatmentToDate', 'Behandling så langt')}
                   value={data.clinical.treatmentToDate}
                   onChange={(v) => updateSection('clinical', 'treatmentToDate', v)}
                   rows={2}
                 />
                 <InputField
-                  label={t('referral', 'response', language)}
+                  label={t('referralResponse', 'Respons på behandling')}
                   value={data.clinical.response}
                   onChange={(v) => updateSection('clinical', 'response', v)}
                 />
@@ -588,10 +587,10 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
             </Section>
 
             {/* Sender */}
-            <Section title={t('referral', 'from', language)} icon={User} defaultOpen={false}>
+            <Section title={t('referralFrom', 'Fra')} icon={User} defaultOpen={false}>
               <div className="grid grid-cols-2 gap-4">
                 <InputField
-                  label={language === 'no' ? 'Navn' : 'Name'}
+                  label={t('referralSenderName', 'Navn')}
                   value={data.sender.name}
                   onChange={(v) => updateSection('sender', 'name', v)}
                   required
@@ -603,17 +602,17 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
                   required
                 />
                 <InputField
-                  label={language === 'no' ? 'Klinikknavn' : 'Clinic Name'}
+                  label={t('referralClinicName', 'Klinikknavn')}
                   value={data.sender.clinicName}
                   onChange={(v) => updateSection('sender', 'clinicName', v)}
                 />
                 <InputField
-                  label={language === 'no' ? 'Telefon' : 'Phone'}
+                  label={t('referralSenderPhone', 'Telefon')}
                   value={data.sender.phone}
                   onChange={(v) => updateSection('sender', 'phone', v)}
                 />
                 <InputField
-                  label={language === 'no' ? 'Adresse' : 'Address'}
+                  label={t('referralSenderAddress', 'Adresse')}
                   value={data.sender.clinicAddress}
                   onChange={(v) => updateSection('sender', 'clinicAddress', v)}
                 />
@@ -637,14 +636,14 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             <Copy className="w-4 h-4" />
-            {t('common', 'copy', language)}
+            {t('copy', 'Kopier')}
           </button>
           <button
             onClick={printDocument}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             <Printer className="w-4 h-4" />
-            {t('common', 'print', language)}
+            {t('print', 'Skriv ut')}
           </button>
         </div>
         <button
@@ -652,7 +651,7 @@ ${language === 'no' ? 'Dato' : 'Date'}: ${today}
           className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700"
         >
           <Send className="w-4 h-4" />
-          {t('common', 'save', language)}
+          {t('save', 'Lagre')}
         </button>
       </div>
     </div>

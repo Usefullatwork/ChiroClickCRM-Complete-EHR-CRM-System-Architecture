@@ -24,7 +24,7 @@ const FINDING_STATES = [
     value: 'NT',
     label: 'Not Tested',
     labelNo: 'Ikke testet',
-    color: 'bg-gray-100 text-gray-500',
+    color: 'bg-gray-100 text-gray-500 dark:text-gray-400',
     icon: MinusCircle,
   },
   {
@@ -270,7 +270,7 @@ function TestItem({ test, values, onChange, lang, showDetails = false }) {
         <div className="flex-1">
           <h5 className="font-medium text-gray-700">{lang === 'no' ? test.nameNo : test.name}</h5>
           {showDetails && (
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {lang === 'no' ? test.techniqueNo : test.technique}
             </p>
           )}
@@ -346,16 +346,16 @@ function CategorySection({
             </span>
           )}
           {expanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
+            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           )}
         </div>
       </button>
 
       {expanded && (
         <div className="p-3 space-y-2 bg-gray-50">
-          <p className="text-xs text-gray-500 mb-2">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">
             {lang === 'no' ? category.descriptionNo : category.description}
           </p>
           {category.tests.map((test) => (
@@ -472,13 +472,13 @@ export default function DynamicPositionalTestPanel({
           <h3 className="text-lg font-semibold text-gray-800">
             {lang === 'no' ? 'Dynamisk Posisjonell Testing' : 'Dynamic Positional Testing'}
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {lang === 'no'
               ? 'Challenge-testing for å identifisere dysfunksjonelle områder'
               : 'Challenge testing to identify dysfunctional areas'}
           </p>
           {summary.tested > 0 && (
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
               {summary.tested} {lang === 'no' ? 'tester' : 'tests'}
               {summary.weak > 0 && (
                 <span className="text-red-600 ml-2">

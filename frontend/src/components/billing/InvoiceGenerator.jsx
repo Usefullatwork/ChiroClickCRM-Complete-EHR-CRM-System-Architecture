@@ -12,6 +12,7 @@ import { useNavigate } from 'react-router-dom';
 import { FileText, User, Save, Send, X, AlertCircle, Check, Loader2, Search } from 'lucide-react';
 import { billingAPI, patientsAPI } from '../../services/api';
 import TakstCodes from './TakstCodes';
+import { useTranslation } from '../../i18n/useTranslation';
 
 import logger from '../../utils/logger';
 /**
@@ -28,6 +29,7 @@ export default function InvoiceGenerator({
   onClose,
   onInvoiceCreated,
 }) {
+  const { t } = useTranslation('financial');
   const _navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -125,11 +127,11 @@ export default function InvoiceGenerator({
     const newErrors = {};
 
     if (!selectedPatientId) {
-      newErrors.patient = 'Velg en pasient';
+      newErrors.patient = t('selectPatient', 'Velg en pasient');
     }
 
     if (selectedCodes.length === 0) {
-      newErrors.codes = 'Velg minst en takstkode';
+      newErrors.codes = t('selectAtLeastOneCode', 'Velg minst en takstkode');
     }
 
     setErrors(newErrors);
@@ -198,12 +200,16 @@ export default function InvoiceGenerator({
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Ny faktura</h2>
-              <p className="text-sm text-gray-500">Opprett faktura med takstkoder</p>
+              <h2 className="text-xl font-semibold text-gray-900">
+                {t('newInvoice', 'Ny faktura')}
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('createInvoiceWithCodes', 'Opprett faktura med takstkoder')}
+              </p>
             </div>
           </div>
           <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
           </button>
         </div>
 
@@ -211,15 +217,20 @@ export default function InvoiceGenerator({
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {/* Patient Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Pasient *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('patient', 'Pasient')} *
+            </label>
 
             {showPatientSearch ? (
               <div className="space-y-3">
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
                   <input
                     type="text"
-                    placeholder="Sok etter pasient (navn, telefon, eller fodselsnummer)..."
+                    placeholder={t(
+                      'searchPatientPlaceholder',
+                      'Søk etter pasient (navn, telefon, eller fødselsnummer)...'
+                    )}
                     value={patientSearch}
                     onChange={(e) => setPatientSearch(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -228,9 +239,9 @@ export default function InvoiceGenerator({
 
                 {/* Search Results */}
                 {searchLoading ? (
-                  <div className="flex items-center gap-2 text-gray-500 p-4">
+                  <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 p-4">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Soker...
+                    {t('searching', 'Søker...')}
                   </div>
                 ) : searchResults?.length > 0 ? (
                   <div className="border border-gray-200 rounded-lg divide-y max-h-60 overflow-y-auto">
@@ -244,17 +255,19 @@ export default function InvoiceGenerator({
                           <p className="font-medium text-gray-900">
                             {p.first_name} {p.last_name}
                           </p>
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
                             {p.date_of_birth && formatDate(p.date_of_birth)}
                             {p.phone && ` - ${p.phone}`}
                           </p>
                         </div>
-                        <Check className="w-5 h-5 text-gray-400" />
+                        <Check className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                       </button>
                     ))}
                   </div>
                 ) : patientSearch.length >= 2 ? (
-                  <p className="text-gray-500 text-sm p-4">Ingen pasienter funnet</p>
+                  <p className="text-gray-500 dark:text-gray-400 text-sm p-4">
+                    {t('noPatients', 'Ingen pasienter funnet')}
+                  </p>
                 ) : null}
               </div>
             ) : patient ? (
@@ -267,7 +280,7 @@ export default function InvoiceGenerator({
                     <p className="font-medium text-gray-900">
                       {patient.first_name} {patient.last_name}
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                       {patient.date_of_birth && formatDate(patient.date_of_birth)}
                       {patient.phone && ` - ${patient.phone}`}
                     </p>
@@ -280,13 +293,13 @@ export default function InvoiceGenerator({
                   }}
                   className="text-sm text-blue-600 hover:text-blue-800"
                 >
-                  Endre
+                  {t('change', 'Endre')}
                 </button>
               </div>
             ) : patientLoading ? (
-              <div className="flex items-center gap-2 text-gray-500 p-4">
+              <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 p-4">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Laster pasient...
+                {t('loadingPatient', 'Laster pasient...')}
               </div>
             ) : null}
 
@@ -307,7 +320,9 @@ export default function InvoiceGenerator({
                 onChange={(e) => setIsChild(e.target.checked)}
                 className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">Barn under 16 ar (fritak for egenandel)</span>
+              <span className="text-sm text-gray-700">
+                {t('childUnder16', 'Barn under 16 år (fritak for egenandel)')}
+              </span>
             </label>
             <label className="flex items-center gap-2 cursor-pointer">
               <input
@@ -316,13 +331,17 @@ export default function InvoiceGenerator({
                 onChange={(e) => setHasExemption(e.target.checked)}
                 className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">Frikort (redusert egenandel)</span>
+              <span className="text-sm text-gray-700">
+                {t('exemptionCard', 'Frikort (redusert egenandel)')}
+              </span>
             </label>
           </div>
 
           {/* Takst Codes Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Takstkoder *</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {t('takstCodes', 'Takstkoder')} *
+            </label>
             <TakstCodes
               selectedCodes={selectedCodes}
               onCodesChange={setSelectedCodes}
@@ -340,30 +359,32 @@ export default function InvoiceGenerator({
           {/* Invoice Options */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Forfallsdager</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                {t('dueDays', 'Forfallsdager')}
+              </label>
               <select
                 value={dueDays}
                 onChange={(e) => setDueDays(parseInt(e.target.value))}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
-                <option value={7}>7 dager</option>
-                <option value={14}>14 dager</option>
-                <option value={21}>21 dager</option>
-                <option value={30}>30 dager</option>
+                <option value={7}>{t('daysOption', '7 dager').replace('{days}', '7')}</option>
+                <option value={14}>{t('daysOption', '14 dager').replace('{days}', '14')}</option>
+                <option value={21}>{t('daysOption', '21 dager').replace('{days}', '21')}</option>
+                <option value={30}>{t('daysOption', '30 dager').replace('{days}', '30')}</option>
               </select>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 Forfallsdato: {formatDate(new Date(Date.now() + dueDays * 24 * 60 * 60 * 1000))}
               </p>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Merknad (valgfri)
+                {t('noteOptional', 'Merknad (valgfri)')}
               </label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Intern merknad..."
+                placeholder={t('internalNoteHint', 'Intern merknad...')}
                 rows={2}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
               />
@@ -373,18 +394,20 @@ export default function InvoiceGenerator({
           {/* Summary */}
           {totals && (
             <div className="bg-blue-50 rounded-lg p-4">
-              <h4 className="font-semibold text-gray-900 mb-3">Fakturasammendrag</h4>
+              <h4 className="font-semibold text-gray-900 mb-3">
+                {t('invoiceSummary', 'Fakturasammendrag')}
+              </h4>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Brutto:</span>
+                  <span className="text-gray-600 dark:text-gray-300">{t('gross', 'Brutto')}:</span>
                   <span className="font-medium">{formatCurrency(totals.totalGross)}</span>
                 </div>
                 <div className="flex justify-between text-sm text-green-600">
-                  <span>HELFO-refusjon:</span>
+                  <span>{t('helfoRefund', 'HELFO-refusjon')}:</span>
                   <span className="font-medium">- {formatCurrency(totals.totalHelfoRefund)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-bold border-t border-blue-200 pt-2 mt-2">
-                  <span>Pasient betaler:</span>
+                  <span>{t('patientPays', 'Pasient betaler')}:</span>
                   <span className="text-blue-700">{formatCurrency(totals.totalPatientShare)}</span>
                 </div>
               </div>
@@ -396,8 +419,12 @@ export default function InvoiceGenerator({
             <div className="bg-red-50 text-red-700 p-4 rounded-lg flex items-start gap-2">
               <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium">Kunne ikke opprette faktura</p>
-                <p className="text-sm">{createMutation.error?.message || 'En feil oppstod'}</p>
+                <p className="font-medium">
+                  {t('couldNotCreateInvoice', 'Kunne ikke opprette faktura')}
+                </p>
+                <p className="text-sm">
+                  {createMutation.error?.message || t('unknownError', 'En feil oppstod')}
+                </p>
               </div>
             </div>
           )}
@@ -407,9 +434,10 @@ export default function InvoiceGenerator({
             <div className="bg-green-50 text-green-700 p-4 rounded-lg flex items-start gap-2">
               <Check className="w-5 h-5 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium">Faktura opprettet</p>
+                <p className="font-medium">{t('invoiceCreated', 'Faktura opprettet')}</p>
                 <p className="text-sm">
-                  Fakturanummer: {createMutation.data?.data?.invoice_number}
+                  {t('invoiceNumberLabel', 'Fakturanummer')}:{' '}
+                  {createMutation.data?.data?.invoice_number}
                 </p>
               </div>
             </div>
@@ -422,7 +450,7 @@ export default function InvoiceGenerator({
             onClick={onClose}
             className="px-6 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
           >
-            Avbryt
+            {t('cancel', 'Avbryt')}
           </button>
 
           <div className="flex gap-3">
@@ -436,7 +464,7 @@ export default function InvoiceGenerator({
               ) : (
                 <Save className="w-4 h-4" />
               )}
-              Lagre som utkast
+              {t('saveAsDraft', 'Lagre som utkast')}
             </button>
             <button
               onClick={() => handleSubmit(true)}
@@ -448,7 +476,7 @@ export default function InvoiceGenerator({
               ) : (
                 <Send className="w-4 h-4" />
               )}
-              Opprett og send
+              {t('createAndSend', 'Opprett og send')}
             </button>
           </div>
         </div>

@@ -34,35 +34,32 @@ import logger from '../utils/logger';
 const LETTER_TYPES = {
   SICK_NOTE: {
     id: 'SICK_NOTE',
-    name: { no: 'Sykemelding', en: 'Sick Note' },
-    description: { no: 'NAV-kompatible sykemeldinger', en: 'NAV-compliant sick notes' },
+    nameKey: 'sickNoteName',
+    descKey: 'sickNoteDesc',
     icon: FileText,
     color: 'blue',
     route: '/sick-notes',
   },
   REFERRAL: {
     id: 'REFERRAL',
-    name: { no: 'Henvisning', en: 'Referral' },
-    description: { no: 'Henvisninger til spesialister', en: 'Referrals to specialists' },
+    nameKey: 'referralName',
+    descKey: 'referralDesc',
     icon: Send,
     color: 'green',
     route: '/referral-letters',
   },
   MEDICAL_CERTIFICATE: {
     id: 'MEDICAL_CERTIFICATE',
-    name: { no: 'Medisinsk erklæring', en: 'Medical Certificate' },
-    description: {
-      no: 'Erklæringer for arbeidsgiver, universitet, etc.',
-      en: 'Certificates for employer, university, etc.',
-    },
+    nameKey: 'medicalCertificateName',
+    descKey: 'medicalCertificateDesc',
     icon: Award,
     color: 'purple',
     route: '/certificates',
   },
   CLINICAL_NOTE: {
     id: 'CLINICAL_NOTE',
-    name: { no: 'Klinisk notat', en: 'Clinical Note' },
-    description: { no: 'Detaljerte kliniske notater', en: 'Detailed clinical notes' },
+    nameKey: 'clinicalNoteName',
+    descKey: 'clinicalNoteDesc',
     icon: ClipboardList,
     color: 'orange',
     route: '/clinical-notes',
@@ -74,7 +71,7 @@ const STATUS_COLORS = {
   DRAFT: 'bg-gray-100 text-gray-800',
   FINALIZED: 'bg-blue-100 text-blue-800',
   SENT: 'bg-green-100 text-green-800',
-  ARCHIVED: 'bg-gray-100 text-gray-600',
+  ARCHIVED: 'bg-gray-100 text-gray-600 dark:text-gray-300',
 };
 
 export default function Letters() {
@@ -199,8 +196,8 @@ export default function Letters() {
                 >
                   <Icon className={`w-6 h-6 text-${type.color}-600`} />
                 </div>
-                <h3 className="font-semibold text-gray-900 mb-1">{type.name[language]}</h3>
-                <p className="text-sm text-gray-500">{type.description[language]}</p>
+                <h3 className="font-semibold text-gray-900 mb-1">{t(type.nameKey)}</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{t(type.descKey)}</p>
               </button>
             );
           })}
@@ -271,7 +268,7 @@ export default function Letters() {
                         {letter.status}
                       </span>
                     </div>
-                    <div className="flex items-center gap-3 text-sm text-gray-500 mt-1">
+                    <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mt-1">
                       <span className="flex items-center gap-1">
                         <User className="w-3.5 h-3.5" />
                         {letter.patientName}
@@ -282,13 +279,15 @@ export default function Letters() {
                       </span>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                 </div>
               );
             })}
 
             {filteredLetters.length === 0 && (
-              <div className="p-8 text-center text-gray-500">{t('noDocuments')}</div>
+              <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+                {t('noDocuments')}
+              </div>
             )}
           </div>
         )}
@@ -302,7 +301,7 @@ export default function Letters() {
       {/* Search and filters */}
       <div className="flex gap-4 mb-6">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
           <input
             type="text"
             placeholder={t('searchByPatientOrTitle')}
@@ -319,7 +318,7 @@ export default function Letters() {
           <option value="all">{t('allTypes')}</option>
           {Object.values(LETTER_TYPES).map((type) => (
             <option key={type.id} value={type.id}>
-              {type.name[language]}
+              {t(type.nameKey)}
             </option>
           ))}
         </select>
@@ -339,19 +338,19 @@ export default function Letters() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('document')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('type')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('patient')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('date')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Status
                 </th>
               </tr>
@@ -377,13 +376,13 @@ export default function Letters() {
                         <span className="font-medium text-gray-900">{letter.title}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {typeConfig.name[language]}
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                      {t(typeConfig.nameKey)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {letter.patientName}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {formatDate(letter.createdAt)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -398,7 +397,10 @@ export default function Letters() {
               })}
               {filteredLetters.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                  <td
+                    colSpan="5"
+                    className="px-6 py-12 text-center text-gray-500 dark:text-gray-400"
+                  >
                     {t('noDocuments')}
                   </td>
                 </tr>
@@ -417,7 +419,7 @@ export default function Letters() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-semibold text-gray-900">{t('documentsAndLetters')}</h1>
-            <p className="text-sm text-gray-500">{t('manageDocuments')}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('manageDocuments')}</p>
           </div>
 
           <div className="flex items-center gap-3">
@@ -426,7 +428,9 @@ export default function Letters() {
               <button
                 onClick={() => setView('dashboard')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  view === 'dashboard' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+                  view === 'dashboard'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300'
                 }`}
               >
                 {t('overview')}
@@ -434,7 +438,9 @@ export default function Letters() {
               <button
                 onClick={() => setView('list')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  view === 'list' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+                  view === 'list'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300'
                 }`}
               >
                 {t('list')}
@@ -446,7 +452,9 @@ export default function Letters() {
               <button
                 onClick={() => setLanguage('no')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  language === 'no' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+                  language === 'no'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300'
                 }`}
               >
                 NO
@@ -454,7 +462,9 @@ export default function Letters() {
               <button
                 onClick={() => setLanguage('en')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  language === 'en' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+                  language === 'en'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300'
                 }`}
               >
                 EN

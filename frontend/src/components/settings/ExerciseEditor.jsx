@@ -1,13 +1,6 @@
-import { useState, useEffect } from 'react'
-import {
-  X,
-  Save,
-  Loader2,
-  Video,
-  Image,
-  AlertCircle,
-  Plus
-} from 'lucide-react'
+import { useState, useEffect } from 'react';
+import { X, Save, Loader2, Video, Image, AlertCircle, Plus } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 /**
  * ExerciseEditor - Modal component for creating and editing exercises
@@ -26,8 +19,9 @@ export default function ExerciseEditor({
   onSave,
   onClose,
   isSaving = false,
-  lang = 'no'
+  lang = 'no',
 }) {
+  const { t } = useTranslation('exercises');
   // Form state
   const [formData, setFormData] = useState({
     name_no: '',
@@ -46,10 +40,10 @@ export default function ExerciseEditor({
     video_url: '',
     image_url: '',
     equipment_needed: [],
-    tags: []
-  })
+    tags: [],
+  });
 
-  const [tagInput, setTagInput] = useState('')
+  const [tagInput, setTagInput] = useState('');
 
   // Initialize form data when exercise prop changes
   useEffect(() => {
@@ -71,99 +65,101 @@ export default function ExerciseEditor({
         video_url: exercise.video_url || '',
         image_url: exercise.image_url || '',
         equipment_needed: exercise.equipment_needed || [],
-        tags: exercise.tags || []
-      })
+        tags: exercise.tags || [],
+      });
     }
-  }, [exercise])
+  }, [exercise]);
 
-  // Category and body region labels
-  const categoryLabels = {
-    stretching: { no: 'Tøyning', en: 'Stretching' },
-    strengthening: { no: 'Styrke', en: 'Strengthening' },
-    mobility: { no: 'Mobilitet', en: 'Mobility' },
-    balance: { no: 'Balanse', en: 'Balance' },
-    posture: { no: 'Holdning', en: 'Posture' },
-    breathing: { no: 'Pust', en: 'Breathing' },
-    nerve_glide: { no: 'Nervegliding', en: 'Nerve Glide' },
-    vestibular: { no: 'Vestibulær', en: 'Vestibular' }
-  }
+  // Category and body region translation key maps
+  const categoryKeys = {
+    stretching: 'catStretching',
+    strengthening: 'catStrengthening',
+    mobility: 'catMobility',
+    balance: 'catBalance',
+    posture: 'catPosture',
+    breathing: 'catBreathing',
+    nerve_glide: 'catNerveGlide',
+    vestibular: 'catVestibular',
+  };
 
-  const bodyRegionLabels = {
-    cervical: { no: 'Nakke', en: 'Cervical' },
-    thoracic: { no: 'Brystsøyle', en: 'Thoracic' },
-    lumbar: { no: 'Korsrygg', en: 'Lumbar' },
-    shoulder: { no: 'Skulder', en: 'Shoulder' },
-    hip: { no: 'Hofte', en: 'Hip' },
-    knee: { no: 'Kne', en: 'Knee' },
-    ankle: { no: 'Ankel', en: 'Ankle' },
-    foot: { no: 'Fot', en: 'Foot' },
-    core: { no: 'Kjerne', en: 'Core' },
-    upper_extremity: { no: 'Overekstremitet', en: 'Upper Extremity' },
-    lower_extremity: { no: 'Underekstremitet', en: 'Lower Extremity' },
-    full_body: { no: 'Helkropp', en: 'Full Body' }
-  }
+  const bodyRegionKeys = {
+    cervical: 'regionCervical',
+    thoracic: 'regionThoracic',
+    lumbar: 'regionLumbar',
+    shoulder: 'regionShoulder',
+    hip: 'regionHip',
+    knee: 'regionKnee',
+    ankle: 'regionAnkle',
+    foot: 'regionFoot',
+    core: 'regionCore',
+    upper_extremity: 'regionUpperExtremity',
+    lower_extremity: 'regionLowerExtremity',
+    full_body: 'regionFullBody',
+  };
 
   const equipmentOptions = [
-    { value: 'none', label: { no: 'Ingen', en: 'None' } },
-    { value: 'yoga_mat', label: { no: 'Yogamatte', en: 'Yoga Mat' } },
-    { value: 'resistance_band', label: { no: 'Elastikk', en: 'Resistance Band' } },
-    { value: 'foam_roller', label: { no: 'Skumrull', en: 'Foam Roller' } },
-    { value: 'chair', label: { no: 'Stol', en: 'Chair' } },
-    { value: 'towel', label: { no: 'Håndkle', en: 'Towel' } },
-    { value: 'doorway', label: { no: 'Døråpning', en: 'Doorway' } },
-    { value: 'marbles', label: { no: 'Kuler', en: 'Marbles' } },
-    { value: 'dumbbell', label: { no: 'Manualer', en: 'Dumbbells' } },
-    { value: 'balance_board', label: { no: 'Balansebrett', en: 'Balance Board' } }
-  ]
+    { value: 'none', labelKey: 'equipNone' },
+    { value: 'yoga_mat', labelKey: 'equipYogaMat' },
+    { value: 'resistance_band', labelKey: 'equipResistanceBand' },
+    { value: 'foam_roller', labelKey: 'equipFoamRoller' },
+    { value: 'chair', labelKey: 'equipChair' },
+    { value: 'towel', labelKey: 'equipTowel' },
+    { value: 'doorway', labelKey: 'equipDoorway' },
+    { value: 'marbles', labelKey: 'equipMarbles' },
+    { value: 'dumbbell', labelKey: 'equipDumbbell' },
+    { value: 'balance_board', labelKey: 'equipBalanceBoard' },
+  ];
 
   // Helper to extract YouTube video ID
   const getYouTubeVideoId = (url) => {
     if (!url) {
-      return null
+      return null;
     }
-    const match = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&?/]+)/)
-    return match ? match[1] : null
-  }
+    const match = url.match(
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([^&?/]+)/
+    );
+    return match ? match[1] : null;
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault()
+    e.preventDefault();
     if (!formData.name_no) {
-      return
+      return;
     }
-    onSave(formData)
-  }
+    onSave(formData);
+  };
 
   const handleAddTag = () => {
     if (tagInput.trim() && !formData.tags.includes(tagInput.trim().toLowerCase())) {
       setFormData({
         ...formData,
-        tags: [...formData.tags, tagInput.trim().toLowerCase()]
-      })
-      setTagInput('')
+        tags: [...formData.tags, tagInput.trim().toLowerCase()],
+      });
+      setTagInput('');
     }
-  }
+  };
 
   const handleRemoveTag = (tagToRemove) => {
     setFormData({
       ...formData,
-      tags: formData.tags.filter(tag => tag !== tagToRemove)
-    })
-  }
+      tags: formData.tags.filter((tag) => tag !== tagToRemove),
+    });
+  };
 
   const handleToggleEquipment = (equipment) => {
-    const current = formData.equipment_needed || []
+    const current = formData.equipment_needed || [];
     if (current.includes(equipment)) {
       setFormData({
         ...formData,
-        equipment_needed: current.filter(e => e !== equipment)
-      })
+        equipment_needed: current.filter((e) => e !== equipment),
+      });
     } else {
       setFormData({
         ...formData,
-        equipment_needed: [...current, equipment]
-      })
+        equipment_needed: [...current, equipment],
+      });
     }
-  }
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -172,12 +168,12 @@ export default function ExerciseEditor({
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
           <h3 className="text-lg font-semibold text-gray-900">
             {mode === 'create'
-              ? (lang === 'no' ? 'Ny øvelse' : 'New Exercise')
-              : (lang === 'no' ? 'Rediger øvelse' : 'Edit Exercise')}
+              ? t('newExercise', 'Ny øvelse')
+              : t('editExerciseTitle', 'Rediger øvelse')}
           </h3>
           <button
             onClick={onClose}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
+            className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg hover:bg-gray-100"
           >
             <X className="w-5 h-5" />
           </button>
@@ -190,20 +186,20 @@ export default function ExerciseEditor({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {lang === 'no' ? 'Navn (Norsk)' : 'Name (Norwegian)'} *
+                  {t('nameNorwegian', 'Navn (Norsk)')} *
                 </label>
                 <input
                   type="text"
                   value={formData.name_no}
                   onChange={(e) => setFormData({ ...formData, name_no: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={lang === 'no' ? 'f.eks. Kne til bryst tøyning' : 'e.g. Knee to Chest Stretch'}
+                  placeholder={t('nameNorwegianPlaceholder', 'f.eks. Kne til bryst tøyning')}
                   required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {lang === 'no' ? 'Navn (Engelsk)' : 'Name (English)'}
+                  {t('nameEnglish', 'Navn (Engelsk)')}
                 </label>
                 <input
                   type="text"
@@ -219,44 +215,48 @@ export default function ExerciseEditor({
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {lang === 'no' ? 'Kategori' : 'Category'}
+                  {t('category', 'Kategori')}
                 </label>
                 <select
                   value={formData.category}
                   onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
-                  {Object.entries(categoryLabels).map(([key, labels]) => (
-                    <option key={key} value={key}>{labels[lang] || key}</option>
+                  {Object.entries(categoryKeys).map(([key, tKey]) => (
+                    <option key={key} value={key}>
+                      {t(tKey, key)}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {lang === 'no' ? 'Kroppsregion' : 'Body Region'}
+                  {t('bodyRegion', 'Kroppsregion')}
                 </label>
                 <select
                   value={formData.body_region}
                   onChange={(e) => setFormData({ ...formData, body_region: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
-                  {Object.entries(bodyRegionLabels).map(([key, labels]) => (
-                    <option key={key} value={key}>{labels[lang] || key}</option>
+                  {Object.entries(bodyRegionKeys).map(([key, tKey]) => (
+                    <option key={key} value={key}>
+                      {t(tKey, key)}
+                    </option>
                   ))}
                 </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {lang === 'no' ? 'Vanskelighetsgrad' : 'Difficulty'}
+                  {t('difficultyLabel', 'Vanskelighetsgrad')}
                 </label>
                 <select
                   value={formData.difficulty}
                   onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 >
-                  <option value="beginner">{lang === 'no' ? 'Nybegynner' : 'Beginner'}</option>
-                  <option value="intermediate">{lang === 'no' ? 'Middels' : 'Intermediate'}</option>
-                  <option value="advanced">{lang === 'no' ? 'Avansert' : 'Advanced'}</option>
+                  <option value="beginner">{t('beginner', 'Nybegynner')}</option>
+                  <option value="intermediate">{t('intermediate', 'Middels')}</option>
+                  <option value="advanced">{t('advanced', 'Avansert')}</option>
                 </select>
               </div>
             </div>
@@ -265,7 +265,7 @@ export default function ExerciseEditor({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <Video className="w-4 h-4 inline mr-1" />
-                {lang === 'no' ? 'Video URL (YouTube)' : 'Video URL (YouTube)'}
+                {t('videoUrlLabel', 'Video URL (YouTube)')}
               </label>
               <input
                 type="url"
@@ -293,7 +293,7 @@ export default function ExerciseEditor({
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 <Image className="w-4 h-4 inline mr-1" />
-                {lang === 'no' ? 'Bilde URL' : 'Image URL'}
+                {t('imageUrlLabel', 'Bilde URL')}
               </label>
               <input
                 type="url"
@@ -302,10 +302,11 @@ export default function ExerciseEditor({
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                 placeholder="https://raw.githubusercontent.com/yuhonas/free-exercise-db/..."
               />
-              <p className="text-xs text-gray-500 mt-1">
-                {lang === 'no'
-                  ? 'Tips: Bruk bilder fra Free Exercise DB eller last opp til egen server'
-                  : 'Tip: Use images from Free Exercise DB or upload to your own server'}
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                {t(
+                  'imageUrlTip',
+                  'Tips: Bruk bilder fra Free Exercise DB eller last opp til egen server'
+                )}
               </p>
               {formData.image_url && (
                 <div className="mt-2 flex justify-center">
@@ -313,7 +314,9 @@ export default function ExerciseEditor({
                     src={formData.image_url}
                     alt="Preview"
                     className="max-h-40 rounded-lg border border-gray-200"
-                    onError={(e) => { e.target.style.display = 'none' }}
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                    }}
                   />
                 </div>
               )}
@@ -323,26 +326,32 @@ export default function ExerciseEditor({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {lang === 'no' ? 'Instruksjoner (Norsk)' : 'Instructions (Norwegian)'}
+                  {t('instructionsNorwegian', 'Instruksjoner (Norsk)')}
                 </label>
                 <textarea
                   value={formData.instructions_no}
                   onChange={(e) => setFormData({ ...formData, instructions_no: e.target.value })}
                   rows={5}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={lang === 'no' ? 'Detaljerte trinn-for-trinn instruksjoner...' : 'Detailed step-by-step instructions...'}
+                  placeholder={t(
+                    'instructionsNorwegianPlaceholder',
+                    'Detaljerte trinn-for-trinn instruksjoner...'
+                  )}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {lang === 'no' ? 'Instruksjoner (Engelsk)' : 'Instructions (English)'}
+                  {t('instructionsEnglish', 'Instruksjoner (Engelsk)')}
                 </label>
                 <textarea
                   value={formData.instructions_en}
                   onChange={(e) => setFormData({ ...formData, instructions_en: e.target.value })}
                   rows={5}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="Detailed step-by-step instructions..."
+                  placeholder={t(
+                    'detailedInstructionsPlaceholder',
+                    'Detailed step-by-step instructions...'
+                  )}
                 />
               </div>
             </div>
@@ -352,27 +361,27 @@ export default function ExerciseEditor({
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   <AlertCircle className="w-4 h-4 inline mr-1 text-red-500" />
-                  {lang === 'no' ? 'Kontraindikasjoner' : 'Contraindications'}
+                  {t('contraindications', 'Kontraindikasjoner')}
                 </label>
                 <textarea
                   value={formData.contraindications}
                   onChange={(e) => setFormData({ ...formData, contraindications: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={lang === 'no' ? 'Når øvelsen IKKE bør utføres...' : 'When the exercise should NOT be performed...'}
+                  placeholder={t('contraindicationsPlaceholder', 'Når øvelsen IKKE bør utføres...')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   <AlertCircle className="w-4 h-4 inline mr-1 text-yellow-500" />
-                  {lang === 'no' ? 'Forholdsregler' : 'Precautions'}
+                  {t('precautions', 'Forholdsregler')}
                 </label>
                 <textarea
                   value={formData.precautions}
                   onChange={(e) => setFormData({ ...formData, precautions: e.target.value })}
                   rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={lang === 'no' ? 'Viktige hensyn og advarsler...' : 'Important considerations and warnings...'}
+                  placeholder={t('precautionsPlaceholder', 'Viktige hensyn og advarsler...')}
                 />
               </div>
             </div>
@@ -380,43 +389,52 @@ export default function ExerciseEditor({
             {/* Dosing Defaults */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {lang === 'no' ? 'Standard dosering' : 'Default Dosing'}
+                {t('defaultDosing', 'Standard dosering')}
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">
-                    {lang === 'no' ? 'Sett' : 'Sets'}
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    {t('setsLabel', 'Sett')}
                   </label>
                   <input
                     type="number"
                     value={formData.default_sets}
-                    onChange={(e) => setFormData({ ...formData, default_sets: parseInt(e.target.value) || 3 })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, default_sets: parseInt(e.target.value) || 3 })
+                    }
                     min={1}
                     max={10}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">
-                    {lang === 'no' ? 'Reps' : 'Reps'}
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    {t('repsLabel', 'Reps')}
                   </label>
                   <input
                     type="number"
                     value={formData.default_reps}
-                    onChange={(e) => setFormData({ ...formData, default_reps: parseInt(e.target.value) || 10 })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, default_reps: parseInt(e.target.value) || 10 })
+                    }
                     min={1}
                     max={100}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">
-                    {lang === 'no' ? 'Hold (sek)' : 'Hold (sec)'}
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    {t('holdSec', 'Hold (sek)')}
                   </label>
                   <input
                     type="number"
                     value={formData.default_hold_seconds || ''}
-                    onChange={(e) => setFormData({ ...formData, default_hold_seconds: e.target.value ? parseInt(e.target.value) : null })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        default_hold_seconds: e.target.value ? parseInt(e.target.value) : null,
+                      })
+                    }
                     min={0}
                     max={300}
                     placeholder="-"
@@ -424,20 +442,22 @@ export default function ExerciseEditor({
                   />
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">
-                    {lang === 'no' ? 'Frekvens' : 'Frequency'}
+                  <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                    {t('frequencyLabel', 'Frekvens')}
                   </label>
                   <select
                     value={formData.default_frequency}
-                    onChange={(e) => setFormData({ ...formData, default_frequency: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, default_frequency: e.target.value })
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="daily">{lang === 'no' ? 'Daglig' : 'Daily'}</option>
-                    <option value="2x_daily">{lang === 'no' ? '2x daglig' : '2x Daily'}</option>
-                    <option value="3x_daily">{lang === 'no' ? '3x daglig' : '3x Daily'}</option>
-                    <option value="3x_week">{lang === 'no' ? '3x per uke' : '3x Weekly'}</option>
-                    <option value="2x_week">{lang === 'no' ? '2x per uke' : '2x Weekly'}</option>
-                    <option value="weekly">{lang === 'no' ? 'Ukentlig' : 'Weekly'}</option>
+                    <option value="daily">{t('freqDaily', 'Daglig')}</option>
+                    <option value="2x_daily">{t('freq2xDaily', '2x daglig')}</option>
+                    <option value="3x_daily">{t('freq3xDaily', '3x daglig')}</option>
+                    <option value="3x_week">{t('freq3xWeek', '3x per uke')}</option>
+                    <option value="2x_week">{t('freq2xWeek', '2x per uke')}</option>
+                    <option value="weekly">{t('freqWeekly', 'Ukentlig')}</option>
                   </select>
                 </div>
               </div>
@@ -446,7 +466,7 @@ export default function ExerciseEditor({
             {/* Equipment Needed */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {lang === 'no' ? 'Utstyr som trengs' : 'Equipment Needed'}
+                {t('equipmentNeeded', 'Utstyr som trengs')}
               </label>
               <div className="flex flex-wrap gap-2">
                 {equipmentOptions.map((equip) => (
@@ -457,10 +477,10 @@ export default function ExerciseEditor({
                     className={`px-3 py-1.5 text-sm rounded-full border transition-colors ${
                       (formData.equipment_needed || []).includes(equip.value)
                         ? 'bg-green-100 border-green-500 text-green-700'
-                        : 'bg-gray-50 border-gray-300 text-gray-600 hover:bg-gray-100'
+                        : 'bg-gray-50 border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                     }`}
                   >
-                    {equip.label[lang] || equip.value}
+                    {t(equip.labelKey, equip.value)}
                   </button>
                 ))}
               </div>
@@ -469,7 +489,7 @@ export default function ExerciseEditor({
             {/* Tags */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                {lang === 'no' ? 'Tagger' : 'Tags'}
+                {t('tags', 'Tagger')}
               </label>
               <div className="flex gap-2 mb-2">
                 <input
@@ -478,7 +498,7 @@ export default function ExerciseEditor({
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder={lang === 'no' ? 'Legg til tag...' : 'Add tag...'}
+                  placeholder={t('addTag', 'Legg til tag...')}
                 />
                 <button
                   type="button"
@@ -517,7 +537,7 @@ export default function ExerciseEditor({
               onClick={onClose}
               className="px-4 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
             >
-              {lang === 'no' ? 'Avbryt' : 'Cancel'}
+              {t('cancelBtn', 'Avbryt')}
             </button>
             <button
               type="submit"
@@ -527,12 +547,12 @@ export default function ExerciseEditor({
               {isSaving ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  {lang === 'no' ? 'Lagrer...' : 'Saving...'}
+                  {t('savingBtn', 'Lagrer...')}
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4" />
-                  {lang === 'no' ? 'Lagre øvelse' : 'Save Exercise'}
+                  {t('saveExerciseBtn', 'Lagre øvelse')}
                 </>
               )}
             </button>
@@ -540,5 +560,5 @@ export default function ExerciseEditor({
         </form>
       </div>
     </div>
-  )
+  );
 }

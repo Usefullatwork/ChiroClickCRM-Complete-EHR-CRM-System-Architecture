@@ -13,113 +13,21 @@
 
 import { useState, useMemo, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from '../../i18n';
 
-// =============================================================================
-// TRANSLATIONS
-// =============================================================================
-
-const TRANSLATIONS = {
-  en: {
-    calendar: 'Calendar',
-    today: 'Today',
-    week: 'Week',
-    day: 'Day',
-    newAppointment: 'New Appointment',
-    noAppointments: 'No appointments',
-    allProviders: 'All Providers',
-    provider: 'Provider',
-    patient: 'Patient',
-    type: 'Type',
-    time: 'Time',
-    duration: 'Duration',
-    minutes: 'min',
-    cancel: 'Cancel',
-    confirm: 'Confirm',
-    checkIn: 'Check In',
-    start: 'Start',
-    reschedule: 'Reschedule',
-    viewPatient: 'View Patient',
-    walkin: 'Walk-in',
-    confirmed: 'Confirmed',
-    pending: 'Pending',
-    completed: 'Completed',
-    cancelled: 'Cancelled',
-    noShow: 'No Show',
-    inProgress: 'In Progress',
-    weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
-    weekDaysFull: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-    months: [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ],
-  },
-  no: {
-    calendar: 'Kalender',
-    today: 'I dag',
-    week: 'Uke',
-    day: 'Dag',
-    newAppointment: 'Ny avtale',
-    noAppointments: 'Ingen avtaler',
-    allProviders: 'Alle behandlere',
-    provider: 'Behandler',
-    patient: 'Pasient',
-    type: 'Type',
-    time: 'Tid',
-    duration: 'Varighet',
-    minutes: 'min',
-    cancel: 'Avlys',
-    confirm: 'Bekreft',
-    checkIn: 'Sjekk inn',
-    start: 'Start',
-    reschedule: 'Endre tid',
-    viewPatient: 'Se pasient',
-    walkin: 'Drop-in',
-    confirmed: 'Bekreftet',
-    pending: 'Venter',
-    completed: 'Fullført',
-    cancelled: 'Avlyst',
-    noShow: 'Uteblitt',
-    inProgress: 'Pågår',
-    weekDays: ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'],
-    weekDaysFull: ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'],
-    months: [
-      'Januar',
-      'Februar',
-      'Mars',
-      'April',
-      'Mai',
-      'Juni',
-      'Juli',
-      'August',
-      'September',
-      'Oktober',
-      'November',
-      'Desember',
-    ],
-  },
-};
+// Note: TRANSLATIONS removed — now served by i18n 'appointments' namespace.
 
 // =============================================================================
 // CONSTANTS
 // =============================================================================
 
 const APPOINTMENT_TYPES = {
-  NEW_PATIENT: { color: 'bg-blue-500', label: { en: 'New Patient', no: 'Ny pasient' } },
-  FOLLOW_UP: { color: 'bg-green-500', label: { en: 'Follow-up', no: 'Oppfølging' } },
-  ACUTE: { color: 'bg-red-500', label: { en: 'Acute', no: 'Akutt' } },
-  MAINTENANCE: { color: 'bg-purple-500', label: { en: 'Maintenance', no: 'Vedlikehold' } },
-  XRAY: { color: 'bg-orange-500', label: { en: 'X-Ray', no: 'Røntgen' } },
-  EXAM: { color: 'bg-cyan-500', label: { en: 'Examination', no: 'Undersøkelse' } },
+  NEW_PATIENT: { color: 'bg-blue-500', labelKey: 'newPatientVisit', labelFallback: 'Ny pasient' },
+  FOLLOW_UP: { color: 'bg-green-500', labelKey: 'followUp', labelFallback: 'Oppfølging' },
+  ACUTE: { color: 'bg-red-500', labelKey: 'emergency', labelFallback: 'Akutt' },
+  MAINTENANCE: { color: 'bg-purple-500', labelKey: 'treatment', labelFallback: 'Vedlikehold' },
+  XRAY: { color: 'bg-orange-500', labelKey: 'type', labelFallback: 'Røntgen' },
+  EXAM: { color: 'bg-cyan-500', labelKey: 'consultation', labelFallback: 'Undersøkelse' },
 };
 
 const WORK_HOURS = {
@@ -249,8 +157,8 @@ function TimeColumn() {
 /**
  * Day Column - Shows a single day with appointments
  */
-function DayColumn({ date, appointments, lang, isToday, onSlotClick, onAppointmentClick }) {
-  const t = TRANSLATIONS[lang];
+function DayColumn({ date, appointments, isToday, onSlotClick, onAppointmentClick }) {
+  const { t } = useTranslation('appointments');
   const dayOfWeek = new Date(date).getDay();
 
   // Calculate slot positions
@@ -272,7 +180,9 @@ function DayColumn({ date, appointments, lang, isToday, onSlotClick, onAppointme
           isToday ? 'bg-blue-50 dark:bg-blue-900/20' : ''
         }`}
       >
-        <div className="text-xs text-gray-500 dark:text-gray-400">{t.weekDays[dayOfWeek]}</div>
+        <div className="text-xs text-gray-500 dark:text-gray-400">
+          {t(`weekDay_${dayOfWeek}`, ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'][dayOfWeek])}
+        </div>
         <div
           className={`text-sm font-semibold ${
             isToday ? 'text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'
@@ -316,7 +226,7 @@ function DayColumn({ date, appointments, lang, isToday, onSlotClick, onAppointme
             {apt.duration >= 30 && (
               <div className="text-xs text-gray-600 dark:text-gray-300 truncate">
                 {apt.startTime} • {apt.duration}
-                {t.minutes}
+                {t('minutes', 'min')}
               </div>
             )}
           </div>
@@ -329,8 +239,8 @@ function DayColumn({ date, appointments, lang, isToday, onSlotClick, onAppointme
 /**
  * Appointment Detail Modal
  */
-function AppointmentModal({ appointment, lang, onClose, onAction }) {
-  const t = TRANSLATIONS[lang];
+function AppointmentModal({ appointment, onClose, onAction }) {
+  const { t } = useTranslation('appointments');
   if (!appointment) {
     return null;
   }
@@ -354,20 +264,20 @@ function AppointmentModal({ appointment, lang, onClose, onAction }) {
             </button>
           </div>
           <div className="text-sm text-gray-600 dark:text-gray-300 mt-1">
-            {typeInfo.label?.[lang] || appointment.type}
+            {typeInfo.labelKey ? t(typeInfo.labelKey, typeInfo.labelFallback) : appointment.type}
           </div>
         </div>
 
         {/* Content */}
         <div className="p-4 space-y-3">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500 dark:text-gray-400">{t.time}:</span>
+            <span className="text-gray-500 dark:text-gray-400">{t('time', 'Tid')}:</span>
             <span className="font-medium text-gray-900 dark:text-white">
-              {appointment.startTime} ({appointment.duration} {t.minutes})
+              {appointment.startTime} ({appointment.duration} {t('minutes', 'min')})
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500 dark:text-gray-400">{t.provider}:</span>
+            <span className="text-gray-500 dark:text-gray-400">{t('provider', 'Behandler')}:</span>
             <span className="font-medium text-gray-900 dark:text-white">
               {MOCK_PROVIDERS.find((p) => p.id === appointment.providerId)?.name || '-'}
             </span>
@@ -385,7 +295,7 @@ function AppointmentModal({ appointment, lang, onClose, onAction }) {
                       : 'bg-gray-100 text-gray-800'
               }`}
             >
-              {t[appointment.status?.toLowerCase()] || appointment.status}
+              {t(appointment.status?.toLowerCase(), appointment.status)}
             </span>
           </div>
         </div>
@@ -397,7 +307,7 @@ function AppointmentModal({ appointment, lang, onClose, onAction }) {
               onClick={() => onAction?.('confirm', appointment)}
               className="px-3 py-1.5 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700"
             >
-              {t.confirm}
+              {t('confirm', 'Bekreft')}
             </button>
           )}
           {appointment.status === 'CONFIRMED' && (
@@ -405,7 +315,7 @@ function AppointmentModal({ appointment, lang, onClose, onAction }) {
               onClick={() => onAction?.('checkin', appointment)}
               className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              {t.checkIn}
+              {t('checkIn', 'Sjekk inn')}
             </button>
           )}
           {appointment.status !== 'COMPLETED' && appointment.status !== 'CANCELLED' && (
@@ -414,13 +324,13 @@ function AppointmentModal({ appointment, lang, onClose, onAction }) {
                 onClick={() => onAction?.('reschedule', appointment)}
                 className="px-3 py-1.5 text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
               >
-                {t.reschedule}
+                {t('reschedule', 'Endre tid')}
               </button>
               <button
                 onClick={() => onAction?.('cancel', appointment)}
                 className="px-3 py-1.5 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
               >
-                {t.cancel}
+                {t('cancel', 'Avlys')}
               </button>
             </>
           )}
@@ -428,7 +338,7 @@ function AppointmentModal({ appointment, lang, onClose, onAction }) {
             to={`/patients/${appointment.patient.id}`}
             className="px-3 py-1.5 text-sm text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg"
           >
-            {t.viewPatient}
+            {t('viewPatient', 'Se pasient')}
           </Link>
         </div>
       </div>
@@ -441,13 +351,13 @@ function AppointmentModal({ appointment, lang, onClose, onAction }) {
 // =============================================================================
 
 export default function AppointmentCalendar({
-  lang = 'en',
+  lang: _lang = 'en',
   appointments: externalAppointments,
   providers = MOCK_PROVIDERS,
   onAppointmentAction,
   onNewAppointment,
 }) {
-  const t = TRANSLATIONS[lang];
+  const { t } = useTranslation('appointments');
   const navigate = useNavigate();
 
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -553,7 +463,7 @@ export default function AppointmentCalendar({
               onClick={goToToday}
               className="px-3 py-1.5 text-sm font-medium bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 rounded-lg"
             >
-              {t.today}
+              {t('today', 'I dag')}
             </button>
             <button
               onClick={goToNext}
@@ -562,7 +472,24 @@ export default function AppointmentCalendar({
               →
             </button>
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-              {t.months[weekStart.getMonth()]} {weekStart.getFullYear()}
+              {t(
+                `month_${weekStart.getMonth()}`,
+                [
+                  'Januar',
+                  'Februar',
+                  'Mars',
+                  'April',
+                  'Mai',
+                  'Juni',
+                  'Juli',
+                  'August',
+                  'September',
+                  'Oktober',
+                  'November',
+                  'Desember',
+                ][weekStart.getMonth()]
+              )}{' '}
+              {weekStart.getFullYear()}
             </h2>
           </div>
 
@@ -576,7 +503,7 @@ export default function AppointmentCalendar({
               }
               className="px-3 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             >
-              <option value="">{t.allProviders}</option>
+              <option value="">{t('allProviders', 'Alle behandlere')}</option>
               {providers.map((provider) => (
                 <option key={provider.id} value={provider.id}>
                   {provider.name}
@@ -594,7 +521,7 @@ export default function AppointmentCalendar({
                     : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
                 }`}
               >
-                {t.week}
+                {t('week', 'Uke')}
               </button>
               <button
                 onClick={() => setViewMode('day')}
@@ -604,7 +531,7 @@ export default function AppointmentCalendar({
                     : 'bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600'
                 }`}
               >
-                {t.day}
+                {t('day', 'Dag')}
               </button>
             </div>
 
@@ -613,7 +540,7 @@ export default function AppointmentCalendar({
               onClick={() => handleSlotClick(today, 9)}
               className="px-4 py-1.5 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700"
             >
-              + {t.newAppointment}
+              + {t('newAppointment', 'Ny avtale')}
             </button>
           </div>
         </div>
@@ -628,7 +555,6 @@ export default function AppointmentCalendar({
               key={date}
               date={date}
               appointments={appointmentsByDate[date] || []}
-              lang={lang}
               isToday={date === today}
               onSlotClick={handleSlotClick}
               onAppointmentClick={setSelectedAppointment}
@@ -638,7 +564,6 @@ export default function AppointmentCalendar({
           <DayColumn
             date={currentDate.toISOString().split('T')[0]}
             appointments={appointmentsByDate[currentDate.toISOString().split('T')[0]] || []}
-            lang={lang}
             isToday={currentDate.toISOString().split('T')[0] === today}
             onSlotClick={handleSlotClick}
             onAppointmentClick={setSelectedAppointment}
@@ -650,7 +575,6 @@ export default function AppointmentCalendar({
       {selectedAppointment && (
         <AppointmentModal
           appointment={selectedAppointment}
-          lang={lang}
           onClose={() => setSelectedAppointment(null)}
           onAction={handleAppointmentAction}
         />

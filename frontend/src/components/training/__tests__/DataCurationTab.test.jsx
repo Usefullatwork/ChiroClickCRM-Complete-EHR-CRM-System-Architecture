@@ -8,6 +8,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import DataCurationTab from '../DataCurationTab';
 
+vi.mock('../../../i18n', () => ({
+  useTranslation: () => ({
+    t: (key, fallback) => fallback || key,
+    lang: 'no',
+    setLang: vi.fn(),
+    getBilingual: (obj) => obj?.['no'] || obj?.['en'] || obj,
+  }),
+}));
+
 // Mock the hooks
 vi.mock('../../../hooks/useAITraining', () => ({
   useCurationFeedback: vi.fn(),
@@ -106,7 +115,7 @@ describe('DataCurationTab', () => {
 
     it('should render filter controls', () => {
       renderWithProviders(<DataCurationTab />);
-      expect(screen.getByText('Alle typer')).toBeInTheDocument();
+      expect(screen.getByText('curationAllTypes')).toBeInTheDocument();
       expect(screen.getAllByText('Ventende').length).toBeGreaterThanOrEqual(1);
     });
 

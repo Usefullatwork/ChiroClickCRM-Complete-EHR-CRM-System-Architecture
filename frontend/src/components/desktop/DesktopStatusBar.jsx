@@ -75,9 +75,9 @@ const DesktopStatusBar = () => {
       <StatusDot status={status.db} label="Database" />
       <StatusDot status={status.ai} label="AI" />
       {status.memory > 0 && (
-        <span className="text-gray-400 dark:text-gray-500">RAM: {Math.round(status.memory)}MB</span>
+        <span className="text-gray-400 dark:text-gray-300">RAM: {Math.round(status.memory)}MB</span>
       )}
-      <span className="ml-auto text-gray-400 dark:text-gray-500">ChiroClickCRM v2.0.0</span>
+      <span className="ml-auto text-gray-400 dark:text-gray-300">ChiroClickEHR v2.0.0</span>
     </div>
   );
 };

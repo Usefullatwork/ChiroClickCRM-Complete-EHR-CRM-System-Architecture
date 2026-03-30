@@ -45,7 +45,7 @@ export const StatCard = ({
       case 'down':
         return 'text-red-600';
       default:
-        return 'text-gray-500';
+        return 'text-gray-500 dark:text-gray-400';
     }
   };
 
@@ -57,7 +57,7 @@ export const StatCard = ({
       case 'down':
         return <TrendingDown size={16} className="text-red-600" />;
       default:
-        return <Minus size={16} className="text-gray-400" />;
+        return <Minus size={16} className="text-gray-400 dark:text-gray-300" />;
     }
   };
 
@@ -84,11 +84,11 @@ export const StatCard = ({
     >
       <div className="flex items-start justify-between">
         <div className="space-y-1">
-          <p className="text-sm font-medium text-gray-600">{title}</p>
+          <p className="text-sm font-medium text-gray-600 dark:text-gray-300">{title}</p>
           <p className="text-3xl font-bold text-gray-900">{value}</p>
 
           {/* Subtitle */}
-          {subtitle && <p className="text-sm text-gray-500">{subtitle}</p>}
+          {subtitle && <p className="text-sm text-gray-500 dark:text-gray-400">{subtitle}</p>}
 
           {/* Change indicator */}
           {changePercent !== undefined && (
@@ -98,7 +98,7 @@ export const StatCard = ({
                 {changePercent > 0 ? '+' : ''}
                 {changePercent}%
               </span>
-              <span className="text-xs text-gray-500">{changeLabel}</span>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{changeLabel}</span>
             </div>
           )}
         </div>
@@ -154,7 +154,7 @@ export const MiniStatCard = ({
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <p className="text-xs text-gray-500 truncate">{title}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{title}</p>
         <div className="flex items-baseline gap-2">
           <p className="text-lg font-bold text-gray-900">{value}</p>
           {changePercent !== undefined && (

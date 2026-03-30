@@ -111,7 +111,7 @@ export default function CheckInConfirmation({
       </h1>
 
       {appointment && (
-        <p className="text-xl text-slate-600 mb-6">
+        <p className="text-xl text-slate-600 dark:text-slate-300 mb-6">
           {t.subtitle}, {appointment.firstName}!
         </p>
       )}
@@ -123,14 +123,14 @@ export default function CheckInConfirmation({
           <p className="text-lg">{t.waitingMessage}</p>
         </div>
 
-        <div className="flex items-center gap-3 text-slate-600">
+        <div className="flex items-center gap-3 text-slate-600 dark:text-slate-300">
           <Clock className="w-6 h-6 text-teal-600" />
           <p className="text-lg">{t.providerMessage}</p>
         </div>
 
         {estimatedWaitMinutes > 0 && (
           <div className="mt-4 pt-4 border-t border-slate-200">
-            <p className="text-sm text-slate-500">{t.estimatedWait}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t.estimatedWait}</p>
             <p className="text-2xl font-bold text-teal-600">
               ~{estimatedWaitMinutes} {t.minutes}
             </p>
@@ -139,7 +139,7 @@ export default function CheckInConfirmation({
       </div>
 
       {/* Auto-reset notice */}
-      <p className="text-sm text-slate-400 mb-4">
+      <p className="text-sm text-slate-400 dark:text-slate-300 mb-4">
         {t.autoResetMessage} {countdown} {t.seconds}
       </p>
 

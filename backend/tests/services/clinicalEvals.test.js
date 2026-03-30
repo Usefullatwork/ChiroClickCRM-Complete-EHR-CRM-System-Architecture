@@ -48,7 +48,7 @@ jest.unstable_mockModule('@anthropic-ai/sdk', () => ({
 process.env.CLAUDE_API_KEY = 'test-key';
 
 const { runComparison, runEvalBatch, getEvalSummary } =
-  await import('../../src/services/clinicalEvals.js');
+  await import('../../src/services/clinical/clinicalEvals.js');
 
 describe('ClinicalEvals', () => {
   beforeEach(() => {

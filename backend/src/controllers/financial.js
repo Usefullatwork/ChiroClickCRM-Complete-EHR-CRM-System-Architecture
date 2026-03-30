@@ -2,7 +2,7 @@
  * Financial Controller
  */
 
-import * as financialService from '../services/financial.js';
+import * as financialService from '../services/practice/financial.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
@@ -16,7 +16,7 @@ export const getFinancialMetrics = async (req, res) => {
       endDate: req.query.endDate,
       patientId: req.query.patientId,
       encounterId: req.query.encounterId,
-      paymentStatus: req.query.paymentStatus
+      paymentStatus: req.query.paymentStatus,
     };
 
     const result = await financialService.getAllFinancialMetrics(organizationId, options);
@@ -59,7 +59,7 @@ export const createFinancialMetric = async (req, res) => {
       resourceType: 'FINANCIAL_METRIC',
       resourceId: metric.id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.status(201).json(metric);
@@ -86,7 +86,7 @@ export const updatePaymentStatus = async (req, res) => {
       resourceId: id,
       changes: { payment_status: req.body.payment_status },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(metric);
@@ -214,7 +214,7 @@ export const recordPayment = async (req, res) => {
       amount,
       payment_method,
       notes,
-      recorded_by: user.id
+      recorded_by: user.id,
     });
 
     await logAudit({
@@ -227,7 +227,7 @@ export const recordPayment = async (req, res) => {
       resourceId: id,
       changes: { payment_recorded: amount },
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json({ success: true, data: metric, message: 'Payment recorded' });
@@ -255,7 +255,7 @@ export const generateInvoice = async (req, res) => {
       success: true,
       html: invoice.html,
       filename: invoice.filename,
-      invoice_number: invoice.invoice_number
+      invoice_number: invoice.invoice_number,
     });
   } catch (error) {
     logger.error('Error in generateInvoice controller:', error);
@@ -276,5 +276,5 @@ export default {
   getOutstandingInvoices,
   getPatientPaymentHistory,
   generateInvoiceNumber,
-  getDailyRevenueChart
+  getDailyRevenueChart,
 };

@@ -7,6 +7,15 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import LiveAppointmentBoard from '../../components/appointments/LiveAppointmentBoard';
 
+// Mock i18n
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({
+    t: (key, fallback) => fallback || key,
+    lang: 'no',
+    setLang: vi.fn(),
+  }),
+}));
+
 // Mock API
 vi.mock('../../services/api', () => ({
   appointmentsAPI: {

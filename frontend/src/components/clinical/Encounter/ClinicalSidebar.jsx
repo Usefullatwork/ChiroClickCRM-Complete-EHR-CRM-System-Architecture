@@ -37,7 +37,7 @@ export default function ClinicalSidebar({
       <div className="p-4 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-white">
         <button
           onClick={onBack}
-          className="flex items-center text-sm text-slate-500 hover:text-slate-700 mb-3"
+          className="flex items-center text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 mb-3"
         >
           <ArrowLeft className="h-4 w-4 mr-1" />
           Tilbake til pasient
@@ -57,7 +57,7 @@ export default function ClinicalSidebar({
                 <h2 className="font-semibold text-lg text-slate-800">
                   {patientData?.first_name} {patientData?.last_name}
                 </h2>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
                   {patientAge ? `${patientAge} år` : ''}
                   {patientData?.national_id &&
                     ` • Fnr: ${patientData.national_id.substring(0, 6)}-*****`}
@@ -67,11 +67,11 @@ export default function ClinicalSidebar({
 
             {/* Quick Contact */}
             <div className="flex gap-2 mt-3">
-              <button className="flex-1 flex items-center justify-center gap-1 text-xs py-1.5 px-2 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
+              <button className="flex-1 flex items-center justify-center gap-1 text-xs py-1.5 px-2 rounded-md bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors">
                 <Phone className="h-3 w-3" />
                 Ring
               </button>
-              <button className="flex-1 flex items-center justify-center gap-1 text-xs py-1.5 px-2 rounded-md bg-slate-100 text-slate-600 hover:bg-slate-200 transition-colors">
+              <button className="flex-1 flex items-center justify-center gap-1 text-xs py-1.5 px-2 rounded-md bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-slate-200 transition-colors">
                 <Mail className="h-3 w-3" />
                 SMS
               </button>
@@ -152,7 +152,7 @@ export default function ClinicalSidebar({
               </h3>
             </div>
             <div className="p-3">
-              <p className="text-sm text-slate-600 leading-relaxed">
+              <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                 {patientData.medical_history}
               </p>
             </div>

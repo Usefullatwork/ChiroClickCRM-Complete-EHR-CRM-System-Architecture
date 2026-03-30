@@ -1,11 +1,11 @@
 @echo off
-title ChiroClick CRM - Lag Ren Kopi (Create Clean Copy)
+title ChiroClickEHR - Lag Ren Kopi (Create Clean Copy)
 color 0B
 setlocal enabledelayedexpansion
 
 echo.
 echo  =====================================================
-echo   ChiroClick CRM - Lag Ren Kopi (Create Clean Copy)
+echo   ChiroClickEHR - Lag Ren Kopi (Create Clean Copy)
 echo  =====================================================
 echo.
 echo   Lager en distribuerbar kopi UTEN:
@@ -26,7 +26,7 @@ echo.
 :: =========================================================================
 :: Step 1: Ask for destination
 :: =========================================================================
-set "DEFAULT_DEST=%USERPROFILE%\Desktop\ChiroClickCRM"
+set "DEFAULT_DEST=%USERPROFILE%\Desktop\ChiroClickEHR"
 
 echo   Hvor skal kopien lagres?
 echo   (Where should the copy be saved?)

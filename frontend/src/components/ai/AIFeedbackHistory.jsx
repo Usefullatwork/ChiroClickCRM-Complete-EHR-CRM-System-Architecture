@@ -25,90 +25,60 @@ import {
 import { Card, CardHeader, CardBody } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { useTranslation } from '../../i18n';
 
-// Bilingual text support
-const TEXTS = {
-  NO: {
-    title: 'Tilbakemeldingshistorikk',
-    subtitle: 'Dine tidligere AI-tilbakemeldinger',
-    filterByType: 'Filtrer etter type',
-    filterByDate: 'Filtrer etter dato',
-    allTypes: 'Alle typer',
-    allDates: 'Alle datoer',
-    last7Days: 'Siste 7 dager',
-    last30Days: 'Siste 30 dager',
-    last90Days: 'Siste 90 dager',
-    noFeedback: 'Ingen tilbakemeldinger funnet',
-    noFeedbackSubtitle: 'Gi tilbakemelding pa AI-forslag for a se dem her',
-    loading: 'Laster...',
-    showMore: 'Vis flere',
+// Build a t-based text object that matches the old TEXTS shape
+function buildFeedbackHistoryTexts(t) {
+  return {
+    title: t('feedbackHistoryTitle', 'Feedback History'),
+    subtitle: t('feedbackHistorySubtitle', 'Your previous AI feedback'),
+    filterByType: t('filterByType', 'Filter by type'),
+    filterByDate: t('filterByDate', 'Filter by date'),
+    allTypes: t('allTypes', 'All types'),
+    allDates: t('allDates', 'All dates'),
+    last7Days: t('last7Days', 'Last 7 days'),
+    last30Days: t('last30Days', 'Last 30 days'),
+    last90Days: t('last90Days', 'Last 90 days'),
+    noFeedback: t('noFeedback', 'No feedback found'),
+    noFeedbackSubtitle: t(
+      'noFeedbackSubtitle',
+      'Submit feedback on AI suggestions to see them here'
+    ),
+    loading: t('loading', 'Loading...'),
+    showMore: t('showMore', 'Show more'),
     stats: {
-      totalFeedback: 'Totale tilbakemeldinger',
-      acceptanceRate: 'Godkjenningsrate',
-      avgRating: 'Gjennomsnittlig vurdering',
-      avgDecisionTime: 'Gjennomsnittlig beslutningstid',
+      totalFeedback: t('totalFeedback', 'Total Feedback'),
+      acceptanceRate: t('acceptanceRate', 'Acceptance Rate'),
+      avgRating: t('avgRating', 'Average Rating'),
+      avgDecisionTime: t('avgDecisionTimeStat', 'Avg Decision Time'),
     },
     actions: {
-      accepted: 'Godkjent',
-      modified: 'Redigert',
-      rejected: 'Avvist',
+      accepted: t('actionAccepted', 'Accepted'),
+      modified: t('actionModified', 'Modified'),
+      rejected: t('actionRejected', 'Rejected'),
     },
     types: {
-      subjective: 'Subjektiv',
-      objective: 'Objektiv',
-      assessment: 'Vurdering',
-      plan: 'Plan',
-      diagnosis: 'Diagnose',
-      treatment: 'Behandling',
-      summary: 'Sammendrag',
-      default: 'Forslag',
+      subjective: t('typeSubjective', 'Subjective'),
+      objective: t('typeObjective', 'Objective'),
+      assessment: t('typeAssessment', 'Assessment'),
+      plan: t('typePlan', 'Plan'),
+      diagnosis: t('typeDiagnosis', 'Diagnosis'),
+      treatment: t('typeTreatment', 'Treatment'),
+      summary: t('typeSummary', 'Summary'),
+      default: t('typeDefault', 'Suggestion'),
     },
-    refresh: 'Oppdater',
-  },
-  EN: {
-    title: 'Feedback History',
-    subtitle: 'Your previous AI feedback',
-    filterByType: 'Filter by type',
-    filterByDate: 'Filter by date',
-    allTypes: 'All types',
-    allDates: 'All dates',
-    last7Days: 'Last 7 days',
-    last30Days: 'Last 30 days',
-    last90Days: 'Last 90 days',
-    noFeedback: 'No feedback found',
-    noFeedbackSubtitle: 'Submit feedback on AI suggestions to see them here',
-    loading: 'Loading...',
-    showMore: 'Show more',
-    stats: {
-      totalFeedback: 'Total Feedback',
-      acceptanceRate: 'Acceptance Rate',
-      avgRating: 'Average Rating',
-      avgDecisionTime: 'Avg Decision Time',
-    },
-    actions: {
-      accepted: 'Accepted',
-      modified: 'Modified',
-      rejected: 'Rejected',
-    },
-    types: {
-      subjective: 'Subjective',
-      objective: 'Objective',
-      assessment: 'Assessment',
-      plan: 'Plan',
-      diagnosis: 'Diagnosis',
-      treatment: 'Treatment',
-      summary: 'Summary',
-      default: 'Suggestion',
-    },
-    refresh: 'Refresh',
-  },
-};
+    refresh: t('refresh', 'Refresh'),
+    originalSuggestion: t('originalSuggestion', 'Original Suggestion'),
+    yourCorrection: t('yourCorrection', 'Your Correction'),
+    feedbackNotes: t('feedbackNotes', 'Notes'),
+  };
+}
 
 /**
  * Stats Summary Card
  */
-const StatsSummary = ({ stats, language = 'NO' }) => {
-  const t = TEXTS[language] || TEXTS.NO;
+const StatsSummary = ({ stats, texts }) => {
+  const t = texts;
 
   const statCards = [
     {
@@ -153,10 +123,14 @@ const StatsSummary = ({ stats, language = 'NO' }) => {
             <Icon size={20} />
           </div>
           <div>
-            <p className="text-xs text-slate-500 font-medium">{label}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">{label}</p>
             <p className="text-lg font-bold text-slate-900">
               {value}
-              {suffix && <span className="text-sm font-normal text-slate-500">{suffix}</span>}
+              {suffix && (
+                <span className="text-sm font-normal text-slate-500 dark:text-slate-400">
+                  {suffix}
+                </span>
+              )}
             </p>
           </div>
         </div>
@@ -199,8 +173,8 @@ function formatDate(dateString, language = 'NO') {
 /**
  * Feedback Item Component
  */
-const FeedbackItem = ({ feedback, language = 'NO' }) => {
-  const t = TEXTS[language] || TEXTS.NO;
+const FeedbackItem = ({ feedback, language = 'NO', texts }) => {
+  const t = texts;
   const [expanded, setExpanded] = useState(false);
 
   const {
@@ -283,13 +257,13 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500 hidden sm:block">
+          <span className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
             {formatDate(createdAt, language)}
           </span>
           {expanded ? (
-            <ChevronUp size={18} className="text-slate-400" />
+            <ChevronUp size={18} className="text-slate-400 dark:text-slate-300" />
           ) : (
-            <ChevronDown size={18} className="text-slate-400" />
+            <ChevronDown size={18} className="text-slate-400 dark:text-slate-300" />
           )}
         </div>
       </button>
@@ -299,8 +273,8 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
         <div className="px-4 py-3 space-y-3 bg-white animate-slide-down">
           {/* Original Suggestion */}
           <div>
-            <p className="text-xs font-medium text-slate-500 mb-1">
-              {language === 'NO' ? 'Opprinnelig forslag' : 'Original Suggestion'}
+            <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+              {t.originalSuggestion}
             </p>
             <p className="text-sm text-slate-700 bg-slate-50 p-2 rounded">
               {originalSuggestion?.length > 300
@@ -312,8 +286,8 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
           {/* User Correction (if modified) */}
           {userCorrection && (
             <div>
-              <p className="text-xs font-medium text-slate-500 mb-1">
-                {language === 'NO' ? 'Din korrigering' : 'Your Correction'}
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                {t.yourCorrection}
               </p>
               <p className="text-sm text-slate-700 bg-blue-50 p-2 rounded border border-blue-200">
                 {userCorrection?.length > 300
@@ -326,15 +300,15 @@ const FeedbackItem = ({ feedback, language = 'NO' }) => {
           {/* Feedback Notes */}
           {feedbackNotes && (
             <div>
-              <p className="text-xs font-medium text-slate-500 mb-1">
-                {language === 'NO' ? 'Kommentarer' : 'Notes'}
+              <p className="text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                {t.feedbackNotes}
               </p>
-              <p className="text-sm text-slate-600 italic">{feedbackNotes}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300 italic">{feedbackNotes}</p>
             </div>
           )}
 
           {/* Meta Info */}
-          <div className="flex items-center gap-4 pt-2 border-t border-slate-100 text-xs text-slate-500">
+          <div className="flex items-center gap-4 pt-2 border-t border-slate-100 text-xs text-slate-500 dark:text-slate-400">
             <span className="flex items-center gap-1">
               <Clock size={12} />
               {formatDecisionTime(timeToDecision)}
@@ -359,7 +333,8 @@ export const AIFeedbackHistory = ({
   className = '',
   pageSize = 10,
 }) => {
-  const t = TEXTS[language] || TEXTS.NO;
+  const { t: translate } = useTranslation('analytics');
+  const t = useMemo(() => buildFeedbackHistoryTexts(translate), [translate]);
 
   // Filter state
   const [typeFilter, setTypeFilter] = useState('all');
@@ -416,19 +391,19 @@ export const AIFeedbackHistory = ({
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Stats Summary */}
-      <StatsSummary stats={stats} language={language} />
+      <StatsSummary stats={stats} texts={t} />
 
       {/* Main Card */}
       <Card>
         <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h2 className="text-lg font-semibold text-slate-900">{t.title}</h2>
-            <p className="text-sm text-slate-500">{t.subtitle}</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">{t.subtitle}</p>
           </div>
 
           {onRefresh && (
             <Button
-              variant="ghost"
+              variant="subtle"
               size="sm"
               onClick={onRefresh}
               disabled={isLoading}
@@ -445,7 +420,7 @@ export const AIFeedbackHistory = ({
           <div className="flex flex-wrap gap-3 mb-4">
             {/* Type Filter */}
             <div className="flex items-center gap-2">
-              <Filter size={16} className="text-slate-400" />
+              <Filter size={16} className="text-slate-400 dark:text-slate-300" />
               <select
                 value={typeFilter}
                 onChange={(e) => setTypeFilter(e.target.value)}
@@ -462,7 +437,7 @@ export const AIFeedbackHistory = ({
 
             {/* Date Filter */}
             <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-slate-400" />
+              <Calendar size={16} className="text-slate-400 dark:text-slate-300" />
               <select
                 value={dateFilter}
                 onChange={(e) => setDateFilter(e.target.value)}
@@ -480,7 +455,7 @@ export const AIFeedbackHistory = ({
           {isLoading && (
             <div className="flex items-center justify-center py-12">
               <RefreshCw size={24} className="text-teal-600 animate-spin" />
-              <span className="ml-2 text-slate-600">{t.loading}</span>
+              <span className="ml-2 text-slate-600 dark:text-slate-300">{t.loading}</span>
             </div>
           )}
 
@@ -488,8 +463,8 @@ export const AIFeedbackHistory = ({
           {!isLoading && filteredFeedback.length === 0 && (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <History size={48} className="text-slate-300 mb-4" />
-              <p className="text-slate-600 font-medium">{t.noFeedback}</p>
-              <p className="text-sm text-slate-400">{t.noFeedbackSubtitle}</p>
+              <p className="text-slate-600 dark:text-slate-300 font-medium">{t.noFeedback}</p>
+              <p className="text-sm text-slate-400 dark:text-slate-300">{t.noFeedbackSubtitle}</p>
             </div>
           )}
 
@@ -497,14 +472,14 @@ export const AIFeedbackHistory = ({
           {!isLoading && displayedFeedback.length > 0 && (
             <div className="space-y-3">
               {displayedFeedback.map((feedback) => (
-                <FeedbackItem key={feedback.id} feedback={feedback} language={language} />
+                <FeedbackItem key={feedback.id} feedback={feedback} language={language} texts={t} />
               ))}
 
               {/* Show More Button */}
               {hasMore && (
                 <div className="flex justify-center pt-4">
                   <Button
-                    variant="ghost"
+                    variant="subtle"
                     size="sm"
                     onClick={() => setDisplayCount((prev) => prev + pageSize)}
                     icon={ChevronDown}

@@ -1,4 +1,5 @@
 import { Search, Check, X } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 /**
  * Diagnosis search and selection panel for the Assessment section.
@@ -15,16 +16,20 @@ export function DiagnosisPanel({
   onRemoveCode,
   isSigned,
 }) {
+  const { t } = useTranslation('clinical');
   return (
     <>
       {/* Diagnosis Search */}
       <div className="relative">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-300" />
           <input
             type="text"
-            placeholder="S\u00F8k ICPC-2 kode eller diagnose (f.eks. L02, rygg)..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+            placeholder={t(
+              'searchIcpcPlaceholder',
+              'Søk ICPC-2 kode eller diagnose (f.eks. L02, rygg)...'
+            )}
+            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
             value={diagnosisSearch}
             onChange={(e) => {
               onSearchChange(e.target.value);
@@ -46,7 +51,9 @@ export function DiagnosisPanel({
                 >
                   <span>
                     <span className="font-mono font-medium text-amber-600">{diagnosis.code}</span>
-                    <span className="text-slate-600 ml-2">- {diagnosis.description_no}</span>
+                    <span className="text-slate-600 dark:text-slate-300 ml-2">
+                      - {diagnosis.description_no}
+                    </span>
                   </span>
                   {selectedCodes.includes(diagnosis.code) && (
                     <Check className="h-4 w-4 text-amber-600" />
@@ -54,7 +61,9 @@ export function DiagnosisPanel({
                 </button>
               ))
             ) : (
-              <p className="px-4 py-3 text-sm text-slate-500">Ingen diagnose funnet</p>
+              <p className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
+                Ingen diagnose funnet
+              </p>
             )}
           </div>
         )}

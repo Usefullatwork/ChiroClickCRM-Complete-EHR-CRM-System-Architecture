@@ -8,7 +8,9 @@ const NeurologicalExam = ({ _patientId, _encounterId, _onDataChange }) => {
     <div className="p-4 border rounded-lg bg-white">
       <h3 className="text-lg font-medium mb-4">Neurologisk undersokelse</h3>
       <div className="space-y-4">
-        <p className="text-sm text-gray-600">Full neurologisk undersokelse - kommer snart.</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300">
+          Full neurologisk undersokelse - kommer snart.
+        </p>
       </div>
     </div>
   );

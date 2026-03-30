@@ -40,12 +40,12 @@ const mockExerciseDeliveryService = {
   sendPortalSMS: jest.fn(),
 };
 
-jest.unstable_mockModule('../../src/services/exerciseLibrary.js', () => ({
+jest.unstable_mockModule('../../src/services/clinical/exerciseLibrary.js', () => ({
   default: mockExerciseLibraryService,
   ...mockExerciseLibraryService,
 }));
 
-jest.unstable_mockModule('../../src/services/exerciseDelivery.js', () => ({
+jest.unstable_mockModule('../../src/services/clinical/exerciseDelivery.js', () => ({
   default: mockExerciseDeliveryService,
   ...mockExerciseDeliveryService,
 }));
@@ -54,8 +54,9 @@ jest.unstable_mockModule('../../src/utils/audit.js', () => ({
   logAudit: jest.fn().mockResolvedValue(true),
 }));
 
-// Import controllers after mocking
+// Import controllers and audit mock after mocking
 const exerciseController = await import('../../src/controllers/exercises.js');
+const { logAudit } = await import('../../src/utils/audit.js');
 
 describe('Exercise Routes', () => {
   let app;
@@ -98,6 +99,7 @@ describe('Exercise Routes', () => {
       exerciseController.updatePrescriptionStatus
     );
     app.get('/api/v1/exercises/prescriptions/:id/progress', exerciseController.getProgressHistory);
+    app.get('/api/v1/exercises/prescriptions/:id/pdf', exerciseController.generatePDF);
 
     // Error handler (matches global error handler in server.js)
     app.use((err, req, res, next) => {
@@ -585,6 +587,104 @@ describe('Exercise Routes', () => {
       const response = await request(app).post('/api/v1/exercises/seed').expect(500);
 
       expect(response.body.message).toBe('Seed failed');
+    });
+  });
+
+  // ============================================================================
+  // AUDIT LOGGING TESTS — patient-data READ endpoints
+  // ============================================================================
+
+  describe('Audit logging — GET /api/v1/exercises/prescriptions/:id', () => {
+    it('should call logAudit with READ action when prescription is found', async () => {
+      const mockPrescription = createTestPrescription();
+      mockExerciseLibraryService.getPrescriptionById.mockResolvedValue(mockPrescription);
+
+      await request(app).get('/api/v1/exercises/prescriptions/rx-123').expect(200);
+
+      expect(logAudit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organizationId,
+          userId: mockUser.id,
+          action: 'READ',
+          resourceType: 'EXERCISE_PRESCRIPTION',
+          resourceId: 'rx-123',
+        })
+      );
+    });
+
+    it('should not call logAudit when prescription is not found', async () => {
+      mockExerciseLibraryService.getPrescriptionById.mockResolvedValue(null);
+
+      await request(app).get('/api/v1/exercises/prescriptions/non-existent').expect(404);
+
+      expect(logAudit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('Audit logging — GET /api/v1/exercises/prescriptions/patient/:patientId', () => {
+    it('should call logAudit with READ action for patient prescription list', async () => {
+      mockExerciseLibraryService.getPatientPrescriptions.mockResolvedValue([]);
+
+      await request(app).get('/api/v1/exercises/prescriptions/patient/patient-456').expect(200);
+
+      expect(logAudit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organizationId,
+          userId: mockUser.id,
+          action: 'READ',
+          resourceType: 'EXERCISE_PRESCRIPTION',
+          resourceId: 'patient-456',
+        })
+      );
+    });
+  });
+
+  describe('Audit logging — GET /api/v1/exercises/prescriptions/:id/progress', () => {
+    it('should call logAudit with READ action for progress history', async () => {
+      mockExerciseLibraryService.getProgressHistory.mockResolvedValue([]);
+
+      await request(app).get('/api/v1/exercises/prescriptions/rx-123/progress').expect(200);
+
+      expect(logAudit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organizationId,
+          userId: mockUser.id,
+          action: 'READ',
+          resourceType: 'EXERCISE_PRESCRIPTION',
+          resourceId: 'rx-123',
+        })
+      );
+    });
+  });
+
+  describe('Audit logging — GET /api/v1/exercises/prescriptions/:id/pdf', () => {
+    it('should call logAudit with GENERATE_PDF action when PDF is generated', async () => {
+      const mockPdf = Buffer.from('%PDF-mock-content');
+      mockExerciseDeliveryService.generatePrescriptionPDF.mockResolvedValue(mockPdf);
+
+      await request(app).get('/api/v1/exercises/prescriptions/rx-123/pdf').expect(200);
+
+      expect(logAudit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          organizationId,
+          userId: mockUser.id,
+          action: 'GENERATE_PDF',
+          resourceType: 'EXERCISE_PRESCRIPTION',
+          resourceId: 'rx-123',
+        })
+      );
+    });
+
+    it('should return 500 on PDF generation error', async () => {
+      mockExerciseDeliveryService.generatePrescriptionPDF.mockRejectedValue(
+        new Error('PDF generation failed')
+      );
+
+      const response = await request(app)
+        .get('/api/v1/exercises/prescriptions/rx-123/pdf')
+        .expect(500);
+
+      expect(response.body.message).toBe('PDF generation failed');
     });
   });
 });

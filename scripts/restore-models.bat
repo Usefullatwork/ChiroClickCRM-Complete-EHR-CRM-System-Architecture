@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ============================================================
-echo   ChiroClick AI - Model Restore
+echo   ChiroClickEHR AI - Model Restore
 echo   Gjenoppretter modeller fra backup
 echo ============================================================
 echo.

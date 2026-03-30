@@ -21,94 +21,7 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { useTranslation } from '../i18n';
-
-// Mock API - In production, this would call a real audit logs endpoint
-const mockAuditAPI = {
-  getAll: async (_params) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    const mockLogs = [
-      {
-        id: '1',
-        created_at: new Date().toISOString(),
-        user_email: 'dr.smith@chiroclinic.no',
-        user_name: 'Dr. John Smith',
-        user_role: 'PRACTITIONER',
-        action: 'READ',
-        resource_type: 'PATIENT',
-        resource_id: 'pat-001',
-        resource_name: 'Erik Johansen',
-        ip_address: '192.168.1.100',
-        user_agent: 'Mozilla/5.0...',
-        reason: null,
-        changes: null,
-      },
-      {
-        id: '2',
-        created_at: new Date(Date.now() - 3600000).toISOString(),
-        user_email: 'admin@chiroclinic.no',
-        user_name: 'Admin User',
-        user_role: 'ADMIN',
-        action: 'UPDATE',
-        resource_type: 'PATIENT',
-        resource_id: 'pat-001',
-        resource_name: 'Erik Johansen',
-        ip_address: '192.168.1.101',
-        user_agent: 'Mozilla/5.0...',
-        reason: null,
-        changes: { consent_marketing: { old: false, new: true } },
-      },
-      {
-        id: '3',
-        created_at: new Date(Date.now() - 7200000).toISOString(),
-        user_email: 'dr.smith@chiroclinic.no',
-        user_name: 'Dr. John Smith',
-        user_role: 'PRACTITIONER',
-        action: 'CREATE',
-        resource_type: 'ENCOUNTER',
-        resource_id: 'enc-123',
-        resource_name: 'Clinical Encounter',
-        ip_address: '192.168.1.100',
-        user_agent: 'Mozilla/5.0...',
-        reason: null,
-        changes: null,
-      },
-      {
-        id: '4',
-        created_at: new Date(Date.now() - 10800000).toISOString(),
-        user_email: 'admin@chiroclinic.no',
-        user_name: 'Admin User',
-        user_role: 'ADMIN',
-        action: 'EXPORT',
-        resource_type: 'PATIENT',
-        resource_id: 'pat-002',
-        resource_name: 'Anna Larsen',
-        ip_address: '192.168.1.101',
-        user_agent: 'Mozilla/5.0...',
-        reason: 'GDPR Article 20 - Data Portability Request',
-        changes: null,
-      },
-      {
-        id: '5',
-        created_at: new Date(Date.now() - 14400000).toISOString(),
-        user_email: 'assistant@chiroclinic.no',
-        user_name: 'Maria Hansen',
-        user_role: 'ASSISTANT',
-        action: 'DELETE',
-        resource_type: 'APPOINTMENT',
-        resource_id: 'apt-456',
-        resource_name: 'Appointment',
-        ip_address: '192.168.1.102',
-        user_agent: 'Mozilla/5.0...',
-        reason: 'Patient requested cancellation',
-        changes: null,
-      },
-    ];
-
-    return { data: { logs: mockLogs, total: mockLogs.length } };
-  },
-};
+import { auditLogsAPI } from '../services/api';
 
 export default function AuditLogs() {
   const { t } = useTranslation('common');
@@ -120,15 +33,44 @@ export default function AuditLogs() {
     userRole: '',
     search: '',
   });
+  const [page, setPage] = useState(1);
   const [selectedLog, setSelectedLog] = useState(null);
 
-  // Fetch audit logs
+  const updateFilter = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+    setPage(1);
+  };
+
+  // Fetch audit logs from real backend
   const { data: logsData, isLoading } = useQuery({
-    queryKey: ['audit-logs', filters],
-    queryFn: () => mockAuditAPI.getAll(filters),
+    queryKey: ['audit-logs', filters, page],
+    queryFn: async () => {
+      const params = { page, limit: 50 };
+      if (filters.action) {
+        params.action = filters.action;
+      }
+      if (filters.resourceType) {
+        params.resourceType = filters.resourceType;
+      }
+      if (filters.userRole) {
+        params.userRole = filters.userRole;
+      }
+      if (filters.startDate) {
+        params.startDate = filters.startDate;
+      }
+      if (filters.endDate) {
+        params.endDate = filters.endDate;
+      }
+      if (filters.search) {
+        params.search = filters.search;
+      }
+      const res = await auditLogsAPI.getAll(params);
+      return res.data;
+    },
   });
 
-  const logs = logsData?.data?.logs || [];
+  const logs = logsData?.logs || [];
+  const totalPages = logsData?.totalPages || 1;
 
   const getActionIcon = (action) => {
     switch (action) {
@@ -143,7 +85,7 @@ export default function AuditLogs() {
       case 'EXPORT':
         return <Download className="w-4 h-4 text-purple-600" />;
       default:
-        return <Database className="w-4 h-4 text-gray-600" />;
+        return <Database className="w-4 h-4 text-gray-600 dark:text-gray-300" />;
     }
   };
 
@@ -187,7 +129,7 @@ export default function AuditLogs() {
             <Shield className="w-8 h-8 text-blue-600" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{t('auditLogs')}</h1>
-              <p className="text-gray-600">{t('auditLogsSubtitle')}</p>
+              <p className="text-gray-600 dark:text-gray-300">{t('auditLogsSubtitle')}</p>
             </div>
           </div>
           <button
@@ -220,7 +162,7 @@ export default function AuditLogs() {
             <input
               type="date"
               value={filters.startDate}
-              onChange={(e) => setFilters((prev) => ({ ...prev, startDate: e.target.value }))}
+              onChange={(e) => updateFilter('startDate', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -230,7 +172,7 @@ export default function AuditLogs() {
             <input
               type="date"
               value={filters.endDate}
-              onChange={(e) => setFilters((prev) => ({ ...prev, endDate: e.target.value }))}
+              onChange={(e) => updateFilter('endDate', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
@@ -240,7 +182,7 @@ export default function AuditLogs() {
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('action')}</label>
             <select
               value={filters.action}
-              onChange={(e) => setFilters((prev) => ({ ...prev, action: e.target.value }))}
+              onChange={(e) => updateFilter('action', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">{t('allActions')}</option>
@@ -259,7 +201,7 @@ export default function AuditLogs() {
             </label>
             <select
               value={filters.resourceType}
-              onChange={(e) => setFilters((prev) => ({ ...prev, resourceType: e.target.value }))}
+              onChange={(e) => updateFilter('resourceType', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">{t('allResources')}</option>
@@ -277,7 +219,7 @@ export default function AuditLogs() {
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('userRole')}</label>
             <select
               value={filters.userRole}
-              onChange={(e) => setFilters((prev) => ({ ...prev, userRole: e.target.value }))}
+              onChange={(e) => updateFilter('userRole', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">{t('allRoles')}</option>
@@ -291,12 +233,12 @@ export default function AuditLogs() {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">{t('search')}</label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
               <input
                 type="text"
                 placeholder={t('searchLogs')}
                 value={filters.search}
-                onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+                onChange={(e) => updateFilter('search', e.target.value)}
                 className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
@@ -310,22 +252,22 @@ export default function AuditLogs() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('timestamp')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('user')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('action')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('resource')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('ipAddress')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('details')}
                 </th>
               </tr>
@@ -335,14 +277,16 @@ export default function AuditLogs() {
                 <tr>
                   <td colSpan="6" className="px-6 py-12 text-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                    <p className="text-sm text-gray-500 mt-3">{t('loadingAuditLogs')}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+                      {t('loadingAuditLogs')}
+                    </p>
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="px-6 py-12 text-center">
                     <Shield className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-sm text-gray-500">{t('noAuditLogs')}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{t('noAuditLogs')}</p>
                   </td>
                 </tr>
               ) : (
@@ -351,17 +295,19 @@ export default function AuditLogs() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                       <div className="flex flex-col">
                         <span>{format(new Date(log.created_at), 'MMM d, yyyy')}</span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
                           {format(new Date(log.created_at), 'HH:mm:ss')}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
-                        <User className="w-4 h-4 text-gray-400" />
+                        <User className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                         <div>
                           <div className="text-sm font-medium text-gray-900">{log.user_name}</div>
-                          <div className="text-xs text-gray-500">{log.user_role}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
+                            {log.user_role}
+                          </div>
                         </div>
                       </div>
                     </td>
@@ -375,11 +321,11 @@ export default function AuditLogs() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{log.resource_type}</div>
-                      <div className="text-xs text-gray-500 truncate max-w-[200px]">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 truncate max-w-[200px]">
                         {log.resource_name || log.resource_id}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {log.ip_address}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -396,6 +342,31 @@ export default function AuditLogs() {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="px-6 py-3 border-t border-gray-200 flex items-center justify-between bg-gray-50">
+            <p className="text-sm text-gray-700">
+              {t('page')} {page} / {totalPages} ({logsData?.total || 0} {t('total')})
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 hover:bg-gray-100"
+              >
+                {t('previous')}
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page >= totalPages}
+                className="px-3 py-1 border border-gray-300 rounded text-sm disabled:opacity-50 hover:bg-gray-100"
+              >
+                {t('next')}
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Detail Modal */}
@@ -417,13 +388,17 @@ export default function AuditLogs() {
             <div className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('timestamp')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('timestamp')}
+                  </label>
                   <p className="mt-1 text-sm text-gray-900">
                     {format(new Date(selectedLog.created_at), 'PPpp')}
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('action')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('action')}
+                  </label>
                   <p className="mt-1">
                     <span
                       className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium border ${getActionColor(selectedLog.action)}`}
@@ -434,28 +409,42 @@ export default function AuditLogs() {
                   </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('user')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('user')}
+                  </label>
                   <p className="mt-1 text-sm text-gray-900">{selectedLog.user_name}</p>
-                  <p className="text-xs text-gray-500">{selectedLog.user_email}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {selectedLog.user_email}
+                  </p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('role')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('role')}
+                  </label>
                   <p className="mt-1 text-sm text-gray-900">{selectedLog.user_role}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('resourceType')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('resourceType')}
+                  </label>
                   <p className="mt-1 text-sm text-gray-900">{selectedLog.resource_type}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Resource ID</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Resource ID
+                  </label>
                   <p className="mt-1 text-sm text-gray-900 font-mono">{selectedLog.resource_id}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('ipAddress')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('ipAddress')}
+                  </label>
                   <p className="mt-1 text-sm text-gray-900">{selectedLog.ip_address}</p>
                 </div>
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('userAgent')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('userAgent')}
+                  </label>
                   <p className="mt-1 text-xs text-gray-900 truncate" title={selectedLog.user_agent}>
                     {selectedLog.user_agent}
                   </p>
@@ -464,7 +453,9 @@ export default function AuditLogs() {
 
               {selectedLog.reason && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500">{t('reason')}</label>
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    {t('reason')}
+                  </label>
                   <p className="mt-1 text-sm text-gray-900 bg-yellow-50 p-3 rounded-lg border border-yellow-200">
                     {selectedLog.reason}
                   </p>
@@ -473,7 +464,7 @@ export default function AuditLogs() {
 
               {selectedLog.changes && (
                 <div>
-                  <label className="text-sm font-medium text-gray-500 mb-2 block">
+                  <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 block">
                     {t('changes')}
                   </label>
                   <pre className="text-xs bg-gray-50 p-3 rounded-lg border border-gray-200 overflow-x-auto">

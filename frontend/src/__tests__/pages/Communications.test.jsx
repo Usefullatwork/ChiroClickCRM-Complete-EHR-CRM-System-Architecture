@@ -94,6 +94,9 @@ vi.mock('lucide-react', () => ({
   Filter: () => <span>Filter</span>,
   Mail: () => <span>Mail</span>,
   Smartphone: () => <span>Smartphone</span>,
+  Phone: () => <span>Phone</span>,
+  ChevronDown: () => <span>ChevronDown</span>,
+  ChevronRight: () => <span>ChevronRight</span>,
 }));
 
 import Communications from '../../pages/Communications';

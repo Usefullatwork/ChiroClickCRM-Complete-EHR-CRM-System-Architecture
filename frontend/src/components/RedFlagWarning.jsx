@@ -5,6 +5,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useTranslation } from '../i18n';
 
 // Severity level configurations
 const SEVERITY_CONFIG = {
@@ -64,7 +65,9 @@ const RedFlagItem = ({ flag, onAcknowledge }) => {
         {flag.details && (
           <div className={`text-sm ${config.textColor} opacity-75 mt-1`}>{flag.details}</div>
         )}
-        <div className="text-xs text-gray-500 mt-1">Kategori: {flag.category}</div>
+        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          Kategori: {flag.category}
+        </div>
       </div>
       {onAcknowledge && (
         <button
@@ -142,6 +145,7 @@ export const RedFlagModal = ({
   onAcknowledge,
   onReferral,
 }) => {
+  const { t } = useTranslation('clinical');
   const [acknowledgedFlags, setAcknowledgedFlags] = useState(new Set());
   const [referralNotes, setReferralNotes] = useState('');
 
@@ -242,7 +246,7 @@ export const RedFlagModal = ({
               <textarea
                 value={referralNotes}
                 onChange={(e) => setReferralNotes(e.target.value)}
-                placeholder="Notat til henvisning..."
+                placeholder={t('referralNotesPlaceholder', 'Notat til henvisning...')}
                 className="w-full p-3 border rounded-lg text-sm resize-y min-h-[80px]"
               />
               <button
@@ -257,7 +261,7 @@ export const RedFlagModal = ({
 
         {/* Footer */}
         <div className="px-6 py-4 border-t bg-gray-50 rounded-b-xl flex justify-between items-center">
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 dark:text-gray-300">
             {allAcknowledged ? (
               <span className="text-green-600">✓ Alle funn er vurdert</span>
             ) : (
@@ -280,7 +284,7 @@ export const RedFlagModal = ({
               disabled={hasCritical && !allAcknowledged}
               className={`px-4 py-2 rounded-lg transition-colors ${
                 hasCritical && !allAcknowledged
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  ? 'bg-gray-300 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                   : 'bg-blue-600 text-white hover:bg-blue-700'
               }`}
             >
@@ -332,12 +336,12 @@ export const RedFlagSummaryCard = ({ _patientId, patientName, flags, onClick }) 
       <div className="flex items-center justify-between">
         <div>
           <div className="font-medium">{patientName}</div>
-          <div className="text-sm text-gray-600">
+          <div className="text-sm text-gray-600 dark:text-gray-300">
             {criticalCount > 0 && (
               <span className="text-red-600 font-medium">{criticalCount} kritisk </span>
             )}
             {highCount > 0 && <span className="text-orange-600">{highCount} høy </span>}
-            <span className="text-gray-500">røde flagg</span>
+            <span className="text-gray-500 dark:text-gray-400">røde flagg</span>
           </div>
         </div>
         <span className="text-2xl">{criticalCount > 0 ? '🚨' : '⚠️'}</span>

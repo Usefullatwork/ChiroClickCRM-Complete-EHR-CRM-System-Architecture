@@ -458,14 +458,18 @@ export function SlashCommandMenu({ show, position, commands, selectedIndex, onSe
       style={{ top: position.top + 5, left: position.left }}
     >
       <div className="sticky top-0 px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
-        <Command className="w-4 h-4 text-gray-400" />
-        <span className="text-xs text-gray-500">Slash Commands</span>
-        <span className="ml-auto text-xs text-gray-400">↑↓ Navigate · Enter Select</span>
+        <Command className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+        <span className="text-xs text-gray-500 dark:text-gray-400">Slash Commands</span>
+        <span className="ml-auto text-xs text-gray-400 dark:text-gray-300">
+          ↑↓ Navigate · Enter Select
+        </span>
       </div>
 
       {Object.entries(grouped).map(([category, items]) => (
         <div key={category}>
-          <div className="px-3 py-1 text-xs font-medium text-gray-500 bg-gray-50">{category}</div>
+          <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50">
+            {category}
+          </div>
           {items.map(({ cmd, data, index }) => (
             <button
               key={cmd}
@@ -477,7 +481,7 @@ export function SlashCommandMenu({ show, position, commands, selectedIndex, onSe
             >
               <code className="text-xs font-mono bg-gray-100 px-1.5 py-0.5 rounded">{cmd}</code>
               <span className="text-sm text-gray-700 truncate">{data.label}</span>
-              <ChevronRight className="w-4 h-4 text-gray-400 ml-auto" />
+              <ChevronRight className="w-4 h-4 text-gray-400 dark:text-gray-300 ml-auto" />
             </button>
           ))}
         </div>
@@ -515,7 +519,9 @@ export default function SlashCommandTextArea({
       {label && (
         <label className="block text-sm font-medium text-gray-700 mb-1">
           {label}
-          <span className="ml-2 text-xs text-gray-400 font-normal">Type "/" for commands</span>
+          <span className="ml-2 text-xs text-gray-400 dark:text-gray-300 font-normal">
+            Type "/" for commands
+          </span>
         </label>
       )}
 
@@ -558,13 +564,15 @@ export function SlashCommandReference({ category = null, compact = false }) {
         {commands.slice(0, 10).map(([cmd]) => (
           <code
             key={cmd}
-            className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono text-gray-600"
+            className="text-xs bg-gray-100 px-1.5 py-0.5 rounded font-mono text-gray-600 dark:text-gray-300"
           >
             {cmd}
           </code>
         ))}
         {commands.length > 10 && (
-          <span className="text-xs text-gray-400">+{commands.length - 10} more</span>
+          <span className="text-xs text-gray-400 dark:text-gray-300">
+            +{commands.length - 10} more
+          </span>
         )}
       </div>
     );
@@ -586,20 +594,26 @@ export function SlashCommandReference({ category = null, compact = false }) {
           <Command className="w-4 h-4" />
           Slash Commands Reference
         </h3>
-        <p className="text-xs text-gray-500 mt-1">Type these shortcuts to auto-expand text</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          Type these shortcuts to auto-expand text
+        </p>
       </div>
 
       <div className="divide-y divide-gray-100 max-h-96 overflow-y-auto">
         {Object.entries(grouped).map(([cat, cmds]) => (
           <div key={cat} className="p-3">
-            <h4 className="text-xs font-semibold text-gray-500 uppercase mb-2">{cat}</h4>
+            <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">
+              {cat}
+            </h4>
             <div className="space-y-1">
               {cmds.map(({ cmd, label, _text }) => (
                 <div key={cmd} className="flex items-start gap-2 text-sm">
                   <code className="flex-shrink-0 font-mono text-xs bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded">
                     {cmd}
                   </code>
-                  <span className="text-gray-600 text-xs line-clamp-1">{label}</span>
+                  <span className="text-gray-600 dark:text-gray-300 text-xs line-clamp-1">
+                    {label}
+                  </span>
                 </div>
               ))}
             </div>

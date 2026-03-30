@@ -25,7 +25,7 @@ const DEFAULT_CONFIG = {
 };
 
 // Storage key for persisted settings
-const STORAGE_KEY = 'chiroclick_ai_config';
+const STORAGE_KEY = 'chiroclickehr_ai_config';
 
 /**
  * Get AI configuration from localStorage or defaults

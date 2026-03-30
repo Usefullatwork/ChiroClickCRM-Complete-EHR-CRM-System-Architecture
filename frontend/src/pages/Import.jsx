@@ -155,7 +155,7 @@ export default function Import() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold mb-2">{t('importPatients')}</h1>
-        <p className="text-gray-600">{t('importSubtitle')}</p>
+        <p className="text-gray-600 dark:text-gray-300">{t('importSubtitle')}</p>
       </div>
 
       {/* Tabs */}
@@ -165,7 +165,7 @@ export default function Import() {
           className={`px-6 py-3 font-medium transition-colors ${
             activeTab === 'excel'
               ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
+              : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -178,7 +178,7 @@ export default function Import() {
           className={`px-6 py-3 font-medium transition-colors ${
             activeTab === 'text'
               ? 'text-blue-600 border-b-2 border-blue-600'
-              : 'text-gray-600 hover:text-gray-900'
+              : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
           }`}
         >
           <div className="flex items-center gap-2">
@@ -218,11 +218,11 @@ export default function Import() {
             onDragOver={handleDrag}
             onDrop={handleDrop}
           >
-            <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <Upload className="w-12 h-12 text-gray-400 dark:text-gray-300 mx-auto mb-4" />
             <p className="text-lg font-medium text-gray-700 mb-2">
               {file ? file.name : t('dropFileHere')}
             </p>
-            <p className="text-sm text-gray-500 mb-4">{t('supportsFormats')}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">{t('supportsFormats')}</p>
             <input
               type="file"
               id="file-upload"
@@ -246,14 +246,16 @@ export default function Import() {
                   <FileSpreadsheet className="w-8 h-8 text-green-600" />
                   <div>
                     <p className="font-medium text-gray-900">{file.name}</p>
-                    <p className="text-sm text-gray-500">{(file.size / 1024).toFixed(2)} KB</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {(file.size / 1024).toFixed(2)} KB
+                    </p>
                   </div>
                 </div>
                 <button
                   onClick={() => setFile(null)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
                 </button>
               </div>
 
@@ -315,7 +317,7 @@ export default function Import() {
 
               {parsedData.type === 'table' ? (
                 <div>
-                  <p className="text-sm text-gray-600 mb-3">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
                     {t('foundPatients').replace('{count}', parsedData.patients.length)}
                   </p>
                   <div className="overflow-x-auto">
@@ -342,7 +344,7 @@ export default function Import() {
                       </tbody>
                     </table>
                     {parsedData.patients.length > 5 && (
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                         {t('andMore').replace('{count}', parsedData.patients.length - 5)}
                       </p>
                     )}
@@ -397,17 +399,17 @@ export default function Import() {
               <p className="text-2xl font-bold text-green-600">
                 {importResults.data?.imported || 0}
               </p>
-              <p className="text-sm text-gray-600">{t('imported')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('imported')}</p>
             </div>
             <div className="text-center p-4 bg-blue-50 rounded-lg">
               <p className="text-2xl font-bold text-blue-600">{importResults.data?.updated || 0}</p>
-              <p className="text-sm text-gray-600">{t('updated')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('updated')}</p>
             </div>
             <div className="text-center p-4 bg-yellow-50 rounded-lg">
               <p className="text-2xl font-bold text-yellow-600">
                 {importResults.data?.skipped || 0}
               </p>
-              <p className="text-sm text-gray-600">{t('skipped')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('skipped')}</p>
             </div>
           </div>
 

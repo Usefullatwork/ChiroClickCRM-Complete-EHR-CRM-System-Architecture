@@ -1,6 +1,6 @@
 {
-  "name": "chiroclickcrm",
-  "version": "2.0.0",
+  "name": "chiroclickehr",
+  "version": "2.1.0",
   "description": "Norwegian-compliant EHR-CRM-PMS for chiropractic practices",
   "private": true,
   "scripts": {
@@ -10,7 +10,12 @@
     "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
     "test": "cd backend && npm test",
     "lint": "concurrently \"cd backend && npm run lint\" \"cd frontend && npm run lint\"",
-    "format": "concurrently \"cd backend && npm run format\" \"cd frontend && npm run format\""
+    "format": "concurrently \"cd backend && npm run format\" \"cd frontend && npm run format\"",
+    "ai:eval": "cd ai-training/promptfoo && npx promptfoo eval",
+    "ai:eval:view": "cd ai-training/promptfoo && npx promptfoo view",
+    "ai:eval:compare": "cd ai-training/promptfoo && npx promptfoo eval --providers ollama:chiro-no-sft-dpo-v6 ollama:chiro-no-sft-dpo-v5",
+    "ai:eval:safety": "cd ai-training/promptfoo && npx promptfoo eval -c suites/clinical-safety.yaml",
+    "ai:eval:redteam": "cd ai-training/promptfoo && npx promptfoo eval -c suites/red-flags.yaml"
   },
   "devDependencies": {
     "concurrently": "^9.0.0",

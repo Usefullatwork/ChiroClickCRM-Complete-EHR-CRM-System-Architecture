@@ -125,15 +125,17 @@ function SectionHeader({ icon: Icon, title, titleNo, lang, expanded, onToggle, h
           className={`w-8 h-8 rounded-full flex items-center justify-center
                         ${hasContent ? 'bg-teal-100' : 'bg-gray-200'}`}
         >
-          <Icon className={`w-4 h-4 ${hasContent ? 'text-teal-600' : 'text-gray-500'}`} />
+          <Icon
+            className={`w-4 h-4 ${hasContent ? 'text-teal-600' : 'text-gray-500 dark:text-gray-400'}`}
+          />
         </div>
         <span className="font-semibold text-gray-700">{lang === 'no' ? titleNo : title}</span>
         {hasContent && <CheckCircle className="w-4 h-4 text-green-500" />}
       </div>
       {expanded ? (
-        <ChevronUp className="w-5 h-5 text-gray-400" />
+        <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
       ) : (
-        <ChevronDown className="w-5 h-5 text-gray-400" />
+        <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
       )}
     </button>
   );
@@ -145,7 +147,7 @@ function SectionHeader({ icon: Icon, title, titleNo, lang, expanded, onToggle, h
 function TemplateSelector({ templates, onSelect, lang }) {
   return (
     <div className="flex flex-wrap gap-2 mb-3">
-      <span className="text-xs text-gray-500 self-center mr-1">
+      <span className="text-xs text-gray-500 dark:text-gray-400 self-center mr-1">
         {lang === 'no' ? 'Maler:' : 'Templates:'}
       </span>
       {Object.entries(templates).map(([key, template]) => (
@@ -153,7 +155,7 @@ function TemplateSelector({ templates, onSelect, lang }) {
           key={key}
           type="button"
           onClick={() => onSelect(template.template[lang === 'no' ? 'no' : 'en'])}
-          className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600
+          className="px-2 py-1 text-xs bg-gray-100 hover:bg-gray-200 text-gray-600 dark:text-gray-300
                     rounded transition-colors"
         >
           {lang === 'no' ? template.nameNo : template.name}
@@ -463,7 +465,7 @@ function AssessmentSection({ values, onChange, lang, expanded, onToggle }) {
                     type="button"
                     onClick={() => onChange({ ...values, carePhase: phase.id })}
                     className={`px-3 py-1.5 text-xs rounded-full border transition-colors
-                               ${values.carePhase === phase.id ? `${phase.color} border-current` : 'bg-white border-gray-200 text-gray-600'}`}
+                               ${values.carePhase === phase.id ? `${phase.color} border-current` : 'bg-white border-gray-200 text-gray-600 dark:text-gray-300'}`}
                   >
                     {lang === 'no' ? phase.nameNo : phase.name}
                   </button>
@@ -541,7 +543,7 @@ function PlanSection({ values, onChange, lang, expanded, onToggle }) {
                              ${
                                (values.treatmentGiven || []).includes(treatment.id)
                                  ? 'bg-teal-100 border-teal-300 text-teal-700'
-                                 : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                                 : 'bg-white border-gray-200 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                              }`}
                 >
                   {lang === 'no' ? treatment.nameNo : treatment.name}
@@ -746,7 +748,7 @@ export default function SOAPNoteTemplate({
           <h3 className="text-lg font-semibold text-gray-800">
             {lang === 'no' ? 'SOAP-notat' : 'SOAP Note'}
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm text-gray-500 dark:text-gray-400">
             {lang === 'no'
               ? 'Strukturert klinisk dokumentasjon'
               : 'Structured clinical documentation'}
@@ -817,7 +819,7 @@ export default function SOAPNoteTemplate({
           <h4 className="text-sm font-medium text-gray-700 mb-2">
             {lang === 'no' ? 'Forhåndsvisning' : 'Preview'}
           </h4>
-          <pre className="text-sm text-gray-600 whitespace-pre-wrap font-sans">
+          <pre className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap font-sans">
             {generateNarrative}
           </pre>
         </div>

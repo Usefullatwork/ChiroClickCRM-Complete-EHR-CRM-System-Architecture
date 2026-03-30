@@ -143,7 +143,7 @@ export const KPIDashboard = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">Analytics Dashboard</h1>
-          <p className="text-sm text-slate-600 mt-1">
+          <p className="text-sm text-slate-600 dark:text-slate-300 mt-1">
             Key performance indicators and clinic metrics
           </p>
         </div>
@@ -190,7 +190,7 @@ export const KPIDashboard = () => {
           <div className="space-y-4">
             {/* View Mode Toggle */}
             <div className="flex items-center gap-2">
-              <BarChart3 size={18} className="text-slate-400" />
+              <BarChart3 size={18} className="text-slate-400 dark:text-slate-300" />
               <span className="text-sm font-medium text-slate-700">Analytics View:</span>
               <div className="flex gap-2">
                 <Button
@@ -214,7 +214,7 @@ export const KPIDashboard = () => {
             {/* Time Range & Date Navigator */}
             <div className="flex items-center justify-between pt-3 border-t border-slate-200">
               <div className="flex items-center gap-2">
-                <Filter size={18} className="text-slate-400" />
+                <Filter size={18} className="text-slate-400 dark:text-slate-300" />
                 <span className="text-sm font-medium text-slate-700">Time Range:</span>
                 <div className="flex gap-2">
                   <Button
@@ -237,7 +237,7 @@ export const KPIDashboard = () => {
               {/* Date navigator */}
               <div className="flex items-center gap-3">
                 <Button
-                  variant="ghost"
+                  variant="subtle"
                   size="sm"
                   onClick={() =>
                     timeRange === 'month' ? handleMonthChange(-1) : handleYearChange(-1)
@@ -249,7 +249,7 @@ export const KPIDashboard = () => {
                   {formatDateRange()}
                 </span>
                 <Button
-                  variant="ghost"
+                  variant="subtle"
                   size="sm"
                   onClick={() =>
                     timeRange === 'month' ? handleMonthChange(1) : handleYearChange(1)
@@ -277,7 +277,9 @@ export const KPIDashboard = () => {
               <Card.Body>
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-600">Total Visits</p>
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                      Total Visits
+                    </p>
                     <p className="text-3xl font-bold text-slate-900 mt-2">
                       {currentKPIs.totalVisits || 0}
                     </p>
@@ -293,7 +295,7 @@ export const KPIDashboard = () => {
                             ? 'text-green-600'
                             : trends.visits?.direction === 'down'
                               ? 'text-red-600'
-                              : 'text-slate-600'
+                              : 'text-slate-600 dark:text-slate-300'
                         }`}
                       >
                         {trends.visits?.percent}% vs previous {timeRange}
@@ -312,7 +314,9 @@ export const KPIDashboard = () => {
               <Card.Body>
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-600">Reactivations</p>
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                      Reactivations
+                    </p>
                     <p className="text-3xl font-bold text-slate-900 mt-2">
                       {currentKPIs.reactivations || 0}
                     </p>
@@ -328,7 +332,7 @@ export const KPIDashboard = () => {
                             ? 'text-green-600'
                             : trends.reactivations?.direction === 'down'
                               ? 'text-red-600'
-                              : 'text-slate-600'
+                              : 'text-slate-600 dark:text-slate-300'
                         }`}
                       >
                         {trends.reactivations?.percent}% vs previous {timeRange}
@@ -347,7 +351,9 @@ export const KPIDashboard = () => {
               <Card.Body>
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-600">Messages Sent</p>
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                      Messages Sent
+                    </p>
                     <p className="text-3xl font-bold text-slate-900 mt-2">
                       {currentKPIs.messagesSent || 0}
                     </p>
@@ -363,7 +369,7 @@ export const KPIDashboard = () => {
                             ? 'text-green-600'
                             : trends.messages?.direction === 'down'
                               ? 'text-red-600'
-                              : 'text-slate-600'
+                              : 'text-slate-600 dark:text-slate-300'
                         }`}
                       >
                         {trends.messages?.percent}% vs previous {timeRange}
@@ -382,7 +388,9 @@ export const KPIDashboard = () => {
               <Card.Body>
                 <div className="flex items-start justify-between">
                   <div>
-                    <p className="text-sm font-medium text-slate-600">Active Patients</p>
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                      Active Patients
+                    </p>
                     <p className="text-3xl font-bold text-slate-900 mt-2">
                       {currentKPIs.activePatients || 0}
                     </p>
@@ -398,7 +406,7 @@ export const KPIDashboard = () => {
                             ? 'text-green-600'
                             : trends.activePatients?.direction === 'down'
                               ? 'text-red-600'
-                              : 'text-slate-600'
+                              : 'text-slate-600 dark:text-slate-300'
                         }`}
                       >
                         {trends.activePatients?.percent}% vs previous {timeRange}
@@ -426,17 +434,19 @@ export const KPIDashboard = () => {
                   <p className="text-4xl font-bold text-teal-600">
                     {currentKPIs.pva ? currentKPIs.pva.toFixed(1) : '0.0'}
                   </p>
-                  <p className="text-sm text-slate-600 mt-2">visits per active patient</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300 mt-2">
+                    visits per active patient
+                  </p>
                 </div>
                 <div className="mt-4 pt-4 border-t border-slate-200">
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-600">Total Visits:</span>
+                    <span className="text-slate-600 dark:text-slate-300">Total Visits:</span>
                     <span className="font-semibold text-slate-900">
                       {currentKPIs.totalVisits || 0}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm mt-2">
-                    <span className="text-slate-600">Active Patients:</span>
+                    <span className="text-slate-600 dark:text-slate-300">Active Patients:</span>
                     <span className="font-semibold text-slate-900">
                       {currentKPIs.activePatients || 0}
                     </span>
@@ -452,19 +462,19 @@ export const KPIDashboard = () => {
               <Card.Body>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Scheduled:</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">Scheduled:</span>
                     <Badge variant="primary">{currentKPIs.appointmentsScheduled || 0}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Completed:</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">Completed:</span>
                     <Badge variant="success">{currentKPIs.appointmentsCompleted || 0}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Cancelled:</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">Cancelled:</span>
                     <Badge variant="warning">{currentKPIs.appointmentsCancelled || 0}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">No-Show:</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">No-Show:</span>
                     <Badge variant="danger">{currentKPIs.appointmentsNoShow || 0}</Badge>
                   </div>
                   <div className="pt-3 border-t border-slate-200">
@@ -486,15 +496,19 @@ export const KPIDashboard = () => {
               <Card.Body>
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">New Patients:</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">
+                      New Patients:
+                    </span>
                     <Badge variant="primary">{currentKPIs.newPatients || 0}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Returning:</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">Returning:</span>
                     <Badge variant="info">{currentKPIs.returningPatients || 0}</Badge>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="text-sm text-slate-600">Inactive (90+ days):</span>
+                    <span className="text-sm text-slate-600 dark:text-slate-300">
+                      Inactive (90+ days):
+                    </span>
                     <Badge variant="warning">{currentKPIs.inactivePatients || 0}</Badge>
                   </div>
                   <div className="pt-3 border-t border-slate-200">

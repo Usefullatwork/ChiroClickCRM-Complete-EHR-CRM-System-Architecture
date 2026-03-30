@@ -1,5 +1,6 @@
 import { Search, X, Check } from 'lucide-react';
 import { useEncounter } from '../../../context/EncounterContext';
+import { useTranslation } from '../../../i18n';
 
 export default function AssessmentSection({
   onTextInputWithMacros,
@@ -12,6 +13,7 @@ export default function AssessmentSection({
   removeDiagnosisCode,
 }) {
   const { encounterData, isSigned, updateField } = useEncounter();
+  const { t } = useTranslation('clinical');
 
   return (
     <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
@@ -27,11 +29,14 @@ export default function AssessmentSection({
         {/* Diagnosis Search */}
         <div className="relative">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-300" />
             <input
               type="text"
-              placeholder="Søk ICPC-2 kode eller diagnose (f.eks. L02, rygg)..."
-              aria-label="Sok diagnosekode"
+              placeholder={t(
+                'searchIcpcPlaceholder',
+                'Søk ICPC-2 kode eller diagnose (f.eks. L02, rygg)...'
+              )}
+              aria-label={t('searchDiagnosisCode', 'Søk diagnosekode')}
               className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent text-sm"
               value={diagnosisSearch}
               onChange={(e) => {
@@ -55,7 +60,7 @@ export default function AssessmentSection({
                   >
                     <span>
                       <span className="font-mono font-medium text-amber-600">{diagnosis.code}</span>
-                      <span className="text-slate-600 ml-2">
+                      <span className="text-slate-600 dark:text-slate-300 ml-2">
                         - {diagnosis.description_no || diagnosis.label}
                       </span>
                     </span>
@@ -65,7 +70,9 @@ export default function AssessmentSection({
                   </button>
                 ))
               ) : (
-                <p className="px-4 py-3 text-sm text-slate-500">Ingen diagnose funnet</p>
+                <p className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
+                  Ingen diagnose funnet
+                </p>
               )}
             </div>
           )}
@@ -94,9 +101,9 @@ export default function AssessmentSection({
         )}
 
         <textarea
-          placeholder="Klinisk resonnering og vurdering..."
-          aria-label="Klinisk resonnering og vurdering"
-          className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+          placeholder={t('clinicalReasoningPlaceholder', 'Klinisk resonnering og vurdering...')}
+          aria-label={t('clinicalReasoning', 'Klinisk resonnering og vurdering')}
+          className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
           value={encounterData.assessment.clinical_reasoning}
           onChange={(e) => {
             if (!onTextInputWithMacros(e, 'assessment', 'clinical_reasoning')) {

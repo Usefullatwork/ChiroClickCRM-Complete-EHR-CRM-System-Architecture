@@ -38,6 +38,12 @@ export const updateCurrentUserSchema = {
     phone: Joi.string().max(20),
     preferred_language: Joi.string().valid('no', 'en'),
     preferences: Joi.object(),
+    notification_preferences: Joi.object({
+      emailNotifications: Joi.boolean(),
+      appointmentReminders: Joi.boolean(),
+      followUpNotifications: Joi.boolean(),
+      systemUpdates: Joi.boolean(),
+    }),
   }).min(1),
 };
 

@@ -5,7 +5,7 @@
  * Usage: node scripts/testSindreJournalParser.js
  */
 
-import sindreJournalParser from '../src/services/sindreJournalParser.js';
+import sindreJournalParser from '../src/services/training/sindreJournalParser.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -62,7 +62,8 @@ function testExtractTreatmentTechniques() {
   console.log('TEST 2: Extract Treatment Techniques');
   console.log('========================================\n');
 
-  const behandlingText = 'SMT Ribb 1 bilat ++ T4 PL ++ T8 PR ++ EMT scapula bilat ++ GH.-ledd bilat ++ IMS øvre traps bilat ++ Tøy HLB bilat x3';
+  const behandlingText =
+    'SMT Ribb 1 bilat ++ T4 PL ++ T8 PR ++ EMT scapula bilat ++ GH.-ledd bilat ++ IMS øvre traps bilat ++ Tøy HLB bilat x3';
 
   const techniques = sindreJournalParser.extractTreatmentTechniques(behandlingText);
 
@@ -80,7 +81,8 @@ function testExtractExaminationFindings() {
   console.log('TEST 3: Extract Examination Findings');
   console.log('========================================\n');
 
-  const undersøkelseText = 'Hypomobil og palpøm C-col, T-col Spurlings ua, kompresjon ua, traksjon ua, Lasegue positiv Hø, Kemps positiv Ve';
+  const undersøkelseText =
+    'Hypomobil og palpøm C-col, T-col Spurlings ua, kompresjon ua, traksjon ua, Lasegue positiv Hø, Kemps positiv Ve';
 
   const findings = sindreJournalParser.extractExaminationFindings(undersøkelseText);
 
@@ -98,7 +100,8 @@ function testExtractSymptoms() {
   console.log('TEST 4: Extract Symptoms from Anamnese');
   console.log('========================================\n');
 
-  const anamneseText = 'Gjør mest vondt på nettene når han sover. Sitter over øvre traps bilateralt. Føler han blir litt anspent når han sover. Akutte smerter i Hø skulder.';
+  const anamneseText =
+    'Gjør mest vondt på nettene når han sover. Sitter over øvre traps bilateralt. Føler han blir litt anspent når han sover. Akutte smerter i Hø skulder.';
 
   const symptoms = sindreJournalParser.extractSymptomsFromAnamnese(anamneseText);
 
@@ -128,7 +131,9 @@ function testCreateTrainingDataset() {
     console.log('Response:', example.response.substring(0, 100) + '...');
   });
 
-  console.log(`\n✓ Created ${result.examples.length} training examples from ${result.statistics.total_entries} entries`);
+  console.log(
+    `\n✓ Created ${result.examples.length} training examples from ${result.statistics.total_entries} entries`
+  );
 }
 
 /**
@@ -170,19 +175,29 @@ function testTerminologyDictionary() {
   console.log('TEST 7: Terminology Dictionary');
   console.log('========================================\n');
 
-  console.log('Anatomical Abbreviations:', Object.keys(sindreJournalParser.ANATOMICAL_ABBREVIATIONS).length);
-  console.log('Treatment Abbreviations:', Object.keys(sindreJournalParser.TREATMENT_ABBREVIATIONS).length);
+  console.log(
+    'Anatomical Abbreviations:',
+    Object.keys(sindreJournalParser.ANATOMICAL_ABBREVIATIONS).length
+  );
+  console.log(
+    'Treatment Abbreviations:',
+    Object.keys(sindreJournalParser.TREATMENT_ABBREVIATIONS).length
+  );
   console.log('Examination Tests:', Object.keys(sindreJournalParser.EXAMINATION_TESTS).length);
 
   console.log('\nSample Anatomical Terms:');
-  Object.entries(sindreJournalParser.ANATOMICAL_ABBREVIATIONS).slice(0, 5).forEach(([abbr, meaning]) => {
-    console.log(`  ${abbr}: ${meaning}`);
-  });
+  Object.entries(sindreJournalParser.ANATOMICAL_ABBREVIATIONS)
+    .slice(0, 5)
+    .forEach(([abbr, meaning]) => {
+      console.log(`  ${abbr}: ${meaning}`);
+    });
 
   console.log('\nSample Treatment Terms:');
-  Object.entries(sindreJournalParser.TREATMENT_ABBREVIATIONS).slice(0, 5).forEach(([abbr, meaning]) => {
-    console.log(`  ${abbr}: ${meaning}`);
-  });
+  Object.entries(sindreJournalParser.TREATMENT_ABBREVIATIONS)
+    .slice(0, 5)
+    .forEach(([abbr, meaning]) => {
+      console.log(`  ${abbr}: ${meaning}`);
+    });
 
   console.log('\n✓ Terminology dictionary loaded successfully');
 }
@@ -207,7 +222,6 @@ function runAllTests() {
     console.log('\n╔════════════════════════════════════════╗');
     console.log('║  All Tests Completed Successfully! ✓  ║');
     console.log('╚════════════════════════════════════════╝\n');
-
   } catch (error) {
     console.error('\n✗ Test failed with error:');
     console.error(error);

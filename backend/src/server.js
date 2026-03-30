@@ -1,5 +1,5 @@
 /**
- * ChiroClickCRM Backend Server
+ * ChiroClickEHR Backend Server
  * Main application entry point
  */
 
@@ -19,14 +19,47 @@ import { healthCheck, query as dbQuery } from './config/database.js';
 import logger from './utils/logger.js';
 import { requireAuth, requireRole } from './middleware/auth.js';
 import circuitBreakerRegistry from './infrastructure/resilience/CircuitBreakerRegistry.js';
-import { securityHeaders, csrfProtection, sendCsrfToken } from './middleware/security.js';
+import {
+  securityHeaders,
+  csrfProtection,
+  sendCsrfToken,
+  sanitizeInput,
+} from './middleware/security.js';
 import { scheduleKeyRotation, createKeyRotationTable } from './utils/keyRotation.js';
 import { initializeScheduler, shutdownScheduler } from './jobs/scheduler.js';
-import { initializeWebSocket, getIO } from './services/websocket.js';
+import { initializeWebSocket, getIO } from './services/communication/websocket.js';
 import { correlationId } from './middleware/correlationId.js';
+import { auditLogger } from './middleware/auditLogger.js';
+import backupGuard from './middleware/backupGuard.js';
 
 // Load environment variables
 const _result = dotenv.config();
+
+// CRITICAL: Refuse to start if DEV_SKIP_AUTH is enabled in production
+if (process.env.NODE_ENV === 'production' && process.env.DEV_SKIP_AUTH === 'true') {
+  logger.error('FATAL: DEV_SKIP_AUTH=true is not allowed in production. Aborting.');
+  process.exit(1);
+}
+
+// Desktop (Electron) production mode is legitimate — log and continue
+if (process.env.NODE_ENV === 'production' && process.env.DESKTOP_MODE === 'true') {
+  logger.info('Running in desktop (Electron) production mode');
+}
+
+// CRITICAL: Validate encryption key before any routes are registered.
+// In production (non-desktop), this throws and stops the server.
+import { validateEncryptionKey } from './utils/encryption.js';
+try {
+  const keyResult = validateEncryptionKey();
+  if (keyResult.valid) {
+    logger.info('Startup encryption key check: PASSED');
+  } else {
+    logger.warn(`Startup encryption key check: FAILED (${keyResult.reason})`);
+  }
+} catch (err) {
+  logger.error(`Startup encryption key check: FATAL — ${err.message}`);
+  process.exit(1);
+}
 
 // Initialize Express app
 const app = express();
@@ -40,6 +73,9 @@ const API_VERSION = process.env.API_VERSION || 'v1';
 
 // Request correlation IDs for distributed tracing
 app.use(correlationId);
+
+// Backup guard — 503 all API requests while backup is in progress
+app.use(backupGuard);
 
 // Security headers
 app.use(securityHeaders);
@@ -77,6 +113,9 @@ if (process.env.DESKTOP_MODE !== 'true' && !['test', 'e2e'].includes(process.env
   app.use(sendCsrfToken);
 }
 
+// Input sanitization (XSS/injection prevention — preserves SOAP fields)
+app.use(sanitizeInput);
+
 // Compression
 app.use(compression());
 
@@ -113,7 +152,7 @@ const swaggerSpec = swaggerJsdoc({
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'ChiroClickCRM API',
+      title: 'ChiroClickEHR API',
       version: '1.0.0',
       description: 'Norwegian EHR/CRM/PMS API for chiropractic practices',
     },
@@ -145,9 +184,6 @@ app.get('/health', async (req, res) => {
   res.status(dbHealthy ? 200 : 503).json({
     status: dbHealthy ? 'healthy' : 'unhealthy',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    environment: process.env.NODE_ENV,
-    version: API_VERSION,
     database: dbHealthy ? 'connected' : 'disconnected',
   });
 });
@@ -243,7 +279,7 @@ app.get('/health/detailed', requireAuth, requireRole(['ADMIN']), async (req, res
 // API root
 app.get(`/api/${API_VERSION}`, (req, res) => {
   res.json({
-    message: 'ChiroClickCRM API',
+    message: 'ChiroClickEHR API',
     version: API_VERSION,
     documentation: '/api/docs',
     endpoints: {
@@ -284,16 +320,22 @@ app.get(`/api/${API_VERSION}`, (req, res) => {
       treatmentPlans: `/api/${API_VERSION}/treatment-plans`,
       macros: `/api/${API_VERSION}/macros`,
       errors: `/api/${API_VERSION}/errors`,
+      mobile: `/api/${API_VERSION}/mobile`,
+      auditLogs: `/api/${API_VERSION}/audit-logs`,
+      backup: `/api/${API_VERSION}/backup`,
     },
   });
 });
+
+// Audit logging (passthrough — calls next() immediately for non-auditable requests)
+app.use(auditLogger);
 
 // Import and mount API routes
 import authRoutes from './routes/auth.js';
 import dashboardRoutes from './routes/dashboard.js';
 import importRoutes from './routes/import.js';
 import patientRoutes from './routes/patients.js';
-import encounterRoutes from './routes/encounters.js';
+import encounterRoutes from './routes/encounters/index.js';
 import diagnosisRoutes from './routes/diagnosis.js';
 import treatmentRoutes from './routes/treatments.js';
 import appointmentRoutes from './routes/appointments.js';
@@ -301,20 +343,20 @@ import communicationRoutes from './routes/communications.js';
 import kpiRoutes from './routes/kpi.js';
 import followUpRoutes from './routes/followups.js';
 import financialRoutes from './routes/financial.js';
-import billingRoutes from './routes/billing.js';
+import billingRoutes from './routes/billing/index.js';
 import outcomeRoutes from './routes/outcomes.js';
 import gdprRoutes from './routes/gdpr.js';
 import pdfRoutes from './routes/pdf.js';
 import organizationRoutes from './routes/organizations.js';
 import userRoutes from './routes/users.js';
 import aiRoutes from './routes/ai.js';
-import trainingRoutes from './routes/training.js';
-import templateRoutes from './routes/templates.js';
+import trainingRoutes from './routes/training/index.js';
+import templateRoutes from './routes/templates/index.js';
 import neuroexamRoutes from './routes/neuroexam.js';
 import docsRoutes from './routes/docs.js';
 import searchRoutes from './routes/search.js';
 import kioskRoutes from './routes/kiosk.js';
-import crmRoutes from './routes/crm.js';
+import crmRoutes from './routes/crm/index.js';
 import bulkCommunicationRoutes from './routes/bulkCommunication.js';
 import automationsRoutes from './routes/automations.js';
 import exerciseRoutes from './routes/exercises.js';
@@ -332,6 +374,11 @@ import errorReportRoutes from './routes/errors.js';
 import aiRetrainingRoutes from './routes/aiRetraining.js';
 import aiCostRoutes from './routes/aiCost.js';
 import batchRoutes from './routes/batch.js';
+import mobileRoutes from './routes/mobile/index.js';
+import auditLogRoutes from './routes/auditLogs.js';
+import slashCommandRoutes from './routes/slashCommands.js';
+import complianceRulesRoutes from './routes/complianceRules.js';
+import backupRoutes from './routes/backup.js';
 
 // Mount routes
 app.use(`/api/${API_VERSION}/auth`, authRoutes);
@@ -374,6 +421,11 @@ app.use(`/api/${API_VERSION}/ai-retraining`, aiRetrainingRoutes);
 app.use(`/api/${API_VERSION}/ai-cost`, aiCostRoutes);
 app.use(`/api/${API_VERSION}/batch`, batchRoutes);
 app.use(`/api/${API_VERSION}/errors`, errorReportRoutes);
+app.use(`/api/${API_VERSION}/mobile`, mobileRoutes);
+app.use(`/api/${API_VERSION}/audit-logs`, auditLogRoutes);
+app.use(`/api/${API_VERSION}/slash-commands`, slashCommandRoutes);
+app.use(`/api/${API_VERSION}/compliance-rules`, complianceRulesRoutes);
+app.use(`/api/${API_VERSION}/backup`, backupRoutes);
 
 // Portal routes (public - no auth required for patient access)
 app.use(`/api/${API_VERSION}/portal`, portalRoutes);
@@ -391,7 +443,8 @@ if (process.env.DESKTOP_MODE === 'true') {
   const { fileURLToPath } = await import('url');
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.default.dirname(__filename);
-  const frontendDist = path.default.resolve(__dirname, '../../frontend/dist');
+  const frontendDist =
+    process.env.FRONTEND_DIST || path.default.resolve(__dirname, '../../frontend/dist');
 
   try {
     const fs = await import('fs');
@@ -405,9 +458,13 @@ if (process.env.DESKTOP_MODE === 'true') {
         res.sendFile(path.default.join(frontendDist, 'index.html'));
       });
       logger.info(`Desktop mode: Serving frontend from ${frontendDist}`);
+    } else {
+      logger.warn(`Desktop mode: Frontend dist NOT found at: ${frontendDist}`);
+      logger.warn('Running in API-only mode');
     }
   } catch (e) {
-    logger.warn('Desktop mode: Frontend dist not found, API-only mode');
+    logger.warn(`Desktop mode: Frontend dist NOT found at: ${frontendDist}`);
+    logger.warn('Running in API-only mode');
   }
 }
 
@@ -475,7 +532,7 @@ let server;
 if (process.env.NODE_ENV !== 'test') {
   try {
     server = httpServer.listen(PORT, async () => {
-      logger.info(`🚀 ChiroClickCRM API Server started`);
+      logger.info(`🚀 ChiroClickEHR API Server started`);
       logger.info(`📍 Environment: ${process.env.NODE_ENV}`);
       logger.info(`📍 Port: ${PORT}`);
       logger.info(`📍 API Version: ${API_VERSION}`);
@@ -511,8 +568,26 @@ if (process.env.NODE_ENV !== 'test') {
       } catch (error) {
         logger.warn('WebSocket initialization skipped:', error.message);
       }
+
+      // Initialize backup scheduler (desktop mode only)
+      if (process.env.DESKTOP_MODE === 'true') {
+        try {
+          const { scheduleBackup } = await import('./services/practice/backupService.js');
+          await scheduleBackup();
+          logger.info('Backup scheduler initialized');
+        } catch (error) {
+          logger.warn('Backup scheduler initialization skipped:', error.message);
+        }
+      }
     });
     server.on('error', (e) => {
+      if (e.code === 'EADDRINUSE') {
+        logger.error(
+          `Port ${PORT} is already in use. Kill the stale process or use a different port.`,
+          { port: PORT, code: e.code }
+        );
+        process.exit(1);
+      }
       logger.error('Server error:', e);
     });
   } catch (err) {
@@ -530,6 +605,14 @@ const gracefulShutdown = async (signal) => {
     logger.info('Job scheduler stopped');
   } catch (error) {
     logger.warn('Error stopping scheduler:', error.message);
+  }
+
+  // Stop backup scheduler
+  try {
+    const { stopScheduler } = await import('./services/practice/backupService.js');
+    stopScheduler();
+  } catch (error) {
+    logger.warn('Error stopping backup scheduler:', error.message);
   }
 
   // Close WebSocket connections

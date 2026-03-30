@@ -3,10 +3,10 @@
  * Manage training pipeline for local AI model
  */
 
-import * as ollamaTraining from '../services/ollamaTraining.js';
-import * as sindreJournalParser from '../services/sindreJournalParser.js';
-import * as sigrunJournalParser from '../services/sigrunJournalParser.js';
-import * as trainingService from '../services/training.js';
+import * as ollamaTraining from '../services/training/ollamaTraining.js';
+import * as sindreJournalParser from '../services/training/sindreJournalParser.js';
+import * as sigrunJournalParser from '../services/training/sigrunJournalParser.js';
+import * as trainingService from '../services/training/training.js';
 import logger from '../utils/logger.js';
 
 // ============================================================================
@@ -408,7 +408,7 @@ export const detectPractitionerStyle = async (req, res) => {
  */
 export const exportFeedbackData = async (req, res) => {
   try {
-    const { exportFailedCases } = await import('../services/clinicalEvals.js');
+    const { exportFailedCases } = await import('../services/clinical/clinicalEvals.js');
     const examples = await exportFailedCases();
 
     // Build JSONL content

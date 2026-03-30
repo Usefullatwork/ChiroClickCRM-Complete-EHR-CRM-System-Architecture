@@ -667,7 +667,7 @@ export default function MuscleMap({
         <div className="flex items-center gap-2">
           <button
             onClick={() => setShowLabels(!showLabels)}
-            className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded"
+            className="p-1.5 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded"
             title={showLabels ? 'Skjul etiketter' : 'Vis etiketter'}
           >
             {showLabels ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
@@ -784,7 +784,7 @@ export default function MuscleMap({
             {/* Finding type selector */}
             {!readOnly && (
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                   Funntype (klikk på muskel for å legge til)
                 </label>
                 <div className="flex flex-wrap gap-1">
@@ -835,7 +835,7 @@ export default function MuscleMap({
             {/* Current findings */}
             {totalFindings > 0 && (
               <div>
-                <label className="block text-xs font-medium text-gray-500 mb-2">
+                <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                   Registrerte funn
                 </label>
                 <div className="flex flex-wrap gap-1 max-h-32 overflow-y-auto">

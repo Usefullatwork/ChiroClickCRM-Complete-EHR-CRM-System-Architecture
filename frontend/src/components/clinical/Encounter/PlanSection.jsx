@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { ChevronDown, Check, Target, Settings, FileText } from 'lucide-react';
 import { useEncounter } from '../../../context/EncounterContext';
+import { useTranslation } from '../../../i18n';
 import {
   BodyChartPanel,
   AnatomicalBodyChart,
@@ -21,6 +22,7 @@ export default function PlanSection({
   setNotationNarrative,
   onNavigateSettings,
 }) {
+  const { t } = useTranslation('clinical');
   const {
     encounterData,
     setEncounterData,
@@ -46,7 +48,7 @@ export default function PlanSection({
           Plan & Behandling
         </h3>
         <div className="flex items-center gap-3">
-          <span className="text-xs text-slate-500">VAS Slutt:</span>
+          <span className="text-xs text-slate-500 dark:text-slate-400">VAS Slutt:</span>
           <input
             type="range"
             min="0"
@@ -56,7 +58,7 @@ export default function PlanSection({
               setEncounterData((prev) => ({ ...prev, vas_pain_end: parseInt(e.target.value) }))
             }
             disabled={isSigned}
-            aria-label="VAS smerteskala slutt"
+            aria-label={t('vasPainScaleEnd', 'VAS smerteskala slutt')}
             className="w-20 h-1.5 accent-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
           />
           <span className="text-sm font-semibold text-purple-600 w-6">
@@ -76,7 +78,7 @@ export default function PlanSection({
           </div>
           <button
             onClick={onNavigateSettings}
-            className="text-xs text-slate-500 hover:text-slate-700 flex items-center gap-1"
+            className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 flex items-center gap-1"
           >
             <Settings className="h-3 w-3" />
             Endre i innstillinger
@@ -151,8 +153,8 @@ export default function PlanSection({
                       ? 'SOAP narrativ: beskriv behandlingen i detalj...'
                       : 'Utført behandling... (bruk .hvla for makro)'
             }
-            aria-label="Utfort behandling"
-            className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+            aria-label={t('treatmentPerformed', 'Utfort behandling')}
+            className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
             value={encounterData.plan.treatment}
             onChange={(e) => {
               if (!onTextInputWithMacros(e, 'plan', 'treatment')) {
@@ -214,10 +216,12 @@ export default function PlanSection({
                       </div>
                       <div>
                         <p className="font-semibold text-slate-800">{takst.code}</p>
-                        <p className="text-xs text-slate-500">{takst.name}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400">{takst.name}</p>
                       </div>
                     </div>
-                    <span className="text-sm font-medium text-slate-600">{takst.price} kr</span>
+                    <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+                      {takst.price} kr
+                    </span>
                   </button>
                 ))}
               </div>
@@ -235,9 +239,9 @@ export default function PlanSection({
 
         {/* Exercises & Advice */}
         <textarea
-          placeholder="Hjemmeøvelser og råd..."
-          aria-label="Hjemmeovelser og rad"
-          className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+          placeholder={t('homeExercisesPlaceholder', 'Hjemmeøvelser og råd...')}
+          aria-label={t('homeExercisesAndAdvice', 'Hjemmeovelser og rad')}
+          className="w-full min-h-[80px] p-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
           value={encounterData.plan.exercises}
           onChange={(e) => updateField('plan', 'exercises', e.target.value)}
           onFocus={() => onSetActiveField('plan.exercises')}
@@ -253,8 +257,8 @@ export default function PlanSection({
             value={encounterData.plan.follow_up}
             onChange={(e) => updateField('plan', 'follow_up', e.target.value)}
             disabled={isSigned}
-            aria-label="Oppfolging"
-            className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 text-sm disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed"
+            aria-label={t('followUp', 'Oppfolging')}
+            className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 focus:ring-2 focus:ring-purple-500 text-sm disabled:bg-slate-50 disabled:text-slate-500 dark:text-slate-400 disabled:cursor-not-allowed"
           />
         </div>
       </div>

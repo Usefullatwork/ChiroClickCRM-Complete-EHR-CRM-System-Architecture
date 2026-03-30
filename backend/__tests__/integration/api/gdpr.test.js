@@ -17,7 +17,7 @@ describe('GDPR API Integration Tests', () => {
   describe('GET /api/v1/gdpr/requests', () => {
     it('should return list of GDPR requests', async () => {
       const res = await agent.get('/api/v1/gdpr/requests');
-      expect([200, 500]).toContain(res.status);
+      expect(res.status).toBe(200);
     });
   });
 
@@ -25,33 +25,35 @@ describe('GDPR API Integration Tests', () => {
     it('should create GDPR request with valid data', async () => {
       const res = await agent.post('/api/v1/gdpr/requests').send({
         patient_id: randomUUID(),
-        request_type: 'DATA_ACCESS',
+        request_type: 'ACCESS',
         reason: 'Patient requested data access under Article 15',
       });
-      expect([201, 200, 400, 500]).toContain(res.status);
+      // 400 when patient does not exist (FK constraint), 201 when patient exists
+      expect([201, 400]).toContain(res.status);
     });
 
     it('should reject request without patient_id', async () => {
       const res = await agent.post('/api/v1/gdpr/requests').send({
         request_type: 'DATA_ACCESS',
       });
-      expect([400, 500]).toContain(res.status);
+      expect(res.status).toBe(400);
     });
 
     it('should reject request without request_type', async () => {
       const res = await agent.post('/api/v1/gdpr/requests').send({
         patient_id: randomUUID(),
       });
-      expect([400, 500]).toContain(res.status);
+      expect(res.status).toBe(400);
     });
 
-    it('should accept DATA_PORTABILITY request type', async () => {
+    it('should accept PORTABILITY request type', async () => {
       const res = await agent.post('/api/v1/gdpr/requests').send({
         patient_id: randomUUID(),
-        request_type: 'DATA_PORTABILITY',
+        request_type: 'PORTABILITY',
         reason: 'Patient moving to another clinic',
       });
-      expect([201, 200, 400, 500]).toContain(res.status);
+      // 400 when patient does not exist (FK constraint), 201 when patient exists
+      expect([201, 400]).toContain(res.status);
     });
 
     it('should accept ERASURE request type', async () => {
@@ -60,7 +62,8 @@ describe('GDPR API Integration Tests', () => {
         request_type: 'ERASURE',
         reason: 'Patient requested data deletion',
       });
-      expect([201, 200, 400, 500]).toContain(res.status);
+      // 400 when patient does not exist (FK constraint), 201 when patient exists
+      expect([201, 400]).toContain(res.status);
     });
   });
 
@@ -73,7 +76,7 @@ describe('GDPR API Integration Tests', () => {
       const res = await agent
         .patch(`/api/v1/gdpr/requests/${randomUUID()}/status`)
         .send({ status: 'IN_PROGRESS' });
-      expect([200, 404, 400, 500]).toContain(res.status);
+      expect(res.status).toBe(404);
     });
   });
 
@@ -84,13 +87,13 @@ describe('GDPR API Integration Tests', () => {
   describe('GET /api/v1/gdpr/patient/:patientId/data-access', () => {
     it('should handle data access for non-existent patient', async () => {
       const res = await agent.get(`/api/v1/gdpr/patient/${randomUUID()}/data-access`);
-      expect([200, 404, 500]).toContain(res.status);
+      expect(res.status).toBe(404);
     });
 
     it('should return patient data when patient exists', async () => {
       const patientId = randomUUID();
       const res = await agent.get(`/api/v1/gdpr/patient/${patientId}/data-access`);
-      expect([200, 404, 500]).toContain(res.status);
+      expect(res.status).toBe(404);
     });
   });
 
@@ -101,7 +104,7 @@ describe('GDPR API Integration Tests', () => {
   describe('GET /api/v1/gdpr/patient/:patientId/data-portability', () => {
     it('should handle portability for non-existent patient', async () => {
       const res = await agent.get(`/api/v1/gdpr/patient/${randomUUID()}/data-portability`);
-      expect([200, 404, 500]).toContain(res.status);
+      expect(res.status).toBe(404);
     });
   });
 
@@ -114,7 +117,7 @@ describe('GDPR API Integration Tests', () => {
       const res = await agent
         .post(`/api/v1/gdpr/requests/${randomUUID()}/erasure`)
         .send({ confirm: true });
-      expect([200, 404, 400, 500]).toContain(res.status);
+      expect(res.status).toBe(404);
     });
   });
 
@@ -125,16 +128,16 @@ describe('GDPR API Integration Tests', () => {
   describe('PATCH /api/v1/gdpr/patient/:patientId/consent', () => {
     it('should handle consent update for non-existent patient', async () => {
       const res = await agent.patch(`/api/v1/gdpr/patient/${randomUUID()}/consent`).send({
-        treatment: true,
-        marketing: false,
-        research: false,
+        consent_sms: true,
+        consent_marketing: false,
+        consent_email: false,
       });
-      expect([200, 404, 400, 500]).toContain(res.status);
+      expect(res.status).toBe(404);
     });
 
     it('should reject empty consent body', async () => {
       const res = await agent.patch(`/api/v1/gdpr/patient/${randomUUID()}/consent`).send({});
-      expect([400, 200, 500]).toContain(res.status);
+      expect(res.status).toBe(400);
     });
   });
 
@@ -145,7 +148,7 @@ describe('GDPR API Integration Tests', () => {
   describe('GET /api/v1/gdpr/patient/:patientId/consent-audit', () => {
     it('should return consent audit trail for patient', async () => {
       const res = await agent.get(`/api/v1/gdpr/patient/${randomUUID()}/consent-audit`);
-      expect([200, 404, 500]).toContain(res.status);
+      expect(res.status).toBe(200);
     });
   });
 
@@ -156,21 +159,19 @@ describe('GDPR API Integration Tests', () => {
   describe('PATCH /api/v1/gdpr/patient/:patientId/consent (variations)', () => {
     it('should accept all consents enabled', async () => {
       const res = await agent.patch(`/api/v1/gdpr/patient/${randomUUID()}/consent`).send({
-        treatment: true,
-        marketing: true,
-        research: true,
-        data_sharing: true,
+        consent_sms: true,
+        consent_marketing: true,
+        consent_email: true,
+        consent_data_storage: true,
       });
-      expect([200, 404, 400, 500]).toContain(res.status);
+      expect(res.status).toBe(404);
     });
 
-    it('should accept minimal consent (treatment only)', async () => {
+    it('should accept minimal consent (sms only)', async () => {
       const res = await agent.patch(`/api/v1/gdpr/patient/${randomUUID()}/consent`).send({
-        treatment: true,
-        marketing: false,
-        research: false,
+        consent_sms: true,
       });
-      expect([200, 404, 400, 500]).toContain(res.status);
+      expect(res.status).toBe(404);
     });
   });
 
@@ -185,7 +186,8 @@ describe('GDPR API Integration Tests', () => {
         request_type: 'RECTIFICATION',
         reason: 'Patient wants address corrected',
       });
-      expect([201, 200, 400, 500]).toContain(res.status);
+      // 400 when patient does not exist (FK constraint), 201 when patient exists
+      expect([201, 400]).toContain(res.status);
     });
 
     it('should accept RESTRICTION request type', async () => {
@@ -194,7 +196,8 @@ describe('GDPR API Integration Tests', () => {
         request_type: 'RESTRICTION',
         reason: 'Patient wants data processing restricted',
       });
-      expect([201, 200, 400, 500]).toContain(res.status);
+      // 400 when patient does not exist (FK constraint), 201 when patient exists
+      expect([201, 400]).toContain(res.status);
     });
   });
 });

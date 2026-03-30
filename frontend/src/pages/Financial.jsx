@@ -60,7 +60,7 @@ export default function Financial() {
   const [showExportMenu, setShowExportMenu] = useState(false);
 
   // Fetch financial summary
-  const { data: summaryData } = useQuery({
+  const { data: summaryData, isLoading: summaryLoading } = useQuery({
     queryKey: ['financial-summary', filters.startDate, filters.endDate],
     queryFn: () =>
       financialAPI.getSummary({
@@ -76,7 +76,7 @@ export default function Financial() {
   });
 
   // Fetch outstanding invoices
-  const { data: outstandingData } = useQuery({
+  const { data: outstandingData, isLoading: outstandingLoading } = useQuery({
     queryKey: ['financial-outstanding'],
     queryFn: () => financialAPI.getOutstanding(),
   });
@@ -92,7 +92,7 @@ export default function Financial() {
   });
 
   // Fetch daily revenue chart
-  const { data: revenueChartData } = useQuery({
+  const { data: revenueChartData, isLoading: chartLoading } = useQuery({
     queryKey: ['financial-revenue-chart', filters.startDate, filters.endDate],
     queryFn: () =>
       financialAPI.getDailyRevenueChart({
@@ -267,7 +267,7 @@ export default function Financial() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{t('financialTracking')}</h1>
-          <p className="text-gray-600 mt-1">{t('billingPaymentsRevenue')}</p>
+          <p className="text-gray-600 dark:text-gray-300 mt-1">{t('billingPaymentsRevenue')}</p>
         </div>
 
         <div className="flex gap-3">
@@ -309,61 +309,72 @@ export default function Financial() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">{t('totalRevenue')}</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">
-                {formatCurrency(summary.totalRevenue)}
-              </p>
+        {summaryLoading ? (
+          Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="bg-white rounded-lg shadow p-6 animate-pulse">
+              <div className="h-4 bg-gray-200 rounded w-24 mb-3"></div>
+              <div className="h-8 bg-gray-200 rounded w-32"></div>
             </div>
-            <div className="p-3 bg-blue-100 rounded-lg">
-              <TrendingUp className="w-6 h-6 text-blue-600" />
+          ))
+        ) : (
+          <>
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{t('totalRevenue')}</p>
+                  <p className="text-2xl font-bold text-gray-900 mt-1">
+                    {formatCurrency(summary.totalRevenue)}
+                  </p>
+                </div>
+                <div className="p-3 bg-blue-100 rounded-lg">
+                  <TrendingUp className="w-6 h-6 text-blue-600" />
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">{t('paid')}</p>
-              <p className="text-2xl font-bold text-green-600 mt-1">
-                {formatCurrency(summary.totalPaid)}
-              </p>
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{t('paid')}</p>
+                  <p className="text-2xl font-bold text-green-600 mt-1">
+                    {formatCurrency(summary.totalPaid)}
+                  </p>
+                </div>
+                <div className="p-3 bg-green-100 rounded-lg">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+              </div>
             </div>
-            <div className="p-3 bg-green-100 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">{t('pending')}</p>
-              <p className="text-2xl font-bold text-yellow-600 mt-1">
-                {formatCurrency(summary.totalPending)}
-              </p>
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{t('pending')}</p>
+                  <p className="text-2xl font-bold text-yellow-600 mt-1">
+                    {formatCurrency(summary.totalPending)}
+                  </p>
+                </div>
+                <div className="p-3 bg-yellow-100 rounded-lg">
+                  <Clock className="w-6 h-6 text-yellow-600" />
+                </div>
+              </div>
             </div>
-            <div className="p-3 bg-yellow-100 rounded-lg">
-              <Clock className="w-6 h-6 text-yellow-600" />
-            </div>
-          </div>
-        </div>
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600">{t('outstanding')}</p>
-              <p className="text-2xl font-bold text-red-600 mt-1">
-                {formatCurrency(summary.totalOutstanding)}
-              </p>
+            <div className="bg-white rounded-lg shadow p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">{t('outstanding')}</p>
+                  <p className="text-2xl font-bold text-red-600 mt-1">
+                    {formatCurrency(summary.totalOutstanding)}
+                  </p>
+                </div>
+                <div className="p-3 bg-red-100 rounded-lg">
+                  <AlertCircle className="w-6 h-6 text-red-600" />
+                </div>
+              </div>
             </div>
-            <div className="p-3 bg-red-100 rounded-lg">
-              <AlertCircle className="w-6 h-6 text-red-600" />
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </div>
 
       {/* Charts Row */}
@@ -371,23 +382,27 @@ export default function Financial() {
         {/* Daily Revenue Chart */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold mb-4">{t('dailyRevenue')}</h2>
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={revenueChart}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis
-                dataKey="date"
-                tickFormatter={(date) =>
-                  new Date(date).toLocaleDateString('no-NO', { month: 'short', day: 'numeric' })
-                }
-              />
-              <YAxis tickFormatter={(value) => `${value.toLocaleString()} kr`} />
-              <Tooltip
-                formatter={(value) => formatCurrency(value)}
-                labelFormatter={(date) => formatDate(date)}
-              />
-              <Bar dataKey="revenue" fill="#3B82F6" />
-            </BarChart>
-          </ResponsiveContainer>
+          {chartLoading ? (
+            <div className="animate-pulse h-[250px] bg-gray-100 rounded"></div>
+          ) : (
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={revenueChart}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="date"
+                  tickFormatter={(date) =>
+                    new Date(date).toLocaleDateString('no-NO', { month: 'short', day: 'numeric' })
+                  }
+                />
+                <YAxis tickFormatter={(value) => `${value.toLocaleString()} kr`} />
+                <Tooltip
+                  formatter={(value) => formatCurrency(value)}
+                  labelFormatter={(date) => formatDate(date)}
+                />
+                <Bar dataKey="revenue" fill="#3B82F6" />
+              </BarChart>
+            </ResponsiveContainer>
+          )}
         </div>
 
         {/* Payment Methods Breakdown */}
@@ -415,7 +430,7 @@ export default function Financial() {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-64 text-gray-500">
+            <div className="flex items-center justify-center h-64 text-gray-500 dark:text-gray-400">
               {t('noPaymentData')}
             </div>
           )}
@@ -423,7 +438,13 @@ export default function Financial() {
       </div>
 
       {/* Outstanding Invoices Alert */}
-      {outstanding.length > 0 && (
+      {outstandingLoading && (
+        <div className="animate-pulse bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div className="h-4 bg-yellow-200 rounded w-48 mb-2"></div>
+          <div className="h-3 bg-yellow-200 rounded w-64"></div>
+        </div>
+      )}
+      {!outstandingLoading && outstanding.length > 0 && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
@@ -445,7 +466,7 @@ export default function Financial() {
       {/* Filters */}
       <div className="bg-white rounded-lg shadow p-4 mb-6">
         <div className="flex items-center gap-2 mb-3">
-          <Filter className="w-5 h-5 text-gray-600" />
+          <Filter className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           <h3 className="font-semibold">{t('filters')}</h3>
         </div>
 
@@ -524,7 +545,7 @@ export default function Financial() {
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold">{t('transactions')}</h2>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-300">
             {pagination.total} {t('transactions').toLowerCase()}
           </p>
         </div>
@@ -535,7 +556,7 @@ export default function Financial() {
           </div>
         ) : transactions.length === 0 ? (
           <div className="text-center py-12 bg-gray-50">
-            <p className="text-gray-600">{t('noTransactions')}</p>
+            <p className="text-gray-600 dark:text-gray-300">{t('noTransactions')}</p>
           </div>
         ) : (
           <>
@@ -543,28 +564,28 @@ export default function Financial() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('date')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('patient')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('type')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('amount')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('payment')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('status')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('invoice')}
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
                       {t('actions')}
                     </th>
                   </tr>
@@ -579,7 +600,7 @@ export default function Financial() {
                         <div className="text-sm font-medium text-gray-900">
                           {transaction.patient_name || t('unknownPatient')}
                         </div>
-                        <div className="text-sm text-gray-500">
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
                           ID: {transaction.patient_id?.substring(0, 8)}...
                         </div>
                       </td>
@@ -591,7 +612,7 @@ export default function Financial() {
                           {formatCurrency(transaction.patient_amount)}
                         </div>
                         {transaction.insurance_amount > 0 && (
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             {t('insurance')}: {formatCurrency(transaction.insurance_amount)}
                           </div>
                         )}
@@ -680,7 +701,9 @@ export default function Financial() {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg p-6 max-w-md w-full">
             <h3 className="text-lg font-semibold mb-4">{t('createNewTransaction')}</h3>
-            <p className="text-gray-600 mb-4">{t('transactionFormComingSoon')}</p>
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              {t('transactionFormComingSoon')}
+            </p>
             <button
               onClick={() => setShowCreateModal(false)}
               className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"

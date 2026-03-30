@@ -14,7 +14,7 @@ jest.unstable_mockModule('../../src/utils/logger.js', () => ({
   default: { info: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() },
 }));
 
-const { default: redFlagEngine } = await import('../../src/services/redFlagEngine.js');
+const { default: redFlagEngine } = await import('../../src/services/clinical/redFlagEngine.js');
 
 describe('Red Flag Engine', () => {
   describe('scanForRedFlags', () => {

@@ -16,8 +16,10 @@ import {
 } from 'lucide-react';
 import StructuredExaminationForm from './StructuredExaminationForm';
 import toast from '../utils/toast';
+import { useTranslation } from '../i18n';
 
 export default function ExaminationFindingsList({ encounterId }) {
+  const { t } = useTranslation('clinical');
   const queryClient = useQueryClient();
   const confirm = useConfirm();
   const [editingFinding, setEditingFinding] = useState(null);
@@ -76,9 +78,9 @@ export default function ExaminationFindingsList({ encounterId }) {
       case 'equivocal':
         return <HelpCircle className="w-4 h-4 text-yellow-500" />;
       case 'not_tested':
-        return <XCircle className="w-4 h-4 text-gray-400" />;
+        return <XCircle className="w-4 h-4 text-gray-400 dark:text-gray-300" />;
       default:
-        return <HelpCircle className="w-4 h-4 text-gray-400" />;
+        return <HelpCircle className="w-4 h-4 text-gray-400 dark:text-gray-300" />;
     }
   };
 
@@ -187,9 +189,13 @@ export default function ExaminationFindingsList({ encounterId }) {
   if (!findings?.data || findings.data.length === 0) {
     return (
       <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-        <FileText className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-        <p className="text-sm text-gray-600">Ingen undersøkelsesfunn registrert</p>
-        <p className="text-xs text-gray-500 mt-1">Bruk protokollvelgeren for å legge til funn</p>
+        <FileText className="w-12 h-12 text-gray-400 dark:text-gray-300 mx-auto mb-3" />
+        <p className="text-sm text-gray-600 dark:text-gray-300">
+          Ingen undersøkelsesfunn registrert
+        </p>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+          Bruk protokollvelgeren for å legge til funn
+        </p>
       </div>
     );
   }
@@ -287,7 +293,7 @@ export default function ExaminationFindingsList({ encounterId }) {
               >
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-semibold text-gray-900">{region}</span>
-                  <span className="text-xs text-gray-500 bg-white px-2 py-0.5 rounded">
+                  <span className="text-xs text-gray-500 dark:text-gray-400 bg-white px-2 py-0.5 rounded">
                     {regionFindings.length}
                   </span>
                 </div>
@@ -295,7 +301,7 @@ export default function ExaminationFindingsList({ encounterId }) {
                   {regionFindings.some((f) => f.result === 'positive') && (
                     <AlertTriangle className="w-4 h-4 text-red-500" />
                   )}
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-gray-400 dark:text-gray-300">
                     {expandedRegions[region] ? '▼' : '▶'}
                   </span>
                 </div>
@@ -317,11 +323,11 @@ export default function ExaminationFindingsList({ encounterId }) {
                             <span className="text-sm font-medium text-gray-900">
                               {finding.test_name}
                             </span>
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
                               ({getResultText(finding.result)})
                             </span>
                             {finding.laterality && finding.laterality !== 'none' && (
-                              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">
+                              <span className="text-xs text-gray-500 dark:text-gray-400 bg-gray-100 px-2 py-0.5 rounded">
                                 {finding.laterality}
                               </span>
                             )}
@@ -329,13 +335,15 @@ export default function ExaminationFindingsList({ encounterId }) {
                           </div>
 
                           {/* Category */}
-                          <div className="text-xs text-gray-500 mb-2">{finding.category}</div>
+                          <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                            {finding.category}
+                          </div>
 
                           {/* Details Grid */}
                           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
                             {finding.measurement_value && (
                               <div>
-                                <span className="text-gray-500">Måling:</span>{' '}
+                                <span className="text-gray-500 dark:text-gray-400">Måling:</span>{' '}
                                 <span className="text-gray-900 font-medium">
                                   {finding.measurement_value} {finding.measurement_unit}
                                 </span>
@@ -343,7 +351,9 @@ export default function ExaminationFindingsList({ encounterId }) {
                             )}
                             {finding.pain_score !== null && finding.pain_score !== undefined && (
                               <div>
-                                <span className="text-gray-500">Smerte (NRS):</span>{' '}
+                                <span className="text-gray-500 dark:text-gray-400">
+                                  Smerte (NRS):
+                                </span>{' '}
                                 <span className="text-gray-900 font-medium">
                                   {finding.pain_score}/10
                                 </span>
@@ -351,7 +361,9 @@ export default function ExaminationFindingsList({ encounterId }) {
                             )}
                             {finding.pain_location && (
                               <div className="col-span-2">
-                                <span className="text-gray-500">Lokalisering:</span>{' '}
+                                <span className="text-gray-500 dark:text-gray-400">
+                                  Lokalisering:
+                                </span>{' '}
                                 <span className="text-gray-900">{finding.pain_location}</span>
                               </div>
                             )}
@@ -366,7 +378,7 @@ export default function ExaminationFindingsList({ encounterId }) {
 
                           {/* Clinician Notes */}
                           {finding.clinician_notes && (
-                            <div className="mt-2 text-xs text-gray-600 italic">
+                            <div className="mt-2 text-xs text-gray-600 dark:text-gray-300 italic">
                               <span className="font-medium">Notat:</span> {finding.clinician_notes}
                             </div>
                           )}
@@ -376,22 +388,22 @@ export default function ExaminationFindingsList({ encounterId }) {
                         <div className="flex gap-1 flex-shrink-0">
                           <button
                             onClick={() => copyFindingToClipboard(finding)}
-                            className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
+                            className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-green-600 hover:bg-green-50 rounded transition-colors"
                             title="Kopier"
                           >
                             <Copy className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleEdit(finding)}
-                            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
+                            className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                             title="Rediger"
                           >
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button
                             onClick={() => handleDelete(finding.id)}
-                            className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
-                            title="Slett"
+                            className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
+                            title={t('delete', 'Slett')}
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>

@@ -121,7 +121,7 @@ export function AIScribeButton({
       <button
         disabled
         className={`inline-flex items-center gap-2 px-3 py-2 text-sm font-medium rounded-lg
-          bg-gray-100 text-gray-400 cursor-not-allowed ${className}`}
+          bg-gray-100 text-gray-400 dark:text-gray-300 cursor-not-allowed ${className}`}
         title="Speech recognition not supported"
       >
         <MicOff className="w-4 h-4" />
@@ -441,7 +441,7 @@ export default function AIScribe({
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">{t.title}</h3>
-              <p className="text-sm text-gray-500">{t.subtitle}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
             </div>
           </div>
 
@@ -449,8 +449,10 @@ export default function AIScribe({
           <div className="flex items-center gap-3">
             {isRecording && (
               <div className="flex items-center gap-2 text-sm">
-                <Clock className="w-4 h-4 text-gray-400" />
-                <span className="font-mono text-gray-600">{formatDuration(duration)}</span>
+                <Clock className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+                <span className="font-mono text-gray-600 dark:text-gray-300">
+                  {formatDuration(duration)}
+                </span>
                 <span
                   className={`px-2 py-0.5 rounded-full text-xs font-medium
                   ${isPaused ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'}`}
@@ -462,7 +464,7 @@ export default function AIScribe({
 
             <div
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
-              ${aiStatus.connected ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}
+              ${aiStatus.connected ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500 dark:text-gray-400'}`}
             >
               {aiStatus.connected ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
               {aiStatus.connected ? 'AI' : 'Offline'}
@@ -527,21 +529,21 @@ export default function AIScribe({
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsEditing(!isEditing)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
+                className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded"
                 title={t.edit}
               >
                 <Edit3 className="w-4 h-4" />
               </button>
               <button
                 onClick={() => navigator.clipboard.writeText(transcript)}
-                className="p-1.5 text-gray-400 hover:text-gray-600 rounded"
+                className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded"
                 title={t.copy}
               >
                 <Copy className="w-4 h-4" />
               </button>
               <button
                 onClick={clearAll}
-                className="p-1.5 text-gray-400 hover:text-red-500 rounded"
+                className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-red-500 rounded"
                 title={t.clear}
               >
                 <Trash2 className="w-4 h-4" />
@@ -567,11 +569,13 @@ export default function AIScribe({
               <p className="text-sm text-gray-700 whitespace-pre-wrap">
                 {transcript}
                 {interimTranscript && (
-                  <span className="text-gray-400 italic">{interimTranscript}</span>
+                  <span className="text-gray-400 dark:text-gray-300 italic">
+                    {interimTranscript}
+                  </span>
                 )}
               </p>
             ) : (
-              <p className="text-sm text-gray-400 italic">{t.noTranscript}</p>
+              <p className="text-sm text-gray-400 dark:text-gray-300 italic">{t.noTranscript}</p>
             )}
           </div>
         )}
@@ -597,7 +601,7 @@ export default function AIScribe({
 
             <button
               onClick={handleApplyTranscript}
-              className="flex items-center gap-2 px-4 py-2 text-gray-600 bg-gray-100 rounded-lg
+              className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 bg-gray-100 rounded-lg
                 hover:bg-gray-200"
             >
               <FileText className="w-4 h-4" />
@@ -626,7 +630,7 @@ export default function AIScribe({
             <div className="grid grid-cols-2 gap-4">
               {['subjective', 'objective', 'assessment', 'plan'].map((section) => (
                 <div key={section} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
-                  <h5 className="text-xs font-semibold text-gray-500 uppercase mb-2">
+                  <h5 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase mb-2">
                     {t[section]}
                   </h5>
                   <p className="text-sm text-gray-700">
@@ -730,14 +734,16 @@ export function AIScribeCompact({ onTranscript, language = 'en', className = '' 
           ${
             isRecording
               ? 'bg-red-500 text-white animate-pulse'
-              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
           }`}
         title={isRecording ? 'Stop' : 'Record'}
       >
         {isRecording ? <Square className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
       </button>
       {isRecording && (
-        <span className="text-xs font-mono text-gray-500">{formatDuration(duration)}</span>
+        <span className="text-xs font-mono text-gray-500 dark:text-gray-400">
+          {formatDuration(duration)}
+        </span>
       )}
     </div>
   );

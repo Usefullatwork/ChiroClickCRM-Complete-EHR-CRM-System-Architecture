@@ -16,7 +16,7 @@ setup('authenticate', async ({ page }) => {
   // Login via real backend API
   const response = await page.request.post(`${API_BASE}/api/v1/auth/login`, {
     data: {
-      email: 'admin@chiroclickcrm.no',
+      email: 'admin@chiroclickehr.no',
       password: 'admin123',
     },
   });

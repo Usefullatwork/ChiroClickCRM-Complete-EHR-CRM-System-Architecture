@@ -9,6 +9,7 @@ export const LoadingSpinner = ({
   className = '',
   label = 'Laster...',
 }) => {
+  const { t } = useTranslation('common');
   const sizeClasses = {
     sm: 'w-4 h-4',
     md: 'w-8 h-8',
@@ -18,7 +19,7 @@ export const LoadingSpinner = ({
 
   const colorClasses = {
     blue: 'text-blue-600',
-    gray: 'text-gray-600',
+    gray: 'text-gray-600 dark:text-gray-300',
     white: 'text-white',
     green: 'text-green-600',
     red: 'text-red-600',
@@ -63,7 +64,7 @@ export const PageLoader = ({ message = 'Laster inn...' }) => {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <LoadingSpinner size="xl" />
-      <p className="mt-4 text-gray-600">{message}</p>
+      <p className="mt-4 text-gray-600 dark:text-gray-300">{message}</p>
     </div>
   );
 };
@@ -95,7 +96,7 @@ export const Skeleton = ({ className = '', variant = 'text', width, height }) =>
       className={`animate-pulse bg-gray-200 ${variantClasses[variant]} ${className}`}
       style={style}
       role="status"
-      aria-label="Laster..."
+      aria-label={t('loading', 'Laster...')}
     />
   );
 };

@@ -51,7 +51,7 @@ export default function AICostDashboard() {
   const [_trend, setTrend] = useState([]);
   const [providers, setProviders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { language } = useTranslation();
+  const { t, language } = useTranslation();
 
   const l = {
     no: {
@@ -138,7 +138,7 @@ export default function AICostDashboard() {
   }, [loadData]);
 
   if (loading) {
-    return <div style={{ padding: 24, textAlign: 'center', color: '#64748b' }}>Loading...</div>;
+    return <div style={{ padding: 24, textAlign: 'center', color: '#64748b' }}>{t('loading')}</div>;
   }
 
   return (

@@ -6,24 +6,26 @@
 import { useState, useCallback } from 'react';
 
 import logger from '../utils/logger';
-// Feedback categories (should match database seed)
-const FEEDBACK_CATEGORIES = {
+import { useTranslation } from '../i18n';
+
+// Feedback category IDs and icons (labels resolved via i18n)
+const FEEDBACK_CATEGORY_DEFS = {
   positive: [
-    { id: 'accurate', label: 'Nøyaktig', icon: '✓' },
-    { id: 'time_saving', label: 'Tidsbesparende', icon: '⏱' },
-    { id: 'comprehensive', label: 'Omfattende', icon: '📋' },
-    { id: 'well_written', label: 'God formulering', icon: '✍' },
+    { id: 'accurate', key: 'accurate', icon: '✓' },
+    { id: 'time_saving', key: 'timeSaving', icon: '⏱' },
+    { id: 'comprehensive', key: 'comprehensive', icon: '📋' },
+    { id: 'well_written', key: 'wellWritten', icon: '✍' },
   ],
   negative: [
-    { id: 'inaccurate', label: 'Unøyaktig', icon: '✗' },
-    { id: 'irrelevant', label: 'Irrelevant', icon: '❌' },
-    { id: 'too_verbose', label: 'For omfattende', icon: '📝' },
-    { id: 'missing_info', label: 'Manglet informasjon', icon: '❓' },
-    { id: 'missed_red_flag', label: 'Manglet rødt flagg', icon: '🚨' },
+    { id: 'inaccurate', key: 'inaccurate', icon: '✗' },
+    { id: 'irrelevant', key: 'irrelevant', icon: '❌' },
+    { id: 'too_verbose', key: 'tooVerbose', icon: '📝' },
+    { id: 'missing_info', key: 'missingInfo', icon: '❓' },
+    { id: 'missed_red_flag', key: 'missedRedFlag', icon: '🚨' },
   ],
   neutral: [
-    { id: 'partially_helpful', label: 'Delvis nyttig', icon: '◐' },
-    { id: 'needs_customization', label: 'Trenger tilpasning', icon: '⚙' },
+    { id: 'partially_helpful', key: 'partiallyHelpful', icon: '◐' },
+    { id: 'needs_customization', key: 'needsCustomization', icon: '⚙' },
   ],
 };
 
@@ -31,6 +33,7 @@ const FEEDBACK_CATEGORIES = {
  * Quick feedback buttons (thumbs up/down)
  */
 export const QuickFeedback = ({ suggestionId, onFeedback }) => {
+  const { t } = useTranslation('ai');
   const [submitted, setSubmitted] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
@@ -51,8 +54,8 @@ export const QuickFeedback = ({ suggestionId, onFeedback }) => {
 
   if (submitted) {
     return (
-      <div className="flex items-center gap-2 text-sm text-gray-500">
-        <span>Takk for tilbakemelding!</span>
+      <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+        <span>{t('thankYouFeedback')}</span>
         {feedback ? (
           <span className="text-green-600">👍</span>
         ) : (
@@ -64,18 +67,18 @@ export const QuickFeedback = ({ suggestionId, onFeedback }) => {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm text-gray-600">Var dette nyttig?</span>
+      <span className="text-sm text-gray-600 dark:text-gray-300">{t('wasThisHelpful')}</span>
       <button
         onClick={() => handleFeedback(true)}
         className="p-1.5 rounded hover:bg-green-100 transition-colors"
-        title="Ja, nyttig"
+        title={t('yesHelpful')}
       >
         👍
       </button>
       <button
         onClick={() => handleFeedback(false)}
         className="p-1.5 rounded hover:bg-red-100 transition-colors"
-        title="Nei, ikke nyttig"
+        title={t('noNotHelpful')}
       >
         👎
       </button>
@@ -87,6 +90,7 @@ export const QuickFeedback = ({ suggestionId, onFeedback }) => {
  * Detailed feedback form
  */
 export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCancel }) => {
+  const { t } = useTranslation('ai');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -122,20 +126,20 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 max-w-2xl">
-      <h3 className="text-lg font-semibold mb-4">Gi tilbakemelding på AI-forslag</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('giveFeedbackOnAI')}</h3>
 
       <form onSubmit={handleSubmit}>
         {/* Original suggestion */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">AI-forslag</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            {t('aiSuggestion')}
+          </label>
           <div className="p-3 bg-gray-50 rounded border text-sm">{suggestionText}</div>
         </div>
 
         {/* Rating */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Hvor nyttig var forslaget?
-          </label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">{t('howHelpful')}</label>
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
@@ -155,15 +159,15 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
         {/* Category selection */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Hva var bra eller dårlig? (velg alle som passer)
+            {t('whatWasGoodOrBad')}
           </label>
 
           <div className="space-y-3">
             {/* Positive categories */}
             <div>
-              <span className="text-xs text-green-600 font-medium">Positivt</span>
+              <span className="text-xs text-green-600 font-medium">{t('positive')}</span>
               <div className="flex flex-wrap gap-2 mt-1">
-                {FEEDBACK_CATEGORIES.positive.map((cat) => (
+                {FEEDBACK_CATEGORY_DEFS.positive.map((cat) => (
                   <button
                     key={cat.id}
                     type="button"
@@ -171,10 +175,10 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
                     className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                       selectedCategories.includes(cat.id)
                         ? 'bg-green-100 border-green-400 text-green-700'
-                        : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                        : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                     }`}
                   >
-                    {cat.icon} {cat.label}
+                    {cat.icon} {t(cat.key)}
                   </button>
                 ))}
               </div>
@@ -182,9 +186,9 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
 
             {/* Negative categories */}
             <div>
-              <span className="text-xs text-red-600 font-medium">Negativt</span>
+              <span className="text-xs text-red-600 font-medium">{t('negative')}</span>
               <div className="flex flex-wrap gap-2 mt-1">
-                {FEEDBACK_CATEGORIES.negative.map((cat) => (
+                {FEEDBACK_CATEGORY_DEFS.negative.map((cat) => (
                   <button
                     key={cat.id}
                     type="button"
@@ -192,10 +196,10 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
                     className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                       selectedCategories.includes(cat.id)
                         ? 'bg-red-100 border-red-400 text-red-700'
-                        : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                        : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                     }`}
                   >
-                    {cat.icon} {cat.label}
+                    {cat.icon} {t(cat.key)}
                   </button>
                 ))}
               </div>
@@ -203,9 +207,11 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
 
             {/* Neutral categories */}
             <div>
-              <span className="text-xs text-gray-600 font-medium">Nøytral</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300 font-medium">
+                {t('neutral')}
+              </span>
               <div className="flex flex-wrap gap-2 mt-1">
-                {FEEDBACK_CATEGORIES.neutral.map((cat) => (
+                {FEEDBACK_CATEGORY_DEFS.neutral.map((cat) => (
                   <button
                     key={cat.id}
                     type="button"
@@ -213,10 +219,10 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
                     className={`px-3 py-1.5 rounded-full text-sm border transition-colors ${
                       selectedCategories.includes(cat.id)
                         ? 'bg-blue-100 border-blue-400 text-blue-700'
-                        : 'bg-white border-gray-300 text-gray-600 hover:bg-gray-50'
+                        : 'bg-white border-gray-300 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                     }`}
                   >
-                    {cat.icon} {cat.label}
+                    {cat.icon} {t(cat.key)}
                   </button>
                 ))}
               </div>
@@ -231,7 +237,7 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
             onClick={() => setShowTextEditor(!showTextEditor)}
             className="text-sm text-blue-600 hover:text-blue-700"
           >
-            {showTextEditor ? '− Skjul tekstredigering' : '+ Rediger forslaget'}
+            {showTextEditor ? `− ${t('hideTextEditor')}` : `+ ${t('editSuggestion')}`}
           </button>
 
           {showTextEditor && (
@@ -239,7 +245,7 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
               value={modifiedText}
               onChange={(e) => setModifiedText(e.target.value)}
               className="mt-2 w-full p-3 border rounded-lg text-sm resize-y min-h-[100px]"
-              placeholder="Rediger teksten..."
+              placeholder={t('editTextPlaceholder')}
             />
           )}
         </div>
@@ -247,13 +253,13 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
         {/* Additional comment */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Kommentar (valgfritt)
+            {t('commentOptional')}
           </label>
           <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             className="w-full p-3 border rounded-lg text-sm resize-y min-h-[80px]"
-            placeholder="Legg til kommentar for å forbedre AI-forslag i fremtiden..."
+            placeholder={t('commentPlaceholder')}
           />
         </div>
 
@@ -262,16 +268,16 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            Avbryt
+            {t('cancel')}
           </button>
           <button
             type="submit"
             disabled={isSubmitting || rating === 0}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
           >
-            {isSubmitting ? 'Sender...' : 'Send tilbakemelding'}
+            {isSubmitting ? t('sending') : t('sendFeedback')}
           </button>
         </div>
       </form>
@@ -283,6 +289,7 @@ export const DetailedFeedback = ({ suggestionId, suggestionText, onSubmit, onCan
  * AI Suggestion Review Card
  */
 export const AISuggestionReview = ({ suggestion, onApprove, onModify, onReject }) => {
+  const { t } = useTranslation('ai');
   const [isModifying, setIsModifying] = useState(false);
   const [modifiedText, setModifiedText] = useState(suggestion.suggestedText);
 
@@ -299,19 +306,19 @@ export const AISuggestionReview = ({ suggestion, onApprove, onModify, onReject }
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <span className="text-lg">🤖</span>
-          <span className="font-medium">AI-forslag</span>
+          <span className="font-medium">{t('aiSuggestionLabel')}</span>
           <span className={`px-2 py-0.5 rounded text-xs ${confidenceColor}`}>
             {suggestion.confidenceLevel === 'HIGH'
-              ? 'Høy'
+              ? t('highConfidence')
               : suggestion.confidenceLevel === 'MEDIUM'
-                ? 'Moderat'
-                : 'Lav'}{' '}
-            konfidens ({Math.round(suggestion.confidenceScore * 100)}%)
+                ? t('moderateConfidence')
+                : t('lowConfidence')}{' '}
+            {t('confidence')} ({Math.round(suggestion.confidenceScore * 100)}%)
           </span>
         </div>
         {suggestion.hasRedFlags && (
           <span className="px-2 py-0.5 rounded text-xs bg-red-100 text-red-700">
-            🚨 Røde flagg oppdaget
+            🚨 {t('redFlagsDetected')}
           </span>
         )}
       </div>
@@ -330,7 +337,7 @@ export const AISuggestionReview = ({ suggestion, onApprove, onModify, onReject }
       {/* Red flag warnings */}
       {suggestion.hasRedFlags && suggestion.redFlags?.length > 0 && (
         <div className="mb-3 p-2 bg-red-50 rounded border border-red-200">
-          <div className="text-xs font-medium text-red-700 mb-1">Påkrevd vurdering:</div>
+          <div className="text-xs font-medium text-red-700 mb-1">{t('requiredAssessment')}</div>
           <ul className="text-xs text-red-600 list-disc list-inside">
             {suggestion.redFlags.map((flag, idx) => (
               <li key={idx}>{flag.description}</li>
@@ -350,7 +357,7 @@ export const AISuggestionReview = ({ suggestion, onApprove, onModify, onReject }
               }}
               className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg text-sm hover:bg-blue-700"
             >
-              Lagre endringer
+              {t('saveChanges')}
             </button>
             <button
               onClick={() => {
@@ -359,7 +366,7 @@ export const AISuggestionReview = ({ suggestion, onApprove, onModify, onReject }
               }}
               className="px-3 py-2 border rounded-lg text-sm hover:bg-gray-50"
             >
-              Avbryt
+              {t('cancel')}
             </button>
           </>
         ) : (
@@ -368,13 +375,13 @@ export const AISuggestionReview = ({ suggestion, onApprove, onModify, onReject }
               onClick={() => onApprove(suggestion.id)}
               className="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg text-sm hover:bg-green-700"
             >
-              ✓ Godkjenn
+              ✓ {t('approve')}
             </button>
             <button
               onClick={() => setIsModifying(true)}
               className="flex-1 px-3 py-2 border border-blue-600 text-blue-600 rounded-lg text-sm hover:bg-blue-50"
             >
-              ✎ Rediger
+              ✎ {t('edit')}
             </button>
             <button
               onClick={() => onReject(suggestion.id)}

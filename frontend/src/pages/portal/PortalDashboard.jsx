@@ -9,20 +9,24 @@ import {
   Calendar,
   Dumbbell,
   ClipboardList,
+  FileText,
   User,
   ChevronRight,
   Loader2,
   AlertCircle,
   Clock,
   LogOut,
+  MessageSquare,
 } from 'lucide-react';
 import { patientPortalAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 import logger from '../../utils/logger';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 export default function PortalDashboard() {
   const navigate = useNavigate();
+  const { t } = useTranslation('portal');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -55,7 +59,7 @@ export default function PortalDashboard() {
       }
     } catch (err) {
       logger.error('Portal dashboard load error:', err);
-      setError('Kunne ikke laste data');
+      setError(t('couldNotLoadData'));
     } finally {
       setLoading(false);
     }
@@ -75,10 +79,10 @@ export default function PortalDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white dark:from-slate-900 dark:to-slate-800 flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-teal-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Laster pasientportalen...</p>
+          <p className="text-gray-600 dark:text-gray-300">{t('loadingPortal')}</p>
         </div>
       </div>
     );
@@ -88,20 +92,20 @@ export default function PortalDashboard() {
   const activeExercises = exercises.filter((e) => e.status === 'active');
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-teal-50 to-white dark:from-slate-900 dark:to-slate-800">
       {/* Header */}
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold text-gray-900">
-              Hei, {profile?.firstName || 'Pasient'}!
+              {t('greeting').replace('{name}', profile?.firstName || 'Pasient')}
             </h1>
-            <p className="text-sm text-gray-500">Pasientportalen</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t('portalTitle')}</p>
           </div>
           <button
             onClick={handleLogout}
-            className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
-            title="Logg ut"
+            className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+            title={t('logout')}
           >
             <LogOut className="w-5 h-5" />
           </button>
@@ -118,9 +122,9 @@ export default function PortalDashboard() {
 
         {/* Next Appointment Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
-          <h2 className="text-sm font-medium text-gray-500 mb-3 flex items-center gap-2">
+          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-3 flex items-center gap-2">
             <Calendar className="w-4 h-4" />
-            Neste time
+            {t('nextAppointment')}
           </h2>
           {nextAppointment ? (
             <div className="flex items-center justify-between">
@@ -132,7 +136,7 @@ export default function PortalDashboard() {
                     month: 'long',
                   })}
                 </p>
-                <div className="flex items-center gap-2 mt-1 text-gray-500">
+                <div className="flex items-center gap-2 mt-1 text-gray-500 dark:text-gray-400">
                   <Clock className="w-4 h-4" />
                   <span>
                     {nextAppointment.appointment_time?.slice(0, 5)} &bull;{' '}
@@ -145,23 +149,23 @@ export default function PortalDashboard() {
               </div>
             </div>
           ) : (
-            <p className="text-gray-400">Ingen kommende timer</p>
+            <p className="text-gray-400 dark:text-gray-300">{t('noUpcomingAppointments')}</p>
           )}
         </div>
 
         {/* Stats Row */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-            <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
+            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-xs mb-1">
               <Dumbbell className="w-3.5 h-3.5" />
-              Aktive ovelser
+              {t('activeExercises')}
             </div>
             <div className="text-2xl font-bold text-gray-900">{activeExercises.length}</div>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-            <div className="flex items-center gap-2 text-gray-500 text-xs mb-1">
+            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-xs mb-1">
               <Calendar className="w-3.5 h-3.5" />
-              Timer
+              {t('appointmentsCount')}
             </div>
             <div className="text-2xl font-bold text-gray-900">{appointments.length}</div>
           </div>
@@ -169,36 +173,54 @@ export default function PortalDashboard() {
 
         {/* Quick Links */}
         <div className="space-y-2">
-          <h2 className="text-sm font-medium text-gray-500 px-1">Hurtiglenker</h2>
+          <h2 className="text-sm font-medium text-gray-500 dark:text-gray-400 px-1">
+            {t('quickLinks')}
+          </h2>
           {[
             {
               icon: Calendar,
-              label: 'Mine timer',
-              desc: 'Se og administrer timer',
+              label: t('myAppointments'),
+              desc: t('manageAppointments'),
               path: '/portal/appointments',
               color: 'text-blue-600',
               bg: 'bg-blue-100',
             },
             {
               icon: Dumbbell,
-              label: 'Mine ovelser',
-              desc: 'Se treningsprogram',
+              label: t('myExercises'),
+              desc: t('viewProgram'),
               path: '/portal/exercises',
               color: 'text-green-600',
               bg: 'bg-green-100',
             },
             {
+              icon: FileText,
+              label: t('myDocuments', 'Mine dokumenter'),
+              desc: t('viewDocuments', 'Se dokumenter fra klinikken'),
+              path: '/portal/documents',
+              color: 'text-indigo-600',
+              bg: 'bg-indigo-100',
+            },
+            {
+              icon: MessageSquare,
+              label: t('portalMyMessages', 'Mine meldinger'),
+              desc: t('portalMessagesDesc', 'Send og motta meldinger'),
+              path: '/portal/messages',
+              color: 'text-teal-600',
+              bg: 'bg-teal-100',
+            },
+            {
               icon: ClipboardList,
-              label: 'Skjemaer',
-              desc: 'Fyll ut sporreskjemaer',
+              label: t('forms'),
+              desc: t('fillQuestionnaires'),
               path: '/portal/outcomes',
               color: 'text-purple-600',
               bg: 'bg-purple-100',
             },
             {
               icon: User,
-              label: 'Min profil',
-              desc: 'Oppdater kontaktinfo',
+              label: t('myProfile'),
+              desc: t('updateContactInfo'),
               path: '/portal/profile',
               color: 'text-orange-600',
               bg: 'bg-orange-100',
@@ -214,7 +236,7 @@ export default function PortalDashboard() {
               </div>
               <div className="flex-1">
                 <p className="font-medium text-gray-900">{item.label}</p>
-                <p className="text-sm text-gray-500">{item.desc}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">{item.desc}</p>
               </div>
               <ChevronRight className="w-5 h-5 text-gray-300" />
             </button>
@@ -223,9 +245,9 @@ export default function PortalDashboard() {
       </div>
 
       {/* Footer */}
-      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400">
-        <p>Ved sporsmal, kontakt din behandler</p>
-        <p className="mt-1">ChiroClick CRM</p>
+      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-300">
+        <p>{t('footerContact')}</p>
+        <p className="mt-1">{t('footerBrand')}</p>
       </footer>
     </div>
   );

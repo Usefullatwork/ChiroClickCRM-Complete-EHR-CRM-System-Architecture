@@ -45,7 +45,9 @@ export const getWorkflows = async (organizationId, options = {}) => {
     params.push(limit, offset);
     const result = await query(
       `SELECT
-        w.*,
+        w.id, w.organization_id, w.name, w.description, w.trigger_type, w.trigger_config,
+        w.actions, w.conditions, w.is_active, w.max_runs_per_patient,
+        w.total_runs, w.successful_runs, w.failed_runs, w.created_by, w.created_at, w.updated_at,
         u.first_name || ' ' || u.last_name as created_by_name,
         (SELECT COUNT(*) FROM workflow_executions we WHERE we.workflow_id = w.id) as execution_count,
         (SELECT COUNT(*) FROM workflow_executions we WHERE we.workflow_id = w.id AND we.status = 'COMPLETED') as successful_count,
@@ -80,7 +82,9 @@ export const getWorkflowById = async (organizationId, workflowId) => {
   try {
     const result = await query(
       `SELECT
-        w.*,
+        w.id, w.organization_id, w.name, w.description, w.trigger_type, w.trigger_config,
+        w.actions, w.conditions, w.is_active, w.max_runs_per_patient,
+        w.total_runs, w.successful_runs, w.failed_runs, w.created_by, w.created_at, w.updated_at,
         u.first_name || ' ' || u.last_name as created_by_name
       FROM workflows w
       LEFT JOIN users u ON u.id = w.created_by
@@ -306,7 +310,9 @@ export const getWorkflowExecutions = async (organizationId, workflowId, options 
     params.push(limit, offset);
     const result = await query(
       `SELECT
-        we.*,
+        we.id, we.workflow_id, we.patient_id, we.lead_id, we.trigger_type, we.trigger_data,
+        we.status, we.current_step, we.total_steps, we.actions_completed, we.error_message,
+        we.started_at, we.completed_at, we.created_at,
         p.first_name || ' ' || p.last_name as patient_name,
         p.phone as patient_phone,
         p.email as patient_email
@@ -374,7 +380,8 @@ const processScheduledActions = async (organizationId = null) => {
 
     const result = await query(
       `SELECT
-        wsa.*,
+        wsa.id, wsa.execution_id, wsa.action_type, wsa.action_config,
+        wsa.scheduled_for, wsa.status, wsa.completed_at, wsa.error_message, wsa.created_at,
         we.patient_id,
         we.lead_id,
         w.organization_id
@@ -395,9 +402,12 @@ const processScheduledActions = async (organizationId = null) => {
         ]);
 
         // Get patient data
-        const patientResult = await query('SELECT * FROM patients WHERE id = $1', [
-          scheduledAction.patient_id,
-        ]);
+        const patientResult = await query(
+          `SELECT id, organization_id, first_name, last_name, email, phone,
+            date_of_birth, status, lifecycle_stage, last_visit_date, total_visits, tags
+          FROM patients WHERE id = $1`,
+          [scheduledAction.patient_id]
+        );
         const patient = patientResult.rows[0];
 
         // Execute the action
@@ -453,7 +463,10 @@ export const triggerWorkflow = async (organizationId, triggerType, eventData) =>
 
     // Find matching active workflows
     const workflowsResult = await query(
-      `SELECT * FROM workflows
+      `SELECT id, organization_id, name, description, trigger_type, trigger_config,
+        actions, conditions, is_active, max_runs_per_patient,
+        total_runs, successful_runs, failed_runs, created_by, created_at, updated_at
+      FROM workflows
       WHERE organization_id = $1
         AND trigger_type = $2
         AND is_active = true`,
@@ -474,7 +487,9 @@ export const triggerWorkflow = async (organizationId, triggerType, eventData) =>
       let patient = null;
       if (eventData.patient_id) {
         const patientResult = await query(
-          'SELECT * FROM patients WHERE id = $1 AND organization_id = $2',
+          `SELECT id, organization_id, first_name, last_name, email, phone,
+            date_of_birth, status, lifecycle_stage, last_visit_date, total_visits, tags
+          FROM patients WHERE id = $1 AND organization_id = $2`,
           [eventData.patient_id, organizationId]
         );
         patient = patientResult.rows[0];
@@ -662,7 +677,9 @@ export const testWorkflow = async (organizationId, workflowData, testPatientId) 
   try {
     // Get test patient
     const patientResult = await query(
-      'SELECT * FROM patients WHERE id = $1 AND organization_id = $2',
+      `SELECT id, organization_id, first_name, last_name, email, phone,
+        date_of_birth, status, lifecycle_stage, last_visit_date, total_visits, tags
+      FROM patients WHERE id = $1 AND organization_id = $2`,
       [testPatientId, organizationId]
     );
 

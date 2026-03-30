@@ -7,9 +7,17 @@
 import express from 'express';
 import { query } from '../config/database.js';
 import validate from '../middleware/validation.js';
-import { pinAuthSchema, logComplianceSchema } from '../validators/patientPortal.validators.js';
+import {
+  pinAuthSchema,
+  logComplianceSchema,
+  bookingRequestSchema,
+  rescheduleSchema,
+  cancelAppointmentSchema,
+  messageSchema,
+} from '../validators/patientPortal.validators.js';
 import logger from '../utils/logger.js';
-import crypto from 'crypto';
+import { strictLimiter } from '../middleware/rateLimiting.js';
+import * as patientPortalController from '../controllers/patientPortal.js';
 
 const router = express.Router();
 
@@ -103,100 +111,7 @@ const requirePortalAuth = async (req, res, next) => {
  *       503:
  *         description: Portal not yet configured
  */
-router.post('/auth/pin', validate(pinAuthSchema), async (req, res) => {
-  try {
-    const { pin, patientId, dateOfBirth } = req.body;
-
-    // Find patient by ID or date of birth
-    let patientResult;
-    if (patientId) {
-      patientResult = await query(
-        `
-        SELECT id, first_name, last_name, email, phone, date_of_birth, organization_id, portal_pin_hash
-        FROM patients WHERE id = $1
-      `,
-        [patientId]
-      );
-    } else {
-      patientResult = await query(
-        `
-        SELECT id, first_name, last_name, email, phone, date_of_birth, organization_id, portal_pin_hash
-        FROM patients WHERE date_of_birth = $1
-      `,
-        [dateOfBirth]
-      );
-    }
-
-    if (patientResult.rows.length === 0) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
-
-    const patient = patientResult.rows[0];
-
-    // Verify PIN (hash comparison)
-    const pinHash = crypto
-      .createHash('sha256')
-      .update(pin + patient.id)
-      .digest('hex');
-
-    if (patient.portal_pin_hash && patient.portal_pin_hash !== pinHash) {
-      return res.status(401).json({ error: 'Invalid PIN' });
-    }
-
-    // If no PIN set yet, accept any 4-digit PIN for first-time setup and save it
-    if (!patient.portal_pin_hash) {
-      if (!/^\d{4}$/.test(pin)) {
-        return res.status(400).json({ error: 'PIN must be 4 digits' });
-      }
-      await query('UPDATE patients SET portal_pin_hash = $1 WHERE id = $2', [pinHash, patient.id]);
-    }
-
-    // Create portal session
-    const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-
-    try {
-      await query(
-        `
-        INSERT INTO portal_sessions (patient_id, token, expires_at, ip_address)
-        VALUES ($1, $2, $3, $4)
-      `,
-        [patient.id, token, expiresAt, req.ip]
-      );
-    } catch (tableError) {
-      // If table doesn't exist, still return token (stateless mode)
-      if (!tableError.message?.includes('relation "portal_sessions" does not exist')) {
-        throw tableError;
-      }
-    }
-
-    res.cookie('portal_session', token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60 * 1000,
-    });
-
-    res.json({
-      token,
-      patient: {
-        id: patient.id,
-        firstName: patient.first_name,
-        lastName: patient.last_name,
-      },
-      expiresAt,
-    });
-  } catch (error) {
-    if (error.message?.includes('column "portal_pin_hash" does not exist')) {
-      return res.status(503).json({
-        error: 'Portal not yet configured',
-        message: 'Portal PIN column needs to be added to patients table',
-      });
-    }
-    logger.error('Portal PIN auth error:', error);
-    res.status(500).json({ error: 'Authentication failed' });
-  }
-});
+router.post('/auth/pin', validate(pinAuthSchema), patientPortalController.authenticateWithPIN);
 
 /**
  * @swagger
@@ -212,22 +127,7 @@ router.post('/auth/pin', validate(pinAuthSchema), async (req, res) => {
  *       401:
  *         description: Portal session expired
  */
-router.get('/profile', requirePortalAuth, async (req, res) => {
-  try {
-    const patient = req.portalPatient;
-    res.json({
-      id: patient.patient_id,
-      firstName: patient.first_name,
-      lastName: patient.last_name,
-      email: patient.email,
-      phone: patient.phone,
-      dateOfBirth: patient.date_of_birth,
-    });
-  } catch (error) {
-    logger.error('Error getting portal profile:', error);
-    res.status(500).json({ error: 'Failed to get profile' });
-  }
-});
+router.get('/profile', requirePortalAuth, patientPortalController.getProfile);
 
 /**
  * @swagger
@@ -243,28 +143,7 @@ router.get('/profile', requirePortalAuth, async (req, res) => {
  *       401:
  *         description: Portal session expired
  */
-router.get('/appointments', requirePortalAuth, async (req, res) => {
-  try {
-    const { patient_id, organization_id } = req.portalPatient;
-
-    const result = await query(
-      `
-      SELECT id, appointment_date, appointment_time, duration, visit_type, status, notes
-      FROM appointments
-      WHERE patient_id = $1 AND organization_id = $2
-      AND appointment_date >= CURRENT_DATE
-      AND status NOT IN ('cancelled', 'no_show')
-      ORDER BY appointment_date ASC, appointment_time ASC
-    `,
-      [patient_id, organization_id]
-    );
-
-    res.json({ appointments: result.rows });
-  } catch (error) {
-    logger.error('Error getting portal appointments:', error);
-    res.status(500).json({ error: 'Failed to get appointments' });
-  }
-});
+router.get('/appointments', requirePortalAuth, patientPortalController.getAppointments);
 
 /**
  * @swagger
@@ -280,34 +159,7 @@ router.get('/appointments', requirePortalAuth, async (req, res) => {
  *       401:
  *         description: Portal session expired
  */
-router.get('/exercises', requirePortalAuth, async (req, res) => {
-  try {
-    const { patient_id } = req.portalPatient;
-
-    const result = await query(
-      `
-      SELECT
-        pep.id, pep.exercise_id, pep.sets, pep.reps, pep.hold_seconds,
-        pep.frequency, pep.instructions, pep.status, pep.start_date, pep.end_date,
-        el.name, el.name_no, el.description, el.description_no,
-        el.category, el.body_region, el.difficulty, el.video_url, el.image_url
-      FROM patient_exercise_prescriptions pep
-      JOIN exercise_library el ON el.id = pep.exercise_id
-      WHERE pep.patient_id = $1 AND pep.status = 'active'
-      ORDER BY pep.created_at DESC
-    `,
-      [patient_id]
-    );
-
-    res.json({ exercises: result.rows });
-  } catch (error) {
-    if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-      return res.json({ exercises: [] });
-    }
-    logger.error('Error getting portal exercises:', error);
-    res.status(500).json({ error: 'Failed to get exercises' });
-  }
-});
+router.get('/exercises', requirePortalAuth, patientPortalController.getExercises);
 
 /**
  * @swagger
@@ -354,31 +206,109 @@ router.post(
   '/exercises/:id/compliance',
   requirePortalAuth,
   validate(logComplianceSchema),
-  async (req, res) => {
-    try {
-      const { id } = req.params;
-      const { patient_id } = req.portalPatient;
-      const { completed, pain_level, difficulty_rating, notes } = req.body;
+  patientPortalController.logExerciseCompliance
+);
 
-      const result = await query(
-        `
-      INSERT INTO exercise_compliance_logs (
-        prescription_id, patient_id, completed, pain_level, difficulty_rating, notes, logged_at
-      ) VALUES ($1, $2, $3, $4, $5, $6, NOW())
-      RETURNING *
-    `,
-        [id, patient_id, completed !== false, pain_level, difficulty_rating, notes]
-      );
+// =============================================================================
+// BOOKING ENDPOINTS (patient-facing)
+// =============================================================================
 
-      res.status(201).json(result.rows[0]);
-    } catch (error) {
-      if (error.message?.includes('relation') && error.message?.includes('does not exist')) {
-        return res.status(503).json({ error: 'Exercise compliance tracking not yet configured' });
-      }
-      logger.error('Error logging compliance:', error);
-      res.status(500).json({ error: 'Failed to log compliance' });
-    }
-  }
+/**
+ * GET /patient-portal/available-slots
+ * Returns available 30-min slots for a given date
+ */
+router.get('/available-slots', requirePortalAuth, patientPortalController.getAvailableSlots);
+
+/**
+ * POST /patient-portal/appointments/request
+ * Patient requests a new appointment
+ */
+router.post(
+  '/appointments/request',
+  requirePortalAuth,
+  validate(bookingRequestSchema),
+  patientPortalController.requestBooking
+);
+
+/**
+ * PATCH /patient-portal/appointments/:id/reschedule
+ * Patient requests to reschedule an existing appointment
+ */
+router.patch(
+  '/appointments/:id/reschedule',
+  requirePortalAuth,
+  validate(rescheduleSchema),
+  patientPortalController.rescheduleAppointment
+);
+
+/**
+ * POST /patient-portal/appointments/:id/cancel
+ * Patient cancels an appointment
+ */
+router.post(
+  '/appointments/:id/cancel',
+  requirePortalAuth,
+  validate(cancelAppointmentSchema),
+  patientPortalController.cancelAppointment
+);
+
+// =============================================================================
+// MESSAGING ENDPOINTS (patient-facing)
+// =============================================================================
+
+/**
+ * GET /patient-portal/messages
+ * Patient retrieves their messages
+ */
+router.get('/messages', requirePortalAuth, patientPortalController.getMessages);
+
+/**
+ * POST /patient-portal/messages
+ * Patient sends a new message
+ */
+router.post(
+  '/messages',
+  requirePortalAuth,
+  validate(messageSchema),
+  patientPortalController.sendMessage
+);
+
+/**
+ * PATCH /patient-portal/messages/:id/read
+ * Patient marks a message as read
+ */
+router.patch('/messages/:id/read', requirePortalAuth, patientPortalController.markMessageRead);
+
+// =============================================================================
+// DOCUMENTS
+// =============================================================================
+
+router.get('/documents', requirePortalAuth, patientPortalController.getDocuments);
+
+router.get('/documents/:token/download', strictLimiter, patientPortalController.downloadDocument);
+
+// =============================================================================
+// COMMUNICATION PREFERENCES
+// =============================================================================
+
+/**
+ * GET /patient-portal/communication-preferences
+ * Returns patient's communication preferences or defaults
+ */
+router.get(
+  '/communication-preferences',
+  requirePortalAuth,
+  patientPortalController.getCommPreferences
+);
+
+/**
+ * PUT /patient-portal/communication-preferences
+ * Creates or updates patient's communication preferences
+ */
+router.put(
+  '/communication-preferences',
+  requirePortalAuth,
+  patientPortalController.updateCommPreferences
 );
 
 /**
@@ -393,17 +323,6 @@ router.post(
  *       200:
  *         description: Logged out
  */
-router.post('/logout', requirePortalAuth, async (req, res) => {
-  try {
-    const token = req.cookies?.portal_session || req.headers['x-portal-token'];
-    await query('DELETE FROM portal_sessions WHERE token = $1', [token]);
-    res.clearCookie('portal_session');
-    res.json({ success: true });
-  } catch (error) {
-    logger.error('Portal logout error:', error);
-    res.clearCookie('portal_session');
-    res.json({ success: true });
-  }
-});
+router.post('/logout', requirePortalAuth, patientPortalController.logout);
 
 export default router;

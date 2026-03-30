@@ -1,0 +1,249 @@
+# =============================================================================
+# ChiroClickEHR — Production Docker Compose
+# =============================================================================
+# Usage:
+#   docker compose -f docker-compose.production.yml --env-file .env.production up -d
+#
+# Pre-built images are pulled from GHCR. To build locally instead, replace the
+# image: lines with build: context directives.
+#
+# Ollama runs natively on the host for GPU access. The backend reaches it via
+# host.docker.internal:11434.
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL Database
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:15-alpine
+    container_name: chiroclickehr-db
+    environment:
+      POSTGRES_DB: ${DB_NAME:-chiroclickcrm}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=nb_NO.UTF-8"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seeds:/docker-entrypoint-initdb.d/seeds
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2G
+
+  # ---------------------------------------------------------------------------
+  # Redis (cache + sessions + socket.io adapter)
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: chiroclickehr-redis
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-changeme}
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-changeme}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - internal
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+
+  # ---------------------------------------------------------------------------
+  # Backend API (Node.js)
+  # ---------------------------------------------------------------------------
+  backend:
+    image: ghcr.io/usefullatwork/chiroclickehr-backend:${BACKEND_TAG:-latest}
+    container_name: chiroclickehr-backend
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-chiroclickcrm}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY}
+      JWT_SECRET: ${JWT_SECRET}
+      SESSION_SECRET: ${SESSION_SECRET}
+      CLERK_PUBLISHABLE_KEY: ${CLERK_PUBLISHABLE_KEY}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      AI_PROVIDER: ${AI_PROVIDER:-ollama}
+      AI_MODEL: ${AI_MODEL:-chiro-no-sft-dpo-v6}
+      AI_ENABLED: ${AI_ENABLED:-true}
+      GUARDRAILS_ENABLED: ${GUARDRAILS_ENABLED:-true}
+      RAG_ENABLED: ${RAG_ENABLED:-false}
+      PHONE_BRIDGE_METHOD: ${PHONE_BRIDGE_METHOD:-manual}
+      PHONE_DEVICE_ID: ${PHONE_DEVICE_ID}
+      PHONE_API_URL: ${PHONE_API_URL}
+      OUTLOOK_CLIENT_ID: ${OUTLOOK_CLIENT_ID}
+      OUTLOOK_CLIENT_SECRET: ${OUTLOOK_CLIENT_SECRET}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+      TELNYX_API_KEY: ${TELNYX_API_KEY}
+      CORS_ORIGIN: ${CORS_ORIGIN:-https://chiroclickehr.no}
+      REDIS_URL: redis://:${REDIS_PASSWORD:-changeme}@redis:6379
+      REDIS_ENABLED: "true"
+      CLAUDE_FALLBACK_MODE: ${CLAUDE_FALLBACK_MODE:-disabled}
+      CLAUDE_API_KEY: ${CLAUDE_API_KEY:-}
+      CLAUDE_DAILY_BUDGET_USD: ${CLAUDE_DAILY_BUDGET_USD:-10}
+      CLAUDE_MONTHLY_BUDGET_USD: ${CLAUDE_MONTHLY_BUDGET_USD:-200}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@chiroclickehr.no}
+      ENABLE_EMAIL: ${ENABLE_EMAIL:-false}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      SMTP_FROM_EMAIL: ${SMTP_FROM_EMAIL:-noreply@chiroclickehr.no}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - backend_logs:/app/logs
+      - backend_temp:/app/temp
+    networks:
+      - internal
+      - proxy
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 1G
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ---------------------------------------------------------------------------
+  # Frontend (React SPA served by its own nginx inside the container)
+  # ---------------------------------------------------------------------------
+  frontend:
+    image: ghcr.io/usefullatwork/chiroclickehr-frontend:${FRONTEND_TAG:-latest}
+    container_name: chiroclickehr-frontend
+    networks:
+      - proxy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 512M
+
+  # ---------------------------------------------------------------------------
+  # Nginx Reverse Proxy (TLS termination, rate limiting, static caching)
+  # ---------------------------------------------------------------------------
+  nginx:
+    image: nginx:alpine
+    container_name: chiroclickehr-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - certbot_data:/var/www/certbot:ro
+      - nginx_cache:/var/cache/nginx
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - proxy
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1"
+          memory: 256M
+
+  # ---------------------------------------------------------------------------
+  # Automated Database Backup (GDPR compliant — 10 year retention)
+  # ---------------------------------------------------------------------------
+  backup:
+    image: postgres:15-alpine
+    container_name: chiroclickehr-backup
+    depends_on:
+      - postgres
+    volumes:
+      - ./backend/scripts:/scripts
+      - backups:/backups
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_USER: ${DB_USER:-postgres}
+      DB_NAME: ${DB_NAME:-chiroclickcrm}
+      PGPASSWORD: ${DB_PASSWORD}
+      BACKUP_DIR: /backups/postgresql
+      RETENTION_DAYS: ${RETENTION_DAYS:-3650}
+      BACKUP_ENCRYPTION_KEY: ${BACKUP_ENCRYPTION_KEY}
+      S3_BUCKET: ${S3_BUCKET:-}
+    command: >
+      sh -c "apk add --no-cache aws-cli openssl &&
+             while true; do
+               /scripts/backup-database.sh
+               sleep 86400
+             done"
+    networks:
+      - internal
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+# =============================================================================
+# Networks
+# =============================================================================
+networks:
+  internal:
+    driver: bridge
+    internal: true
+  proxy:
+    driver: bridge
+
+# =============================================================================
+# Volumes
+# =============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  backend_logs:
+    driver: local
+  backend_temp:
+    driver: local
+  nginx_cache:
+    driver: local
+  certbot_data:
+    driver: local
+  backups:
+    driver: local

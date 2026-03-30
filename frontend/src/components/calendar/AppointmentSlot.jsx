@@ -5,8 +5,8 @@
  * Color-coded by type, shows patient name and time
  */
 
-import { format, parseISO } from 'date-fns'
-import { User, Clock } from 'lucide-react'
+import { format, parseISO } from 'date-fns';
+import { User, Clock } from 'lucide-react';
 
 export default function AppointmentSlot({
   appointment,
@@ -16,13 +16,13 @@ export default function AppointmentSlot({
   statusStyle,
   onClick,
   translations,
-  compact = false
+  compact = false,
 }) {
-  const startTime = parseISO(appointment.start_time)
-  const endTime = parseISO(appointment.end_time)
+  const startTime = parseISO(appointment.start_time);
+  const endTime = parseISO(appointment.end_time);
 
   // Determine if we should show compact view
-  const isCompact = compact || height < 40
+  const isCompact = compact || height < 40;
 
   return (
     <div
@@ -32,7 +32,7 @@ export default function AppointmentSlot({
       style={{
         top: `${top}px`,
         height: `${height}px`,
-        minHeight: '24px'
+        minHeight: '24px',
       }}
       onClick={onClick}
     >
@@ -43,14 +43,14 @@ export default function AppointmentSlot({
             <span className="text-xs font-semibold text-gray-700 whitespace-nowrap">
               {format(startTime, 'HH:mm')}
             </span>
-            <span className="text-xs text-gray-600 truncate">
+            <span className="text-xs text-gray-600 dark:text-gray-300 truncate">
               {appointment.patient_name}
             </span>
           </div>
         ) : (
           <>
             {/* Time */}
-            <div className="flex items-center gap-1 text-xs text-gray-500">
+            <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
               <Clock className="w-3 h-3" />
               <span className="font-medium">
                 {format(startTime, 'HH:mm')} - {format(endTime, 'HH:mm')}
@@ -59,7 +59,7 @@ export default function AppointmentSlot({
 
             {/* Patient Name */}
             <div className="flex items-center gap-1 mt-0.5">
-              <User className="w-3 h-3 text-gray-500" />
+              <User className="w-3 h-3 text-gray-500 dark:text-gray-400" />
               <span className="text-sm font-semibold text-gray-800 truncate">
                 {appointment.patient_name}
               </span>
@@ -77,7 +77,9 @@ export default function AppointmentSlot({
             {/* Status Badge (if space allows) */}
             {height >= 80 && (
               <div className="mt-1">
-                <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${statusStyle.color}`}>
+                <span
+                  className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${statusStyle.color}`}
+                >
                   {translations.statuses[appointment.status] || appointment.status}
                 </span>
               </div>
@@ -87,11 +89,9 @@ export default function AppointmentSlot({
       </div>
 
       {/* Visual indicator for type on left edge */}
-      <div
-        className={`absolute left-0 top-0 bottom-0 w-1 ${typeStyle.color}`}
-      />
+      <div className={`absolute left-0 top-0 bottom-0 w-1 ${typeStyle.color}`} />
     </div>
-  )
+  );
 }
 
 // Simplified version for list views
@@ -103,11 +103,11 @@ export function AppointmentListItem({
   translations,
   onConfirm,
   onCancel,
-  onCheckIn
+  onCheckIn,
 }) {
-  const startTime = parseISO(appointment.start_time)
-  const endTime = parseISO(appointment.end_time)
-  const StatusIcon = statusStyle?.icon
+  const startTime = parseISO(appointment.start_time);
+  const endTime = parseISO(appointment.end_time);
+  const StatusIcon = statusStyle?.icon;
 
   return (
     <div
@@ -119,13 +119,15 @@ export function AppointmentListItem({
         <div className="flex-1">
           {/* Time and Status */}
           <div className="flex items-center gap-3 mb-2">
-            <div className="flex items-center gap-1 text-sm text-gray-600">
+            <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300">
               <Clock className="w-4 h-4" />
               <span className="font-medium">
                 {format(startTime, 'HH:mm')} - {format(endTime, 'HH:mm')}
               </span>
             </div>
-            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle.color}`}>
+            <span
+              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${statusStyle.color}`}
+            >
               {StatusIcon && <StatusIcon className="w-3 h-3" />}
               {translations.statuses[appointment.status] || appointment.status}
             </span>
@@ -133,10 +135,8 @@ export function AppointmentListItem({
 
           {/* Patient Name */}
           <div className="flex items-center gap-2 mb-1">
-            <User className="w-5 h-5 text-gray-500" />
-            <span className="text-lg font-semibold text-gray-900">
-              {appointment.patient_name}
-            </span>
+            <User className="w-5 h-5 text-gray-500 dark:text-gray-400" />
+            <span className="text-lg font-semibold text-gray-900">{appointment.patient_name}</span>
           </div>
 
           {/* Appointment Type */}
@@ -146,7 +146,7 @@ export function AppointmentListItem({
 
           {/* Notes */}
           {appointment.patient_notes && (
-            <p className="text-sm text-gray-600 mt-2 line-clamp-2">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 line-clamp-2">
               {appointment.patient_notes}
             </p>
           )}
@@ -157,30 +157,31 @@ export function AppointmentListItem({
           {appointment.status === 'PENDING' && onConfirm && (
             <button
               onClick={(e) => {
-                e.stopPropagation()
-                onConfirm(appointment)
+                e.stopPropagation();
+                onConfirm(appointment);
               }}
               className="px-3 py-1.5 text-xs font-medium text-green-700 bg-green-50 border border-green-200 rounded-lg hover:bg-green-100"
             >
               {translations.confirm}
             </button>
           )}
-          {(appointment.status === 'PENDING' || appointment.status === 'CONFIRMED') && onCheckIn && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation()
-                onCheckIn(appointment)
-              }}
-              className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
-            >
-              {translations.checkIn}
-            </button>
-          )}
+          {(appointment.status === 'PENDING' || appointment.status === 'CONFIRMED') &&
+            onCheckIn && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onCheckIn(appointment);
+                }}
+                className="px-3 py-1.5 text-xs font-medium text-blue-700 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100"
+              >
+                {translations.checkIn}
+              </button>
+            )}
           {!['CANCELLED', 'COMPLETED', 'NO_SHOW'].includes(appointment.status) && onCancel && (
             <button
               onClick={(e) => {
-                e.stopPropagation()
-                onCancel(appointment)
+                e.stopPropagation();
+                onCancel(appointment);
               }}
               className="px-3 py-1.5 text-xs font-medium text-red-700 bg-red-50 border border-red-200 rounded-lg hover:bg-red-100"
             >
@@ -190,5 +191,5 @@ export function AppointmentListItem({
         </div>
       </div>
     </div>
-  )
+  );
 }

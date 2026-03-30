@@ -40,11 +40,10 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: true,
+    sourcemap: false,
     rollupOptions: {
       output: {
         manualChunks: {
-          'three-vendor': ['three', '@react-three/fiber', '@react-three/drei'],
           'socket-vendor': ['socket.io-client'],
           'chart-vendor': ['recharts'],
           'ui-vendor': ['react', 'react-dom', 'react-router-dom'],

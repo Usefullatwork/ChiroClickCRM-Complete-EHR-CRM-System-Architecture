@@ -10,6 +10,7 @@ import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import 'react-native-reanimated';
 
 import { useAuthStore } from '../stores/authStore';
@@ -76,6 +77,17 @@ function RootLayoutNav() {
     }
   }, [isAuthenticated, isLoading]);
 
+  // Handle push notification taps — navigate to the relevant screen
+  useEffect(() => {
+    const sub = Notifications.addNotificationResponseReceivedListener(response => {
+      const data = response.notification.request.content.data;
+      if (data?.route) {
+        router.push(data.route as string);
+      }
+    });
+    return () => sub.remove();
+  }, []);
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
@@ -95,6 +107,18 @@ function RootLayoutNav() {
             headerShown: true,
             title: 'Program'
           }}
+        />
+        <Stack.Screen
+          name="clinic/messages"
+          options={{ headerShown: true, title: 'Meldinger' }}
+        />
+        <Stack.Screen
+          name="clinic/documents"
+          options={{ headerShown: true, title: 'Dokumenter' }}
+        />
+        <Stack.Screen
+          name="clinic/booking"
+          options={{ headerShown: true, title: 'Timebestilling' }}
         />
         <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
       </Stack>

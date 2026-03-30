@@ -31,6 +31,14 @@ const SENSITIVE_RESOURCES = [
   'episodes',
   'auth',
   'care_episodes',
+  'encounters',
+  'appointments',
+  'documents',
+  'referrals',
+  'exercises',
+  'portal',
+  'mobile',
+  'settings',
 ];
 
 /**

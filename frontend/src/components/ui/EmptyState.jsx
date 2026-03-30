@@ -25,7 +25,7 @@ export default function EmptyState({
     >
       {illustration || (
         <div className="w-16 h-16 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center mb-4">
-          <Icon className="w-8 h-8 text-gray-400 dark:text-gray-500" aria-hidden="true" />
+          <Icon className="w-8 h-8 text-gray-400 dark:text-gray-300" aria-hidden="true" />
         </div>
       )}
       <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-1">{title}</h3>

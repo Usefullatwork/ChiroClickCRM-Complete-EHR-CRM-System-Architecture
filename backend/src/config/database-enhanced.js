@@ -37,7 +37,7 @@ const poolConfig = {
   idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT || '30000'),
   statement_timeout: parseInt(process.env.DB_STATEMENT_TIMEOUT || '30000'),
   query_timeout: parseInt(process.env.DB_QUERY_TIMEOUT || '30000'),
-  application_name: 'ChiroClickCRM',
+  application_name: 'ChiroClickEHR',
   keepAlive: true,
   keepAliveInitialDelayMillis: 10000,
   ssl: isProduction ? { rejectUnauthorized: true } : false,

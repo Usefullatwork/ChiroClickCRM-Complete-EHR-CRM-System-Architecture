@@ -10,8 +10,9 @@
 
 import express from 'express';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
-import * as progressService from '../services/progressTracking.js';
+import * as progressService from '../services/clinical/progressTracking.js';
 import validate from '../middleware/validation.js';
+import { logAudit } from '../utils/audit.js';
 import {
   getPatientStatsSchema,
   getWeeklyComplianceSchema,
@@ -311,6 +312,18 @@ router.post(
         notes,
         'clinician'
       );
+
+      await logAudit({
+        organizationId,
+        userId: req.user?.id,
+        userEmail: req.user?.email,
+        userRole: req.user?.role,
+        action: 'CREATE',
+        resourceType: 'PAIN_ENTRY',
+        resourceId: patientId,
+        ipAddress: req.ip,
+        userAgent: req.get('user-agent'),
+      });
 
       res.json({
         success: true,

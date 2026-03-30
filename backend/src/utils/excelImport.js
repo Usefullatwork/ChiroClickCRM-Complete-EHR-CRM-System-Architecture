@@ -5,7 +5,7 @@
 
 import { readFile } from 'fs/promises';
 import ExcelJS from 'exceljs';
-import { createPatient } from '../services/patients.js';
+import { createPatient } from '../services/practice/patients.js';
 // encryption available via ./encryption.js
 import logger from './logger.js';
 
@@ -345,7 +345,7 @@ export const generateImportTemplate = async () => {
     Gender: 'Male',
     Email: 'ola@example.com',
     Phone: '98765432',
-    'Personal Number': '15018012345',
+    'Personal Number': '01010100000',
     Address: 'Storgata 1',
     'Postal Code': '0150',
     City: 'Oslo',

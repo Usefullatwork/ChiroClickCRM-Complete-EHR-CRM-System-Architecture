@@ -1,10 +1,10 @@
 @echo off
-REM ChiroClickCRM - Local AI Setup Script
+REM ChiroClickEHR - Local AI Setup Script
 REM Installs and configures Ollama with optimal models for clinical documentation
 
 echo.
 echo ===============================================
-echo   ChiroClickCRM Local AI Setup
+echo   ChiroClickEHR Local AI Setup
 echo   Privacy-first clinical AI assistance
 echo ===============================================
 echo.
@@ -112,7 +112,7 @@ REM Create custom clinical modelfile
 echo Creating optimized clinical model configuration...
 
 (
-echo # ChiroClickCRM Clinical Model
+echo # ChiroClickEHR Clinical Model
 echo # Optimized for Norwegian chiropractic documentation
 echo.
 echo FROM llama3.2:3b
@@ -177,14 +177,14 @@ echo ===============================================
 echo   Setup Complete!
 echo ===============================================
 echo.
-echo Local AI is now configured for ChiroClickCRM.
+echo Local AI is now configured for ChiroClickEHR.
 echo.
 echo Configuration:
 echo   - Ollama URL: http://localhost:11434
 echo   - Primary Model: llama3.2:3b
 echo   - Custom Model: chiroclick-clinical (if created)
 echo.
-echo To use in ChiroClickCRM:
+echo To use in ChiroClickEHR:
 echo   1. Set AI_PROVIDER=ollama in backend\.env
 echo   2. Set AI_MODEL=llama3.2:3b (or chiroclick-clinical)
 echo   3. Restart the backend server

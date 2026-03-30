@@ -40,7 +40,7 @@ export default function AutomationStatsTab({
                       {getTriggerLabel(stat.trigger_type)}
                     </span>
                   </div>
-                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-500">
+                  <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400">
                     <div>
                       <span className="font-medium text-gray-900">{stat.workflow_count}</span>
                       <span className="ml-1">
@@ -67,7 +67,7 @@ export default function AutomationStatsTab({
             })}
           </div>
         ) : (
-          <p className="text-sm text-gray-500 text-center py-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
             {language === 'no' ? 'Ingen statistikk tilgjengelig' : 'No statistics available'}
           </p>
         )}
@@ -89,7 +89,7 @@ export default function AutomationStatsTab({
                   className={`px-2 py-0.5 text-xs rounded-full ${
                     stats.upcoming_triggers.birthdays?.has_active_workflow
                       ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 text-gray-600'
+                      : 'bg-gray-100 text-gray-600 dark:text-gray-300'
                   }`}
                 >
                   {stats.upcoming_triggers.birthdays?.has_active_workflow
@@ -100,7 +100,7 @@ export default function AutomationStatsTab({
               <div className="text-3xl font-bold text-purple-600 mb-2">
                 {stats.upcoming_triggers.birthdays?.count || 0}
               </div>
-              <div className="space-y-1 text-sm text-gray-500">
+              <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
                 {stats.upcoming_triggers.birthdays?.patients?.slice(0, 3).map((p) => (
                   <div key={p.id} className="flex items-center justify-between">
                     <span>
@@ -123,7 +123,7 @@ export default function AutomationStatsTab({
                   className={`px-2 py-0.5 text-xs rounded-full ${
                     stats.upcoming_triggers.recalls?.has_active_workflow
                       ? 'bg-green-100 text-green-700'
-                      : 'bg-gray-100 text-gray-600'
+                      : 'bg-gray-100 text-gray-600 dark:text-gray-300'
                   }`}
                 >
                   {stats.upcoming_triggers.recalls?.has_active_workflow
@@ -134,7 +134,7 @@ export default function AutomationStatsTab({
               <div className="text-3xl font-bold text-orange-600 mb-2">
                 {stats.upcoming_triggers.recalls?.count || 0}
               </div>
-              <div className="space-y-1 text-sm text-gray-500">
+              <div className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
                 {stats.upcoming_triggers.recalls?.patients?.slice(0, 3).map((p) => (
                   <div key={p.id} className="flex items-center justify-between">
                     <span>
@@ -147,7 +147,7 @@ export default function AutomationStatsTab({
             </div>
           </div>
         ) : (
-          <p className="text-sm text-gray-500 text-center py-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
             {language === 'no' ? 'Laster...' : 'Loading...'}
           </p>
         )}

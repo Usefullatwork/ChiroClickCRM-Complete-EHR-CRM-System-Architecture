@@ -24,6 +24,7 @@ import {
 import { exercisesApi } from '../api/exercises';
 import ExerciseLibrary from '../components/exercises/ExerciseLibrary';
 import ExercisePrescription from '../components/exercises/ExercisePrescription';
+import SendDocumentModal from '../components/ui/SendDocumentModal';
 
 import logger from '../utils/logger';
 export default function Exercises() {
@@ -48,6 +49,9 @@ export default function Exercises() {
   const [success, setSuccess] = useState(null);
   const [_showCreateModal, _setShowCreateModal] = useState(false);
   const [selectedPrescription, setSelectedPrescription] = useState(null);
+  const [sendModalOpen, setSendModalOpen] = useState(false);
+  const [sendPrescriptionId, setSendPrescriptionId] = useState(null);
+  const [sendPatientName, setSendPatientName] = useState('');
 
   // Mock patient data (would come from context in real app)
   const patient = patientId
@@ -257,11 +261,13 @@ export default function Exercises() {
 
   // Get status label
   const getStatusLabel = (status) => {
-    const labels = {
-      no: { active: 'Aktiv', completed: 'Fullført', paused: 'Pauset', cancelled: 'Avbrutt' },
-      en: { active: 'Active', completed: 'Completed', paused: 'Paused', cancelled: 'Cancelled' },
+    const statusKeys = {
+      active: t('statusActive', 'Aktiv'),
+      completed: t('statusCompleted', 'Fullført'),
+      paused: t('statusPaused', 'Pauset'),
+      cancelled: t('statusCancelled', 'Avbrutt'),
     };
-    return labels[language][status] || status;
+    return statusKeys[status] || status;
   };
 
   return (
@@ -283,7 +289,7 @@ export default function Exercises() {
               <div>
                 <h1 className="text-xl font-semibold text-gray-900">{t('exerciseLibrary')}</h1>
                 {patient && (
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     {patient.first_name} {patient.last_name}
                   </p>
                 )}
@@ -297,7 +303,9 @@ export default function Exercises() {
               <button
                 onClick={() => setLanguage('no')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  language === 'no' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+                  language === 'no'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300'
                 }`}
               >
                 Norsk
@@ -305,7 +313,9 @@ export default function Exercises() {
               <button
                 onClick={() => setLanguage('en')}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
-                  language === 'en' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600'
+                  language === 'en'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600 dark:text-gray-300'
                 }`}
               >
                 English
@@ -347,7 +357,7 @@ export default function Exercises() {
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'library'
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -360,7 +370,7 @@ export default function Exercises() {
               className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === 'prescriptions'
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700'
               }`}
             >
               <div className="flex items-center gap-2">
@@ -379,7 +389,7 @@ export default function Exercises() {
                 className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
                   activeTab === 'create'
                     ? 'border-blue-600 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700'
                 }`}
               >
                 <div className="flex items-center gap-2">
@@ -418,7 +428,7 @@ export default function Exercises() {
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-            <span className="ml-3 text-gray-500">{t('loadingExercises')}</span>
+            <span className="ml-3 text-gray-500 dark:text-gray-400">{t('loadingExercises')}</span>
           </div>
         ) : activeTab === 'library' ? (
           /* Exercise Library Tab */
@@ -443,10 +453,10 @@ export default function Exercises() {
             </div>
 
             {prescriptions.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+              <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
                 <FileText className="w-12 h-12 text-gray-300 mb-3" />
                 <p>{t('noProgramsCreated')}</p>
-                <p className="text-sm text-gray-400">{t('selectFromLibrary')}</p>
+                <p className="text-sm text-gray-400 dark:text-gray-300">{t('selectFromLibrary')}</p>
               </div>
             ) : (
               <div className="divide-y divide-gray-200">
@@ -464,11 +474,11 @@ export default function Exercises() {
                             {getStatusLabel(prescription.status)}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                           {t('created')}: {formatDate(prescription.created_at)}
                         </p>
                         {prescription.patient_instructions && (
-                          <p className="text-sm text-gray-600 mt-2 italic">
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 italic">
                             "{prescription.patient_instructions}"
                           </p>
                         )}
@@ -478,7 +488,7 @@ export default function Exercises() {
                         <button
                           onClick={() => handleDownloadPDF(prescription.id)}
                           disabled={sending}
-                          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+                          className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                           title={t('downloadPDF')}
                         >
                           <Download className="w-4 h-4" />
@@ -486,7 +496,7 @@ export default function Exercises() {
                         <button
                           onClick={() => handleSendEmail(prescription.id)}
                           disabled={sending}
-                          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+                          className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                           title={t('sendEmail')}
                         >
                           <Mail className="w-4 h-4" />
@@ -494,7 +504,7 @@ export default function Exercises() {
                         <button
                           onClick={() => handleSendSMS(prescription.id)}
                           disabled={sending}
-                          className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+                          className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                           title={t('sendSMS')}
                         >
                           <MessageSquare className="w-4 h-4" />
@@ -515,13 +525,13 @@ export default function Exercises() {
                         {prescription.exercises.slice(0, 5).map((ex, i) => (
                           <span
                             key={i}
-                            className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600"
+                            className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-600 dark:text-gray-300"
                           >
                             {ex.name_norwegian || ex.name}
                           </span>
                         ))}
                         {prescription.exercises.length > 5 && (
-                          <span className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-500">
+                          <span className="px-2 py-1 bg-gray-100 rounded text-xs text-gray-500 dark:text-gray-400">
                             +{prescription.exercises.length - 5} {t('more')}
                           </span>
                         )}
@@ -542,8 +552,16 @@ export default function Exercises() {
                 selectedExercises={selectedExercises}
                 onExercisesChange={setSelectedExercises}
                 onSave={handleSavePrescription}
-                onSendEmail={() => {}}
-                onSendSMS={() => {}}
+                onSendEmail={(prescriptionId) => {
+                  setSendPrescriptionId(prescriptionId);
+                  setSendPatientName(patient ? `${patient.first_name} ${patient.last_name}` : '');
+                  setSendModalOpen(true);
+                }}
+                onSendSMS={(prescriptionId) => {
+                  setSendPrescriptionId(prescriptionId);
+                  setSendPatientName(patient ? `${patient.first_name} ${patient.last_name}` : '');
+                  setSendModalOpen(true);
+                }}
                 onGeneratePDF={() => {}}
                 saving={saving}
                 sending={sending}
@@ -591,7 +609,7 @@ export default function Exercises() {
                   >
                     {getStatusLabel(selectedPrescription.status)}
                   </span>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {formatDate(selectedPrescription.created_at)}
                   </span>
                 </div>
@@ -599,7 +617,9 @@ export default function Exercises() {
                 {selectedPrescription.patient_instructions && (
                   <div>
                     <h4 className="text-sm font-medium text-gray-700 mb-1">{t('instructions')}</h4>
-                    <p className="text-gray-600">{selectedPrescription.patient_instructions}</p>
+                    <p className="text-gray-600 dark:text-gray-300">
+                      {selectedPrescription.patient_instructions}
+                    </p>
                   </div>
                 )}
 
@@ -610,12 +630,14 @@ export default function Exercises() {
                       <div key={i} className="p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center justify-between">
                           <span className="font-medium">{ex.name_norwegian || ex.name}</span>
-                          <span className="text-sm text-gray-500">
-                            {ex.sets} sett × {ex.reps} rep
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
+                            {ex.sets} {t('sets', 'sett')} × {ex.reps} {t('reps', 'rep')}
                           </span>
                         </div>
                         {ex.custom_instructions && (
-                          <p className="text-sm text-gray-600 mt-1">{ex.custom_instructions}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                            {ex.custom_instructions}
+                          </p>
                         )}
                       </div>
                     ))}
@@ -643,6 +665,16 @@ export default function Exercises() {
           </div>
         </div>
       )}
+
+      <SendDocumentModal
+        isOpen={sendModalOpen}
+        onClose={() => setSendModalOpen(false)}
+        documentType="exercise_prescription"
+        documentId={sendPrescriptionId}
+        patientId={patientId}
+        patientName={sendPatientName}
+        onSuccess={() => {}}
+      />
     </div>
   );
 }

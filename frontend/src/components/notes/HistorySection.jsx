@@ -3,6 +3,7 @@
  * Extracted from InitialConsultTemplate.jsx
  */
 import { User, FileText, Heart, AlertTriangle } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 export default function HistorySection({
   consultData,
@@ -15,36 +16,46 @@ export default function HistorySection({
   InputField,
   Checkbox,
 }) {
+  const { t } = useTranslation('clinical');
+
   return (
     <>
       {/* Demographics Section / Demografiseksjon */}
-      <Section id="demographics" title="Pasientinformasjon" icon={User} color="gray">
+      <Section
+        id="demographics"
+        title={t('historyPatientInfo', 'Pasientinformasjon')}
+        icon={User}
+        color="gray"
+      >
         <div className="grid grid-cols-2 gap-4">
           <InputField
-            label="Yrke"
+            label={t('historyOccupation', 'Yrke')}
             value={consultData.demographics.occupation}
             onChange={(v) => updateField('demographics', 'occupation', v)}
-            placeholder="F.eks. kontorarbeider, haandverker"
+            placeholder={t('occupationPlaceholder', 'F.eks. kontorarbeider, haandverker')}
           />
           <InputField
-            label="Aktivitetsniva"
+            label={t('historyActivityLevel', 'Aktivitetsnivå')}
             value={consultData.demographics.activityLevel}
             onChange={(v) => updateField('demographics', 'activityLevel', v)}
-            placeholder="F.eks. stillesittende, moderat aktiv, svaert aktiv"
+            placeholder={t(
+              'activityLevelPlaceholder',
+              'F.eks. stillesittende, moderat aktiv, svaert aktiv'
+            )}
           />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <InputField
-            label="Livsstil"
+            label={t('historyLifestyle', 'Livsstil')}
             value={consultData.demographics.lifestyle}
             onChange={(v) => updateField('demographics', 'lifestyle', v)}
-            placeholder="Relevante livsstilsfaktorer"
+            placeholder={t('lifestylePlaceholder', 'Relevante livsstilsfaktorer')}
           />
           <InputField
-            label="Sovnkvalitet"
+            label={t('historySleepQuality', 'Søvnkvalitet')}
             value={consultData.demographics.sleepQuality}
             onChange={(v) => updateField('demographics', 'sleepQuality', v)}
-            placeholder="F.eks. god, moderat, darlig"
+            placeholder={t('sleepQualityPlaceholder', 'F.eks. god, moderat, darlig')}
           />
         </div>
       </Section>
@@ -52,7 +63,7 @@ export default function HistorySection({
       {/* Subjective Section / Subjektiv seksjon */}
       <Section
         id="subjective"
-        title="Subjektiv - Hovedklage og anamnese"
+        title={t('historySubjectiveTitle', 'Subjektiv - Hovedklage og anamnese')}
         icon={FileText}
         color="blue"
       >
@@ -60,7 +71,7 @@ export default function HistorySection({
           label="Hovedklage"
           value={consultData.subjective.chiefComplaint}
           onChange={(v) => updateField('subjective', 'chiefComplaint', v)}
-          placeholder="Pasientens hovedplage i egne ord..."
+          placeholder={t('chiefComplaintDetailPlaceholder', 'Pasientens hovedplage i egne ord...')}
           required
         />
         <div className="grid grid-cols-2 gap-4">
@@ -74,7 +85,7 @@ export default function HistorySection({
             label="Omstendigheter ved debut"
             value={consultData.subjective.onsetCircumstances}
             onChange={(v) => updateField('subjective', 'onsetCircumstances', v)}
-            placeholder="Hvordan startet plagene?"
+            placeholder={t('onsetCircumstancesPlaceholder', 'Hvordan startet plagene?')}
           />
         </div>
         <TextField
@@ -82,14 +93,14 @@ export default function HistorySection({
           value={consultData.subjective.historyOfPresentIllness}
           onChange={(v) => updateField('subjective', 'historyOfPresentIllness', v)}
           rows={3}
-          placeholder="Detaljert beskrivelse av navaerende plager..."
+          placeholder={t('hpiPlaceholder', 'Detaljert beskrivelse av navaerende plager...')}
         />
         <div className="grid grid-cols-2 gap-4">
           <InputField
             label="Smertelokalisering"
             value={consultData.subjective.painLocation}
             onChange={(v) => updateField('subjective', 'painLocation', v)}
-            placeholder="Hvor er smerten?"
+            placeholder={t('painLocationPlaceholder', 'Hvor er smerten?')}
           />
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -105,10 +116,10 @@ export default function HistorySection({
                 updateRootField('vas_pain_start', parseInt(e.target.value));
               }}
               disabled={readOnly}
-              aria-label="Smerteintensitet VAS skala"
+              aria-label={t('painIntensityVasScale', 'Smerteintensitet VAS skala')}
               className="w-full"
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1">
               <span>0</span>
               <span className="font-medium text-blue-600">
                 {consultData.subjective.painIntensity || 0}
@@ -124,7 +135,7 @@ export default function HistorySection({
               value={consultData.subjective.painPattern || ''}
               onChange={(e) => updateField('subjective', 'painPattern', e.target.value)}
               disabled={readOnly}
-              aria-label="Smertemonster"
+              aria-label={t('painPattern', 'Smertemonster')}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Velg...</option>
@@ -138,82 +149,87 @@ export default function HistorySection({
             label="Smerteutstrahling"
             value={consultData.subjective.painRadiation}
             onChange={(v) => updateField('subjective', 'painRadiation', v)}
-            placeholder="Strahler smerten ut?"
+            placeholder={t('painRadiationPlaceholder', 'Strahler smerten ut?')}
           />
         </div>
         <TextField
           label="Forverrende faktorer"
           value={consultData.subjective.aggravatingFactors}
           onChange={(v) => updateField('subjective', 'aggravatingFactors', v)}
-          placeholder="Hva forverrer plagene?"
+          placeholder={t('aggravatingFactorsPlaceholder', 'Hva forverrer plagene?')}
         />
         <TextField
           label="Lindrende faktorer"
           value={consultData.subjective.relievingFactors}
           onChange={(v) => updateField('subjective', 'relievingFactors', v)}
-          placeholder="Hva lindrer plagene?"
+          placeholder={t('relievingFactorsPlaceholder', 'Hva lindrer plagene?')}
         />
         <TextField
           label="Funksjonsbegrensninger"
           value={consultData.subjective.functionalLimitations}
           onChange={(v) => updateField('subjective', 'functionalLimitations', v)}
-          placeholder="Hvordan pavirker dette dagliglivet?"
+          placeholder={t('functionalLimitationsPlaceholder', 'Hvordan pavirker dette dagliglivet?')}
         />
         <TextField
           label="Tidligere episoder"
           value={consultData.subjective.previousEpisodes}
           onChange={(v) => updateField('subjective', 'previousEpisodes', v)}
-          placeholder="Har pasienten hatt lignende plager for?"
+          placeholder={t('previousEpisodesPlaceholder', 'Har pasienten hatt lignende plager for?')}
         />
         <TextField
           label="Tidligere behandling"
           value={consultData.subjective.previousTreatment}
           onChange={(v) => updateField('subjective', 'previousTreatment', v)}
-          placeholder="Hva har vaert forsokt tidligere?"
+          placeholder={t('previousTreatmentPlaceholder', 'Hva har vaert forsokt tidligere?')}
         />
         <div className="grid grid-cols-2 gap-4">
           <TextField
             label="Navaerende medikamenter"
             value={consultData.subjective.currentMedications}
             onChange={(v) => updateField('subjective', 'currentMedications', v)}
-            placeholder="Liste over medisiner..."
+            placeholder={t('medicationsPlaceholder', 'Liste over medisiner...')}
           />
           <TextField
             label="Allergier"
             value={consultData.subjective.medicationAllergies}
             onChange={(v) => updateField('subjective', 'medicationAllergies', v)}
-            placeholder="Kjente allergier..."
+            placeholder={t('allergiesPlaceholder', 'Kjente allergier...')}
           />
         </div>
       </Section>
 
       {/* Medical History Section / Sykehistorieseksjon */}
-      <Section id="medicalHistory" title="Sykehistorie" icon={Heart} color="pink">
+      <Section
+        id="medicalHistory"
+        title={t('historyMedicalHistory', 'Sykehistorie')}
+        icon={Heart}
+        color="pink"
+      >
         <TextField
           label="Tidligere sykdommer"
           value={consultData.medicalHistory.pastMedicalHistory}
           onChange={(v) => updateField('medicalHistory', 'pastMedicalHistory', v)}
           rows={2}
-          placeholder="Relevante tidligere sykdommer..."
+          placeholder={t('pastMedicalHistoryPlaceholder', 'Relevante tidligere sykdommer...')}
         />
         <TextField
           label="Kirurgisk historie"
           value={consultData.medicalHistory.surgicalHistory}
           onChange={(v) => updateField('medicalHistory', 'surgicalHistory', v)}
-          placeholder="Tidligere operasjoner..."
+          placeholder={t('surgicalHistoryPlaceholder', 'Tidligere operasjoner...')}
         />
         <div className="grid grid-cols-2 gap-4">
           <TextField
             label="Familiehistorie"
             value={consultData.medicalHistory.familyHistory}
             onChange={(v) => updateField('medicalHistory', 'familyHistory', v)}
-            placeholder="Relevante sykdommer i familien..."
+            placeholder={t('familyHistoryPlaceholder', 'Relevante sykdommer i familien...')}
           />
           <TextField
             label="Sosial historie"
             value={consultData.medicalHistory.socialHistory}
             onChange={(v) => updateField('medicalHistory', 'socialHistory', v)}
-            placeholder="Royk, alkohol, etc..."
+            placeholder={t('socialHistoryPlaceholder', 'Royk, alkohol, etc...')}
           />
         </div>
 
@@ -221,7 +237,7 @@ export default function HistorySection({
         <div className="mt-4">
           <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 text-red-500" />
-            Rodt flagg screening
+            {t('historyRedFlagScreening', 'Rødt flagg screening')}
           </h4>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
             <Checkbox

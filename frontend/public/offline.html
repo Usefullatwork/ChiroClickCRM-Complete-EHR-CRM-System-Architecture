@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Offline - ChiroClick CRM</title>
+  <title>Offline - ChiroClick EHR</title>
   <style>
     * {
       box-sizing: border-box;
@@ -133,11 +133,11 @@
 
   <script>
     // Language preference
-    let currentLang = localStorage.getItem('chiroclick_lang') || 'en';
+    let currentLang = localStorage.getItem('chiroclickehr_lang') || 'en';
 
     function setLang(lang) {
       currentLang = lang;
-      localStorage.setItem('chiroclick_lang', lang);
+      localStorage.setItem('chiroclickehr_lang', lang);
       document.getElementById('content-en').classList.toggle('hidden', lang !== 'en');
       document.getElementById('content-no').classList.toggle('hidden', lang !== 'no');
     }

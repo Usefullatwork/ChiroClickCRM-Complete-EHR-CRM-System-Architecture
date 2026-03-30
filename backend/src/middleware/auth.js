@@ -104,11 +104,12 @@ export const requireAuth = (req, res, next) => {
 
   if (
     process.env.NODE_ENV === 'development' &&
-    req.headers['x-dev-bypass'] === (process.env.DEV_BYPASS_SECRET || 'true')
+    process.env.DEV_BYPASS_SECRET &&
+    req.headers['x-dev-bypass'] === process.env.DEV_BYPASS_SECRET
   ) {
     req.user = {
       id: DEV_USER_ID,
-      email: 'dev@chiroclickcrm.local',
+      email: 'dev@chiroclickehr.local',
       first_name: 'Dev',
       last_name: 'User',
       role: 'ADMIN',

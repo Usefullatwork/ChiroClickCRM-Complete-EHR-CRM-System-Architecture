@@ -2,7 +2,7 @@
  * Outcomes Controller
  */
 
-import * as outcomeService from '../services/outcomes.js';
+import * as outcomeService from '../services/clinical/outcomes.js';
 import logger from '../utils/logger.js';
 
 export const getPatientOutcomeSummary = async (req, res) => {
@@ -56,7 +56,7 @@ export const getCohortAnalysis = async (req, res) => {
     const options = {
       groupBy: req.query.groupBy || 'age_group',
       startDate: req.query.startDate,
-      endDate: req.query.endDate
+      endDate: req.query.endDate,
     };
 
     const analysis = await outcomeService.getCohortAnalysis(organizationId, options);
@@ -105,5 +105,5 @@ export default {
   getTreatmentOutcomeStats,
   getCohortAnalysis,
   getPatientLongitudinalData,
-  predictTreatmentOutcome
+  predictTreatmentOutcome,
 };

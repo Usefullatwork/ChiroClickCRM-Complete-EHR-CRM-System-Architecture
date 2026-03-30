@@ -149,7 +149,9 @@ export default function PrescriptionPreview({
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">Forhandsvisning</h2>
-            <p className="text-sm text-gray-500">Slik vil programmet se ut for pasienten</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Slik vil programmet se ut for pasienten
+            </p>
           </div>
 
           <div className="flex items-center gap-4">
@@ -224,7 +226,9 @@ export default function PrescriptionPreview({
                       </div>
                       <div>
                         <h1 className="font-semibold text-gray-900">{clinic?.name || 'Klinikk'}</h1>
-                        <p className="text-sm text-gray-500">Ditt treningsprogram</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          Ditt treningsprogram
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -235,7 +239,7 @@ export default function PrescriptionPreview({
                   {/* Prescription Info / Forskrivningsinformasjon */}
                   <div className="bg-white rounded-xl shadow-sm p-4">
                     <h2 className="font-semibold text-gray-900 mb-3">Treningsprogram</h2>
-                    <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-300">
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4" />
                         <span>For: {displayPatientName}</span>
@@ -271,7 +275,7 @@ export default function PrescriptionPreview({
                       <div className="flex-1 bg-gray-100 rounded-full h-3">
                         <div className="bg-green-500 h-full rounded-full" style={{ width: '0%' }} />
                       </div>
-                      <span className="text-sm font-medium text-gray-600">
+                      <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
                         0 / {exercises.length}
                       </span>
                     </div>
@@ -306,7 +310,7 @@ export default function PrescriptionPreview({
                                   </h4>
                                   <div className="flex flex-wrap items-center gap-2 mt-1">
                                     {exercise.category && (
-                                      <span className="text-xs text-gray-500">
+                                      <span className="text-xs text-gray-500 dark:text-gray-400">
                                         {exercise.category}
                                       </span>
                                     )}
@@ -325,24 +329,24 @@ export default function PrescriptionPreview({
                                     )}
                                   </div>
                                   {/* Parameters / Parametere */}
-                                  <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600">
+                                  <div className="flex flex-wrap items-center gap-3 mt-2 text-sm text-gray-600 dark:text-gray-300">
                                     <span className="flex items-center gap-1">
-                                      <Target className="w-4 h-4 text-gray-400" />
+                                      <Target className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                                       {exercise.sets || 3} sett
                                     </span>
                                     <span className="flex items-center gap-1">
-                                      <Activity className="w-4 h-4 text-gray-400" />
+                                      <Activity className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                                       {exercise.reps || 10} rep
                                     </span>
                                     {exercise.holdSeconds > 0 && (
                                       <span className="flex items-center gap-1">
-                                        <Clock className="w-4 h-4 text-gray-400" />
+                                        <Clock className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                                         {exercise.holdSeconds} sek
                                       </span>
                                     )}
                                   </div>
                                 </div>
-                                <div className="text-gray-400">
+                                <div className="text-gray-400 dark:text-gray-300">
                                   {expandedExercise === index ? (
                                     <ChevronUp className="w-5 h-5" />
                                   ) : (
@@ -360,7 +364,7 @@ export default function PrescriptionPreview({
                                     <h5 className="text-sm font-medium text-gray-700 mb-1">
                                       Instruksjoner
                                     </h5>
-                                    <p className="text-sm text-gray-600">
+                                    <p className="text-sm text-gray-600 dark:text-gray-300">
                                       {exercise.instructions_norwegian || exercise.instructions}
                                     </p>
                                   </div>
@@ -397,7 +401,7 @@ export default function PrescriptionPreview({
                           </div>
                         ))
                       ) : (
-                        <div className="text-center py-8 text-gray-500">
+                        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                           Ingen ovelser i programmet
                         </div>
                       )}
@@ -408,10 +412,10 @@ export default function PrescriptionPreview({
                   {(prescription?.startDate || prescription?.endDate) && (
                     <div className="bg-white rounded-xl shadow-sm p-4">
                       <div className="flex items-center gap-2 mb-2">
-                        <Calendar className="w-4 h-4 text-gray-600" />
+                        <Calendar className="w-4 h-4 text-gray-600 dark:text-gray-300" />
                         <h3 className="font-medium text-gray-900">Programvarighet</h3>
                       </div>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
                         {prescription.startDate && (
                           <>
                             Start: <strong>{formatDate(prescription.startDate)}</strong>
@@ -429,7 +433,7 @@ export default function PrescriptionPreview({
                   )}
 
                   {/* Footer Warning / Bunntekst-advarsel */}
-                  <div className="text-center text-sm text-gray-500 pt-4 pb-8">
+                  <div className="text-center text-sm text-gray-500 dark:text-gray-400 pt-4 pb-8">
                     <p>Stopp ovelsene hvis du opplever okt smerte og kontakt klinikken.</p>
                   </div>
                 </main>
@@ -440,7 +444,7 @@ export default function PrescriptionPreview({
 
         {/* Footer / Bunntekst */}
         <div className="px-6 py-4 border-t border-gray-200 flex items-center justify-between bg-gray-50">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-gray-500 dark:text-gray-400">
             Forhandsvisning - dette er hva pasienten vil se
           </div>
           <div className="flex items-center gap-3">

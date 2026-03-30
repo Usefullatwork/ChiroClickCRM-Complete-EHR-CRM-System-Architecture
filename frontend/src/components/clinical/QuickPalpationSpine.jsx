@@ -162,7 +162,7 @@ export const QuickPalpationSpine = ({ onInsertText, disabled = false }) => {
             {/* Region header */}
             <button
               onClick={() => toggleRegion(key)}
-              className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50"
+              className="w-full flex items-center justify-between px-2 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-50"
             >
               <span>{region.label}</span>
               {expandedRegions[key] ? (
@@ -214,7 +214,9 @@ export const QuickPalpationSpine = ({ onInsertText, disabled = false }) => {
 
       {/* Hint */}
       <div className="px-2 py-1 bg-slate-50 border-t border-slate-100">
-        <p className="text-[9px] text-slate-400 text-center">1. Klikk segment → 2. Klikk V/H/B</p>
+        <p className="text-[9px] text-slate-400 dark:text-slate-300 text-center">
+          1. Klikk segment → 2. Klikk V/H/B
+        </p>
       </div>
     </div>
   );

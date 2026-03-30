@@ -7,7 +7,7 @@ REM ============================================================================
 
 echo.
 echo ============================================================
-echo    Add Training Data to ChiroClick Models
+echo    Add Training Data to ChiroClickEHR Models
 echo ============================================================
 echo.
 

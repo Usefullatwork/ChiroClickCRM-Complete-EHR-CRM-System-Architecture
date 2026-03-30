@@ -5,8 +5,8 @@
  * @module controllers/exercises
  */
 
-import exerciseLibraryService from '../services/exerciseLibrary.js';
-import exerciseDeliveryService from '../services/exerciseDelivery.js';
+import exerciseLibraryService from '../services/clinical/exerciseLibrary.js';
+import exerciseDeliveryService from '../services/clinical/exerciseDelivery.js';
 import { logAudit } from '../utils/audit.js';
 
 // ============================================================================
@@ -341,7 +341,7 @@ export const createPrescription = async (req, res) => {
  * @route GET /api/v1/exercises/prescriptions/patient/:patientId
  */
 export const getPatientPrescriptions = async (req, res) => {
-  const { organizationId } = req;
+  const { organizationId, user } = req;
   const { patientId } = req.params;
   const { status } = req.query;
 
@@ -350,6 +350,24 @@ export const getPatientPrescriptions = async (req, res) => {
     patientId,
     status
   );
+
+  // Log audit — prescription list reveals treatment history (patient health data)
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    userEmail: user.email,
+    userRole: user.role,
+    action: 'READ',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: patientId,
+    details: {
+      list_type: 'patient_prescriptions',
+      status_filter: status || 'all',
+      results_count: prescriptions.length,
+    },
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
 
   res.json({
     success: true,
@@ -362,7 +380,7 @@ export const getPatientPrescriptions = async (req, res) => {
  * @route GET /api/v1/exercises/prescriptions/:id
  */
 export const getPrescriptionById = async (req, res) => {
-  const { organizationId } = req;
+  const { organizationId, user } = req;
   const { id } = req.params;
 
   const prescription = await exerciseLibraryService.getPrescriptionById(organizationId, id);
@@ -370,6 +388,16 @@ export const getPrescriptionById = async (req, res) => {
   if (!prescription) {
     return res.status(404).json({ error: 'Prescription not found' });
   }
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'READ',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: id,
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
 
   res.json({
     success: true,
@@ -491,10 +519,21 @@ export const updatePrescriptionStatus = async (req, res) => {
  * @route GET /api/v1/exercises/prescriptions/:id/progress
  */
 export const getProgressHistory = async (req, res) => {
-  const { organizationId } = req;
+  const { organizationId, user } = req;
   const { id } = req.params;
 
   const progress = await exerciseLibraryService.getProgressHistory(organizationId, id);
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'READ',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: id,
+    details: { subresource: 'progress_history' },
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
 
   res.json({
     success: true,
@@ -511,10 +550,20 @@ export const getProgressHistory = async (req, res) => {
  * @route GET /api/v1/exercises/prescriptions/:id/pdf
  */
 export const generatePDF = async (req, res) => {
-  const { organizationId } = req;
+  const { organizationId, user } = req;
   const { id } = req.params;
 
   const pdfBuffer = await exerciseDeliveryService.generatePrescriptionPDF(organizationId, id);
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'GENERATE_PDF',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: id,
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
 
   res.setHeader('Content-Type', 'application/pdf');
   res.setHeader('Content-Disposition', `attachment; filename="exercise-program-${id}.pdf"`);
@@ -602,6 +651,59 @@ export const sendSMS = async (req, res) => {
   });
 };
 
+/**
+ * Deliver prescription via email, SMS, or both
+ * @route POST /api/v1/exercises/prescriptions/:id/deliver
+ */
+export const deliverPrescription = async (req, res) => {
+  const { organizationId, user } = req;
+  const { id } = req.params;
+  const { method } = req.body;
+
+  if (!method || !['email', 'sms', 'both'].includes(method)) {
+    return res.status(400).json({ error: 'Invalid delivery method. Must be email, sms, or both' });
+  }
+
+  // Get prescription to verify it exists
+  const prescription = await exerciseLibraryService.getPrescriptionById(organizationId, id);
+  if (!prescription) {
+    return res.status(404).json({ error: 'Prescription not found' });
+  }
+
+  const results = {};
+
+  if (method === 'email' || method === 'both') {
+    results.email = await exerciseDeliveryService.sendPrescriptionEmail(organizationId, id);
+  }
+
+  if (method === 'sms' || method === 'both') {
+    results.sms = await exerciseDeliveryService.sendPortalSMS(organizationId, id);
+  }
+
+  // Update delivered_at
+  await exerciseLibraryService.updatePrescription(organizationId, id, {
+    delivered_at: new Date().toISOString(),
+    delivery_method: method,
+  });
+
+  await logAudit({
+    organizationId,
+    userId: user.id,
+    action: 'DELIVER',
+    resourceType: 'EXERCISE_PRESCRIPTION',
+    resourceId: id,
+    details: { method },
+    ipAddress: req.ip,
+    userAgent: req.get('user-agent'),
+  });
+
+  res.json({
+    success: true,
+    message: 'Prescription delivered successfully',
+    data: results,
+  });
+};
+
 export default {
   // Library
   getExercises,
@@ -632,4 +734,5 @@ export default {
   sendEmail,
   sendReminder,
   sendSMS,
+  deliverPrescription,
 };

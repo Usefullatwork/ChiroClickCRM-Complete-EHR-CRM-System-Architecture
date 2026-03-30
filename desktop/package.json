@@ -1,7 +1,7 @@
 {
-  "name": "chiroclickcrm-desktop",
-  "version": "2.0.0",
-  "description": "ChiroClickCRM Desktop - Standalone EHR-CRM for Chiropractors",
+  "name": "chiroclickehr-desktop",
+  "version": "2.1.0",
+  "description": "ChiroClickEHR Desktop - Standalone EHR for Chiropractors",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -11,26 +11,26 @@
     "build:linux": "electron-builder --linux"
   },
   "build": {
-    "appId": "no.chiroclick.crm",
-    "productName": "ChiroClickCRM",
+    "appId": "no.chiroclickehr.desktop",
+    "productName": "ChiroClickEHR",
     "directories": {
       "output": "../release"
     },
     "files": [
       "**/*",
-      "../backend/**/*",
-      "../frontend/dist/**/*",
-      "!../backend/node_modules/.cache",
-      "!../**/tests/**",
-      "!../**/*.test.js"
+      "!node_modules/.cache"
+    ],
+    "asarUnpack": [
+      "node_modules/electron-store/**",
+      "node_modules/@electric-sql/pglite/**"
     ],
     "win": {
       "target": "portable",
-      "icon": "icon.ico"
+      "icon": "icon.png"
     },
     "mac": {
       "target": "dmg",
-      "icon": "icon.icns"
+      "icon": "icon.png"
     },
     "linux": {
       "target": "AppImage",
@@ -38,8 +38,34 @@
     },
     "extraResources": [
       {
-        "from": "../data",
-        "to": "data",
+        "from": "../backend/src",
+        "to": "backend/src",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../backend/node_modules",
+        "to": "backend/node_modules",
+        "filter": [
+          "**/*",
+          "!.cache/**"
+        ]
+      },
+      {
+        "from": "../backend/package.json",
+        "to": "backend/package.json"
+      },
+      {
+        "from": "../frontend/dist",
+        "to": "frontend/dist",
+        "filter": [
+          "**/*"
+        ]
+      },
+      {
+        "from": "../database",
+        "to": "database",
         "filter": [
           "**/*"
         ]

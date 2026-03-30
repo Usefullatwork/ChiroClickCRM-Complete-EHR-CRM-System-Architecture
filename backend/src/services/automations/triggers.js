@@ -13,6 +13,8 @@ export const TRIGGER_TYPES = {
   APPOINTMENT_COMPLETED: 'APPOINTMENT_COMPLETED',
   APPOINTMENT_MISSED: 'APPOINTMENT_MISSED',
   APPOINTMENT_CANCELLED: 'APPOINTMENT_CANCELLED',
+  ENCOUNTER_CREATED: 'ENCOUNTER_CREATED',
+  ENCOUNTER_SIGNED: 'ENCOUNTER_SIGNED',
   DAYS_SINCE_VISIT: 'DAYS_SINCE_VISIT',
   BIRTHDAY: 'BIRTHDAY',
   LIFECYCLE_CHANGE: 'LIFECYCLE_CHANGE',
@@ -43,6 +45,15 @@ export const evaluateTrigger = (workflow, eventData) => {
 
     case TRIGGER_TYPES.APPOINTMENT_CANCELLED:
       return !!eventData.appointment_id && eventData.status === 'CANCELLED';
+
+    case TRIGGER_TYPES.ENCOUNTER_CREATED:
+      if (config.encounter_type && eventData.encounter_type !== config.encounter_type) {
+        return false;
+      }
+      return !!eventData.encounter_id;
+
+    case TRIGGER_TYPES.ENCOUNTER_SIGNED:
+      return !!eventData.encounter_id && !!eventData.signed_by;
 
     case TRIGGER_TYPES.DAYS_SINCE_VISIT:
       // Check days since last visit

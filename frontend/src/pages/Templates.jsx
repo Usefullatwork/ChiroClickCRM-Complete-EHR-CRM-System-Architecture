@@ -104,20 +104,20 @@ export default function Templates() {
             <BookOpen className="w-8 h-8 text-blue-600" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900">{t('clinicalTemplates')}</h1>
-              <p className="text-gray-600">{t('templatesSubtitle')}</p>
+              <p className="text-gray-600 dark:text-gray-300">{t('templatesSubtitle')}</p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
+              className={`p-2 rounded-lg ${viewMode === 'grid' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'}`}
             >
               <Grid className="w-5 h-5" />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 hover:bg-gray-100'}`}
+              className={`p-2 rounded-lg ${viewMode === 'list' ? 'bg-blue-100 text-blue-600' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'}`}
             >
               <List className="w-5 h-5" />
             </button>
@@ -133,7 +133,7 @@ export default function Templates() {
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">{t('totalTemplates')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('totalTemplates')}</p>
               <p className="text-2xl font-bold text-gray-900">{filteredTemplates.length}</p>
             </div>
           </div>
@@ -145,7 +145,7 @@ export default function Templates() {
               <Star className="w-5 h-5 text-yellow-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">{t('favorites')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('favorites')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 {filteredTemplates.filter((t) => t.is_favorite).length}
               </p>
@@ -159,7 +159,7 @@ export default function Templates() {
               <TrendingUp className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">{t('mostUsed')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('mostUsed')}</p>
               <p className="text-2xl font-bold text-gray-900">
                 {filteredTemplates.reduce((max, t) => Math.max(max, t.usage_count || 0), 0)}
               </p>
@@ -173,7 +173,7 @@ export default function Templates() {
               <Filter className="w-5 h-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-sm text-gray-600">{t('categories')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{t('categories')}</p>
               <p className="text-2xl font-bold text-gray-900">{allCategories.length}</p>
             </div>
           </div>
@@ -185,7 +185,7 @@ export default function Templates() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Search */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
             <input
               type="text"
               placeholder={t('searchTemplates')}
@@ -215,12 +215,12 @@ export default function Templates() {
       {isLoading ? (
         <div className="text-center py-12">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="text-gray-600 mt-4">{t('loadingTemplates')}</p>
+          <p className="text-gray-600 dark:text-gray-300 mt-4">{t('loadingTemplates')}</p>
         </div>
       ) : filteredTemplates.length === 0 ? (
         <div className="text-center py-12 bg-white rounded-lg border border-gray-200">
           <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-600">{t('noTemplatesFound')}</p>
+          <p className="text-gray-600 dark:text-gray-300">{t('noTemplatesFound')}</p>
         </div>
       ) : viewMode === 'grid' ? (
         /* Grid View */
@@ -243,16 +243,18 @@ export default function Templates() {
                   {template.is_favorite ? (
                     <Star className="w-4 h-4 text-yellow-500 fill-current" />
                   ) : (
-                    <StarOff className="w-4 h-4 text-gray-400" />
+                    <StarOff className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                   )}
                 </button>
               </div>
 
               {template.description && (
-                <p className="text-xs text-gray-600 mb-3 line-clamp-2">{template.description}</p>
+                <p className="text-xs text-gray-600 dark:text-gray-300 mb-3 line-clamp-2">
+                  {template.description}
+                </p>
               )}
 
-              <div className="flex items-center justify-between text-xs text-gray-500">
+              <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                 <span className="px-2 py-1 bg-gray-100 rounded">{template.category}</span>
                 <div className="flex items-center gap-2">
                   <TrendingUp className="w-3 h-3" />
@@ -268,16 +270,16 @@ export default function Templates() {
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('name')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('categories')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('usageCount')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   {t('actions')}
                 </th>
               </tr>
@@ -295,7 +297,7 @@ export default function Templates() {
                       <div>
                         <div className="text-sm font-medium text-gray-900">{template.name}</div>
                         {template.description && (
-                          <div className="text-xs text-gray-500 line-clamp-1">
+                          <div className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">
                             {template.description}
                           </div>
                         )}
@@ -307,7 +309,7 @@ export default function Templates() {
                       {template.category}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {t('uses').replace('{count}', template.usage_count || 0)}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
@@ -318,7 +320,7 @@ export default function Templates() {
                       {template.is_favorite ? (
                         <Star className="w-4 h-4 text-yellow-500 fill-current" />
                       ) : (
-                        <StarOff className="w-4 h-4 text-gray-400" />
+                        <StarOff className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                       )}
                     </button>
                   </td>
@@ -339,7 +341,9 @@ export default function Templates() {
                   <FileText className="w-6 h-6 text-blue-600" />
                   <div>
                     <h3 className="text-xl font-bold text-gray-900">{selectedTemplate.name}</h3>
-                    <p className="text-sm text-gray-600">{selectedTemplate.category}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {selectedTemplate.category}
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -353,14 +357,14 @@ export default function Templates() {
                     {selectedTemplate.is_favorite ? (
                       <Star className="w-5 h-5 text-yellow-500 fill-current" />
                     ) : (
-                      <StarOff className="w-5 h-5 text-gray-400" />
+                      <StarOff className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                     )}
                   </button>
                   <button
                     onClick={() => copyTemplate(selectedTemplate)}
                     className="p-2 hover:bg-gray-100 rounded-lg"
                   >
-                    <Copy className="w-5 h-5 text-gray-600" />
+                    <Copy className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                   </button>
                   <button
                     onClick={() => setSelectedTemplate(null)}
@@ -391,21 +395,21 @@ export default function Templates() {
 
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <span className="text-gray-600">{t('language')}:</span>
+                  <span className="text-gray-600 dark:text-gray-300">{t('language')}:</span>
                   <span className="ml-2 font-medium">{selectedTemplate.language}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">{t('usageCount')}:</span>
+                  <span className="text-gray-600 dark:text-gray-300">{t('usageCount')}:</span>
                   <span className="ml-2 font-medium">{selectedTemplate.usage_count || 0}</span>
                 </div>
                 <div>
-                  <span className="text-gray-600">{t('created')}:</span>
+                  <span className="text-gray-600 dark:text-gray-300">{t('created')}:</span>
                   <span className="ml-2 font-medium">
                     {new Date(selectedTemplate.created_at).toLocaleDateString('no-NO')}
                   </span>
                 </div>
                 <div>
-                  <span className="text-gray-600">{t('lastUpdated')}:</span>
+                  <span className="text-gray-600 dark:text-gray-300">{t('lastUpdated')}:</span>
                   <span className="ml-2 font-medium">
                     {new Date(selectedTemplate.updated_at).toLocaleDateString('no-NO')}
                   </span>

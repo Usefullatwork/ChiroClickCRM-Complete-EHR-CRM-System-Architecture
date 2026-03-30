@@ -6,10 +6,12 @@
 
 import { useState } from 'react';
 import { getApiBaseUrl } from '../services/api';
+import { useTranslation } from '../i18n';
 
 const STEPS = ['Velkommen', 'Klinikk', 'Brukerkonto', 'AI-modeller', 'Ferdig'];
 
 const Setup = ({ onComplete }) => {
+  const { t } = useTranslation('settings');
   const [step, setStep] = useState(0);
   const [config, setConfig] = useState({
     clinicName: '',
@@ -43,37 +45,37 @@ const Setup = ({ onComplete }) => {
 
     if (stepIndex === 1) {
       if (!config.clinicName.trim()) {
-        newErrors.clinicName = 'Klinikknavn er påkrevd';
+        newErrors.clinicName = t('setupClinicNameRequired', 'Klinikknavn er påkrevd');
       }
     }
 
     if (stepIndex === 2) {
       if (!config.userName.trim()) {
-        newErrors.userName = 'Navn er påkrevd';
+        newErrors.userName = t('setupNameRequired', 'Navn er påkrevd');
       }
       if (!config.userEmail.trim()) {
-        newErrors.userEmail = 'E-post er påkrevd';
+        newErrors.userEmail = t('setupEmailRequired', 'E-post er påkrevd');
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(config.userEmail)) {
-        newErrors.userEmail = 'Ugyldig e-postadresse';
+        newErrors.userEmail = t('setupEmailInvalid', 'Ugyldig e-postadresse');
       }
       if (!config.userPassword) {
-        newErrors.userPassword = 'Passord er påkrevd';
+        newErrors.userPassword = t('setupPasswordRequired', 'Passord er påkrevd');
       } else {
         const pwdErrors = [];
         if (config.userPassword.length < 8) {
-          pwdErrors.push('minst 8 tegn');
+          pwdErrors.push(t('setupPwdMin8', 'minst 8 tegn'));
         }
         if (!/[a-z]/.test(config.userPassword)) {
-          pwdErrors.push('minst én liten bokstav (a-z)');
+          pwdErrors.push(t('setupPwdLowercase', 'minst én liten bokstav (a-z)'));
         }
         if (!/[A-Z]/.test(config.userPassword)) {
-          pwdErrors.push('minst én stor bokstav (A-Z)');
+          pwdErrors.push(t('setupPwdUppercase', 'minst én stor bokstav (A-Z)'));
         }
         if (!/[0-9]/.test(config.userPassword)) {
-          pwdErrors.push('minst ett tall (0-9)');
+          pwdErrors.push(t('setupPwdDigit', 'minst ett tall (0-9)'));
         }
         if (pwdErrors.length > 0) {
-          newErrors.userPassword = `Passord må inneholde: ${pwdErrors.join(', ')}`;
+          newErrors.userPassword = `${t('setupPwdMustContain', 'Passord må inneholde')}: ${pwdErrors.join(', ')}`;
         }
       }
     }
@@ -142,10 +144,12 @@ const Setup = ({ onComplete }) => {
         onComplete?.();
       } else {
         const data = await response.json().catch(() => ({}));
-        setSubmitError(data.message || 'Oppsettet feilet. Prøv igjen.');
+        setSubmitError(data.message || t('setupFailed', 'Oppsettet feilet. Prøv igjen.'));
       }
     } catch {
-      setSubmitError('Kunne ikke koble til serveren. Er backend-serveren startet?');
+      setSubmitError(
+        t('setupConnectionError', 'Kunne ikke koble til serveren. Er backend-serveren startet?')
+      );
     } finally {
       setSubmitting(false);
     }
@@ -174,12 +178,15 @@ const Setup = ({ onComplete }) => {
         {/* Step 0: Welcome */}
         {step === 0 && (
           <div className="text-center">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">ChiroClickCRM</h1>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">ChiroClickEHR</h1>
             <p className="text-gray-600 dark:text-gray-300 mb-6">
-              Velkommen til ditt nye journalsystem. La oss sette opp klinikken din.
+              {t(
+                'setupWelcomeText',
+                'Velkommen til ditt nye journalsystem. La oss sette opp klinikken din.'
+              )}
             </p>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
-              Alt lagres lokalt på din maskin. Ingen skytjenester.
+              {t('setupLocalStorage', 'Alt lagres lokalt på din maskin. Ingen skytjenester.')}
             </p>
           </div>
         )}
@@ -188,37 +195,37 @@ const Setup = ({ onComplete }) => {
         {step === 1 && (
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Klinikkinformasjon
+              {t('setupClinicInfo', 'Klinikkinformasjon')}
             </h2>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Klinikknavn *
+                  {t('setupClinicName', 'Klinikknavn')} *
                 </label>
                 <input
                   type="text"
                   value={config.clinicName}
                   onChange={(e) => updateConfig('clinicName', e.target.value)}
                   className={`w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:text-white ${errors.clinicName ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
-                  placeholder="Min Kiropraktorklinikk"
+                  placeholder={t('setupClinicNamePlaceholder', 'Min Kiropraktorklinikk')}
                 />
                 <FieldError field="clinicName" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Adresse
+                  {t('setupAddress', 'Adresse')}
                 </label>
                 <input
                   type="text"
                   value={config.clinicAddress}
                   onChange={(e) => updateConfig('clinicAddress', e.target.value)}
                   className="w-full rounded-lg border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white px-3 py-2"
-                  placeholder="Storgata 1, 0001 Oslo"
+                  placeholder={t('setupAddressPlaceholder', 'Storgata 1, 0001 Oslo')}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Telefon
+                  {t('setupPhone', 'Telefon')}
                 </label>
                 <input
                   type="tel"
@@ -230,7 +237,7 @@ const Setup = ({ onComplete }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Org.nummer
+                  {t('setupOrgNumber', 'Org.nummer')}
                 </label>
                 <input
                   type="text"
@@ -248,25 +255,25 @@ const Setup = ({ onComplete }) => {
         {step === 2 && (
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Din brukerkonto
+              {t('setupUserAccount', 'Din brukerkonto')}
             </h2>
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Fullt navn *
+                  {t('setupFullName', 'Fullt navn')} *
                 </label>
                 <input
                   type="text"
                   value={config.userName}
                   onChange={(e) => updateConfig('userName', e.target.value)}
                   className={`w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:text-white ${errors.userName ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
-                  placeholder="Ola Nordmann"
+                  placeholder={t('setupFullNamePlaceholder', 'Ola Nordmann')}
                 />
                 <FieldError field="userName" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  E-post *
+                  {t('setupEmail', 'E-post')} *
                 </label>
                 <input
                   type="email"
@@ -279,14 +286,14 @@ const Setup = ({ onComplete }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Passord *
+                  {t('setupPassword', 'Passord')} *
                 </label>
                 <input
                   type="password"
                   value={config.userPassword}
                   onChange={(e) => updateConfig('userPassword', e.target.value)}
                   className={`w-full rounded-lg border px-3 py-2 dark:bg-gray-700 dark:text-white ${errors.userPassword ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
-                  placeholder="Minst 8 tegn"
+                  placeholder={t('setupPasswordPlaceholder', 'Minst 8 tegn')}
                 />
                 <FieldError field="userPassword" />
               </div>
@@ -298,10 +305,13 @@ const Setup = ({ onComplete }) => {
         {step === 3 && (
           <div>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              AI-assistent
+              {t('setupAIAssistant', 'AI-assistent')}
             </h2>
             <p className="text-gray-600 dark:text-gray-300 mb-4">
-              ChiroClickCRM bruker lokale AI-modeller via Ollama for klinisk dokumentasjon.
+              {t(
+                'setupAIDescription',
+                'ChiroClickEHR bruker lokale AI-modeller via Ollama for klinisk dokumentasjon.'
+              )}
             </p>
 
             {/* Ollama status indicator */}
@@ -318,10 +328,12 @@ const Setup = ({ onComplete }) => {
                 }`}
               />
               <span className="text-gray-600 dark:text-gray-300">
-                {ollamaStatus === 'online' && 'Ollama kjører'}
-                {ollamaStatus === 'offline' && 'Ollama ikke funnet — installer fra ollama.com'}
-                {ollamaStatus === 'checking' && 'Sjekker Ollama-tilkobling...'}
-                {ollamaStatus === null && 'Ollama-status ukjent'}
+                {ollamaStatus === 'online' && t('setupOllamaRunning', 'Ollama kjører')}
+                {ollamaStatus === 'offline' &&
+                  t('setupOllamaNotFound', 'Ollama ikke funnet — installer fra ollama.com')}
+                {ollamaStatus === 'checking' &&
+                  t('setupOllamaChecking', 'Sjekker Ollama-tilkobling...')}
+                {ollamaStatus === null && t('setupOllamaUnknown', 'Ollama-status ukjent')}
               </span>
             </div>
 
@@ -334,22 +346,30 @@ const Setup = ({ onComplete }) => {
                   className="w-5 h-5 rounded border-gray-300 text-teal-600"
                 />
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Aktiver AI-funksjoner</p>
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    {t('setupEnableAI', 'Aktiver AI-funksjoner')}
+                  </p>
                   <p className="text-sm text-gray-500 dark:text-gray-400">
-                    Krever Ollama installert (ollama.com)
+                    {t('setupRequiresOllama', 'Krever Ollama installert (ollama.com)')}
                   </p>
                 </div>
               </label>
             </div>
             {config.installAI && (
               <div className="space-y-2 text-sm text-gray-600 dark:text-gray-300">
-                <p>AI-modeller som brukes:</p>
+                <p>{t('setupAIModelsUsed', 'AI-modeller som brukes:')}</p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>
-                    chiro-no-sft-dpo-v6 (Qwen2.5-7B, ~8 GB) — Klinisk dokumentasjon, SOAP, brev
+                    chiro-no-sft-dpo-v6 (Qwen2.5-7B, ~8 GB) —{' '}
+                    {t('setupModelMain', 'Klinisk dokumentasjon, SOAP, brev')}
                   </li>
-                  <li>chiro-fast (Qwen2.5-1.5B, ~1 GB) — Autofullføring</li>
-                  <li>chiro-medical (Qwen2.5-3B, ~2 GB) — Klinisk sikkerhet og røde flagg</li>
+                  <li>
+                    chiro-fast (Qwen2.5-1.5B, ~1 GB) — {t('setupModelFast', 'Autofullføring')}
+                  </li>
+                  <li>
+                    chiro-medical (Qwen2.5-3B, ~2 GB) —{' '}
+                    {t('setupModelMedical', 'Klinisk sikkerhet og røde flagg')}
+                  </li>
                 </ul>
               </div>
             )}
@@ -360,9 +380,11 @@ const Setup = ({ onComplete }) => {
         {step === 4 && (
           <div className="text-center">
             <div className="text-5xl mb-4 text-teal-600">&#10003;</div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">Alt klart!</h2>
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+              {t('setupAllReady', 'Alt klart!')}
+            </h2>
             <p className="text-gray-600 dark:text-gray-300 mb-2">
-              ChiroClickCRM er konfigurert og klar til bruk.
+              {t('setupConfigured', 'ChiroClickEHR er konfigurert og klar til bruk.')}
             </p>
             {submitError && <p className="text-red-500 text-sm mb-4">{submitError}</p>}
           </div>
@@ -377,15 +399,15 @@ const Setup = ({ onComplete }) => {
                 disabled={submitting}
                 className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-900 disabled:opacity-50"
               >
-                Tilbake
+                {t('setupBack', 'Tilbake')}
               </button>
             ) : (
               <button
                 onClick={handleSkip}
                 disabled={submitting}
-                className="text-sm text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50"
+                className="text-sm text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-gray-300 disabled:opacity-50"
               >
-                Hopp over oppsett
+                {t('setupSkip', 'Hopp over oppsett')}
               </button>
             )}
           </div>
@@ -395,7 +417,7 @@ const Setup = ({ onComplete }) => {
               onClick={nextStep}
               className="px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700"
             >
-              Neste
+              {t('setupNext', 'Neste')}
             </button>
           ) : (
             <button
@@ -406,7 +428,7 @@ const Setup = ({ onComplete }) => {
               {submitting && (
                 <span className="animate-spin inline-block w-4 h-4 border-2 border-white border-t-transparent rounded-full" />
               )}
-              Start ChiroClickCRM
+              {t('setupStart', 'Start ChiroClickEHR')}
             </button>
           )}
         </div>

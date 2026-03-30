@@ -17,10 +17,8 @@ test.describe('Full SOAP Note Creation Flow', () => {
 
     // Step 2: Click on first patient
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
-    if (!(await patientRow.isVisible({ timeout: 5000 }).catch(() => false))) {
-      // No patients in seed data - skip test gracefully
-      return;
-    }
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
     await patientRow.click();
 
     // Step 3: Verify patient detail loaded
@@ -29,7 +27,7 @@ test.describe('Full SOAP Note Creation Flow', () => {
 
     // Step 4: Click "New Visit" to open encounter form
     const newVisitButton = authenticatedPage.locator('button').filter({ hasText: /New Visit|Ny konsultasjon/i }).first();
-    if (!(await newVisitButton.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(newVisitButton).toBeVisible({ timeout: 5000 });
     await newVisitButton.click();
 
     // Step 5: Wait for lazy-loaded encounter form
@@ -37,40 +35,34 @@ test.describe('Full SOAP Note Creation Flow', () => {
 
     // Verify encounter form loaded with SOAP sections
     const subjective = authenticatedPage.locator('[data-testid="encounter-subjective"]');
-    if (!(await subjective.isVisible({ timeout: 10000 }).catch(() => false))) return;
-
-    await expect(subjective).toBeVisible();
+    await expect(subjective).toBeVisible({ timeout: 10000 });
     await expect(authenticatedPage.locator('[data-testid="encounter-objective"]')).toBeVisible();
     await expect(authenticatedPage.locator('[data-testid="encounter-assessment"]')).toBeVisible();
     await expect(authenticatedPage.locator('[data-testid="encounter-plan"]')).toBeVisible();
 
     // Step 6: Fill Subjective section
     const chiefComplaintInput = authenticatedPage.locator('[data-testid="encounter-subjective"] input[type="text"]').first();
-    if (await chiefComplaintInput.isVisible().catch(() => false)) {
-      await chiefComplaintInput.fill('Korsryggsmerter i 3 uker, forverres ved sitting');
-    }
+    await expect(chiefComplaintInput).toBeVisible();
+    await chiefComplaintInput.fill('Korsryggsmerter i 3 uker, forverres ved sitting');
 
     // Step 7: Fill Objective section - look for textarea in the objective section
     const objectiveTextarea = authenticatedPage.locator('[data-testid="encounter-objective"] textarea').first();
-    if (await objectiveTextarea.isVisible().catch(() => false)) {
-      await objectiveTextarea.fill('Redusert fleksjon lumbal, oemhet over L4-L5 fasettledd');
-    }
+    await expect(objectiveTextarea).toBeVisible();
+    await objectiveTextarea.fill('Redusert fleksjon lumbal, oemhet over L4-L5 fasettledd');
 
     // Step 8: Fill Assessment section - clinical reasoning textarea
     const assessmentTextarea = authenticatedPage.locator('[data-testid="encounter-assessment"] textarea').first();
-    if (await assessmentTextarea.isVisible().catch(() => false)) {
-      await assessmentTextarea.fill('Mekanisk korsryggsyndrom uten utstroling. God prognose.');
-    }
+    await expect(assessmentTextarea).toBeVisible();
+    await assessmentTextarea.fill('Mekanisk korsryggsyndrom uten utstroling. God prognose.');
 
     // Step 9: Verify save button is available
     const saveButton = authenticatedPage.locator('[data-testid="encounter-save-button"]');
-    if (await saveButton.isVisible({ timeout: 5000 }).catch(() => false)) {
-      await expect(saveButton).toBeEnabled();
+    await expect(saveButton).toBeVisible({ timeout: 5000 });
+    await expect(saveButton).toBeEnabled();
 
-      // Step 10: Click save
-      await saveButton.click();
-      await authenticatedPage.waitForTimeout(2000);
-    }
+    // Step 10: Click save
+    await saveButton.click();
+    await authenticatedPage.waitForTimeout(2000);
   });
 
   test('should display all SOAP section headers', async ({ authenticatedPage }) => {
@@ -80,19 +72,20 @@ test.describe('Full SOAP Note Creation Flow', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
-    if (!(await patientRow.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
     await patientRow.click();
     await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
     const newVisitButton = authenticatedPage.locator('button').filter({ hasText: /New Visit|Ny konsultasjon/i }).first();
-    if (!(await newVisitButton.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(newVisitButton).toBeVisible({ timeout: 5000 });
 
     await newVisitButton.click();
     await authenticatedPage.waitForTimeout(3000);
 
     const subjective = authenticatedPage.locator('[data-testid="encounter-subjective"]');
-    if (!(await subjective.isVisible({ timeout: 10000 }).catch(() => false))) return;
+    await expect(subjective).toBeVisible({ timeout: 10000 });
 
     // Verify S, O, A, P badges/headers exist (Norwegian labels)
     const subjectiveHeader = authenticatedPage.locator('[data-testid="encounter-subjective"]').locator('text=Subjektivt');
@@ -101,18 +94,10 @@ test.describe('Full SOAP Note Creation Flow', () => {
     const planHeader = authenticatedPage.locator('[data-testid="encounter-plan"]').locator('text=Plan');
 
     // Check each header - they may use different labels in different languages
-    if (await subjectiveHeader.isVisible().catch(() => false)) {
-      await expect(subjectiveHeader).toBeVisible();
-    }
-    if (await objectiveHeader.isVisible().catch(() => false)) {
-      await expect(objectiveHeader).toBeVisible();
-    }
-    if (await assessmentHeader.isVisible().catch(() => false)) {
-      await expect(assessmentHeader).toBeVisible();
-    }
-    if (await planHeader.isVisible().catch(() => false)) {
-      await expect(planHeader).toBeVisible();
-    }
+    await expect.soft(subjectiveHeader).toBeVisible();
+    await expect.soft(objectiveHeader).toBeVisible();
+    await expect.soft(assessmentHeader).toBeVisible();
+    await expect.soft(planHeader).toBeVisible();
   });
 
   test('should have VAS pain slider in subjective section', async ({ authenticatedPage }) => {
@@ -122,25 +107,24 @@ test.describe('Full SOAP Note Creation Flow', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
-    if (!(await patientRow.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
     await patientRow.click();
     await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
     const newVisitButton = authenticatedPage.locator('button').filter({ hasText: /New Visit|Ny konsultasjon/i }).first();
-    if (!(await newVisitButton.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    await expect(newVisitButton).toBeVisible({ timeout: 5000 });
 
     await newVisitButton.click();
     await authenticatedPage.waitForTimeout(3000);
 
     const subjective = authenticatedPage.locator('[data-testid="encounter-subjective"]');
-    if (!(await subjective.isVisible({ timeout: 10000 }).catch(() => false))) return;
+    await expect(subjective).toBeVisible({ timeout: 10000 });
 
     // VAS pain slider should be in subjective section
     const vasSlider = authenticatedPage.locator('[data-testid="encounter-subjective"] input[type="range"]');
-    if (await vasSlider.isVisible().catch(() => false)) {
-      await expect(vasSlider).toBeVisible();
-    }
+    await expect(vasSlider).toBeVisible();
   });
 });
 
@@ -152,7 +136,8 @@ test.describe('SOAP Note from Patient Detail', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
-    if (!(await patientRow.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
     await patientRow.click();
     await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
@@ -169,15 +154,15 @@ test.describe('SOAP Note from Patient Detail', () => {
     await authenticatedPage.waitForTimeout(1000);
 
     const patientRow = authenticatedPage.locator('[data-testid="patient-row"]').first();
-    if (!(await patientRow.isVisible({ timeout: 5000 }).catch(() => false))) return;
+    const hasPatients = await patientRow.isVisible({ timeout: 5000 }).catch(() => false);
+    test.skip(!hasPatients, 'No patients in seed data');
 
     await patientRow.click();
     await authenticatedPage.waitForSelector('[data-testid="patient-detail-name"]', { timeout: 15000 });
 
     // Easy Assessment button should be visible
     const easyAssessmentButton = authenticatedPage.locator('button').filter({ hasText: 'Easy Assessment' }).first();
-    if (await easyAssessmentButton.isVisible().catch(() => false)) {
-      await expect(easyAssessmentButton).toBeEnabled();
-    }
+    await expect(easyAssessmentButton).toBeVisible();
+    await expect(easyAssessmentButton).toBeEnabled();
   });
 });

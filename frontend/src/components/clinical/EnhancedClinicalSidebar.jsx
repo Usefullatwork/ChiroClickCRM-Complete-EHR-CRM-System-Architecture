@@ -14,7 +14,8 @@
 import { useState, useCallback, lazy, Suspense } from 'react';
 import { Layers, Box, User, ChevronDown, ChevronUp, Settings } from 'lucide-react';
 import QuickPalpationSpine from './QuickPalpationSpine';
-import { EnhancedSpineDiagram, EnhancedBodyDiagram } from '../anatomy';
+import EnhancedSpineDiagram from '../anatomy/spine/EnhancedSpineDiagram';
+import EnhancedBodyDiagram from '../anatomy/body/EnhancedBodyDiagram';
 
 // Lazy-load Three.js 3D viewer (~300KB)
 const Spine3DViewer = lazy(() => import('../anatomy/spine/Spine3DViewer'));
@@ -122,7 +123,7 @@ export default function EnhancedClinicalSidebar({
           <div className="h-full">
             <Suspense
               fallback={
-                <div className="flex items-center justify-center h-48 text-gray-400">
+                <div className="flex items-center justify-center h-48 text-gray-400 dark:text-gray-300">
                   Laster 3D-modell...
                 </div>
               }
@@ -175,7 +176,9 @@ export default function EnhancedClinicalSidebar({
             <CurrentIcon className="w-4 h-4 text-emerald-600" />
             <div>
               <h3 className="text-sm font-semibold text-emerald-800">PALPASJON</h3>
-              <p className="text-[10px] text-slate-500">{currentConfig.description}</p>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                {currentConfig.description}
+              </p>
             </div>
           </div>
 
@@ -186,7 +189,7 @@ export default function EnhancedClinicalSidebar({
               className={`p-1 rounded transition-colors ${
                 showModeSelector
                   ? 'bg-emerald-100 text-emerald-700'
-                  : 'text-slate-400 hover:text-slate-600 hover:bg-slate-100'
+                  : 'text-slate-400 dark:text-slate-300 hover:text-slate-600 hover:bg-slate-100'
               }`}
               title="Bytt visning"
             >
@@ -196,7 +199,7 @@ export default function EnhancedClinicalSidebar({
             {/* Collapse toggle */}
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-1 text-slate-400 hover:text-slate-600"
+              className="p-1 text-slate-400 dark:text-slate-300 hover:text-slate-600"
               title={isExpanded ? 'Minimer' : 'Utvid'}
             >
               {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -222,7 +225,7 @@ export default function EnhancedClinicalSidebar({
                     className={`flex items-center gap-1.5 px-2 py-1.5 text-xs rounded-lg transition-all ${
                       isActive
                         ? 'bg-emerald-600 text-white'
-                        : 'bg-white text-slate-600 hover:bg-emerald-50 border border-slate-200'
+                        : 'bg-white text-slate-600 dark:text-slate-300 hover:bg-emerald-50 border border-slate-200'
                     }`}
                   >
                     <Icon className="w-3.5 h-3.5" />
@@ -235,7 +238,7 @@ export default function EnhancedClinicalSidebar({
             {/* Close button */}
             <button
               onClick={() => setShowModeSelector(false)}
-              className="w-full mt-2 text-xs text-slate-400 hover:text-slate-600"
+              className="w-full mt-2 text-xs text-slate-400 dark:text-slate-300 hover:text-slate-600"
             >
               Lukk
             </button>
@@ -249,7 +252,7 @@ export default function EnhancedClinicalSidebar({
       {/* Footer hint */}
       {isExpanded && (
         <div className="flex-shrink-0 px-2 py-1.5 bg-slate-50 border-t border-slate-200">
-          <p className="text-[9px] text-slate-400 text-center">
+          <p className="text-[9px] text-slate-400 dark:text-slate-300 text-center">
             {mode === SIDEBAR_MODES.QUICK && 'Klikk segment → Velg retning → Tekst settes inn'}
             {mode === SIDEBAR_MODES.SPINE_2D && 'Klikk vertebra for å dokumentere funn'}
             {mode === SIDEBAR_MODES.SPINE_3D && 'Roter med mus • Klikk for å velge'}
@@ -280,7 +283,7 @@ export function SidebarModeBar({ mode, onModeChange, disabled }) {
             className={`p-1.5 rounded transition-colors ${
               isActive
                 ? 'bg-white text-emerald-600 shadow-sm'
-                : 'text-slate-400 hover:text-slate-600'
+                : 'text-slate-400 dark:text-slate-300 hover:text-slate-600'
             }`}
             title={config.label}
           >

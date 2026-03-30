@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Search, X, ChevronDown, ChevronRight, Star, Clock, CheckCircle } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 /**
  * Common ICD-10 codes for chiropractic practice
@@ -252,6 +253,7 @@ const ICD10_CODES = {
  * @returns {JSX.Element} ICD-10 code picker modal
  */
 export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] }) {
+  const { t } = useTranslation('clinical');
   const [searchTerm, setSearchTerm] = useState('');
   const [expandedCategories, setExpandedCategories] = useState(['spine']);
   const [recentCodes, setRecentCodes] = useState([]);
@@ -366,7 +368,7 @@ export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] 
           {isSelected(code) && <CheckCircle className="w-4 h-4 text-green-500" />}
         </div>
         <p className="text-sm text-gray-900">{code.descriptionNo}</p>
-        <p className="text-xs text-gray-500">{code.description}</p>
+        <p className="text-xs text-gray-500 dark:text-gray-400">{code.description}</p>
       </div>
       <button onClick={(e) => toggleFavorite(code, e)} className="p-1 hover:bg-gray-100 rounded">
         <Star
@@ -382,18 +384,20 @@ export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] 
         {/* Header / Overskrift */}
         <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Velg ICD-10 kode</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              {t('selectICD10Code', 'Velg ICD-10 kode')}
+            </h3>
             <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             </button>
           </div>
 
           {/* Search / Sok */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
             <input
               type="text"
-              placeholder="Sok etter kode eller beskrivelse..."
+              placeholder={t('searchCodeOrDescription', 'Søk etter kode eller beskrivelse...')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -410,7 +414,7 @@ export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] 
               {filteredCodes && filteredCodes.length > 0 ? (
                 filteredCodes.map((code) => <CodeItem key={code.code} code={code} />)
               ) : (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                   Ingen koder funnet for "{searchTerm}"
                 </div>
               )}
@@ -436,7 +440,7 @@ export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] 
               {recentCodes.length > 0 && (
                 <div className="mb-6">
                   <h4 className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-                    <Clock className="w-4 h-4 text-gray-500" />
+                    <Clock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
                     Nylig brukt
                   </h4>
                   <div className="space-y-2">
@@ -457,11 +461,13 @@ export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] 
                     >
                       <span className="font-medium text-gray-900">{label}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">{codes.length} koder</span>
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
+                          {codes.length} koder
+                        </span>
                         {expandedCategories.includes(key) ? (
-                          <ChevronDown className="w-5 h-5 text-gray-400" />
+                          <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                         ) : (
-                          <ChevronRight className="w-5 h-5 text-gray-400" />
+                          <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                         )}
                       </div>
                     </button>
@@ -482,7 +488,7 @@ export default function ICD10CodePicker({ onSelect, onClose, selectedCodes = [] 
         {/* Footer / Bunntekst */}
         <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex-shrink-0">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               {selectedCodes.length} kode{selectedCodes.length !== 1 && 'r'} valgt
             </span>
             <button

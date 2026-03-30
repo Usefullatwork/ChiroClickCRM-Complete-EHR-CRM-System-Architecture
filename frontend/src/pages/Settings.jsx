@@ -1,4 +1,4 @@
-import { useState, useEffect, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Building2,
@@ -10,11 +10,16 @@ import {
   Stethoscope,
   Dumbbell,
   Loader2,
+  ToggleLeft,
+  Package,
+  Timer,
+  HardDrive,
 } from 'lucide-react';
-import { organizationAPI, usersAPI } from '../services/api';
+import { organizationAPI, usersAPI, clinicalSettingsAPI } from '../services/api';
 import { useTranslation } from '../i18n';
 import toast from '../utils/toast';
 import Breadcrumbs from '../components/common/Breadcrumbs';
+import InviteUserModal from '../components/settings/InviteUserModal';
 
 // Lazy-loaded tab components
 const OrganizationSettings = lazy(() => import('../components/settings/OrganizationSettings'));
@@ -22,10 +27,16 @@ const ProfileSettings = lazy(() => import('../components/settings/ProfileSetting
 const UserManagement = lazy(() => import('../components/settings/UserManagement'));
 const NotificationSettings = lazy(() => import('../components/settings/NotificationSettings'));
 const IntegrationSettings = lazy(() => import('../components/settings/IntegrationSettings'));
-const AISettings = lazy(() => import('../components/AISettings'));
+const AISettings = lazy(() => import('../components/assessment/AISettings'));
 const TrainingDataExport = lazy(() => import('../components/settings/TrainingDataExport'));
 const ClinicalSettings = lazy(() => import('../components/settings/ClinicalSettings'));
 const ExerciseSettings = lazy(() => import('../components/settings/ExerciseSettings'));
+const AutoAcceptSettings = lazy(() => import('../components/settings/AutoAcceptSettings'));
+const ModuleManager = lazy(() => import('../components/settings/ModuleManager'));
+const AutomatedRemindersSettings = lazy(
+  () => import('../components/settings/AutomatedRemindersSettings')
+);
+const BackupManager = lazy(() => import('../components/settings/BackupManager'));
 
 // Default clinical preferences
 const DEFAULT_CLINICAL_PREFS = {
@@ -52,21 +63,49 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState('organization');
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({});
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
 
-  // Clinical preferences state
+  // Clinical preferences — load from backend, fall back to localStorage, then defaults
+  const { data: clinicalSettingsResponse } = useQuery({
+    queryKey: ['clinical-settings'],
+    queryFn: () => clinicalSettingsAPI.getAll(),
+    staleTime: 60_000,
+  });
+
   const [clinicalPrefs, setClinicalPrefs] = useState(() => {
-    const saved = localStorage.getItem('chiroclick_clinical_prefs');
+    const saved = localStorage.getItem('chiroclickehr_clinical_prefs');
     return saved ? JSON.parse(saved) : DEFAULT_CLINICAL_PREFS;
   });
 
-  // Save clinical preferences to localStorage
+  // Merge backend response into state once loaded
+  const backendInitialized = useRef(false);
   useEffect(() => {
-    localStorage.setItem('chiroclick_clinical_prefs', JSON.stringify(clinicalPrefs));
+    if (clinicalSettingsResponse?.data?.settings?.display && !backendInitialized.current) {
+      backendInitialized.current = true;
+      setClinicalPrefs((prev) => ({ ...prev, ...clinicalSettingsResponse.data.settings.display }));
+    }
+  }, [clinicalSettingsResponse]);
+
+  // Save clinical preferences to localStorage (immediate) + debounced backend sync
+  const syncTimerRef = useRef(null);
+  const saveClinicalToBackend = useMutation({
+    mutationFn: (prefs) => clinicalSettingsAPI.update({ display: prefs }),
+  });
+
+  useEffect(() => {
+    localStorage.setItem('chiroclickehr_clinical_prefs', JSON.stringify(clinicalPrefs));
+    if (backendInitialized.current) {
+      clearTimeout(syncTimerRef.current);
+      syncTimerRef.current = setTimeout(() => {
+        saveClinicalToBackend.mutate(clinicalPrefs);
+      }, 1000);
+    }
+    return () => clearTimeout(syncTimerRef.current);
   }, [clinicalPrefs]);
 
-  const handleClinicalPrefChange = (key, value) => {
+  const handleClinicalPrefChange = useCallback((key, value) => {
     setClinicalPrefs((prev) => ({ ...prev, [key]: value }));
-  };
+  }, []);
 
   const lang = clinicalPrefs.language || 'no';
 
@@ -152,13 +191,16 @@ export default function Settings() {
   };
 
   const handleInviteUser = () => {
-    const email = prompt(t('enterEmailToInvite'));
-    if (email) {
-      const role = prompt(t('enterRole'), 'PRACTITIONER');
-      if (role) {
-        inviteUserMutation.mutate({ email, role });
+    setInviteModalOpen(true);
+  };
+
+  const handleInviteSubmit = ({ email, role }) => {
+    inviteUserMutation.mutate(
+      { email, role },
+      {
+        onSuccess: () => setInviteModalOpen(false),
       }
-    }
+    );
   };
 
   // Tab configuration — activeClass uses full Tailwind class names (not dynamic)
@@ -203,8 +245,32 @@ export default function Settings() {
     {
       id: 'exercises',
       icon: Dumbbell,
-      label: lang === 'no' ? 'Øvelser' : 'Exercises',
+      label: t('exercises', 'Øvelser'),
       activeClass: 'border-green-600 text-green-600',
+    },
+    {
+      id: 'autoaccept',
+      icon: ToggleLeft,
+      label: t('autoAccept'),
+      activeClass: 'border-teal-600 text-teal-600',
+    },
+    {
+      id: 'reminders',
+      icon: Timer,
+      label: t('automatedReminders', 'Automatiske påminnelser'),
+      activeClass: 'border-orange-600 text-orange-600',
+    },
+    {
+      id: 'modules',
+      icon: Package,
+      label: t('moduleManagement', 'Modules'),
+      activeClass: 'border-teal-600 text-teal-600',
+    },
+    {
+      id: 'backup',
+      icon: HardDrive,
+      label: t('tabs.backup', 'Sikkerhetskopi'),
+      activeClass: 'border-teal-600 text-teal-600',
     },
   ];
 
@@ -311,7 +377,26 @@ export default function Settings() {
         )}
 
         {activeTab === 'exercises' && <ExerciseSettings lang={lang} />}
+
+        {activeTab === 'autoaccept' && <AutoAcceptSettings />}
+
+        {activeTab === 'reminders' && <AutomatedRemindersSettings />}
+
+        {activeTab === 'modules' && <ModuleManager />}
+
+        {activeTab === 'backup' && <BackupManager />}
       </Suspense>
+
+      {/* Invite User Modal */}
+      {inviteModalOpen && (
+        <InviteUserModal
+          isOpen={inviteModalOpen}
+          onClose={() => setInviteModalOpen(false)}
+          onSubmit={handleInviteSubmit}
+          isLoading={inviteUserMutation.isPending}
+          t={t}
+        />
+      )}
     </div>
   );
 }

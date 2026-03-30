@@ -233,15 +233,18 @@ export default function AISettings({ language = 'en', onClose, className = '' })
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gray-100 rounded-lg">
-              <Settings className="w-5 h-5 text-gray-600" />
+              <Settings className="w-5 h-5 text-gray-600 dark:text-gray-300" />
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">{t.title}</h3>
-              <p className="text-sm text-gray-500">{t.subtitle}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
             </div>
           </div>
           {onClose && (
-            <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 rounded-lg">
+            <button
+              onClick={onClose}
+              className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 rounded-lg"
+            >
               <span className="sr-only">Close</span>×
             </button>
           )}
@@ -264,7 +267,7 @@ export default function AISettings({ language = 'en', onClose, className = '' })
               <p className={`text-sm ${status.connected ? 'text-green-600' : 'text-red-500'}`}>
                 {status.connected ? t.connected : t.disconnected}
                 {status.connected && status.models?.length > 0 && (
-                  <span className="text-gray-500 ml-2">
+                  <span className="text-gray-500 dark:text-gray-400 ml-2">
                     ({status.models.length} {language === 'no' ? 'modeller' : 'models'})
                   </span>
                 )}
@@ -336,7 +339,7 @@ export default function AISettings({ language = 'en', onClose, className = '' })
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             placeholder="http://localhost:11434"
           />
-          <p className="mt-1 text-xs text-gray-500">{t.serverUrlHelp}</p>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t.serverUrlHelp}</p>
         </div>
 
         {/* Model Selection */}
@@ -369,11 +372,13 @@ export default function AISettings({ language = 'en', onClose, className = '' })
               {status.connected && <p className="mt-1 text-xs text-amber-600">{t.noModels}</p>}
             </div>
           )}
-          <p className="mt-1 text-xs text-gray-500">{t.modelHelp}</p>
+          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t.modelHelp}</p>
 
           {/* Recommended Models */}
           <div className="mt-3">
-            <p className="text-xs font-medium text-gray-500 mb-2">{t.recommendedModels}:</p>
+            <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+              {t.recommendedModels}:
+            </p>
             <div className="flex flex-wrap gap-2">
               {recommendedModels.map((model) => (
                 <button
@@ -383,7 +388,7 @@ export default function AISettings({ language = 'en', onClose, className = '' })
                     ${
                       config.model === model.name
                         ? 'bg-blue-50 border-blue-300 text-blue-700'
-                        : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                        : 'bg-white border-gray-200 text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                     }`}
                   title={`${model.size} - ${model.purpose}`}
                 >
@@ -410,7 +415,7 @@ export default function AISettings({ language = 'en', onClose, className = '' })
               onChange={(e) => handleConfigChange('temperature', parseFloat(e.target.value))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
-            <p className="mt-1 text-xs text-gray-500">{t.temperatureHelp}</p>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t.temperatureHelp}</p>
           </div>
 
           <div>
@@ -427,14 +432,14 @@ export default function AISettings({ language = 'en', onClose, className = '' })
               onChange={(e) => handleConfigChange('maxTokens', parseInt(e.target.value))}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
-            <p className="mt-1 text-xs text-gray-500">{t.maxTokensHelp}</p>
+            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t.maxTokensHelp}</p>
           </div>
         </div>
 
         {/* Advanced Settings Toggle */}
         <button
           onClick={() => setShowAdvanced(!showAdvanced)}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800"
+          className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800"
         >
           {showAdvanced ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           {t.advanced}
@@ -453,7 +458,7 @@ export default function AISettings({ language = 'en', onClose, className = '' })
                 onChange={(e) => handleConfigChange('timeout', parseInt(e.target.value))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
-              <p className="mt-1 text-xs text-gray-500">{t.timeoutHelp}</p>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t.timeoutHelp}</p>
             </div>
 
             <div>
@@ -470,7 +475,7 @@ export default function AISettings({ language = 'en', onClose, className = '' })
                 <option value="small">small (244M)</option>
                 <option value="medium">medium (769M)</option>
               </select>
-              <p className="mt-1 text-xs text-gray-500">{t.whisperHelp}</p>
+              <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">{t.whisperHelp}</p>
             </div>
           </div>
         )}
@@ -532,7 +537,7 @@ export default function AISettings({ language = 'en', onClose, className = '' })
       <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-between">
         <button
           onClick={handleReset}
-          className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:text-gray-800"
+          className="flex items-center gap-2 px-3 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800"
         >
           <RotateCcw className="w-4 h-4" />
           {t.reset}
@@ -583,7 +588,7 @@ export function AIStatusIndicator({ onClick, language = 'en', className = '' }) 
         ${
           status.connected
             ? 'bg-green-100 text-green-700 hover:bg-green-200'
-            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+            : 'bg-gray-100 text-gray-500 dark:text-gray-400 hover:bg-gray-200'
         }
         ${className}`}
       title={status.connected ? t.aiOnline : t.aiOffline}

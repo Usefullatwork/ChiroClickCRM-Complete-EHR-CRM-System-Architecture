@@ -21,6 +21,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import { useTranslation } from '../i18n';
+import { usePrompt } from '../components/ui/PromptDialog';
 import { AppointmentsListSkeleton } from '../components/ui/Skeleton';
 import {
   startOfMonth,
@@ -40,10 +41,12 @@ export default function Calendar() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { t, lang } = useTranslation('appointments');
+  const prompt = usePrompt();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [view, setView] = useState('month'); // 'month' or 'week' or 'day'
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const [colorMode, setColorMode] = useState('status'); // 'status' or 'type'
 
   // Fetch appointments for the current month
   const { data: appointmentsData, isLoading } = useQuery({
@@ -114,18 +117,38 @@ export default function Calendar() {
   const getStatusColor = (status) => {
     switch (status) {
       case 'CONFIRMED':
-        return 'bg-green-100 text-green-800 border-green-300';
+        return 'bg-green-100 text-green-800 border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700';
       case 'PENDING':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 dark:border-yellow-700';
       case 'CANCELLED':
-        return 'bg-red-100 text-red-800 border-red-300';
+        return 'bg-red-100 text-red-800 border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700';
       case 'COMPLETED':
-        return 'bg-blue-100 text-blue-800 border-blue-300';
+        return 'bg-blue-100 text-blue-800 border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700';
       case 'NO_SHOW':
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+        return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600';
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-300';
+        return 'bg-gray-100 text-gray-800 border-gray-300 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600';
     }
+  };
+
+  const getTypeColor = (type) => {
+    const colors = {
+      NEW_PATIENT:
+        'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400',
+      FOLLOW_UP:
+        'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-400',
+      EMERGENCY: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-400',
+      SPECIAL:
+        'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400',
+    };
+    return (
+      colors[type] ||
+      'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/30 dark:text-gray-400'
+    );
+  };
+
+  const getAppointmentColor = (apt) => {
+    return colorMode === 'type' ? getTypeColor(apt.appointment_type) : getStatusColor(apt.status);
   };
 
   const getStatusIcon = (status) => {
@@ -142,23 +165,23 @@ export default function Calendar() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto" data-testid="calendar-page">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">{t('calendar')}</h1>
-          <p className="text-gray-600">{format(currentDate, 'MMMM yyyy')}</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{t('calendar')}</h1>
+          <p className="text-gray-600 dark:text-gray-400">{format(currentDate, 'MMMM yyyy')}</p>
         </div>
 
         <div className="flex items-center gap-3">
           {/* View Toggle */}
-          <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
             <button
               onClick={() => setView('month')}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 view === 'month'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
               <CalendarIcon className="w-4 h-4" />
@@ -167,8 +190,8 @@ export default function Calendar() {
               onClick={() => setView('week')}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 view === 'week'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
               <Grid className="w-4 h-4" />
@@ -177,8 +200,8 @@ export default function Calendar() {
               onClick={() => setView('day')}
               className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 view === 'day'
-                  ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
+                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
               }`}
             >
               <List className="w-4 h-4" />
@@ -189,7 +212,8 @@ export default function Calendar() {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            data-testid="calendar-status-filter"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="ALL">{t('allStatus')}</option>
             <option value="PENDING">{t('pending')}</option>
@@ -199,8 +223,33 @@ export default function Calendar() {
             <option value="NO_SHOW">{t('noShow')}</option>
           </select>
 
+          {/* Color Mode Toggle */}
+          <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+            <button
+              onClick={() => setColorMode('status')}
+              className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                colorMode === 'status'
+                  ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
+              }`}
+            >
+              Status
+            </button>
+            <button
+              onClick={() => setColorMode('type')}
+              className={`px-3 py-1 text-xs font-medium rounded transition-colors ${
+                colorMode === 'type'
+                  ? 'bg-white dark:bg-gray-600 shadow-sm text-gray-900 dark:text-gray-100'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
+              }`}
+            >
+              {t('type') || 'Type'}
+            </button>
+          </div>
+
           <button
             onClick={() => navigate('/appointments/new')}
+            data-testid="calendar-new-appointment"
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
             <Plus className="w-4 h-4" />
@@ -212,21 +261,27 @@ export default function Calendar() {
       {/* Navigation */}
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
-          <button onClick={prevMonth} className="p-2 hover:bg-gray-100 rounded-lg">
+          <button
+            onClick={prevMonth}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
+          >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             onClick={today}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+            className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
           >
             {t('today')}
           </button>
-          <button onClick={nextMonth} className="p-2 hover:bg-gray-100 rounded-lg">
+          <button
+            onClick={nextMonth}
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-600 dark:text-gray-300"
+          >
             <ChevronRight className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="text-lg font-semibold text-gray-900">
+        <div className="text-lg font-semibold text-gray-900 dark:text-white">
           {view === 'month' && format(currentDate, 'MMMM yyyy')}
           {view === 'week' && t('weekOf').replace('{date}', format(weekDays[0], 'MMM d, yyyy'))}
           {view === 'day' && format(selectedDate, 'EEEE, MMMM d, yyyy')}
@@ -237,9 +292,12 @@ export default function Calendar() {
 
       {/* Month View */}
       {view === 'month' && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div
+          className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden"
+          data-testid="calendar-month-view"
+        >
           {/* Week Days Header */}
-          <div className="grid grid-cols-7 border-b bg-gray-50">
+          <div className="grid grid-cols-7 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
             {(() => {
               const weekStart = startOfWeek(new Date(), { weekStartsOn: 1 });
               return Array.from({ length: 7 }, (_, i) => {
@@ -250,7 +308,7 @@ export default function Calendar() {
                 return (
                   <div
                     key={i}
-                    className="px-2 py-3 text-center text-sm font-semibold text-gray-700"
+                    className="px-2 py-3 text-center text-sm font-semibold text-gray-700 dark:text-gray-300"
                   >
                     {label}
                   </div>
@@ -261,7 +319,7 @@ export default function Calendar() {
 
           {/* Calendar Grid */}
           <div className="grid grid-cols-7">
-            {calendarDays.map((day, index) => {
+            {calendarDays.map((day) => {
               const dayAppointments = getAppointmentsForDate(day);
               const isCurrentMonth = isSameMonth(day, currentDate);
               const isSelectedDay = isSameDay(day, selectedDate);
@@ -269,22 +327,24 @@ export default function Calendar() {
 
               return (
                 <div
-                  key={index}
+                  key={day.toISOString()}
                   onClick={() => {
                     setSelectedDate(day);
                     setView('day');
                   }}
-                  className={`min-h-[120px] border-b border-r p-2 cursor-pointer transition-colors ${
-                    !isCurrentMonth ? 'bg-gray-50' : 'bg-white hover:bg-gray-50'
+                  className={`min-h-[120px] border-b border-r border-gray-200 dark:border-gray-700 p-2 cursor-pointer transition-colors ${
+                    !isCurrentMonth
+                      ? 'bg-gray-50 dark:bg-gray-900'
+                      : 'bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750'
                   } ${isSelectedDay ? 'ring-2 ring-blue-500' : ''}`}
                 >
                   <div
                     className={`text-sm font-medium mb-1 ${
                       !isCurrentMonth
-                        ? 'text-gray-400'
+                        ? 'text-gray-400 dark:text-gray-300'
                         : isTodayDate
                           ? 'bg-blue-600 text-white rounded-full w-7 h-7 flex items-center justify-center'
-                          : 'text-gray-900'
+                          : 'text-gray-900 dark:text-gray-100'
                     }`}
                   >
                     {format(day, 'd')}
@@ -295,7 +355,7 @@ export default function Calendar() {
                     {dayAppointments.slice(0, 3).map((apt) => (
                       <div
                         key={apt.id}
-                        className={`text-xs px-1.5 py-0.5 rounded border truncate ${getStatusColor(apt.status)}`}
+                        className={`text-xs px-1.5 py-0.5 rounded border truncate ${getAppointmentColor(apt)}`}
                         onClick={(e) => {
                           e.stopPropagation();
                           navigate(`/appointments/${apt.id}`);
@@ -305,7 +365,7 @@ export default function Calendar() {
                       </div>
                     ))}
                     {dayAppointments.length > 3 && (
-                      <div className="text-xs text-gray-500 px-1.5">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 px-1.5">
                         {t('moreAppointments').replace('{count}', dayAppointments.length - 3)}
                       </div>
                     )}
@@ -319,17 +379,24 @@ export default function Calendar() {
 
       {/* Week View */}
       {view === 'week' && (
-        <div className="bg-white rounded-lg shadow overflow-hidden">
-          <div className="grid grid-cols-7 border-b">
+        <div
+          className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden"
+          data-testid="calendar-week-view"
+        >
+          <div className="grid grid-cols-7 border-b border-gray-200 dark:border-gray-700">
             {weekDays.map((day) => (
               <div
                 key={day.toString()}
-                className={`p-4 text-center border-r ${isToday(day) ? 'bg-blue-50' : ''}`}
+                className={`p-4 text-center border-r border-gray-200 dark:border-gray-700 ${isToday(day) ? 'bg-blue-50 dark:bg-blue-900/20' : ''}`}
               >
-                <div className="text-sm font-semibold text-gray-700">{format(day, 'EEE')}</div>
+                <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                  {format(day, 'EEE')}
+                </div>
                 <div
                   className={`text-2xl font-bold mt-1 ${
-                    isToday(day) ? 'text-blue-600' : 'text-gray-900'
+                    isToday(day)
+                      ? 'text-blue-600 dark:text-blue-400'
+                      : 'text-gray-900 dark:text-white'
                   }`}
                 >
                   {format(day, 'd')}
@@ -343,13 +410,16 @@ export default function Calendar() {
             {weekDays.map((day) => {
               const dayAppointments = getAppointmentsForDate(day);
               return (
-                <div key={day.toString()} className="border-r min-h-[400px] p-2">
+                <div
+                  key={day.toString()}
+                  className="border-r border-gray-200 dark:border-gray-700 min-h-[400px] p-2"
+                >
                   <div className="space-y-2">
                     {dayAppointments.map((apt) => (
                       <div
                         key={apt.id}
                         onClick={() => navigate(`/appointments/${apt.id}`)}
-                        className={`p-2 rounded border cursor-pointer ${getStatusColor(apt.status)}`}
+                        className={`p-2 rounded border cursor-pointer ${getAppointmentColor(apt)}`}
                       >
                         <div className="flex items-center gap-1 text-xs font-semibold mb-1">
                           {getStatusIcon(apt.status)}
@@ -369,9 +439,12 @@ export default function Calendar() {
 
       {/* Day View */}
       {view === 'day' && (
-        <div className="bg-white rounded-lg shadow">
-          <div className="p-6 border-b">
-            <h3 className="text-lg font-semibold text-gray-900">
+        <div
+          className="bg-white dark:bg-gray-800 rounded-lg shadow"
+          data-testid="calendar-day-view"
+        >
+          <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               {format(selectedDate, 'EEEE, MMMM d, yyyy')}
             </h3>
           </div>
@@ -381,8 +454,8 @@ export default function Calendar() {
               <AppointmentsListSkeleton items={5} />
             ) : getAppointmentsForDate(selectedDate).length === 0 ? (
               <div className="text-center py-12">
-                <CalendarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600">{t('noAppointmentsScheduled')}</p>
+                <CalendarIcon className="w-16 h-16 text-gray-400 dark:text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-600 dark:text-gray-400">{t('noAppointmentsScheduled')}</p>
                 <button
                   onClick={() => navigate('/appointments/new')}
                   className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -396,7 +469,7 @@ export default function Calendar() {
                 {getAppointmentsForDate(selectedDate).map((apt) => (
                   <div
                     key={apt.id}
-                    className={`p-4 rounded-lg border-2 ${getStatusColor(apt.status)}`}
+                    className={`p-4 rounded-lg border-2 ${getAppointmentColor(apt)}`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
@@ -405,12 +478,12 @@ export default function Calendar() {
                           <span className="text-sm font-semibold uppercase">{apt.status}</span>
                         </div>
 
-                        <div className="flex items-center gap-2 text-lg font-semibold text-gray-900 mb-1">
+                        <div className="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-white mb-1">
                           <User className="w-5 h-5" />
                           {apt.patient_name}
                         </div>
 
-                        <div className="flex items-center gap-4 text-sm text-gray-600 mb-2">
+                        <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400 mb-2">
                           <div className="flex items-center gap-1">
                             <Clock className="w-4 h-4" />
                             {format(parseISO(apt.start_time), 'HH:mm')} -{' '}
@@ -421,7 +494,11 @@ export default function Calendar() {
                           </div>
                         </div>
 
-                        {apt.notes && <p className="text-sm text-gray-600 mt-2">{apt.notes}</p>}
+                        {apt.notes && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                            {apt.notes}
+                          </p>
+                        )}
                       </div>
 
                       <div className="flex gap-2">
@@ -435,8 +512,11 @@ export default function Calendar() {
                               {t('confirm')}
                             </button>
                             <button
-                              onClick={() => {
-                                const reason = prompt(t('cancellationReasonPrompt'));
+                              onClick={async () => {
+                                const reason = await prompt({
+                                  title: t('cancellationReasonTitle', 'Avbestillingsgrunn'),
+                                  placeholder: t('cancellationReasonPrompt'),
+                                });
                                 if (reason) {
                                   cancelMutation.mutate({ id: apt.id, reason });
                                 }

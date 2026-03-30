@@ -21,6 +21,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, Maximize2, Minimize2, Eye, EyeOff, Settings, RotateCcw } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 // Default SOAP sections with Norwegian labels
 const DEFAULT_SECTIONS = [
@@ -114,7 +115,11 @@ const SortableSectionItem = ({
         style={style}
         className="flex items-center gap-2 p-2 bg-gray-50 rounded-lg mb-2 opacity-50"
       >
-        <div {...attributes} {...listeners} className="cursor-grab text-gray-400">
+        <div
+          {...attributes}
+          {...listeners}
+          className="cursor-grab text-gray-400 dark:text-gray-300"
+        >
           <GripVertical className="w-4 h-4" />
         </div>
         <div
@@ -122,10 +127,12 @@ const SortableSectionItem = ({
         >
           {section.icon}
         </div>
-        <span className="flex-1 text-gray-500 line-through">{section.label}</span>
+        <span className="flex-1 text-gray-500 dark:text-gray-400 line-through">
+          {section.label}
+        </span>
         <button
           onClick={() => onToggleHidden(section.id)}
-          className="p-1 hover:bg-gray-200 rounded text-gray-400"
+          className="p-1 hover:bg-gray-200 rounded text-gray-400 dark:text-gray-300"
           title="Vis seksjon"
         >
           <Eye className="w-4 h-4" />
@@ -205,6 +212,7 @@ const DraggableSoapSections = ({
   collapsedSections: initialCollapsed,
   hiddenSections: initialHidden,
 }) => {
+  const { t } = useTranslation('clinical');
   // State
   const [sections, setSections] = useState(DEFAULT_SECTIONS);
   const [collapsedSections, setCollapsedSections] = useState(new Set(initialCollapsed || []));
@@ -345,12 +353,12 @@ const DraggableSoapSections = ({
     <div className="relative">
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
-        <h3 className="font-medium text-gray-900">SOAP-notater</h3>
+        <h3 className="font-medium text-gray-900">{t('draggableSoapTitle', 'SOAP-notater')}</h3>
 
         <div className="flex items-center gap-2">
           {hiddenSections.size > 0 && (
             <button onClick={showAllHidden} className="text-xs text-blue-600 hover:underline">
-              Vis skjulte ({hiddenSections.size})
+              {t('draggableShowHidden', 'Vis skjulte')} ({hiddenSections.size})
             </button>
           )}
 
@@ -360,21 +368,23 @@ const DraggableSoapSections = ({
               className="p-1.5 hover:bg-gray-100 rounded-l-lg border-r border-gray-200"
               title="Utvid alle"
             >
-              <Maximize2 className="w-4 h-4 text-gray-500" />
+              <Maximize2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
             </button>
             <button
               onClick={collapseAll}
               className="p-1.5 hover:bg-gray-100 rounded-r-lg"
               title="Minimer alle"
             >
-              <Minimize2 className="w-4 h-4 text-gray-500" />
+              <Minimize2 className="w-4 h-4 text-gray-500 dark:text-gray-400" />
             </button>
           </div>
 
           <button
             onClick={() => setShowSettings(!showSettings)}
             className={`p-1.5 rounded-lg ${
-              showSettings ? 'bg-blue-100 text-blue-600' : 'hover:bg-gray-100 text-gray-500'
+              showSettings
+                ? 'bg-blue-100 text-blue-600'
+                : 'hover:bg-gray-100 text-gray-500 dark:text-gray-400'
             }`}
             title="Innstillinger"
           >
@@ -387,17 +397,22 @@ const DraggableSoapSections = ({
       {showSettings && (
         <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between mb-3">
-            <h4 className="font-medium text-gray-900">Tilpass seksjoner</h4>
+            <h4 className="font-medium text-gray-900">
+              {t('draggableCustomize', 'Tilpass seksjoner')}
+            </h4>
             <button
               onClick={handleReset}
-              className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900"
+              className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900"
             >
               <RotateCcw className="w-3 h-3" />
-              Tilbakestill
+              {t('draggableReset', 'Tilbakestill')}
             </button>
           </div>
-          <p className="text-sm text-gray-600 mb-2">
-            Dra seksjonene for å endre rekkefølge. Klikk på øye-ikonet for å skjule.
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+            {t(
+              'draggableInstructions',
+              'Dra seksjonene for å endre rekkefølge. Klikk på øye-ikonet for å skjule.'
+            )}
           </p>
           <div className="flex flex-wrap gap-2">
             {sections.map((section) => (
@@ -405,7 +420,7 @@ const DraggableSoapSections = ({
                 key={section.id}
                 className={`flex items-center gap-1 px-2 py-1 rounded text-sm ${
                   hiddenSections.has(section.id)
-                    ? 'bg-gray-200 text-gray-500 line-through'
+                    ? 'bg-gray-200 text-gray-500 dark:text-gray-400 line-through'
                     : getColorClasses(section.color)
                 }`}
               >
@@ -441,9 +456,12 @@ const DraggableSoapSections = ({
       {/* Hidden sections indicator */}
       {hiddenSections.size > 0 && (
         <div className="mt-2 p-2 bg-gray-100 rounded-lg text-center">
-          <button onClick={showAllHidden} className="text-sm text-gray-600 hover:text-gray-900">
-            {hiddenSections.size} seksjon{hiddenSections.size !== 1 ? 'er' : ''} skjult - klikk for
-            å vise
+          <button
+            onClick={showAllHidden}
+            className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900"
+          >
+            {hiddenSections.size}{' '}
+            {t('draggableHiddenCount', 'seksjon(er) skjult - klikk for å vise')}
           </button>
         </div>
       )}

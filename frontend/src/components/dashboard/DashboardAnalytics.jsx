@@ -23,17 +23,20 @@ import {
 } from 'recharts';
 import { TrendingUp, Grid3X3, UserX, Users, ChevronDown, ChevronUp } from 'lucide-react';
 import { dashboardAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 
-const PERIOD_OPTIONS = [
-  { value: '30', label: '30 dager' },
-  { value: '90', label: '90 dager' },
-  { value: '365', label: '1 ar' },
+const PERIOD_OPTION_KEYS = [
+  { value: '30', key: 'days30', fallback: '30 dager' },
+  { value: '90', key: 'days90', fallback: '90 dager' },
+  { value: '365', key: 'year1', fallback: '1 år' },
 ];
 
-const DAY_LABELS = ['Son', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lor'];
+const DAY_LABEL_KEYS = ['daySun', 'dayMon', 'dayTue', 'dayWed', 'dayThu', 'dayFri', 'daySat'];
+const DAY_LABEL_FALLBACKS = ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'];
 const HOURS = Array.from({ length: 12 }, (_, i) => i + 7); // 07:00 - 18:00
 
 export default function DashboardAnalytics() {
+  const { t } = useTranslation('dashboard');
   const [revenuePeriod, setRevenuePeriod] = useState('30');
   const [noShowPeriod, setNoShowPeriod] = useState('90');
   const [patientFlowPeriod, setPatientFlowPeriod] = useState('90');
@@ -73,10 +76,12 @@ export default function DashboardAnalytics() {
       }),
   });
 
-  const revenue = revenueData?.data || [];
-  const utilization = utilizationData?.data || [];
-  const noShow = noShowData?.data || [];
-  const patientFlow = patientFlowData?.data || [];
+  // Axios wraps response in .data, API wraps payload in {success, data}
+  const unwrap = (resp) => resp?.data?.data ?? resp?.data;
+  const revenue = unwrap(revenueData) || [];
+  const utilization = unwrap(utilizationData) || [];
+  const noShow = unwrap(noShowData) || [];
+  const patientFlow = unwrap(patientFlowData) || [];
 
   const toggleSection = (section) => {
     setExpandedSection(expandedSection === section ? null : section);
@@ -86,7 +91,7 @@ export default function DashboardAnalytics() {
     <div className="space-y-4">
       {/* Revenue Trend */}
       <AnalyticsPanel
-        title="Inntektstrend"
+        title={t('revenueTrend', 'Inntektstrend')}
         icon={TrendingUp}
         iconColor="text-green-600"
         bgColor="bg-green-50"
@@ -98,7 +103,7 @@ export default function DashboardAnalytics() {
         {revenueLoading ? (
           <ChartSkeleton />
         ) : revenue.length === 0 ? (
-          <EmptyChart message="Ingen inntektsdata i perioden" />
+          <EmptyChart message={t('noRevenueData', 'Ingen inntektsdata i perioden')} />
         ) : (
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={revenue} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
@@ -118,11 +123,19 @@ export default function DashboardAnalytics() {
                 tickFormatter={(v) => `${v / 1000}k`}
               />
               <Tooltip
-                formatter={(value) => [`${Number(value).toLocaleString('no-NO')} kr`, 'Inntekt']}
+                formatter={(value) => [
+                  `${Number(value).toLocaleString('no-NO')} kr`,
+                  t('revenue', 'Inntekt'),
+                ]}
                 labelStyle={{ color: '#475569' }}
                 contentStyle={{ borderRadius: '8px', border: '1px solid #e2e8f0' }}
               />
-              <Bar dataKey="amount" fill="#14b8a6" radius={[4, 4, 0, 0]} name="Inntekt" />
+              <Bar
+                dataKey="amount"
+                fill="#14b8a6"
+                radius={[4, 4, 0, 0]}
+                name={t('revenue', 'Inntekt')}
+              />
             </BarChart>
           </ResponsiveContainer>
         )}
@@ -130,7 +143,7 @@ export default function DashboardAnalytics() {
 
       {/* Utilization Heatmap */}
       <AnalyticsPanel
-        title="Kapasitetsutnyttelse"
+        title={t('capacityUtilization', 'Kapasitetsutnyttelse')}
         icon={Grid3X3}
         iconColor="text-blue-600"
         bgColor="bg-blue-50"
@@ -142,15 +155,15 @@ export default function DashboardAnalytics() {
         {utilizationLoading ? (
           <ChartSkeleton />
         ) : utilization.length === 0 ? (
-          <EmptyChart message="Ingen timebokdata i perioden" />
+          <EmptyChart message={t('noScheduleData', 'Ingen timebokdata i perioden')} />
         ) : (
-          <UtilizationHeatmap data={utilization} />
+          <UtilizationHeatmap data={utilization} t={t} />
         )}
       </AnalyticsPanel>
 
       {/* No-Show Trend */}
       <AnalyticsPanel
-        title="Uteblivelsestrend"
+        title={t('noShowTrend', 'Uteblivelsestrend')}
         icon={UserX}
         iconColor="text-red-600"
         bgColor="bg-red-50"
@@ -162,7 +175,7 @@ export default function DashboardAnalytics() {
         {noShowLoading ? (
           <ChartSkeleton />
         ) : noShow.length === 0 ? (
-          <EmptyChart message="Ingen uteblivelsesdata i perioden" />
+          <EmptyChart message={t('noNoShowData', 'Ingen uteblivelsesdata i perioden')} />
         ) : (
           <ResponsiveContainer width="100%" height={280}>
             <LineChart data={noShow} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
@@ -176,10 +189,10 @@ export default function DashboardAnalytics() {
               <Tooltip
                 formatter={(value, name) => {
                   if (name === 'rate') {
-                    return [`${value}%`, 'Uteblivelsesrate'];
+                    return [`${value}%`, t('noShowRate', 'Uteblivelsesrate')];
                   }
                   if (name === 'noShows') {
-                    return [value, 'Uteblivelser'];
+                    return [value, t('noShows', 'Uteblivelser')];
                   }
                   return [value, name];
                 }}
@@ -218,7 +231,7 @@ export default function DashboardAnalytics() {
 
       {/* Patient Flow */}
       <AnalyticsPanel
-        title="Pasientflyt"
+        title={t('patientFlow', 'Pasientflyt')}
         icon={Users}
         iconColor="text-purple-600"
         bgColor="bg-purple-50"
@@ -230,7 +243,7 @@ export default function DashboardAnalytics() {
         {patientFlowLoading ? (
           <ChartSkeleton />
         ) : patientFlow.length === 0 ? (
-          <EmptyChart message="Ingen pasientflytdata i perioden" />
+          <EmptyChart message={t('noPatientFlowData', 'Ingen pasientflytdata i perioden')} />
         ) : (
           <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={patientFlow} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
@@ -240,13 +253,13 @@ export default function DashboardAnalytics() {
               <Tooltip
                 formatter={(value, name) => {
                   if (name === 'newPatients') {
-                    return [value, 'Nye pasienter'];
+                    return [value, t('newPatientsTooltip', 'Nye pasienter')];
                   }
                   if (name === 'returningPatients') {
-                    return [value, 'Gjenbesokende'];
+                    return [value, t('returningPatientsTooltip', 'Gjenbesøkende')];
                   }
                   if (name === 'totalVisits') {
-                    return [value, 'Totale besok'];
+                    return [value, t('totalVisitsTooltip', 'Totale besøk')];
                   }
                   return [value, name];
                 }}
@@ -255,7 +268,7 @@ export default function DashboardAnalytics() {
               <Legend
                 formatter={(value) => {
                   if (value === 'newPatients') {
-                    return 'Nye';
+                    return t('newPatientsChart', 'Nye');
                   }
                   if (value === 'returningPatients') {
                     return 'Gjenbesokende';
@@ -300,6 +313,7 @@ function AnalyticsPanel({
   onPeriodChange,
   children,
 }) {
+  const { t } = useTranslation('dashboard');
   return (
     <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-sm">
       <button
@@ -323,17 +337,17 @@ function AnalyticsPanel({
               onClick={(e) => e.stopPropagation()}
               className="text-xs border border-gray-200 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-600 dark:text-gray-300"
             >
-              {PERIOD_OPTIONS.map((opt) => (
+              {PERIOD_OPTION_KEYS.map((opt) => (
                 <option key={opt.value} value={opt.value}>
-                  {opt.label}
+                  {t(opt.key, opt.fallback)}
                 </option>
               ))}
             </select>
           )}
           {expanded ? (
-            <ChevronUp className="w-4 h-4 text-gray-400" />
+            <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
           ) : (
-            <ChevronDown className="w-4 h-4 text-gray-400" />
+            <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
           )}
         </div>
       </button>
@@ -344,7 +358,7 @@ function AnalyticsPanel({
   );
 }
 
-function UtilizationHeatmap({ data }) {
+function UtilizationHeatmap({ data, t }) {
   // Build a lookup: {dayOfWeek-hour} => utilization
   const lookup = {};
   let maxCount = 0;
@@ -378,9 +392,12 @@ function UtilizationHeatmap({ data }) {
       <div className="min-w-[500px]">
         {/* Header row */}
         <div className="flex items-center gap-1 mb-1">
-          <div className="w-10 text-xs text-gray-400 flex-shrink-0" />
+          <div className="w-10 text-xs text-gray-400 dark:text-gray-300 flex-shrink-0" />
           {HOURS.map((hour) => (
-            <div key={hour} className="flex-1 text-center text-[10px] text-gray-400 font-mono">
+            <div
+              key={hour}
+              className="flex-1 text-center text-[10px] text-gray-400 dark:text-gray-300 font-mono"
+            >
               {String(hour).padStart(2, '0')}
             </div>
           ))}
@@ -389,7 +406,9 @@ function UtilizationHeatmap({ data }) {
         {/* Day rows (Mon-Fri, skip Sun=0 and Sat=6) */}
         {[1, 2, 3, 4, 5].map((dow) => (
           <div key={dow} className="flex items-center gap-1 mb-1">
-            <div className="w-10 text-xs text-gray-500 flex-shrink-0">{DAY_LABELS[dow]}</div>
+            <div className="w-10 text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+              {t(DAY_LABEL_KEYS[dow], DAY_LABEL_FALLBACKS[dow])}
+            </div>
             {HOURS.map((hour) => {
               const item = lookup[`${dow}-${hour}`];
               const count = item?.count || 0;
@@ -397,7 +416,7 @@ function UtilizationHeatmap({ data }) {
                 <div
                   key={hour}
                   className={`flex-1 h-8 rounded ${getColor(count)} transition-colors cursor-default`}
-                  title={`${DAY_LABELS[dow]} kl ${hour}:00 — ${count} timer`}
+                  title={`${t(DAY_LABEL_KEYS[dow], DAY_LABEL_FALLBACKS[dow])} kl ${hour}:00 — ${count} timer`}
                 />
               );
             })}
@@ -405,14 +424,14 @@ function UtilizationHeatmap({ data }) {
         ))}
 
         {/* Legend */}
-        <div className="flex items-center gap-2 mt-3 justify-end text-[10px] text-gray-400">
-          <span>Lav</span>
+        <div className="flex items-center gap-2 mt-3 justify-end text-[10px] text-gray-400 dark:text-gray-300">
+          <span>{t('heatmapLow', 'Lav')}</span>
           <div className="w-4 h-4 rounded bg-gray-100" />
           <div className="w-4 h-4 rounded bg-teal-100" />
           <div className="w-4 h-4 rounded bg-teal-200" />
           <div className="w-4 h-4 rounded bg-teal-400" />
           <div className="w-4 h-4 rounded bg-teal-600" />
-          <span>Hoy</span>
+          <span>{t('heatmapHigh', 'Høy')}</span>
         </div>
       </div>
     </div>
@@ -438,7 +457,7 @@ function ChartSkeleton() {
 
 function EmptyChart({ message }) {
   return (
-    <div className="flex items-center justify-center h-[200px] text-sm text-gray-400">
+    <div className="flex items-center justify-center h-[200px] text-sm text-gray-400 dark:text-gray-300">
       {message}
     </div>
   );

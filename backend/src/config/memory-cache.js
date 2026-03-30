@@ -11,7 +11,7 @@ import logger from '../utils/logger.js';
 const store = new Map();
 const timers = new Map();
 
-const KEY_PREFIX = 'chiroclickcrm:';
+const KEY_PREFIX = 'chiroclickehr:';
 
 const prefixKey = (key) => `${KEY_PREFIX}${key}`;
 

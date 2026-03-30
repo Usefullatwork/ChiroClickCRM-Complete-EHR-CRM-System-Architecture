@@ -3,7 +3,7 @@
  * Wraps the autoAccept service for route handlers
  */
 
-import * as autoAcceptService from '../services/autoAccept.js';
+import * as autoAcceptService from '../services/practice/autoAccept.js';
 import logger from '../utils/logger.js';
 
 /**

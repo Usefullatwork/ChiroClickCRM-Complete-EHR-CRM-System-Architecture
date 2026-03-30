@@ -13,6 +13,11 @@ import { letters } from './letters';
 import { exercises } from './exercises';
 import { validation } from './validation';
 import { analytics } from './analytics';
+import { ai } from './ai';
+import { assessment } from './assessment';
+import { portal } from './portal';
+import { automations } from './automations';
+import { neuroexam } from './neuroexam';
 
 export const translations = {
   common,
@@ -30,4 +35,9 @@ export const translations = {
   exercises,
   validation,
   analytics,
+  ai,
+  assessment,
+  portal,
+  automations,
+  neuroexam,
 };

@@ -170,7 +170,12 @@ const DERMATOME_REGIONS = {
 
 // Finding options
 const FINDING_OPTIONS = [
-  { value: 'NT', label: 'Not Tested', labelNo: 'Ikke testet', color: 'bg-gray-100 text-gray-500' },
+  {
+    value: 'NT',
+    label: 'Not Tested',
+    labelNo: 'Ikke testet',
+    color: 'bg-gray-100 text-gray-500 dark:text-gray-400',
+  },
   { value: 'normal', label: 'Normal', labelNo: 'Normal', color: 'bg-green-100 text-green-700' },
   {
     value: 'decreased',
@@ -253,7 +258,7 @@ function DermatomeRow({ dermatome, modality, values, onChange, lang }) {
           {dermatome.level}
         </span>
       </td>
-      <td className="px-3 py-2 text-xs text-gray-600">
+      <td className="px-3 py-2 text-xs text-gray-600 dark:text-gray-300">
         {lang === 'no' ? dermatome.landmarkNo : dermatome.landmark}
       </td>
       <td className="px-2 py-2">
@@ -307,7 +312,7 @@ function ModalitySection({ modality, values, onChange, lang, expanded, onToggle 
             <span className="font-medium text-gray-700">
               {lang === 'no' ? modality.nameNo : modality.name}
             </span>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               {lang === 'no' ? modality.pathwayNo : modality.pathway}
             </p>
           </div>
@@ -319,27 +324,27 @@ function ModalitySection({ modality, values, onChange, lang, expanded, onToggle 
             </span>
           )}
           {expanded ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
+            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           )}
         </div>
       </button>
 
       {expanded && (
         <div className="p-4 bg-white">
-          <p className="text-xs text-gray-500 mb-3">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mb-3">
             {lang === 'no' ? modality.descriptionNo : modality.description}
           </p>
 
           {Object.entries(DERMATOME_REGIONS).map(([regionKey, region]) => (
             <div key={regionKey} className="mb-4 last:mb-0">
-              <h5 className="text-xs font-medium text-gray-500 mb-2">
+              <h5 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
                 {lang === 'no' ? region.nameNo : region.name}
               </h5>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-xs text-gray-500">
+                  <tr className="text-xs text-gray-500 dark:text-gray-400">
                     <th className="px-3 py-1 text-left w-16">{lang === 'no' ? 'Nivå' : 'Level'}</th>
                     <th className="px-3 py-1 text-left">
                       {lang === 'no' ? 'Landemerke' : 'Landmark'}
@@ -388,15 +393,15 @@ function CorticalSensorySection({ values, onChange, lang, expanded, onToggle }) 
             <span className="font-medium text-gray-700">
               {lang === 'no' ? 'Kortikal Sensibilitet' : 'Cortical Sensation'}
             </span>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-gray-500 dark:text-gray-400">
               {lang === 'no' ? 'Parietallapp-funksjon' : 'Parietal lobe function'}
             </p>
           </div>
         </div>
         {expanded ? (
-          <ChevronUp className="w-5 h-5 text-gray-400" />
+          <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-400" />
+          <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
         )}
       </button>
 
@@ -411,13 +416,13 @@ function CorticalSensorySection({ values, onChange, lang, expanded, onToggle }) 
                 <p className="text-sm font-medium text-gray-700">
                   {lang === 'no' ? modality.nameNo : modality.name}
                 </p>
-                <p className="text-xs text-gray-500 mt-0.5">
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                   {lang === 'no' ? modality.descriptionNo : modality.description}
                 </p>
               </div>
               <div className="flex gap-2">
                 <div className="text-center">
-                  <span className="text-[10px] text-gray-400 block mb-1">
+                  <span className="text-[10px] text-gray-400 dark:text-gray-300 block mb-1">
                     {lang === 'no' ? 'V' : 'L'}
                   </span>
                   <FindingSelector
@@ -427,7 +432,7 @@ function CorticalSensorySection({ values, onChange, lang, expanded, onToggle }) 
                   />
                 </div>
                 <div className="text-center">
-                  <span className="text-[10px] text-gray-400 block mb-1">
+                  <span className="text-[10px] text-gray-400 dark:text-gray-300 block mb-1">
                     {lang === 'no' ? 'H' : 'R'}
                   </span>
                   <FindingSelector
@@ -573,7 +578,7 @@ export default function SensoryExamination({
             {lang === 'no' ? 'Sensibilitetsundersøkelse' : 'Sensory Examination'}
           </h3>
           {summary.tested > 0 && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {summary.tested} {lang === 'no' ? 'tester' : 'tests'}
               {summary.abnormal > 0 && (
                 <span className="text-amber-600 ml-2">

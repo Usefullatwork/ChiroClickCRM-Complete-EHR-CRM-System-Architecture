@@ -7,7 +7,9 @@ import './index.css';
 import { initializeCSRF } from './services/api';
 import { LanguageProvider } from './i18n';
 import { ConfirmProvider } from './components/ui/ConfirmDialog';
+import { PromptProvider } from './components/ui/PromptDialog';
 import logger from './utils/logger';
+import { migrateLocalStorage } from './migrations/localStorage';
 
 const log = logger.scope('Main');
 
@@ -22,10 +24,13 @@ const queryClient = new QueryClient({
   },
 });
 
+// Migrate legacy localStorage keys (one-time, idempotent)
+migrateLocalStorage();
+
 // Initialize CSRF protection
 initializeCSRF();
 
-log.info('ChiroClickCRM Desktop starting');
+log.info('ChiroClickEHR Desktop starting');
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -33,7 +38,9 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <LanguageProvider>
         <BrowserRouter>
           <ConfirmProvider>
-            <App />
+            <PromptProvider>
+              <App />
+            </PromptProvider>
           </ConfirmProvider>
         </BrowserRouter>
       </LanguageProvider>

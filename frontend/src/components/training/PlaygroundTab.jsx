@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import { Play, TestTube, Clock, Columns, Monitor, Zap } from 'lucide-react';
 import { trainingAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 
 const MODELS = [
   { value: 'chiro-no', label: 'chiro-no (Standard)' },
@@ -55,6 +56,7 @@ const PRESET_PROMPTS = [
 ];
 
 export default function PlaygroundTab() {
+  const { t } = useTranslation('clinical');
   const [prompt, setPrompt] = useState('');
   const [modelA, setModelA] = useState('chiro-no');
   const [modelB, setModelB] = useState('chiro-norwegian');
@@ -93,7 +95,7 @@ export default function PlaygroundTab() {
   return (
     <div className="space-y-6">
       {/* Prompt Input */}
-      <div className="bg-white rounded-lg shadow p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
           <TestTube className="w-5 h-5" />
           Modell-lekeplass
@@ -101,13 +103,13 @@ export default function PlaygroundTab() {
 
         {/* Preset Prompts */}
         <div className="mb-4">
-          <p className="text-sm text-gray-600 mb-2">Hurtigvalg:</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">Hurtigvalg:</p>
           <div className="flex flex-wrap gap-2">
             {PRESET_PROMPTS.map((p) => (
               <button
                 key={p.label}
                 onClick={() => applyPreset(p.prompt)}
-                className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-xs font-medium transition-colors"
+                className="px-3 py-1.5 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg text-xs font-medium transition-colors dark:text-gray-200"
               >
                 {p.label}
               </button>
@@ -120,18 +122,20 @@ export default function PlaygroundTab() {
           value={prompt}
           onChange={(e) => setPrompt(e.target.value)}
           rows={4}
-          placeholder="Skriv en prompt for å teste modellen..."
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
+          placeholder={t('playgroundPromptPlaceholder', 'Skriv en prompt for å teste modellen...')}
+          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm dark:bg-gray-700 dark:text-gray-200"
         />
 
         {/* Controls Row */}
         <div className="flex flex-wrap items-center gap-4 mt-4">
           {/* Mode Toggle */}
-          <div className="flex bg-gray-100 rounded-lg p-0.5">
+          <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
             <button
               onClick={() => setSideBySide(false)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                !sideBySide ? 'bg-white shadow-sm text-blue-700' : 'text-gray-600'
+                !sideBySide
+                  ? 'bg-white dark:bg-gray-600 shadow-sm text-blue-700 dark:text-blue-300'
+                  : 'text-gray-600 dark:text-gray-300'
               }`}
             >
               <Monitor className="w-4 h-4" />
@@ -140,7 +144,9 @@ export default function PlaygroundTab() {
             <button
               onClick={() => setSideBySide(true)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
-                sideBySide ? 'bg-white shadow-sm text-blue-700' : 'text-gray-600'
+                sideBySide
+                  ? 'bg-white dark:bg-gray-600 shadow-sm text-blue-700 dark:text-blue-300'
+                  : 'text-gray-600 dark:text-gray-300'
               }`}
             >
               <Columns className="w-4 h-4" />
@@ -153,7 +159,7 @@ export default function PlaygroundTab() {
             <select
               value={modelA}
               onChange={(e) => setModelA(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+              className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
             >
               {MODELS.map((m) => (
                 <option key={m.value} value={m.value}>
@@ -163,11 +169,11 @@ export default function PlaygroundTab() {
             </select>
             {sideBySide && (
               <>
-                <span className="text-gray-400 text-sm">vs</span>
+                <span className="text-gray-400 dark:text-gray-300 text-sm">vs</span>
                 <select
                   value={modelB}
                   onChange={(e) => setModelB(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm dark:bg-gray-700 dark:text-gray-200"
                 >
                   {MODELS.map((m) => (
                     <option key={m.value} value={m.value}>
@@ -223,7 +229,7 @@ export default function PlaygroundTab() {
 
       {/* Error display */}
       {testMutationA.isError && !resultA && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
+        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-lg text-sm text-red-800 dark:text-red-300">
           Feil: {testMutationA.error?.response?.data?.error || testMutationA.error?.message}
         </div>
       )}
@@ -233,11 +239,11 @@ export default function PlaygroundTab() {
 
 function ResultCard({ model, result, loading, error }) {
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
-      <div className="px-4 py-3 bg-gray-50 border-b flex items-center justify-between">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
+      <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700 border-b flex items-center justify-between">
         <span className="font-medium text-sm font-mono">{model}</span>
         {result && (
-          <div className="flex items-center gap-3 text-xs text-gray-500">
+          <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
             {result.latency_ms && (
               <span className="flex items-center gap-1">
                 <Zap className="w-3 h-3" />
@@ -250,7 +256,7 @@ function ResultCard({ model, result, loading, error }) {
       </div>
       <div className="p-4">
         {loading ? (
-          <div className="flex items-center gap-2 text-gray-500">
+          <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
             <Clock className="w-4 h-4 animate-spin" />
             <span className="text-sm">Genererer svar...</span>
           </div>
@@ -261,14 +267,16 @@ function ResultCard({ model, result, loading, error }) {
         ) : result ? (
           <div>
             {result.prompt && (
-              <div className="text-xs text-gray-500 mb-2">Prompt: {result.prompt}</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400 mb-2">
+                Prompt: {result.prompt}
+              </div>
             )}
-            <div className="whitespace-pre-wrap text-sm font-mono bg-gray-50 rounded-lg p-3 max-h-96 overflow-y-auto">
+            <div className="whitespace-pre-wrap text-sm font-mono bg-gray-50 dark:bg-gray-700 rounded-lg p-3 max-h-96 overflow-y-auto">
               {result.response}
             </div>
           </div>
         ) : (
-          <p className="text-gray-400 text-sm">Ingen resultat enna.</p>
+          <p className="text-gray-400 dark:text-gray-300 text-sm">Ingen resultat enna.</p>
         )}
       </div>
     </div>

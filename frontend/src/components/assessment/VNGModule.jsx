@@ -2,7 +2,7 @@
  * VNGModule - Video Nystagmography Assessment Component
  *
  * Comprehensive vestibular testing interface based on clinical VNG protocols.
- * Supports bilingual documentation (English/Norwegian).
+ * Supports bilingual documentation (English/Norwegian) via centralized i18n.
  *
  * Tests included:
  * - Spontaneous Nystagmus
@@ -16,7 +16,7 @@
  */
 
 import { useState, useCallback } from 'react';
-import { t } from './translations';
+import { useTranslation } from '../../i18n';
 import {
   Eye,
   Activity,
@@ -39,7 +39,7 @@ import {
 const RESULT_OPTIONS = {
   normal: { value: 'normal', icon: CheckCircle2, color: 'text-green-600' },
   abnormal: { value: 'abnormal', icon: XCircle, color: 'text-red-600' },
-  notTested: { value: 'not_tested', icon: AlertCircle, color: 'text-gray-400' },
+  notTested: { value: 'not_tested', icon: AlertCircle, color: 'text-gray-400 dark:text-gray-300' },
 };
 
 // Default VNG data structure
@@ -167,8 +167,32 @@ const getDefaultVNGData = () => ({
   recommendations: '',
 });
 
+// Mapping from result option value to i18n key
+const RESULT_KEY_MAP = {
+  normal: 'vngNormal',
+  abnormal: 'vngAbnormal',
+  not_tested: 'vngNotTested',
+};
+
+// Mapping from gaze/cerebellar data keys to i18n keys for narrative labels
+const VNG_KEY_MAP = {
+  center: 'vngCenter',
+  left: 'vngLeft',
+  right: 'vngRight',
+  up: 'vngUp',
+  down: 'vngDown',
+  romberg7Step: 'vngRomberg7Step',
+  oneLegStanding: 'vngOneLegStanding',
+  fingerToNose: 'vngFingerToNose',
+  fingerToFinger: 'vngFingerToFinger',
+  rapidSupination: 'vngRapidSupination',
+  fingerTapping: 'vngFingerTapping',
+  dualTasking: 'vngDualTasking',
+};
+
 // Result Button Component
-function ResultButton({ value, currentValue, onChange, language }) {
+function ResultButton({ value, currentValue, onChange }) {
+  const { t } = useTranslation('assessment');
   const option = RESULT_OPTIONS[value];
   const Icon = option.icon;
   const isSelected = currentValue === value;
@@ -183,33 +207,27 @@ function ResultButton({ value, currentValue, onChange, language }) {
         ${
           isSelected
             ? `${option.color} bg-gray-100 ring-1 ring-current`
-            : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+            : 'text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-50'
         }
       `}
     >
       <Icon className="w-3.5 h-3.5" />
-      {t('vng', value, language)}
+      {t(RESULT_KEY_MAP[value] || `vng${value.charAt(0).toUpperCase()}${value.slice(1)}`, value)}
     </button>
   );
 }
 
 // Test Row Component
-function TestRow({ label, testKey, value, onChange, language }) {
+function TestRow({ label, testKey, value, onChange }) {
   return (
     <div className="flex items-center justify-between py-1.5 border-b border-gray-100 last:border-b-0">
       <span className="text-sm text-gray-700">{label}</span>
       <div className="flex gap-1">
-        <ResultButton
-          value="normal"
-          currentValue={value}
-          onChange={(v) => onChange(testKey, v)}
-          language={language}
-        />
+        <ResultButton value="normal" currentValue={value} onChange={(v) => onChange(testKey, v)} />
         <ResultButton
           value="abnormal"
           currentValue={value}
           onChange={(v) => onChange(testKey, v)}
-          language={language}
         />
       </div>
     </div>
@@ -217,7 +235,7 @@ function TestRow({ label, testKey, value, onChange, language }) {
 }
 
 // Collapsible Section Component
-function Section({ title, icon: Icon, children, defaultOpen = true, _language }) {
+function Section({ title, icon: Icon, children, defaultOpen = true }) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
@@ -232,9 +250,9 @@ function Section({ title, icon: Icon, children, defaultOpen = true, _language })
           <span className="font-medium text-gray-900">{title}</span>
         </div>
         {isOpen ? (
-          <ChevronUp className="w-5 h-5 text-gray-500" />
+          <ChevronUp className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         ) : (
-          <ChevronDown className="w-5 h-5 text-gray-500" />
+          <ChevronDown className="w-5 h-5 text-gray-500 dark:text-gray-400" />
         )}
       </button>
       {isOpen && <div className="p-4 bg-white">{children}</div>}
@@ -244,13 +262,14 @@ function Section({ title, icon: Icon, children, defaultOpen = true, _language })
 
 // Main VNG Module Component
 export default function VNGModule({
-  language = 'en',
+  _language = 'en',
   initialData = null,
   onSave,
   _onGenerateReport,
   patientName = '',
   examDate = new Date().toISOString().split('T')[0],
 }) {
+  const { t, lang: _lang } = useTranslation('assessment');
   const [data, setData] = useState(initialData || getDefaultVNGData());
   const [activeTab, setActiveTab] = useState('assessment');
 
@@ -286,67 +305,52 @@ export default function VNGModule({
     // Gaze testing narrative
     const gazeAbnormal = Object.entries(data.gazeLight)
       .filter(([k, v]) => k !== 'notes' && v === 'abnormal')
-      .map(([k]) => t('vng', k, language));
+      .map(([k]) => t(VNG_KEY_MAP[k] || k, k));
 
     if (gazeAbnormal.length > 0) {
       sections.push(
-        language === 'no'
-          ? `Blikktest viser avvik i: ${gazeAbnormal.join(', ')}.`
-          : `Gaze testing shows abnormality in: ${gazeAbnormal.join(', ')}.`
+        `${t('vngGazeAbnormal', 'Blikktest viser avvik i:')} ${gazeAbnormal.join(', ')}.`
       );
     } else {
-      sections.push(
-        language === 'no'
-          ? 'Blikktest er normal i alle retninger.'
-          : 'Gaze testing is normal in all directions.'
-      );
+      sections.push(t('vngGazeNormalAll', 'Blikktest er normal i alle retninger.'));
     }
 
     // Cerebellar assessment narrative
     const cerebellarAbnormal = Object.entries(data.cerebellar)
       .filter(([k, v]) => k !== 'notes' && v === 'abnormal')
-      .map(([k]) => t('vng', k, language));
+      .map(([k]) => t(VNG_KEY_MAP[k] || k, k));
 
     if (cerebellarAbnormal.length > 0) {
       sections.push(
-        language === 'no'
-          ? `Cerebellum-vurdering viser avvik i: ${cerebellarAbnormal.join(', ')}.`
-          : `Cerebellar assessment shows abnormality in: ${cerebellarAbnormal.join(', ')}.`
+        `${t('vngCerebellumAbnormal', 'Cerebellum-vurdering viser avvik i:')} ${cerebellarAbnormal.join(', ')}.`
       );
     } else {
-      sections.push(
-        language === 'no' ? 'Cerebellum-vurdering er normal.' : 'Cerebellar assessment is normal.'
-      );
+      sections.push(t('vngCerebellumNormal', 'Cerebellum-vurdering er normal.'));
     }
 
     // VOR narrative
     if (data.vor.vorTest === 'abnormal' || data.vor.hipTest === 'abnormal') {
-      sections.push(
-        language === 'no'
-          ? 'VOR/Hodeimpulstest viser avvik.'
-          : 'VOR/Head impulse testing shows abnormality.'
-      );
+      sections.push(t('vngVorAbnormal', 'VOR/Hodeimpulstest viser avvik.'));
     }
 
     // BPPV narrative
     if (data.bppv.dixHallpikeRight === 'abnormal' || data.bppv.dixHallpikeLeft === 'abnormal') {
       const side =
         data.bppv.dixHallpikeRight === 'abnormal'
-          ? language === 'no'
-            ? 'høyre'
-            : 'right'
-          : language === 'no'
-            ? 'venstre'
-            : 'left';
-      sections.push(
-        language === 'no'
-          ? `Dix-Hallpike positiv på ${side} side. ${data.bppv.affectedCanal ? `Påvirket buegang: ${data.bppv.affectedCanal}.` : ''}`
-          : `Dix-Hallpike positive on ${side} side. ${data.bppv.affectedCanal ? `Affected canal: ${data.bppv.affectedCanal}.` : ''}`
+          ? t('vngRight', 'Høyre').toLowerCase()
+          : t('vngLeft', 'Venstre').toLowerCase();
+      const dixText = t('vngDixPositive', 'Dix-Hallpike positiv på {side} side.').replace(
+        '{side}',
+        side
       );
+      const canalText = data.bppv.affectedCanal
+        ? ` ${t('vngAffectedCanalPrefix', 'Påvirket buegang:')} ${data.bppv.affectedCanal}.`
+        : '';
+      sections.push(`${dixText}${canalText}`);
     }
 
     return sections.join('\n\n');
-  }, [data, language]);
+  }, [data, t]);
 
   // Copy to clipboard
   const copyToClipboard = useCallback(() => {
@@ -369,11 +373,13 @@ export default function VNGModule({
           <div>
             <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
               <Eye className="w-7 h-7 text-blue-600" />
-              {t('vng', 'title', language)}
+              {t('vngTitle', 'VNG-undersøkelse')}
             </h2>
-            <p className="text-sm text-gray-500 mt-1">{t('vng', 'subtitle', language)}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {t('vngSubtitle', 'Omfattende vestibulær testprotokoll')}
+            </p>
           </div>
-          <div className="text-right text-sm text-gray-600">
+          <div className="text-right text-sm text-gray-600 dark:text-gray-300">
             {patientName && <div className="font-medium">{patientName}</div>}
             <div>{examDate}</div>
           </div>
@@ -386,20 +392,20 @@ export default function VNGModule({
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'assessment'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
             }`}
           >
-            {t('vng', 'protocol', language)}
+            {t('vngProtocol', 'Undersøkelsesprotokoll')}
           </button>
           <button
             onClick={() => setActiveTab('report')}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
               activeTab === 'report'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
             }`}
           >
-            {t('vng', 'results', language)}
+            {t('vngResults', 'Resultater og rapport')}
           </button>
         </div>
       </div>
@@ -409,11 +415,7 @@ export default function VNGModule({
         {activeTab === 'assessment' ? (
           <>
             {/* Spontaneous Nystagmus */}
-            <Section
-              title={t('vng', 'spontaneousNystagmus', language)}
-              icon={Eye}
-              language={language}
-            >
+            <Section title={t('vngSpontaneousNystagmus', 'Spontan nystagmus')} icon={Eye}>
               <div className="flex items-center gap-4 mb-3">
                 <label className="flex items-center gap-2">
                   <input
@@ -424,13 +426,13 @@ export default function VNGModule({
                     }
                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
-                  <span className="text-sm">{t('vng', 'nystagmusPresent', language)}</span>
+                  <span className="text-sm">{t('vngNystagmusPresent', 'Nystagmus til stede')}</span>
                 </label>
               </div>
               {data.spontaneousNystagmus.present && (
                 <div className="mt-2">
-                  <label className="block text-sm text-gray-600 mb-1">
-                    {language === 'no' ? 'Retning/Karakteristikk' : 'Direction/Characteristics'}
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
+                    {t('vngDirectionCharacteristics', 'Retning/Karakteristikk')}
                   </label>
                   <select
                     value={data.spontaneousNystagmus.direction}
@@ -439,176 +441,145 @@ export default function VNGModule({
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                   >
-                    <option value="">{language === 'no' ? 'Velg...' : 'Select...'}</option>
-                    <option value="upBeating">{t('vng', 'upBeating', language)}</option>
-                    <option value="downBeating">{t('vng', 'downBeating', language)}</option>
-                    <option value="rightBeating">{t('vng', 'rightBeating', language)}</option>
-                    <option value="leftBeating">{t('vng', 'leftBeating', language)}</option>
-                    <option value="torsional">{t('vng', 'torsional', language)}</option>
+                    <option value="">{t('vngSelectOption', 'Velg...')}</option>
+                    <option value="upBeating">{t('vngUpBeating', 'Oppslående')}</option>
+                    <option value="downBeating">{t('vngDownBeating', 'Nedslående')}</option>
+                    <option value="rightBeating">{t('vngRightBeating', 'Høyreslående')}</option>
+                    <option value="leftBeating">{t('vngLeftBeating', 'Venstreslående')}</option>
+                    <option value="torsional">{t('vngTorsional', 'Torsjonell')}</option>
                   </select>
                 </div>
               )}
             </Section>
 
             {/* Gaze Testing - Light */}
-            <Section title={t('vng', 'gazeLight', language)} icon={Eye} language={language}>
+            <Section title={t('vngGazeLight', 'Blikktest (lys)')} icon={Eye}>
               <TestRow
-                label={t('vng', 'center', language)}
+                label={t('vngCenter', 'Senter')}
                 testKey="center"
                 value={data.gazeLight.center}
                 onChange={(k, v) => updateSection('gazeLight', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'left', language)}
+                label={t('vngLeft', 'Venstre')}
                 testKey="left"
                 value={data.gazeLight.left}
                 onChange={(k, v) => updateSection('gazeLight', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'right', language)}
+                label={t('vngRight', 'Høyre')}
                 testKey="right"
                 value={data.gazeLight.right}
                 onChange={(k, v) => updateSection('gazeLight', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'up', language)}
+                label={t('vngUp', 'Opp')}
                 testKey="up"
                 value={data.gazeLight.up}
                 onChange={(k, v) => updateSection('gazeLight', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'down', language)}
+                label={t('vngDown', 'Ned')}
                 testKey="down"
                 value={data.gazeLight.down}
                 onChange={(k, v) => updateSection('gazeLight', k, v)}
-                language={language}
               />
             </Section>
 
             {/* Gaze Testing - Dark */}
-            <Section
-              title={t('vng', 'gazeDark', language)}
-              icon={Eye}
-              defaultOpen={false}
-              language={language}
-            >
+            <Section title={t('vngGazeDark', 'Blikktest (mørke)')} icon={Eye} defaultOpen={false}>
               <TestRow
-                label={t('vng', 'center', language)}
+                label={t('vngCenter', 'Senter')}
                 testKey="center"
                 value={data.gazeDark.center}
                 onChange={(k, v) => updateSection('gazeDark', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'left', language)}
+                label={t('vngLeft', 'Venstre')}
                 testKey="left"
                 value={data.gazeDark.left}
                 onChange={(k, v) => updateSection('gazeDark', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'right', language)}
+                label={t('vngRight', 'Høyre')}
                 testKey="right"
                 value={data.gazeDark.right}
                 onChange={(k, v) => updateSection('gazeDark', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'up', language)}
+                label={t('vngUp', 'Opp')}
                 testKey="up"
                 value={data.gazeDark.up}
                 onChange={(k, v) => updateSection('gazeDark', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'down', language)}
+                label={t('vngDown', 'Ned')}
                 testKey="down"
                 value={data.gazeDark.down}
                 onChange={(k, v) => updateSection('gazeDark', k, v)}
-                language={language}
               />
             </Section>
 
             {/* Positional Testing */}
-            <Section
-              title={t('vng', 'positionalTest', language)}
-              icon={RotateCcw}
-              language={language}
-            >
+            <Section title={t('vngPositionalTest', 'Posisjonstest')} icon={RotateCcw}>
               <TestRow
-                label={t('vng', 'headRight', language)}
+                label={t('vngHeadRight', 'Hode høyre')}
                 testKey="headRight"
                 value={data.positional.headRight}
                 onChange={(k, v) => updateSection('positional', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'headLeft', language)}
+                label={t('vngHeadLeft', 'Hode venstre')}
                 testKey="headLeft"
                 value={data.positional.headLeft}
                 onChange={(k, v) => updateSection('positional', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'bow', language)}
+                label={t('vngBow', 'Foroverbøyd')}
                 testKey="bow"
                 value={data.positional.bow}
                 onChange={(k, v) => updateSection('positional', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'lean', language)}
+                label={t('vngLean', 'Bakoverbøyd')}
                 testKey="lean"
                 value={data.positional.lean}
                 onChange={(k, v) => updateSection('positional', k, v)}
-                language={language}
               />
             </Section>
 
             {/* Smooth Pursuit */}
             <Section
-              title={t('vng', 'smoothPursuit', language)}
+              title={t('vngSmoothPursuit', 'Glatt følgebevegelse')}
               icon={ArrowUpDown}
               defaultOpen={false}
-              language={language}
             >
               <TestRow
-                label={language === 'no' ? 'Horisontal' : 'Horizontal'}
+                label={t('vngHorizontal', 'Horisontal')}
                 testKey="horizontal"
                 value={data.smoothPursuit.horizontal}
                 onChange={(k, v) => updateSection('smoothPursuit', k, v)}
-                language={language}
               />
               <TestRow
-                label={language === 'no' ? 'Vertikal' : 'Vertical'}
+                label={t('vngVertical', 'Vertikal')}
                 testKey="vertical"
                 value={data.smoothPursuit.vertical}
                 onChange={(k, v) => updateSection('smoothPursuit', k, v)}
-                language={language}
               />
             </Section>
 
             {/* Saccades */}
-            <Section
-              title={t('vng', 'saccades', language)}
-              icon={Target}
-              defaultOpen={false}
-              language={language}
-            >
+            <Section title={t('vngSaccades', 'Sakkader')} icon={Target} defaultOpen={false}>
               <div className="grid grid-cols-2 gap-4">
                 {/* Prosaccade */}
                 <div>
                   <h4 className="font-medium text-sm text-gray-700 mb-2">
-                    {t('vng', 'prosaccade', language)}
+                    {t('vngProsaccade', 'Prosakkade')}
                   </h4>
                   <div className="space-y-2">
                     <div>
-                      <label className="text-xs text-gray-500">
-                        {t('vng', 'latency', language)} ({t('vng', 'ms', language)})
+                      <label className="text-xs text-gray-500 dark:text-gray-400">
+                        {t('vngLatency', 'Latens')} ({t('vngMs', 'ms')})
                       </label>
                       <input
                         type="number"
@@ -619,8 +590,8 @@ export default function VNGModule({
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">
-                        {t('vng', 'velocity', language)} ({t('vng', 'degPerSec', language)})
+                      <label className="text-xs text-gray-500 dark:text-gray-400">
+                        {t('vngVelocity', 'Hastighet')} ({t('vngDegPerSec', '°/s')})
                       </label>
                       <input
                         type="number"
@@ -631,8 +602,8 @@ export default function VNGModule({
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">
-                        {t('vng', 'accuracy', language)} ({t('vng', 'percent', language)})
+                      <label className="text-xs text-gray-500 dark:text-gray-400">
+                        {t('vngAccuracy', 'Nøyaktighet')} ({t('vngPercent', '%')})
                       </label>
                       <input
                         type="number"
@@ -648,12 +619,12 @@ export default function VNGModule({
                 {/* Antisaccade */}
                 <div>
                   <h4 className="font-medium text-sm text-gray-700 mb-2">
-                    {t('vng', 'antisaccade', language)}
+                    {t('vngAntisaccade', 'Antisakkade')}
                   </h4>
                   <div className="space-y-2">
                     <div>
-                      <label className="text-xs text-gray-500">
-                        {t('vng', 'latency', language)} ({t('vng', 'ms', language)})
+                      <label className="text-xs text-gray-500 dark:text-gray-400">
+                        {t('vngLatency', 'Latens')} ({t('vngMs', 'ms')})
                       </label>
                       <input
                         type="number"
@@ -664,8 +635,8 @@ export default function VNGModule({
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">
-                        {t('vng', 'velocity', language)} ({t('vng', 'degPerSec', language)})
+                      <label className="text-xs text-gray-500 dark:text-gray-400">
+                        {t('vngVelocity', 'Hastighet')} ({t('vngDegPerSec', '°/s')})
                       </label>
                       <input
                         type="number"
@@ -676,8 +647,8 @@ export default function VNGModule({
                       />
                     </div>
                     <div>
-                      <label className="text-xs text-gray-500">
-                        {t('vng', 'accuracy', language)} ({t('vng', 'percent', language)})
+                      <label className="text-xs text-gray-500 dark:text-gray-400">
+                        {t('vngAccuracy', 'Nøyaktighet')} ({t('vngPercent', '%')})
                       </label>
                       <input
                         type="number"
@@ -693,102 +664,86 @@ export default function VNGModule({
             </Section>
 
             {/* Cerebellar Assessment */}
-            <Section
-              title={t('vng', 'cerebellumAssessment', language)}
-              icon={Brain}
-              language={language}
-            >
+            <Section title={t('vngCerebellumAssessment', 'Cerebellum-vurdering')} icon={Brain}>
               <TestRow
-                label={t('vng', 'romberg7Step', language)}
+                label={t('vngRomberg7Step', '7-trinns Romberg')}
                 testKey="romberg7Step"
                 value={data.cerebellar.romberg7Step}
                 onChange={(k, v) => updateSection('cerebellar', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'oneLegStanding', language)}
+                label={t('vngOneLegStanding', 'Ett-bens stående')}
                 testKey="oneLegStanding"
                 value={data.cerebellar.oneLegStanding}
                 onChange={(k, v) => updateSection('cerebellar', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'fingerToNose', language)}
+                label={t('vngFingerToNose', 'Finger til nese')}
                 testKey="fingerToNose"
                 value={data.cerebellar.fingerToNose}
                 onChange={(k, v) => updateSection('cerebellar', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'fingerToFinger', language)}
+                label={t('vngFingerToFinger', 'Finger til finger')}
                 testKey="fingerToFinger"
                 value={data.cerebellar.fingerToFinger}
                 onChange={(k, v) => updateSection('cerebellar', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'rapidSupination', language)}
+                label={t('vngRapidSupination', 'Rask supinasjon')}
                 testKey="rapidSupination"
                 value={data.cerebellar.rapidSupination}
                 onChange={(k, v) => updateSection('cerebellar', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'fingerTapping', language)}
+                label={t('vngFingerTapping', 'Fingertapping')}
                 testKey="fingerTapping"
                 value={data.cerebellar.fingerTapping}
                 onChange={(k, v) => updateSection('cerebellar', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'dualTasking', language)}
+                label={t('vngDualTasking', 'Dobbeltoppgave')}
                 testKey="dualTasking"
                 value={data.cerebellar.dualTasking}
                 onChange={(k, v) => updateSection('cerebellar', k, v)}
-                language={language}
               />
             </Section>
 
             {/* VOR / HIT */}
-            <Section title={t('vng', 'vor', language)} icon={Activity} language={language}>
+            <Section title={t('vngVor', 'VOR / Hodeimpuls')} icon={Activity}>
               <TestRow
-                label={t('vng', 'vorTest', language)}
+                label={t('vngVorTest', 'VOR-test')}
                 testKey="vorTest"
                 value={data.vor.vorTest}
                 onChange={(k, v) => updateSection('vor', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'hipTest', language)}
+                label={t('vngHipTest', 'Hodeimpulstest (HIT)')}
                 testKey="hipTest"
                 value={data.vor.hipTest}
                 onChange={(k, v) => updateSection('vor', k, v)}
-                language={language}
               />
               <TestRow
-                label={t('vng', 'headShakeNystagmus', language)}
+                label={t('vngHeadShakeNystagmus', 'Hoderisting-nystagmus')}
                 testKey="headShakeNystagmus"
                 value={data.vor.headShakeNystagmus}
                 onChange={(k, v) => updateSection('vor', k, v)}
-                language={language}
               />
             </Section>
 
             {/* Dix-Hallpike / BPPV */}
-            <Section title={t('vng', 'dix', language)} icon={RotateCcw} language={language}>
+            <Section title={t('vngDix', 'Dix-Hallpike')} icon={RotateCcw}>
               <TestRow
-                label={`${t('vng', 'dix', language)} - ${t('vng', 'right', language)}`}
+                label={`${t('vngDix', 'Dix-Hallpike')} - ${t('vngRight', 'Høyre')}`}
                 testKey="dixHallpikeRight"
                 value={data.bppv.dixHallpikeRight}
                 onChange={(k, v) => updateSection('bppv', k, v)}
-                language={language}
               />
               <TestRow
-                label={`${t('vng', 'dix', language)} - ${t('vng', 'left', language)}`}
+                label={`${t('vngDix', 'Dix-Hallpike')} - ${t('vngLeft', 'Venstre')}`}
                 testKey="dixHallpikeLeft"
                 value={data.bppv.dixHallpikeLeft}
                 onChange={(k, v) => updateSection('bppv', k, v)}
-                language={language}
               />
 
               {(data.bppv.dixHallpikeRight === 'abnormal' ||
@@ -796,33 +751,37 @@ export default function VNGModule({
                 <div className="mt-4 p-3 bg-yellow-50 rounded-lg">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm text-gray-600 mb-1">
-                        {language === 'no' ? 'Påvirket buegang' : 'Affected Canal'}
+                      <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
+                        {t('vngAffectedCanal', 'Påvirket buegang')}
                       </label>
                       <select
                         value={data.bppv.affectedCanal}
                         onChange={(e) => updateSection('bppv', 'affectedCanal', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                       >
-                        <option value="">{language === 'no' ? 'Velg...' : 'Select...'}</option>
-                        <option value="posterior">{t('vng', 'posteriorCanal', language)}</option>
-                        <option value="anterior">{t('vng', 'anteriorCanal', language)}</option>
-                        <option value="horizontal">{t('vng', 'horizontalCanal', language)}</option>
+                        <option value="">{t('vngSelectOption', 'Velg...')}</option>
+                        <option value="posterior">{t('vngPosteriorCanal', 'Bakre buegang')}</option>
+                        <option value="anterior">{t('vngAnteriorCanal', 'Fremre buegang')}</option>
+                        <option value="horizontal">
+                          {t('vngHorizontalCanal', 'Horisontal buegang')}
+                        </option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-600 mb-1">
-                        {language === 'no' ? 'Type' : 'Type'}
+                      <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
+                        {t('vngBppvType', 'Type')}
                       </label>
                       <select
                         value={data.bppv.type}
                         onChange={(e) => updateSection('bppv', 'type', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                       >
-                        <option value="">{language === 'no' ? 'Velg...' : 'Select...'}</option>
-                        <option value="canalithiasis">{t('vng', 'canalithiasis', language)}</option>
+                        <option value="">{t('vngSelectOption', 'Velg...')}</option>
+                        <option value="canalithiasis">
+                          {t('vngCanalithiasis', 'Kanalitiasis')}
+                        </option>
                         <option value="cupulolithiasis">
-                          {t('vng', 'cupulolithiasis', language)}
+                          {t('vngCupulolithiasis', 'Kupulolitiasis')}
                         </option>
                       </select>
                     </div>
@@ -832,16 +791,11 @@ export default function VNGModule({
             </Section>
 
             {/* Vitals */}
-            <Section
-              title={language === 'no' ? 'Vitalia' : 'Vitals'}
-              icon={Activity}
-              defaultOpen={false}
-              language={language}
-            >
+            <Section title={t('vngVitals', 'Vitalia')} icon={Activity} defaultOpen={false}>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    {t('vng', 'bloodPressure', language)} ({t('vng', 'left', language)})
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
+                    {t('vngBloodPressure', 'Blodtrykk')} ({t('vngLeft', 'Venstre')})
                   </label>
                   <input
                     type="text"
@@ -852,8 +806,8 @@ export default function VNGModule({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    {t('vng', 'bloodPressure', language)} ({t('vng', 'right', language)})
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
+                    {t('vngBloodPressure', 'Blodtrykk')} ({t('vngRight', 'Høyre')})
                   </label>
                   <input
                     type="text"
@@ -864,8 +818,8 @@ export default function VNGModule({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    {t('vng', 'pulse', language)} ({t('vng', 'left', language)})
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
+                    {t('vngPulse', 'Puls')} ({t('vngLeft', 'Venstre')})
                   </label>
                   <input
                     type="text"
@@ -876,8 +830,8 @@ export default function VNGModule({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm text-gray-600 mb-1">
-                    {t('vng', 'pulse', language)} ({t('vng', 'right', language)})
+                  <label className="block text-sm text-gray-600 dark:text-gray-300 mb-1">
+                    {t('vngPulse', 'Puls')} ({t('vngRight', 'Høyre')})
                   </label>
                   <input
                     type="text"
@@ -891,15 +845,11 @@ export default function VNGModule({
             </Section>
 
             {/* Interpretation & Recommendations */}
-            <Section
-              title={t('vng', 'interpretation', language)}
-              icon={FileText}
-              language={language}
-            >
+            <Section title={t('vngInterpretation', 'Tolkning')} icon={FileText}>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('vng', 'interpretation', language)}
+                    {t('vngInterpretation', 'Tolkning')}
                   </label>
                   <textarea
                     value={data.interpretation}
@@ -908,16 +858,15 @@ export default function VNGModule({
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     rows={3}
-                    placeholder={
-                      language === 'no'
-                        ? 'Klinisk tolkning av funnene...'
-                        : 'Clinical interpretation of findings...'
-                    }
+                    placeholder={t(
+                      'vngInterpretationPlaceholder',
+                      'Klinisk tolkning av funnene...'
+                    )}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('vng', 'recommendations', language)}
+                    {t('vngRecommendations', 'Anbefalinger')}
                   </label>
                   <textarea
                     value={data.recommendations}
@@ -926,11 +875,10 @@ export default function VNGModule({
                     }
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                     rows={3}
-                    placeholder={
-                      language === 'no'
-                        ? 'Anbefalinger og videre tiltak...'
-                        : 'Recommendations and further actions...'
-                    }
+                    placeholder={t(
+                      'vngRecommendationsPlaceholder',
+                      'Anbefalinger og videre tiltak...'
+                    )}
                   />
                 </div>
               </div>
@@ -941,7 +889,7 @@ export default function VNGModule({
           <div className="space-y-4">
             <div className="bg-gray-50 rounded-lg p-4">
               <h3 className="font-medium text-gray-900 mb-3">
-                {language === 'no' ? 'Generert rapport' : 'Generated Report'}
+                {t('vngGeneratedReport', 'Generert rapport')}
               </h3>
               <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans">
                 {generateNarrative()}
@@ -951,7 +899,7 @@ export default function VNGModule({
             {data.interpretation && (
               <div className="bg-blue-50 rounded-lg p-4">
                 <h4 className="font-medium text-blue-900 mb-2">
-                  {t('vng', 'interpretation', language)}
+                  {t('vngInterpretation', 'Tolkning')}
                 </h4>
                 <p className="text-sm text-blue-800">{data.interpretation}</p>
               </div>
@@ -960,7 +908,7 @@ export default function VNGModule({
             {data.recommendations && (
               <div className="bg-green-50 rounded-lg p-4">
                 <h4 className="font-medium text-green-900 mb-2">
-                  {t('vng', 'recommendations', language)}
+                  {t('vngRecommendations', 'Anbefalinger')}
                 </h4>
                 <p className="text-sm text-green-800">{data.recommendations}</p>
               </div>
@@ -977,14 +925,14 @@ export default function VNGModule({
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             <Copy className="w-4 h-4" />
-            {t('common', 'copy', language)}
+            {t('copy', 'Kopier')}
           </button>
           <button
             onClick={() => window.print()}
             className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
           >
             <Printer className="w-4 h-4" />
-            {t('common', 'print', language)}
+            {t('print', 'Skriv ut')}
           </button>
         </div>
         <button
@@ -992,7 +940,7 @@ export default function VNGModule({
           className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
         >
           <Save className="w-4 h-4" />
-          {t('common', 'save', language)}
+          {t('save', 'Lagre')}
         </button>
       </div>
     </div>

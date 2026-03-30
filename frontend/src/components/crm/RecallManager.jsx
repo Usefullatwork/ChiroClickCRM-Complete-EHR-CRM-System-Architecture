@@ -324,7 +324,7 @@ export default function RecallManager({
               <Bell className="w-5 h-5 text-orange-500" />
               {t.title}
             </h3>
-            <p className="text-sm text-gray-500">{t.subtitle}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
           </div>
           <button
             onClick={() => setShowCampaignForm(true)}
@@ -342,7 +342,7 @@ export default function RecallManager({
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors
-                ${activeTab === tab ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'}`}
+                ${activeTab === tab ? 'bg-white shadow text-gray-900' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'}`}
             >
               {t[tab]}
             </button>
@@ -370,7 +370,7 @@ export default function RecallManager({
                     ${
                       isSelected
                         ? `border-${type.color}-300 bg-${type.color}-50 text-${type.color}-700`
-                        : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'
+                        : 'border-gray-200 bg-white text-gray-600 dark:text-gray-300 hover:bg-gray-50'
                     }`}
                   >
                     <Icon className="w-4 h-4" />
@@ -404,7 +404,7 @@ export default function RecallManager({
                   />
                   <span className="text-sm font-medium">{t.selectAll}</span>
                 </label>
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   ({filteredPatients.length} {t.patientsToRecall.toLowerCase()})
                 </span>
               </div>
@@ -422,7 +422,7 @@ export default function RecallManager({
 
             <div className="divide-y divide-gray-100 max-h-[300px] overflow-y-auto">
               {filteredPatients.length === 0 ? (
-                <div className="px-4 py-8 text-center text-gray-500">
+                <div className="px-4 py-8 text-center text-gray-500 dark:text-gray-400">
                   <CheckCircle className="w-8 h-8 mx-auto mb-2 opacity-50" />
                   <p>{t.noPatients}</p>
                 </div>
@@ -443,7 +443,7 @@ export default function RecallManager({
                       <p className="font-medium text-gray-900">
                         {patient.first_name} {patient.last_name}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
                         {patient.phone && (
                           <span className="mr-3">
                             <Phone className="w-3 h-3 inline mr-1" />
@@ -481,7 +481,7 @@ export default function RecallManager({
       {activeTab === 'campaigns' && (
         <div className="p-6">
           {campaigns.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8 text-gray-500 dark:text-gray-400">
               <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p>No campaigns created yet</p>
               <button
@@ -498,7 +498,7 @@ export default function RecallManager({
                   <div className="flex items-center justify-between">
                     <div>
                       <h4 className="font-medium text-gray-900">{campaign.name}</h4>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {RECALL_TYPES[campaign.type.toUpperCase()]?.label[language] ||
                           campaign.type}
                       </p>
@@ -506,33 +506,33 @@ export default function RecallManager({
                     <div className="flex items-center gap-2">
                       <span
                         className={`px-2 py-1 text-xs rounded-full
-                        ${campaign.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}
+                        ${campaign.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600 dark:text-gray-300'}`}
                       >
                         {campaign.active ? t.active : t.paused}
                       </span>
-                      <button className="p-1.5 text-gray-400 hover:text-gray-600">
+                      <button className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600">
                         {campaign.active ? (
                           <Pause className="w-4 h-4" />
                         ) : (
                           <Play className="w-4 h-4" />
                         )}
                       </button>
-                      <button className="p-1.5 text-gray-400 hover:text-gray-600">
+                      <button className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600">
                         <Edit3 className="w-4 h-4" />
                       </button>
-                      <button className="p-1.5 text-gray-400 hover:text-red-500">
+                      <button className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-red-500">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                   <div className="mt-3 flex gap-6 text-sm">
-                    <span className="text-gray-500">
+                    <span className="text-gray-500 dark:text-gray-400">
                       {t.sent}: <strong>{campaign.stats.sent}</strong>
                     </span>
-                    <span className="text-gray-500">
+                    <span className="text-gray-500 dark:text-gray-400">
                       {t.delivered}: <strong>{campaign.stats.delivered}</strong>
                     </span>
-                    <span className="text-gray-500">
+                    <span className="text-gray-500 dark:text-gray-400">
                       {t.responded}: <strong>{campaign.stats.responded}</strong>
                     </span>
                   </div>
@@ -567,7 +567,7 @@ export default function RecallManager({
             </div>
           </div>
 
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             <BarChart2 className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p>
               {language === 'no'
@@ -586,7 +586,7 @@ export default function RecallManager({
               <h3 className="font-semibold text-gray-900">{t.createCampaign}</h3>
               <button
                 onClick={() => setShowCampaignForm(false)}
-                className="p-2 text-gray-400 hover:text-gray-600"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600"
               >
                 <XCircle className="w-5 h-5" />
               </button>
@@ -635,7 +635,7 @@ export default function RecallManager({
                   rows={4}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 text-sm"
                 />
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
                   {t.variables}: {'{firstName}'}, {'{lastName}'}, {'{clinicName}'}, {'{phone}'}
                 </p>
               </div>
@@ -675,7 +675,7 @@ export default function RecallManager({
             <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-2">
               <button
                 onClick={() => setShowCampaignForm(false)}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800"
+                className="px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800"
               >
                 {t.cancel}
               </button>

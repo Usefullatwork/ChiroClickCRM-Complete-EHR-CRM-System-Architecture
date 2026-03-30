@@ -3,59 +3,22 @@
  * Import and re-use the TRANSLATIONS object from the assessment module.
  * This file adds any clinical strings not already covered there.
  */
+import { clinicalSOAP } from './clinicalSOAP.js';
+import { clinicalExams } from './clinicalExams.js';
+import { clinicalDiagnosis } from './clinicalDiagnosis.js';
+import { clinicalTemplates } from './clinicalTemplates.js';
+
 export const clinical = {
   en: {
-    clinicalEncounter: 'Clinical Encounter',
-    newEncounter: 'New Encounter',
-    encounterHistory: 'Encounter History',
-    soapNote: 'SOAP Note',
-    examination: 'Examination',
-    assessment: 'Assessment',
-    treatmentPlan: 'Treatment Plan',
-    progressNotes: 'Progress Notes',
-    signAndLock: 'Sign & Lock',
-    addendum: 'Addendum',
-    previousEncounters: 'Previous Encounters',
-    noEncounters: 'No encounters recorded',
-    startEncounter: 'Start Encounter',
-    completeEncounter: 'Complete Encounter',
-    macros: 'Macros',
-    macrosDescription: 'Manage clinical text macros for quick documentation in SOAP notes.',
-    vngAssessment: 'VNG Assessment',
-    vngSaved: 'VNG assessment saved!',
-    vngSaveError: 'Error saving',
-    // ClinicalEncounter UI
-    noPreviousEncounter: 'No previous encounter found for this patient.',
-    switchToASOAP: 'Switch to Assessment-first (ASOAP)',
-    switchToSOAP: 'Switch to standard SOAP',
-    riskLevel: 'Risk level',
-    fillSoapForAI: 'Fill in subjective and objective findings for AI suggestions.',
+    ...clinicalSOAP.en,
+    ...clinicalExams.en,
+    ...clinicalDiagnosis.en,
+    ...clinicalTemplates.en,
   },
   no: {
-    clinicalEncounter: 'Klinisk konsultasjon',
-    newEncounter: 'Ny konsultasjon',
-    encounterHistory: 'Konsultasjonshistorikk',
-    soapNote: 'SOAP-notat',
-    examination: 'Undersøkelse',
-    assessment: 'Vurdering',
-    treatmentPlan: 'Behandlingsplan',
-    progressNotes: 'Forløpsnotater',
-    signAndLock: 'Signer og lås',
-    addendum: 'Tillegg',
-    previousEncounters: 'Tidligere konsultasjoner',
-    noEncounters: 'Ingen konsultasjoner registrert',
-    startEncounter: 'Start konsultasjon',
-    completeEncounter: 'Fullfør konsultasjon',
-    macros: 'Makroer',
-    macrosDescription: 'Administrer kliniske tekstmakroer for rask dokumentasjon i SOAP-notater.',
-    vngAssessment: 'VNG-undersøkelse',
-    vngSaved: 'VNG-undersøkelse lagret!',
-    vngSaveError: 'Feil ved lagring',
-    // ClinicalEncounter UI
-    noPreviousEncounter: 'Ingen tidligere konsultasjon funnet for denne pasienten.',
-    switchToASOAP: 'Bytt til Vurdering-først (ASOAP)',
-    switchToSOAP: 'Bytt til standard SOAP',
-    riskLevel: 'Risikonivå',
-    fillSoapForAI: 'Fyll ut subjektive og objektive funn for AI-forslag.',
+    ...clinicalSOAP.no,
+    ...clinicalExams.no,
+    ...clinicalDiagnosis.no,
+    ...clinicalTemplates.no,
   },
 };

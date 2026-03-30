@@ -400,7 +400,7 @@ export default function NeurologicalFindings() {
         </button>
         {showRegionalDiagrams && (
           <div className="p-4 bg-white">
-            <p className="text-sm text-gray-600 mb-3">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">
               Velg region og marker funn på venstre og høyre side.
             </p>
             <div className="flex flex-wrap gap-2 mb-4">

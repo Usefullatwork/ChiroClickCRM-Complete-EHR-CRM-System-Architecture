@@ -211,8 +211,8 @@ const ClinicalProgressTracking = ({ _patientId, encountersData = [] }) => {
       <div className="timeline-container">
         <h3 className="section-title">Treatment Timeline</h3>
         <div className="timeline">
-          {chartData.encounters.map((encounter, index) => (
-            <div key={index} className="timeline-item">
+          {chartData.encounters.map((encounter) => (
+            <div key={encounter.id || encounter.encounter_date} className="timeline-item">
               <div className="timeline-marker"></div>
               <div className="timeline-content">
                 <div className="timeline-date">

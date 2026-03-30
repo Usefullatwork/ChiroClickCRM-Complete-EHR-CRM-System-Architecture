@@ -98,10 +98,10 @@ export default function AIConfidenceBadge({
             <Info className="w-3 h-3" />
             Basert på:
           </p>
-          <ul className="space-y-0.5 text-gray-600">
+          <ul className="space-y-0.5 text-gray-600 dark:text-gray-300">
             {reasoning.map((reason, i) => (
               <li key={i} className="flex items-start gap-1">
-                <span className="text-gray-400">•</span>
+                <span className="text-gray-400 dark:text-gray-300">•</span>
                 <span>{reason}</span>
               </li>
             ))}

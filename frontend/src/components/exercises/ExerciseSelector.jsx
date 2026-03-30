@@ -6,6 +6,7 @@
  */
 
 import { useState, useMemo } from 'react';
+import { useTranslation } from '../../i18n';
 import {
   Search,
   Filter,
@@ -40,6 +41,7 @@ const ExerciseSelector = ({
   onSelectExercise,
   loading = false,
 }) => {
+  const { t } = useTranslation('exercises');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState('all');
@@ -125,17 +127,19 @@ const ExerciseSelector = ({
             <Dumbbell className="w-5 h-5 text-blue-600" />
             <h2 className="text-lg font-semibold text-gray-900">Ovelsesbibliotek</h2>
           </div>
-          <span className="text-sm text-gray-500">{filteredExercises.length} ovelser</span>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {filteredExercises.length} ovelser
+          </span>
         </div>
 
         {/* Search */}
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Sok etter ovelser..."
+            placeholder={t('searchExercisesPlaceholder', 'Søk etter øvelser...')}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
           />
           {searchTerm && (
@@ -143,7 +147,7 @@ const ExerciseSelector = ({
               onClick={() => setSearchTerm('')}
               className="absolute right-3 top-1/2 transform -translate-y-1/2"
             >
-              <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+              <X className="w-4 h-4 text-gray-400 dark:text-gray-300 hover:text-gray-600" />
             </button>
           )}
         </div>
@@ -155,7 +159,7 @@ const ExerciseSelector = ({
             className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               selectedCategory === 'all'
                 ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
             }`}
           >
             Alle
@@ -167,7 +171,7 @@ const ExerciseSelector = ({
               className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === cat.category
                   ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
               }`}
             >
               {cat.category}
@@ -181,11 +185,11 @@ const ExerciseSelector = ({
         {/* Extra Filters */}
         <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+            <Filter className="w-4 h-4 text-gray-400 dark:text-gray-300" />
             <select
               value={selectedDifficulty}
               onChange={(e) => setSelectedDifficulty(e.target.value)}
-              className="text-sm border-0 bg-transparent text-gray-600 focus:outline-none focus:ring-0 cursor-pointer"
+              className="text-sm border-0 bg-transparent text-gray-600 dark:text-gray-300 focus:outline-none focus:ring-0 cursor-pointer"
             >
               {difficultyLevels.map((level) => (
                 <option key={level.value} value={level.value}>
@@ -199,13 +203,13 @@ const ExerciseSelector = ({
           <div className="flex items-center border border-gray-200 rounded-lg overflow-hidden">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-1.5 ${viewMode === 'grid' ? 'bg-blue-50 text-blue-600' : 'text-gray-400 hover:bg-gray-50'}`}
+              className={`p-1.5 ${viewMode === 'grid' ? 'bg-blue-50 text-blue-600' : 'text-gray-400 dark:text-gray-300 hover:bg-gray-50'}`}
             >
               <Grid className="w-4 h-4" />
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-1.5 ${viewMode === 'list' ? 'bg-blue-50 text-blue-600' : 'text-gray-400 hover:bg-gray-50'}`}
+              className={`p-1.5 ${viewMode === 'list' ? 'bg-blue-50 text-blue-600' : 'text-gray-400 dark:text-gray-300 hover:bg-gray-50'}`}
             >
               <List className="w-4 h-4" />
             </button>
@@ -220,10 +224,10 @@ const ExerciseSelector = ({
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           </div>
         ) : filteredExercises.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
             <Dumbbell className="w-12 h-12 text-gray-300 mb-3" />
             <p className="font-medium">Ingen ovelser funnet</p>
-            <p className="text-sm text-gray-400">Prov a endre sokekriteriene</p>
+            <p className="text-sm text-gray-400 dark:text-gray-300">Prov a endre sokekriteriene</p>
           </div>
         ) : viewMode === 'grid' ? (
           /* Grid View */
@@ -277,7 +281,7 @@ const ExerciseSelector = ({
                 </div>
 
                 {/* Quick stats */}
-                <div className="flex items-center gap-2 mt-2 text-xs text-gray-500">
+                <div className="flex items-center gap-2 mt-2 text-xs text-gray-500 dark:text-gray-400">
                   {exercise.sets_default && <span>{exercise.sets_default} sett</span>}
                   {exercise.reps_default && <span>{exercise.reps_default} rep</span>}
                 </div>
@@ -288,7 +292,7 @@ const ExerciseSelector = ({
                     e.stopPropagation();
                     setDetailExercise(exercise);
                   }}
-                  className="absolute bottom-2 right-2 p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+                  className="absolute bottom-2 right-2 p-1 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded"
                 >
                   <Info className="w-3.5 h-3.5" />
                 </button>
@@ -338,7 +342,9 @@ const ExerciseSelector = ({
                     {exercise.name_norwegian || exercise.name}
                   </h3>
                   <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-xs text-gray-500">{exercise.category}</span>
+                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                      {exercise.category}
+                    </span>
                     <span
                       className={`px-1.5 py-0.5 rounded text-xs ${getDifficultyColor(exercise.difficulty_level)}`}
                     >
@@ -355,7 +361,7 @@ const ExerciseSelector = ({
                       e.stopPropagation();
                       setDetailExercise(exercise);
                     }}
-                    className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded"
+                    className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 rounded"
                   >
                     <Info className="w-4 h-4" />
                   </button>
@@ -414,7 +420,7 @@ const ExerciseSelector = ({
                   {detailExercise.category}
                 </span>
                 {detailExercise.subcategory && (
-                  <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
+                  <span className="px-3 py-1 bg-gray-100 text-gray-600 dark:text-gray-300 rounded-full text-sm">
                     {detailExercise.subcategory}
                   </span>
                 )}
@@ -429,7 +435,7 @@ const ExerciseSelector = ({
               {detailExercise.description && (
                 <div className="mb-4">
                   <h4 className="text-sm font-medium text-gray-700 mb-2">Beskrivelse</h4>
-                  <p className="text-sm text-gray-600 whitespace-pre-line">
+                  <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">
                     {detailExercise.description_norwegian || detailExercise.description}
                   </p>
                 </div>
@@ -438,19 +444,19 @@ const ExerciseSelector = ({
               {/* Default Parameters */}
               <div className="grid grid-cols-3 gap-4 p-3 bg-gray-50 rounded-lg">
                 <div className="text-center">
-                  <Target className="w-5 h-5 text-gray-400 mx-auto mb-1" />
+                  <Target className="w-5 h-5 text-gray-400 dark:text-gray-300 mx-auto mb-1" />
                   <p className="text-sm font-medium">{detailExercise.sets_default || 3}</p>
-                  <p className="text-xs text-gray-500">Sett</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Sett</p>
                 </div>
                 <div className="text-center">
-                  <Activity className="w-5 h-5 text-gray-400 mx-auto mb-1" />
+                  <Activity className="w-5 h-5 text-gray-400 dark:text-gray-300 mx-auto mb-1" />
                   <p className="text-sm font-medium">{detailExercise.reps_default || 10}</p>
-                  <p className="text-xs text-gray-500">Repetisjoner</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Repetisjoner</p>
                 </div>
                 <div className="text-center">
-                  <Clock className="w-5 h-5 text-gray-400 mx-auto mb-1" />
+                  <Clock className="w-5 h-5 text-gray-400 dark:text-gray-300 mx-auto mb-1" />
                   <p className="text-sm font-medium">{detailExercise.hold_seconds || 0}s</p>
-                  <p className="text-xs text-gray-500">Hold</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Hold</p>
                 </div>
               </div>
             </div>

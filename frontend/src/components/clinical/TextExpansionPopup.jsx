@@ -18,7 +18,7 @@ const CATEGORY_COLORS = {
   Respons: 'bg-cyan-100 text-cyan-700',
 };
 
-const DEFAULT_BADGE = 'bg-gray-100 text-gray-600';
+const DEFAULT_BADGE = 'bg-gray-100 text-gray-600 dark:text-gray-300';
 
 /**
  * Calculate caret pixel position inside a textarea using a mirror div.
@@ -162,15 +162,21 @@ export default function TextExpansionPopup({
     >
       {/* Header */}
       <div className="sticky top-0 px-3 py-2 bg-gray-50 border-b border-gray-200 flex items-center gap-2">
-        <Command className="w-4 h-4 text-gray-400" />
-        <span className="text-xs text-gray-500">Maler ({suggestions.length})</span>
-        <span className="ml-auto text-xs text-gray-400">Tab for å sette inn</span>
+        <Command className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+        <span className="text-xs text-gray-500 dark:text-gray-400">
+          Maler ({suggestions.length})
+        </span>
+        <span className="ml-auto text-xs text-gray-400 dark:text-gray-300">
+          Tab for å sette inn
+        </span>
       </div>
 
       {/* Grouped results */}
       {Object.entries(grouped).map(([category, items]) => (
         <div key={category}>
-          <div className="px-3 py-1 text-xs font-medium text-gray-500 bg-gray-50">{category}</div>
+          <div className="px-3 py-1 text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50">
+            {category}
+          </div>
           {items.map((tmpl) => (
             <button
               key={tmpl.id || tmpl.shortcut}
@@ -191,7 +197,7 @@ export default function TextExpansionPopup({
                   {tmpl.category}
                 </span>
               </div>
-              <div className="mt-0.5 text-xs text-gray-500 truncate">
+              <div className="mt-0.5 text-xs text-gray-500 dark:text-gray-400 truncate">
                 {tmpl.name} — {(tmpl.preview || tmpl.text || '').substring(0, 50)}
               </div>
             </button>

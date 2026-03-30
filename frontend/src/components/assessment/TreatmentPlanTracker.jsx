@@ -206,10 +206,10 @@ export default function TreatmentPlanTracker({
                 <div className="text-3xl font-bold text-green-700">{currentVisit}</div>
                 <div className="text-xs text-green-600">Current Visit</div>
               </div>
-              <div className="text-center text-gray-400">of</div>
+              <div className="text-center text-gray-400 dark:text-gray-300">of</div>
               <div className="text-center">
                 <div className="text-3xl font-bold text-gray-700">{totalPlannedVisits}</div>
-                <div className="text-xs text-gray-500">Projected Visits</div>
+                <div className="text-xs text-gray-500 dark:text-gray-400">Projected Visits</div>
               </div>
             </div>
 
@@ -220,7 +220,7 @@ export default function TreatmentPlanTracker({
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
-            <div className="text-xs text-gray-500 text-center mt-1">
+            <div className="text-xs text-gray-500 dark:text-gray-400 text-center mt-1">
               {Math.round(progressPercent)}% complete
             </div>
           </div>
@@ -266,7 +266,7 @@ export default function TreatmentPlanTracker({
                     </span>
                     <span className="font-medium text-gray-900">{phase.name}</span>
                   </div>
-                  <span className="text-sm text-gray-500">
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
                     {phase.status === 'current'
                       ? `${phase.phaseCurrentVisit}/${phase.totalVisits} visits`
                       : phase.status === 'completed'
@@ -276,7 +276,7 @@ export default function TreatmentPlanTracker({
                 </div>
 
                 {/* Phase details */}
-                <div className="flex items-center gap-4 text-xs text-gray-500">
+                <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
                   <span className="flex items-center gap-1">
                     <Clock className="w-3 h-3" />
                     {phase.visitsPerWeek}x/week
@@ -309,7 +309,7 @@ export default function TreatmentPlanTracker({
           <div className="px-4 pb-4">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-gray-500 border-b">
+                <tr className="text-left text-gray-500 dark:text-gray-400 border-b">
                   <th className="pb-2">Phase</th>
                   <th className="pb-2 text-center">Freq</th>
                   <th className="pb-2 text-center">Weeks</th>
@@ -340,7 +340,9 @@ export default function TreatmentPlanTracker({
         <div className="p-4 space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">Start Date</label>
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
+                Start Date
+              </label>
               <input
                 type="date"
                 value={editedPlan.startDate}
@@ -349,7 +351,7 @@ export default function TreatmentPlanTracker({
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-500 mb-1">
+              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">
                 Re-eval Every (visits)
               </label>
               <input
@@ -381,7 +383,9 @@ export default function TreatmentPlanTracker({
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <label className="block text-xs text-gray-500">Visits/Week</label>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400">
+                      Visits/Week
+                    </label>
                     <input
                       type="number"
                       min="1"
@@ -398,7 +402,7 @@ export default function TreatmentPlanTracker({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500">Weeks</label>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400">Weeks</label>
                     <input
                       type="number"
                       min="1"
@@ -414,7 +418,9 @@ export default function TreatmentPlanTracker({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500">Total Visits</label>
+                    <label className="block text-xs text-gray-500 dark:text-gray-400">
+                      Total Visits
+                    </label>
                     <input
                       type="number"
                       value={phase.totalVisits}
@@ -439,7 +445,7 @@ export default function TreatmentPlanTracker({
         /* No Plan */
         <div className="p-6 text-center">
           <Target className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-          <p className="text-gray-500 mb-3">No treatment plan set</p>
+          <p className="text-gray-500 dark:text-gray-400 mb-3">No treatment plan set</p>
           <button
             onClick={() => {
               setEditedPlan(getDefaultPlan());

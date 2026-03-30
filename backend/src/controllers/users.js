@@ -2,7 +2,7 @@
  * Users Controller
  */
 
-import * as userService from '../services/users.js';
+import * as userService from '../services/practice/users.js';
 import { logAudit } from '../utils/audit.js';
 import logger from '../utils/logger.js';
 
@@ -32,7 +32,14 @@ export const updateCurrentUser = async (req, res) => {
     const { organizationId, user } = req;
 
     // Only allow updating certain fields for self-update
-    const allowedFields = ['first_name', 'last_name', 'phone', 'preferred_language', 'preferences'];
+    const allowedFields = [
+      'first_name',
+      'last_name',
+      'phone',
+      'preferred_language',
+      'preferences',
+      'notification_preferences',
+    ];
     const filteredBody = {};
     for (const field of allowedFields) {
       if (req.body[field] !== undefined) {
@@ -52,7 +59,7 @@ export const updateCurrentUser = async (req, res) => {
       resourceId: user.id,
       changes: filteredBody,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(updatedUser);
@@ -70,7 +77,7 @@ export const getUsers = async (req, res) => {
       limit: parseInt(req.query.limit) || 50,
       search: req.query.search,
       role: req.query.role,
-      status: req.query.status
+      status: req.query.status,
     };
 
     const result = await userService.getAllUsers(organizationId, options);
@@ -113,7 +120,7 @@ export const createUser = async (req, res) => {
       resourceType: 'USER',
       resourceId: newUser.id,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.status(201).json(newUser);
@@ -140,7 +147,7 @@ export const updateUser = async (req, res) => {
       resourceId: id,
       changes: req.body,
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(updatedUser);
@@ -181,7 +188,7 @@ export const deactivateUser = async (req, res) => {
       changes: { status: 'INACTIVE' },
       reason: 'User deactivated',
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(deactivatedUser);
@@ -209,7 +216,7 @@ export const reactivateUser = async (req, res) => {
       changes: { status: 'ACTIVE' },
       reason: 'User reactivated',
       ipAddress: req.ip,
-      userAgent: req.get('user-agent')
+      userAgent: req.get('user-agent'),
     });
 
     res.json(reactivatedUser);
@@ -254,5 +261,5 @@ export default {
   deactivateUser,
   reactivateUser,
   getUserStats,
-  getPractitioners
+  getPractitioners,
 };

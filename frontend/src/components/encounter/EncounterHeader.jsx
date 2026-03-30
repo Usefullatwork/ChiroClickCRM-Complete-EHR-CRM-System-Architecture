@@ -26,7 +26,7 @@ export function EncounterHeader({
     <header className="bg-white border-b border-slate-200 px-6 py-3 flex justify-between items-center flex-shrink-0">
       <div className="flex items-center space-x-4">
         <span
-          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full ${isSigned ? 'bg-slate-100 text-slate-500' : 'bg-teal-50 text-teal-700'} text-sm font-medium border ${isSigned ? 'border-slate-200' : 'border-teal-200'}`}
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full ${isSigned ? 'bg-slate-100 text-slate-500 dark:text-slate-400' : 'bg-teal-50 text-teal-700'} text-sm font-medium border ${isSigned ? 'border-slate-200' : 'border-teal-200'}`}
         >
           <Calendar className="h-3.5 w-3.5" />
           <input
@@ -43,7 +43,7 @@ export function EncounterHeader({
           value={encounterData.encounter_type}
           onChange={(e) => applyEncounterTypeDefaults(e.target.value)}
           disabled={isSigned}
-          className="text-sm text-slate-600 bg-transparent border border-slate-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="text-sm text-slate-600 dark:text-slate-300 bg-transparent border border-slate-200 rounded-lg px-2 py-1 focus:ring-2 focus:ring-teal-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <option value="INITIAL">F{'\u00F8'}rstegangs</option>
           <option value="FOLLOWUP">Oppf{'\u00F8'}lging</option>
@@ -51,7 +51,7 @@ export function EncounterHeader({
           <option value="REEXAM">Re-unders{'\u00F8'}kelse</option>
           <option value="EMERGENCY">Akutt</option>
         </select>
-        <span className="text-sm text-slate-500 flex items-center gap-1">
+        <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
           <Clock className="h-3.5 w-3.5" />
           <input
             type="number"
@@ -68,7 +68,7 @@ export function EncounterHeader({
           min
         </span>
         <span
-          className="text-sm text-slate-500 flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-md border border-slate-200"
+          className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1 bg-slate-50 px-2 py-1 rounded-md border border-slate-200"
           title="Tid brukt"
         >
           <Clock className="h-3.5 w-3.5 text-teal-600" />
@@ -94,13 +94,13 @@ export function EncounterHeader({
         )}
         <button
           onClick={() => setShowKeyboardHelp(true)}
-          className="text-xs px-2 py-1 rounded bg-slate-100 text-slate-500 hover:bg-slate-200 transition-colors"
+          className="text-xs px-2 py-1 rounded bg-slate-100 text-slate-500 dark:text-slate-400 hover:bg-slate-200 transition-colors"
           title="Tastatursnarveier (F1)"
         >
           {'\u2328\uFE0F'}
         </button>
         {autoSaveStatus === 'saving' && (
-          <span className="text-xs text-slate-500 flex items-center gap-1">
+          <span className="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
             <Loader2 className="h-3 w-3 animate-spin" />
             Lagrer...
           </span>

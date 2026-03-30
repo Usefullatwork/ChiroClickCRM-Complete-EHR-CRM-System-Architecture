@@ -26,7 +26,7 @@ const VimeoPlayer = ({ videoUrl, title, onClose, autoplay = true }) => {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6 max-w-md mx-4">
-          <p className="text-gray-600">Video URL er ugyldig</p>
+          <p className="text-gray-600 dark:text-gray-300">Video URL er ugyldig</p>
           <button
             onClick={onClose}
             className="mt-4 px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"

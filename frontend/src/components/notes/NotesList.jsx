@@ -141,7 +141,9 @@ export default function NotesList({
       <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
         <User className="w-12 h-12 text-gray-300 mx-auto mb-3" />
         <h3 className="text-lg font-medium text-gray-900 mb-1">Ingen pasient valgt</h3>
-        <p className="text-sm text-gray-500">Velg en pasient for a se deres kliniske notater</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Velg en pasient for a se deres kliniske notater
+        </p>
       </div>
     );
   }
@@ -161,7 +163,7 @@ export default function NotesList({
       <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
         <FileText className="w-12 h-12 text-gray-300 mx-auto mb-3" />
         <h3 className="text-lg font-medium text-gray-900 mb-1">Ingen notater</h3>
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
           Det er ingen kliniske notater for denne pasienten enna
         </p>
       </div>
@@ -198,7 +200,7 @@ export default function NotesList({
                       }`}
                     >
                       {isLocked ? (
-                        <Lock className="w-5 h-5 text-gray-600" />
+                        <Lock className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                       ) : (
                         <FileText className="w-5 h-5 text-blue-600" />
                       )}
@@ -223,22 +225,24 @@ export default function NotesList({
 
                       {/* Chief Complaint / Hovedklage */}
                       {chiefComplaint && (
-                        <p className="text-sm text-gray-600 truncate mb-1">{chiefComplaint}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 truncate mb-1">
+                          {chiefComplaint}
+                        </p>
                       )}
 
                       {/* Diagnosis Codes / Diagnosekoder */}
                       {diagnosisCodes.length > 0 && (
                         <div className="flex items-center gap-1 mb-1">
-                          {diagnosisCodes.map((code, index) => (
+                          {diagnosisCodes.map((code) => (
                             <span
-                              key={index}
-                              className="px-1.5 py-0.5 text-xs bg-gray-100 text-gray-600 rounded"
+                              key={code}
+                              className="px-1.5 py-0.5 text-xs bg-gray-100 text-gray-600 dark:text-gray-300 rounded"
                             >
                               {code}
                             </span>
                           ))}
                           {note.icd10_codes?.length + note.icpc_codes?.length > 3 && (
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-gray-400 dark:text-gray-300">
                               +{note.icd10_codes?.length + note.icpc_codes?.length - 3}
                             </span>
                           )}
@@ -246,7 +250,7 @@ export default function NotesList({
                       )}
 
                       {/* Metadata */}
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
+                      <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
                         <span className="flex items-center gap-1">
                           <Clock className="w-3 h-3" />
                           {formatTime(note.note_date)}
@@ -285,7 +289,7 @@ export default function NotesList({
                         e.stopPropagation();
                         onViewNote(note.id);
                       }}
-                      className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+                      className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                       title="Se notat"
                     >
                       <Eye className="w-4 h-4" />
@@ -296,7 +300,7 @@ export default function NotesList({
                           e.stopPropagation();
                           onEditNote(note);
                         }}
-                        className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+                        className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                         title="Rediger notat"
                       >
                         <Edit className="w-4 h-4" />
@@ -307,7 +311,7 @@ export default function NotesList({
                         e.stopPropagation();
                         onPrintNote(note.id);
                       }}
-                      className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+                      className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                       title="Skriv ut"
                     >
                       <Printer className="w-4 h-4" />
@@ -317,7 +321,7 @@ export default function NotesList({
                         e.stopPropagation();
                         onExportNote(note.id);
                       }}
-                      className="p-2 text-gray-500 hover:bg-gray-100 rounded-lg"
+                      className="p-2 text-gray-500 dark:text-gray-400 hover:bg-gray-100 rounded-lg"
                       title="Last ned"
                     >
                       <Download className="w-4 h-4" />
@@ -334,7 +338,7 @@ export default function NotesList({
                         <Trash2 className="w-4 h-4" />
                       </button>
                     )}
-                    <ChevronRight className="w-5 h-5 text-gray-400 ml-2" />
+                    <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300 ml-2" />
                   </div>
                 </div>
               </div>

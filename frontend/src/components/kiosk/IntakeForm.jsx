@@ -52,7 +52,7 @@ const YesNoQuestion = ({ label, value, onChange, detailValue, onDetailChange, la
           className={`flex-1 py-3 text-lg font-medium rounded-xl transition-all ${
             value === true
               ? 'bg-teal-600 text-white'
-              : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
+              : 'bg-white border-2 border-slate-200 text-slate-600 dark:text-slate-300 hover:border-slate-300'
           }`}
         >
           {t.yes}
@@ -62,7 +62,7 @@ const YesNoQuestion = ({ label, value, onChange, detailValue, onDetailChange, la
           className={`flex-1 py-3 text-lg font-medium rounded-xl transition-all ${
             value === false
               ? 'bg-teal-600 text-white'
-              : 'bg-white border-2 border-slate-200 text-slate-600 hover:border-slate-300'
+              : 'bg-white border-2 border-slate-200 text-slate-600 dark:text-slate-300 hover:border-slate-300'
           }`}
         >
           {t.no}
@@ -134,7 +134,7 @@ export default function IntakeForm({ lang = 'no', onNext, onBack }) {
     <div className="flex flex-col h-full">
       <div className="text-center mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">{t.title}</h1>
-        <p className="text-lg text-slate-500">{t.subtitle}</p>
+        <p className="text-lg text-slate-500 dark:text-slate-400">{t.subtitle}</p>
       </div>
 
       <div className="flex-1 space-y-4 overflow-y-auto">
@@ -183,7 +183,7 @@ export default function IntakeForm({ lang = 'no', onNext, onBack }) {
       <div className="mt-6 flex gap-3">
         <button
           onClick={onBack}
-          className="px-6 py-4 bg-slate-100 text-slate-600 text-lg font-medium rounded-2xl hover:bg-slate-200 transition-colors flex items-center gap-2"
+          className="px-6 py-4 bg-slate-100 text-slate-600 dark:text-slate-300 text-lg font-medium rounded-2xl hover:bg-slate-200 transition-colors flex items-center gap-2"
         >
           <ArrowLeft className="w-5 h-5" />
           {t.back}

@@ -7,6 +7,7 @@
 
 import { useState, useMemo } from 'react';
 import logger from '../../utils/logger';
+import { useTranslation } from '../../i18n';
 import {
   FileText,
   Search,
@@ -38,6 +39,7 @@ const TemplateSelector = ({
   currentExercises = [],
   loading = false,
 }) => {
+  const { t } = useTranslation('exercises');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [showSaveModal, setShowSaveModal] = useState(false);
@@ -150,12 +152,12 @@ const TemplateSelector = ({
 
         {/* Search */}
         <div className="relative mb-3">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Søk i maler..."
+            placeholder={t('searchInTemplatesPlaceholder', 'Søk i maler...')}
             className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
           />
           {searchTerm && (
@@ -163,7 +165,7 @@ const TemplateSelector = ({
               onClick={() => setSearchTerm('')}
               className="absolute right-3 top-1/2 transform -translate-y-1/2"
             >
-              <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+              <X className="w-4 h-4 text-gray-400 dark:text-gray-300 hover:text-gray-600" />
             </button>
           )}
         </div>
@@ -175,7 +177,7 @@ const TemplateSelector = ({
             className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               selectedCategory === 'all'
                 ? 'bg-purple-600 text-white'
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
             }`}
           >
             Alle maler
@@ -187,7 +189,7 @@ const TemplateSelector = ({
               className={`px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                 selectedCategory === cat
                   ? 'bg-purple-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
               }`}
             >
               {cat}
@@ -201,13 +203,13 @@ const TemplateSelector = ({
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-6 h-6 animate-spin text-purple-500" />
-            <span className="ml-2 text-gray-500">Laster maler...</span>
+            <span className="ml-2 text-gray-500 dark:text-gray-400">Laster maler...</span>
           </div>
         ) : filteredTemplates.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 px-4">
             <FolderOpen className="w-12 h-12 text-gray-300 mb-3" />
-            <p className="font-medium text-gray-600">Ingen maler funnet</p>
-            <p className="text-sm text-gray-400 text-center mt-1">
+            <p className="font-medium text-gray-600 dark:text-gray-300">Ingen maler funnet</p>
+            <p className="text-sm text-gray-400 dark:text-gray-300 text-center mt-1">
               {searchTerm
                 ? 'Prøv å endre søkekriteriene'
                 : 'Lag et program og lagre det som mal for å komme i gang'}
@@ -231,11 +233,11 @@ const TemplateSelector = ({
                       )}
                     </div>
                     {template.description && (
-                      <p className="text-sm text-gray-500 mt-1 line-clamp-1">
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
                         {template.description}
                       </p>
                     )}
-                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-500 dark:text-gray-400">
                       <span className="px-2 py-0.5 bg-purple-50 text-purple-600 rounded">
                         {template.category || 'Generell'}
                       </span>
@@ -249,7 +251,7 @@ const TemplateSelector = ({
                       </span>
                     </div>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-500 transition-colors flex-shrink-0 ml-2" />
+                  <ChevronRight className="w-5 h-5 text-gray-400 dark:text-gray-300 group-hover:text-purple-500 transition-colors flex-shrink-0 ml-2" />
                 </div>
               </button>
             ))}
@@ -295,7 +297,7 @@ const TemplateSelector = ({
                   type="text"
                   value={newTemplateName}
                   onChange={(e) => setNewTemplateName(e.target.value)}
-                  placeholder="F.eks. Nakke- og skulderprogram"
+                  placeholder={t('templateNamePlaceholder', 'F.eks. Nakke- og skulderprogram')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
@@ -306,7 +308,7 @@ const TemplateSelector = ({
                   type="text"
                   value={newTemplateCategory}
                   onChange={(e) => setNewTemplateCategory(e.target.value)}
-                  placeholder="F.eks. Nakke, Rygg, Rehabilitering"
+                  placeholder={t('templateTagsPlaceholder', 'F.eks. Nakke, Rygg, Rehabilitering')}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
                 />
               </div>
@@ -316,14 +318,17 @@ const TemplateSelector = ({
                 <textarea
                   value={newTemplateDescription}
                   onChange={(e) => setNewTemplateDescription(e.target.value)}
-                  placeholder="Beskriv når denne malen skal brukes..."
+                  placeholder={t(
+                    'templateDescriptionPlaceholder',
+                    'Beskriv når denne malen skal brukes...'
+                  )}
                   rows={3}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 resize-none"
                 />
               </div>
 
               <div className="p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   <strong>{currentExercises.length}</strong> øvelser vil bli lagret i denne malen.
                 </p>
               </div>

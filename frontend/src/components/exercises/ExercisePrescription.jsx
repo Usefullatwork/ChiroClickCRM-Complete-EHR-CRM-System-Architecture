@@ -4,6 +4,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslation } from '../../i18n';
 import {
   GripVertical,
   Trash2,
@@ -34,6 +35,7 @@ const ExercisePrescription = ({
   saving = false,
   sending = false,
 }) => {
+  const { t } = useTranslation('exercises');
   const [patientInstructions, setPatientInstructions] = useState('');
   const [clinicalNotes, setClinicalNotes] = useState('');
   const [expandedExercise, setExpandedExercise] = useState(null);
@@ -107,7 +109,7 @@ const ExercisePrescription = ({
       case 'advanced':
         return 'text-red-600 bg-red-50';
       default:
-        return 'text-gray-600 bg-gray-50';
+        return 'text-gray-600 dark:text-gray-300 bg-gray-50';
     }
   };
 
@@ -121,7 +123,7 @@ const ExercisePrescription = ({
             <h2 className="text-lg font-semibold text-gray-900">Øvelsesprogram</h2>
           </div>
           {patient && (
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-600 dark:text-gray-300">
               Pasient:{' '}
               <span className="font-medium">
                 {patient.first_name} {patient.last_name}
@@ -134,10 +136,12 @@ const ExercisePrescription = ({
       {/* Selected Exercises */}
       <div className="flex-1 overflow-y-auto">
         {selectedExercises.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 text-gray-500">
+          <div className="flex flex-col items-center justify-center h-48 text-gray-500 dark:text-gray-400">
             <Dumbbell className="w-12 h-12 text-gray-300 mb-3" />
             <p>Ingen øvelser valgt</p>
-            <p className="text-sm text-gray-400">Velg øvelser fra biblioteket til venstre</p>
+            <p className="text-sm text-gray-400 dark:text-gray-300">
+              Velg øvelser fra biblioteket til venstre
+            </p>
           </div>
         ) : (
           <div className="p-4 space-y-3">
@@ -149,7 +153,7 @@ const ExercisePrescription = ({
                 {/* Exercise Header */}
                 <div className="flex items-center gap-2 p-3 bg-gray-50">
                   {/* Drag Handle */}
-                  <div className="text-gray-400 cursor-grab">
+                  <div className="text-gray-400 dark:text-gray-300 cursor-grab">
                     <GripVertical className="w-4 h-4" />
                   </div>
 
@@ -163,7 +167,7 @@ const ExercisePrescription = ({
                     <h4 className="font-medium text-gray-900 truncate">
                       {exercise.name_norwegian || exercise.name}
                     </h4>
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
                       <span>{exercise.category}</span>
                       <span
                         className={`px-1.5 py-0.5 rounded ${getDifficultyColor(exercise.difficulty_level)}`}
@@ -210,7 +214,7 @@ const ExercisePrescription = ({
 
                 {/* Parameters (Quick View) */}
                 <div className="flex items-center gap-4 px-3 py-2 bg-white border-t border-gray-100 text-sm">
-                  <div className="flex items-center gap-1 text-gray-600">
+                  <div className="flex items-center gap-1 text-gray-600 dark:text-gray-300">
                     <Target className="w-3.5 h-3.5" />
                     <input
                       type="number"
@@ -222,10 +226,10 @@ const ExercisePrescription = ({
                       min="1"
                       max="10"
                     />
-                    <span className="text-gray-500">sett</span>
+                    <span className="text-gray-500 dark:text-gray-400">sett</span>
                   </div>
 
-                  <div className="flex items-center gap-1 text-gray-600">
+                  <div className="flex items-center gap-1 text-gray-600 dark:text-gray-300">
                     <Activity className="w-3.5 h-3.5" />
                     <input
                       type="number"
@@ -237,11 +241,11 @@ const ExercisePrescription = ({
                       min="1"
                       max="100"
                     />
-                    <span className="text-gray-500">rep</span>
+                    <span className="text-gray-500 dark:text-gray-400">rep</span>
                   </div>
 
                   {(exercise.hold_seconds || exercise.holdSeconds) && (
-                    <div className="flex items-center gap-1 text-gray-600">
+                    <div className="flex items-center gap-1 text-gray-600 dark:text-gray-300">
                       <Clock className="w-3.5 h-3.5" />
                       <input
                         type="number"
@@ -253,12 +257,12 @@ const ExercisePrescription = ({
                         min="0"
                         max="300"
                       />
-                      <span className="text-gray-500">sek</span>
+                      <span className="text-gray-500 dark:text-gray-400">sek</span>
                     </div>
                   )}
 
-                  <div className="flex items-center gap-1 text-gray-600">
-                    <span className="text-gray-500">×</span>
+                  <div className="flex items-center gap-1 text-gray-600 dark:text-gray-300">
+                    <span className="text-gray-500 dark:text-gray-400">×</span>
                     <input
                       type="number"
                       value={exercise.frequencyPerDay || exercise.frequency_per_day || 1}
@@ -269,7 +273,7 @@ const ExercisePrescription = ({
                       min="1"
                       max="10"
                     />
-                    <span className="text-gray-500">/dag</span>
+                    <span className="text-gray-500 dark:text-gray-400">/dag</span>
                   </div>
                 </div>
 
@@ -278,7 +282,7 @@ const ExercisePrescription = ({
                   <div className="p-3 bg-gray-50 border-t border-gray-200 space-y-3">
                     {/* Instructions */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                         Instruksjoner
                       </label>
                       <p className="text-sm text-gray-700">
@@ -288,7 +292,7 @@ const ExercisePrescription = ({
 
                     {/* Custom Instructions */}
                     <div>
-                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                      <label className="block text-xs font-medium text-gray-600 dark:text-gray-300 mb-1">
                         Spesielle instruksjoner for pasient
                       </label>
                       <textarea
@@ -296,7 +300,10 @@ const ExercisePrescription = ({
                         onChange={(e) =>
                           updateExerciseParams(index, 'customInstructions', e.target.value)
                         }
-                        placeholder="Legg til spesielle instruksjoner..."
+                        placeholder={t(
+                          'specialInstructionsPlaceholder',
+                          'Legg til spesielle instruksjoner...'
+                        )}
                         className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         rows={2}
                       />
@@ -336,7 +343,10 @@ const ExercisePrescription = ({
             <textarea
               value={patientInstructions}
               onChange={(e) => setPatientInstructions(e.target.value)}
-              placeholder="F.eks. 'Gjør øvelsene morgen og kveld. Stopp hvis du opplever økt smerte.'"
+              placeholder={t(
+                'patientInstructionsPlaceholder',
+                "F.eks. 'Gjør øvelsene morgen og kveld. Stopp hvis du opplever økt smerte.'"
+              )}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={2}
             />
@@ -349,7 +359,10 @@ const ExercisePrescription = ({
             <textarea
               value={clinicalNotes}
               onChange={(e) => setClinicalNotes(e.target.value)}
-              placeholder="Interne notater som ikke sendes til pasient..."
+              placeholder={t(
+                'internalNotesPlaceholder',
+                'Interne notater som ikke sendes til pasient...'
+              )}
               className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               rows={2}
             />
@@ -360,7 +373,9 @@ const ExercisePrescription = ({
       {/* Actions */}
       <div className="p-4 border-t border-gray-200 bg-white">
         <div className="flex items-center justify-between">
-          <div className="text-sm text-gray-600">{selectedExercises.length} øvelser valgt</div>
+          <div className="text-sm text-gray-600 dark:text-gray-300">
+            {selectedExercises.length} øvelser valgt
+          </div>
 
           <div className="flex items-center gap-2">
             {/* Delivery Options */}

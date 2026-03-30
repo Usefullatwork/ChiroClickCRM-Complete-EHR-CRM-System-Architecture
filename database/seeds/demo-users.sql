@@ -11,7 +11,7 @@ VALUES (
   'a0000000-0000-0000-0000-000000000001',
   'ChiroClick Demo Klinikk',
   '999888777',
-  'demo@chiroclickcrm.no',
+  'demo@chiroclickehr.no',
   'PRO',
   true
 ) ON CONFLICT (id) DO UPDATE SET
@@ -24,7 +24,7 @@ INSERT INTO users (id, organization_id, email, password_hash, first_name, last_n
 VALUES (
   'b0000000-0000-0000-0000-000000000001',
   'a0000000-0000-0000-0000-000000000001',
-  'admin@chiroclickcrm.no',
+  'admin@chiroclickehr.no',
   '$2b$10$ohl4C6Xa9meLOVyotGbMq.80PrTc4I..sHs0a6zGj8OWVqQC5arFO',
   'Admin',
   'User',
@@ -40,7 +40,7 @@ INSERT INTO users (id, organization_id, email, password_hash, first_name, last_n
 VALUES (
   'b0000000-0000-0000-0000-000000000002',
   'a0000000-0000-0000-0000-000000000001',
-  'kiropraktor@chiroclickcrm.no',
+  'kiropraktor@chiroclickehr.no',
   '$2b$10$ohl4C6Xa9meLOVyotGbMq.80PrTc4I..sHs0a6zGj8OWVqQC5arFO',
   'Kari',
   'Nordmann',
@@ -57,7 +57,7 @@ INSERT INTO users (id, organization_id, email, password_hash, first_name, last_n
 VALUES (
   'b0000000-0000-0000-0000-000000000003',
   'a0000000-0000-0000-0000-000000000001',
-  'resepsjon@chiroclickcrm.no',
+  'resepsjon@chiroclickehr.no',
   '$2b$10$ohl4C6Xa9meLOVyotGbMq.80PrTc4I..sHs0a6zGj8OWVqQC5arFO',
   'Ole',
   'Hansen',

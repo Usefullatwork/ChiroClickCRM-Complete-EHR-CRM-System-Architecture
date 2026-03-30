@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import toast from '../utils/toast';
+import { useTranslation } from '../i18n';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
@@ -15,6 +16,7 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
  * Main component for importing old journal notes
  */
 export default function OldNotesImporter({ patientId, onClose }) {
+  const { t } = useTranslation('common');
   const [noteContent, setNoteContent] = useState('');
   const [filename, setFilename] = useState('');
   const [uploadMode, setUploadMode] = useState('single'); // 'single' or 'multiple'
@@ -47,10 +49,15 @@ export default function OldNotesImporter({ patientId, onClose }) {
       queryClient.invalidateQueries(['oldNotes', patientId]);
       setNoteContent('');
       setFilename('');
-      toast.success('Notat lastet opp!');
+      toast.success(t('noteUploaded', 'Notat lastet opp!'));
     },
     onError: (error) => {
-      toast.error(`Feil ved opplasting: ${error.response?.data?.error || error.message}`);
+      toast.error(
+        t('uploadError', 'Feil ved opplasting: {error}').replace(
+          '{error}',
+          error.response?.data?.error || error.message
+        )
+      );
     },
   });
 
@@ -65,10 +72,15 @@ export default function OldNotesImporter({ patientId, onClose }) {
     onSuccess: () => {
       queryClient.invalidateQueries(['oldNotes', patientId]);
       setMultipleNotes([{ content: '', filename: '' }]);
-      toast.success('Notater lastet opp!');
+      toast.success(t('notesUploaded', 'Notater lastet opp!'));
     },
     onError: (error) => {
-      toast.error(`Feil ved opplasting: ${error.response?.data?.error || error.message}`);
+      toast.error(
+        t('uploadError', 'Feil ved opplasting: {error}').replace(
+          '{error}',
+          error.response?.data?.error || error.message
+        )
+      );
     },
   });
 
@@ -84,10 +96,15 @@ export default function OldNotesImporter({ patientId, onClose }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['oldNotes', patientId]);
-      toast.success('Notat prosessert!');
+      toast.success(t('noteProcessed', 'Notat prosessert!'));
     },
     onError: (error) => {
-      toast.error(`Feil ved prosessering: ${error.response?.data?.error || error.message}`);
+      toast.error(
+        t('processError', 'Feil ved prosessering: {error}').replace(
+          '{error}',
+          error.response?.data?.error || error.message
+        )
+      );
     },
   });
 
@@ -103,7 +120,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['oldNotes', patientId]);
-      toast.success('Vurdering lagret!');
+      toast.success(t('reviewSaved', 'Vurdering lagret!'));
     },
   });
 
@@ -120,10 +137,17 @@ export default function OldNotesImporter({ patientId, onClose }) {
     onSuccess: (data) => {
       queryClient.invalidateQueries(['oldNotes', patientId]);
       queryClient.invalidateQueries(['encounters', patientId]);
-      toast.success(`Notat konvertert til journal #${data.encounter.id}!`);
+      toast.success(
+        t('noteConverted', 'Notat konvertert til journal #{id}!').replace('{id}', data.encounter.id)
+      );
     },
     onError: (error) => {
-      toast.error(`Feil ved konvertering: ${error.response?.data?.error || error.message}`);
+      toast.error(
+        t('convertError', 'Feil ved konvertering: {error}').replace(
+          '{error}',
+          error.response?.data?.error || error.message
+        )
+      );
     },
   });
 
@@ -137,13 +161,13 @@ export default function OldNotesImporter({ patientId, onClose }) {
     onSuccess: () => {
       queryClient.invalidateQueries(['oldNotes', patientId]);
       setSelectedNoteId(null);
-      toast.success('Notat slettet!');
+      toast.success(t('noteDeleted', 'Notat slettet!'));
     },
   });
 
   const handleUploadSingle = () => {
     if (!noteContent.trim()) {
-      toast.warning('Vennligst skriv inn notatinnhold');
+      toast.warning(t('pleaseEnterContent', 'Vennligst skriv inn notatinnhold'));
       return;
     }
 
@@ -158,7 +182,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
     const validNotes = multipleNotes.filter((n) => n.content.trim());
 
     if (validNotes.length === 0) {
-      toast.warning('Vennligst skriv inn minst ett notat');
+      toast.warning(t('pleaseEnterAtLeastOne', 'Vennligst skriv inn minst ett notat'));
       return;
     }
 
@@ -208,9 +232,14 @@ export default function OldNotesImporter({ patientId, onClose }) {
         <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
           <div className="flex justify-between items-center">
             <div>
-              <h2 className="text-2xl font-bold">Importer gamle journalnotater</h2>
+              <h2 className="text-2xl font-bold">
+                {t('importOldNotes', 'Importer gamle journalnotater')}
+              </h2>
               <p className="text-blue-100 mt-1">
-                Last opp og organiser historiske pasientnotater med AI-assistanse
+                {t(
+                  'importOldNotesDesc',
+                  'Last opp og organiser historiske pasientnotater med AI-assistanse'
+                )}
               </p>
             </div>
             <button onClick={onClose} className="text-white hover:bg-blue-800 rounded-full p-2">
@@ -232,12 +261,18 @@ export default function OldNotesImporter({ patientId, onClose }) {
             {/* Left: Upload Section */}
             <div className="space-y-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-semibold text-blue-900 mb-2">Slik fungerer det</h3>
+                <h3 className="font-semibold text-blue-900 mb-2">
+                  {t('howItWorks', 'Slik fungerer det')}
+                </h3>
                 <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
-                  <li>Lim inn eller skriv gamle journalnotater nedenfor</li>
-                  <li>AI organiserer og strukturerer innholdet</li>
-                  <li>Gjennomga og rediger det AI-genererte SOAP-formatet</li>
-                  <li>Godkjenn og konverter til klinisk journal</li>
+                  <li>
+                    {t('howItWorksStep1', 'Lim inn eller skriv gamle journalnotater nedenfor')}
+                  </li>
+                  <li>{t('howItWorksStep2', 'AI organiserer og strukturerer innholdet')}</li>
+                  <li>
+                    {t('howItWorksStep3', 'Gjennomgå og rediger det AI-genererte SOAP-formatet')}
+                  </li>
+                  <li>{t('howItWorksStep4', 'Godkjenn og konverter til klinisk journal')}</li>
                 </ol>
               </div>
 
@@ -248,20 +283,20 @@ export default function OldNotesImporter({ patientId, onClose }) {
                   className={`px-4 py-2 font-medium ${
                     uploadMode === 'single'
                       ? 'border-b-2 border-blue-600 text-blue-600'
-                      : 'text-gray-600 hover:text-gray-800'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-800'
                   }`}
                 >
-                  Enkelt notat
+                  {t('singleNote', 'Enkelt notat')}
                 </button>
                 <button
                   onClick={() => setUploadMode('multiple')}
                   className={`px-4 py-2 font-medium ${
                     uploadMode === 'multiple'
                       ? 'border-b-2 border-blue-600 text-blue-600'
-                      : 'text-gray-600 hover:text-gray-800'
+                      : 'text-gray-600 dark:text-gray-300 hover:text-gray-800'
                   }`}
                 >
-                  Flere notater
+                  {t('multipleNotes', 'Flere notater')}
                 </button>
               </div>
 
@@ -270,7 +305,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                 <div className="space-y-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Filnavn (valgfritt)
+                      {t('filenameOptional', 'Filnavn (valgfritt)')}
                     </label>
                     <input
                       type="text"
@@ -283,12 +318,12 @@ export default function OldNotesImporter({ patientId, onClose }) {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Notatinnhold *
+                      {t('noteContent', 'Notatinnhold *')}
                     </label>
                     <textarea
                       value={noteContent}
                       onChange={(e) => setNoteContent(e.target.value)}
-                      placeholder="Lim inn gammelt journalnotat her..."
+                      placeholder={t('pasteOldNote', 'Lim inn gammelt journalnotat her...')}
                       rows={12}
                       className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm"
                     />
@@ -303,7 +338,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                       className="mr-2"
                     />
                     <label htmlFor="processImmediately" className="text-sm text-gray-700">
-                      Prosesser med AI umiddelbart
+                      {t('processWithAi', 'Prosesser med AI umiddelbart')}
                     </label>
                   </div>
 
@@ -312,7 +347,9 @@ export default function OldNotesImporter({ patientId, onClose }) {
                     disabled={uploadNoteMutation.isPending}
                     className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-medium"
                   >
-                    {uploadNoteMutation.isPending ? 'Laster opp...' : 'Last opp notat'}
+                    {uploadNoteMutation.isPending
+                      ? t('uploading2', 'Laster opp...')
+                      : t('uploadNote', 'Last opp notat')}
                   </button>
                 </div>
               )}
@@ -322,15 +359,17 @@ export default function OldNotesImporter({ patientId, onClose }) {
                 <div className="space-y-3">
                   <div className="max-h-96 overflow-y-auto space-y-3">
                     {multipleNotes.map((note, index) => (
-                      <div key={index} className="border rounded-lg p-3 bg-gray-50">
+                      <div key={`note-${index}`} className="border rounded-lg p-3 bg-gray-50">
                         <div className="flex justify-between items-center mb-2">
-                          <span className="font-medium text-sm">Notat {index + 1}</span>
+                          <span className="font-medium text-sm">
+                            {t('noteNumber', 'Notat {num}').replace('{num}', index + 1)}
+                          </span>
                           {multipleNotes.length > 1 && (
                             <button
                               onClick={() => removeNoteField(index)}
                               className="text-red-600 hover:text-red-800 text-sm"
                             >
-                              Fjern
+                              {t('removeNote', 'Fjern')}
                             </button>
                           )}
                         </div>
@@ -338,13 +377,13 @@ export default function OldNotesImporter({ patientId, onClose }) {
                           type="text"
                           value={note.filename}
                           onChange={(e) => updateNoteField(index, 'filename', e.target.value)}
-                          placeholder="Filnavn (valgfritt)"
+                          placeholder={t('filenameOptional', 'Filnavn (valgfritt)')}
                           className="w-full px-2 py-1 border rounded mb-2 text-sm"
                         />
                         <textarea
                           value={note.content}
                           onChange={(e) => updateNoteField(index, 'content', e.target.value)}
-                          placeholder="Notatinnhold..."
+                          placeholder={t('noteContentPlaceholder', 'Notatinnhold...')}
                           rows={4}
                           className="w-full px-2 py-1 border rounded font-mono text-xs"
                         />
@@ -354,9 +393,9 @@ export default function OldNotesImporter({ patientId, onClose }) {
 
                   <button
                     onClick={addNoteField}
-                    className="w-full border-2 border-dashed border-gray-300 text-gray-600 py-2 px-4 rounded-lg hover:border-blue-500 hover:text-blue-600"
+                    className="w-full border-2 border-dashed border-gray-300 text-gray-600 dark:text-gray-300 py-2 px-4 rounded-lg hover:border-blue-500 hover:text-blue-600"
                   >
-                    + Legg til nytt notat
+                    {t('addNewNote', '+ Legg til nytt notat')}
                   </button>
 
                   <div className="flex items-center">
@@ -368,7 +407,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                       className="mr-2"
                     />
                     <label htmlFor="processImmediatelyMultiple" className="text-sm text-gray-700">
-                      Prosesser alle notater med AI umiddelbart
+                      {t('processAllWithAi', 'Prosesser alle notater med AI umiddelbart')}
                     </label>
                   </div>
 
@@ -378,8 +417,11 @@ export default function OldNotesImporter({ patientId, onClose }) {
                     className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-medium"
                   >
                     {uploadMultipleMutation.isPending
-                      ? 'Laster opp...'
-                      : `Last opp ${multipleNotes.filter((n) => n.content.trim()).length} notater`}
+                      ? t('uploading2', 'Laster opp...')
+                      : t('uploadNotes', 'Last opp {count} notater').replace(
+                          '{count}',
+                          multipleNotes.filter((n) => n.content.trim()).length
+                        )}
                   </button>
                 </div>
               )}
@@ -387,13 +429,20 @@ export default function OldNotesImporter({ patientId, onClose }) {
 
             {/* Right: Existing Notes List */}
             <div className="space-y-4">
-              <h3 className="font-semibold text-gray-900 text-lg">Importerte notater</h3>
+              <h3 className="font-semibold text-gray-900 text-lg">
+                {t('importedNotes', 'Importerte notater')}
+              </h3>
 
               {loadingNotes ? (
-                <div className="text-center py-8 text-gray-500">Laster...</div>
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  {t('loading2', 'Laster...')}
+                </div>
               ) : existingNotes?.notes?.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  Ingen importerte notater enna. Last opp ditt forste notat for a komme i gang.
+                <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                  {t(
+                    'noImportedNotes',
+                    'Ingen importerte notater ennå. Last opp ditt første notat for å komme i gang.'
+                  )}
                 </div>
               ) : (
                 <div className="space-y-2 max-h-[500px] overflow-y-auto">
@@ -410,7 +459,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                       <div className="flex justify-between items-start mb-2">
                         <div>
                           <div className="font-medium text-sm">{note.original_filename}</div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs text-gray-500 dark:text-gray-400">
                             {new Date(note.upload_date).toLocaleDateString('nb-NO')}
                           </div>
                         </div>
@@ -419,8 +468,9 @@ export default function OldNotesImporter({ patientId, onClose }) {
 
                       {note.ai_confidence_score && (
                         <div className="mt-2">
-                          <div className="text-xs text-gray-600 mb-1">
-                            AI-konfidens: {(note.ai_confidence_score * 100).toFixed(0)}%
+                          <div className="text-xs text-gray-600 dark:text-gray-300 mb-1">
+                            {t('aiConfidence', 'AI-konfidens')}:{' '}
+                            {(note.ai_confidence_score * 100).toFixed(0)}%
                           </div>
                           <div className="w-full bg-gray-200 rounded-full h-2">
                             <div
@@ -432,12 +482,18 @@ export default function OldNotesImporter({ patientId, onClose }) {
                       )}
 
                       {note.approved && (
-                        <div className="mt-2 text-xs text-green-600 font-medium">✓ Godkjent</div>
+                        <div className="mt-2 text-xs text-green-600 font-medium">
+                          ✓ {t('approved', 'Godkjent')}
+                        </div>
                       )}
 
                       {note.converted_to_encounter_id && (
                         <div className="mt-2 text-xs text-purple-600 font-medium">
-                          → Konvertert til journal #{note.converted_to_encounter_id}
+                          →{' '}
+                          {t('convertedToJournal', 'Konvertert til journal #{id}').replace(
+                            '{id}',
+                            note.converted_to_encounter_id
+                          )}
                         </div>
                       )}
 
@@ -450,7 +506,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                             }}
                             className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700"
                           >
-                            Prosesser
+                            {t('processBtn', 'Prosesser')}
                           </button>
                         )}
 
@@ -462,7 +518,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                             }}
                             className="text-xs bg-green-600 text-white px-2 py-1 rounded hover:bg-green-700"
                           >
-                            Godkjenn
+                            {t('approveBtn', 'Godkjenn')}
                           </button>
                         )}
 
@@ -474,7 +530,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                             }}
                             className="text-xs bg-purple-600 text-white px-2 py-1 rounded hover:bg-purple-700"
                           >
-                            Konverter til journal
+                            {t('convertToJournal', 'Konverter til journal')}
                           </button>
                         )}
 
@@ -482,13 +538,13 @@ export default function OldNotesImporter({ patientId, onClose }) {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              toast.info('Vil du slette dette notatet?', {
+                              toast.info(t('confirmDeleteNote', 'Vil du slette dette notatet?'), {
                                 action: {
-                                  label: 'Slett',
+                                  label: t('deleteNote', 'Slett'),
                                   onClick: () => deleteNoteMutation.mutate(note.id),
                                 },
                                 cancel: {
-                                  label: 'Avbryt',
+                                  label: t('cancel', 'Avbryt'),
                                   onClick: () => {},
                                 },
                                 duration: 10000,
@@ -496,7 +552,7 @@ export default function OldNotesImporter({ patientId, onClose }) {
                             }}
                             className="text-xs text-red-600 hover:text-red-800"
                           >
-                            Slett
+                            {t('deleteNote', 'Slett')}
                           </button>
                         )}
                       </div>
@@ -510,12 +566,16 @@ export default function OldNotesImporter({ patientId, onClose }) {
           {/* Selected Note Detail */}
           {selectedNote && (
             <div className="mt-6 border-t pt-6">
-              <h3 className="font-semibold text-gray-900 text-lg mb-4">Notatdetaljer</h3>
+              <h3 className="font-semibold text-gray-900 text-lg mb-4">
+                {t('noteDetails', 'Notatdetaljer')}
+              </h3>
 
               <div className="grid grid-cols-2 gap-6">
                 {/* Original Content */}
                 <div>
-                  <h4 className="font-medium text-gray-700 mb-2">Originalt innhold</h4>
+                  <h4 className="font-medium text-gray-700 mb-2">
+                    {t('originalContent', 'Originalt innhold')}
+                  </h4>
                   <div className="bg-gray-50 p-3 rounded border text-sm font-mono whitespace-pre-wrap max-h-64 overflow-y-auto">
                     {selectedNote.original_content}
                   </div>
@@ -524,7 +584,9 @@ export default function OldNotesImporter({ patientId, onClose }) {
                 {/* AI-Generated SOAP */}
                 {selectedNote.generated_soap && (
                   <div>
-                    <h4 className="font-medium text-gray-700 mb-2">AI-generert SOAP-format</h4>
+                    <h4 className="font-medium text-gray-700 mb-2">
+                      {t('aiGeneratedSoap', 'AI-generert SOAP-format')}
+                    </h4>
                     <div className="bg-green-50 p-3 rounded border text-sm max-h-64 overflow-y-auto space-y-2">
                       {selectedNote.generated_soap.subjective && (
                         <div>

@@ -30,7 +30,7 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
 
   const getComparisonIcon = (current, past) => {
     if (!past) {
-      return <Minus className="w-4 h-4 text-gray-400" />;
+      return <Minus className="w-4 h-4 text-gray-400 dark:text-gray-300" />;
     }
 
     const currentScore = getResultScore(current);
@@ -41,7 +41,7 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
     } else if (currentScore > pastScore) {
       return <TrendingUp className="w-4 h-4 text-green-500" title="Forbedret" />;
     }
-    return <Minus className="w-4 h-4 text-gray-400" title="Uendret" />;
+    return <Minus className="w-4 h-4 text-gray-400 dark:text-gray-300" title="Uendret" />;
   };
 
   const getResultScore = (result) => {
@@ -121,8 +121,8 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
 
       {availableEncounters.length === 0 ? (
         <div className="text-center py-6 bg-gray-50 rounded-lg">
-          <p className="text-sm text-gray-600">Ingen tidligere konsultasjoner</p>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-sm text-gray-600 dark:text-gray-300">Ingen tidligere konsultasjoner</p>
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
             Sammenligningen vil vises når pasienten har flere konsultasjoner
           </p>
         </div>
@@ -163,17 +163,20 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
                 </div>
               </div>
 
-              {comparisons.map((comparison, index) => (
-                <div key={index} className="border border-gray-200 rounded-lg overflow-hidden">
+              {comparisons.map((comparison) => (
+                <div
+                  key={comparison.current.id}
+                  className="border border-gray-200 rounded-lg overflow-hidden"
+                >
                   <button
                     onClick={() => toggleTestExpansion(comparison.current.id)}
                     className="w-full px-3 py-2 hover:bg-gray-50 transition-colors flex items-center justify-between"
                   >
                     <div className="flex items-center gap-2">
                       {expandedTests[comparison.current.id] ? (
-                        <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+                        <ChevronDown className="w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />
                       ) : (
-                        <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
+                        <ChevronRight className="w-3.5 h-3.5 text-gray-400 dark:text-gray-300" />
                       )}
                       <span className="text-xs font-medium text-gray-900 text-left">
                         {comparison.current.test_name}
@@ -183,7 +186,7 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
                     <div className="flex gap-8 items-center">
                       <span
                         className={`text-xs w-16 text-right ${
-                          comparison.past ? 'text-gray-700' : 'text-gray-400'
+                          comparison.past ? 'text-gray-700' : 'text-gray-400 dark:text-gray-300'
                         }`}
                       >
                         {comparison.past ? getResultText(comparison.past.result) : 'N/A'}
@@ -211,12 +214,12 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
                       <div>
                         <p className="font-medium text-gray-700 mb-1">Nå:</p>
                         {comparison.current.findings_text && (
-                          <p className="text-gray-600 bg-white p-2 rounded">
+                          <p className="text-gray-600 dark:text-gray-300 bg-white p-2 rounded">
                             {comparison.current.findings_text}
                           </p>
                         )}
                         {comparison.current.pain_score !== null && (
-                          <p className="text-gray-600 mt-1">
+                          <p className="text-gray-600 dark:text-gray-300 mt-1">
                             <span className="font-medium">Smerte:</span>{' '}
                             {comparison.current.pain_score}/10
                           </p>
@@ -228,12 +231,12 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
                         <div>
                           <p className="font-medium text-gray-700 mb-1">Tidligere:</p>
                           {comparison.past.findings_text && (
-                            <p className="text-gray-600 bg-white p-2 rounded">
+                            <p className="text-gray-600 dark:text-gray-300 bg-white p-2 rounded">
                               {comparison.past.findings_text}
                             </p>
                           )}
                           {comparison.past.pain_score !== null && (
-                            <p className="text-gray-600 mt-1">
+                            <p className="text-gray-600 dark:text-gray-300 mt-1">
                               <span className="font-medium">Smerte:</span>{' '}
                               {comparison.past.pain_score}/10
                             </p>
@@ -265,8 +268,8 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
                   </div>
                   <div className="bg-gray-50 rounded-lg p-3">
                     <div className="flex items-center justify-center gap-1 mb-1">
-                      <Minus className="w-4 h-4 text-gray-600" />
-                      <span className="text-lg font-bold text-gray-600">
+                      <Minus className="w-4 h-4 text-gray-600 dark:text-gray-300" />
+                      <span className="text-lg font-bold text-gray-600 dark:text-gray-300">
                         {
                           comparisons.filter(
                             (c) =>
@@ -300,7 +303,9 @@ export default function ExaminationHistory({ patientId, currentEncounterId }) {
 
           {selectedPastEncounter && comparisons.length === 0 && (
             <div className="text-center py-6 bg-gray-50 rounded-lg">
-              <p className="text-sm text-gray-600">Ingen felles undersøkelser å sammenligne</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
+                Ingen felles undersøkelser å sammenligne
+              </p>
             </div>
           )}
         </>

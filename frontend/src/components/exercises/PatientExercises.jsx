@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { exercisesAPI } from '../../services/api';
 import { useConfirm } from '../ui/ConfirmDialog';
+import { useTranslation } from '../../i18n';
 import {
   Activity,
   Check,
@@ -89,7 +90,7 @@ const ComplianceCalendar = ({ complianceLog, startDate, onLogCompliance }) => {
                   ? 'bg-green-100 text-green-700 border border-green-200'
                   : day.completed === false
                     ? 'bg-red-100 text-red-700 border border-red-200'
-                    : 'bg-slate-100 text-slate-500 hover:bg-slate-200 cursor-pointer'
+                    : 'bg-slate-100 text-slate-500 dark:text-slate-400 hover:bg-slate-200 cursor-pointer'
             }
           `}
           title={day.date}
@@ -128,7 +129,7 @@ const LogComplianceModal = ({ prescription, date, onClose, onSave, isLoading }) 
         <div className="flex items-center justify-between p-4 border-b">
           <div>
             <h2 className="font-semibold">Logg fremgang</h2>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               {prescription.exercise_name} - {date}
             </p>
           </div>
@@ -284,7 +285,7 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
                   className="w-full h-full object-cover rounded-lg"
                 />
               ) : (
-                <Dumbbell className="w-6 h-6 text-slate-400" />
+                <Dumbbell className="w-6 h-6 text-slate-400 dark:text-slate-300" />
               )}
             </div>
             <div>
@@ -295,7 +296,7 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
                 >
                   {STATUS_LABELS[prescription.status]}
                 </span>
-                <span className="text-xs text-slate-500">
+                <span className="text-xs text-slate-500 dark:text-slate-400">
                   {prescription.sets}x{prescription.reps}
                   {prescription.hold_seconds && ` | Hold: ${prescription.hold_seconds}s`}
                 </span>
@@ -309,7 +310,7 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
               onClick={() => setShowMenu(!showMenu)}
               className="p-1.5 rounded hover:bg-slate-100"
             >
-              <MoreVertical className="w-4 h-4 text-slate-400" />
+              <MoreVertical className="w-4 h-4 text-slate-400 dark:text-slate-300" />
             </button>
             {showMenu && (
               <div className="absolute right-0 top-full mt-1 w-48 bg-white rounded-lg shadow-lg border z-10">
@@ -358,17 +359,17 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
             <span className="text-2xl font-bold text-slate-800">
               {Math.round(compliancePercent)}%
             </span>
-            <p className="text-xs text-slate-500">Etterlevelse</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Etterlevelse</p>
           </div>
           <div className="text-center">
             <span className="text-2xl font-bold text-slate-800">{daysActive}</span>
-            <p className="text-xs text-slate-500">Dager aktiv</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Dager aktiv</p>
           </div>
           <div className="text-center">
             <span className="text-2xl font-bold text-slate-800">
               {FREQUENCY_LABELS[prescription.frequency] || prescription.frequency}
             </span>
-            <p className="text-xs text-slate-500">Frekvens</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Frekvens</p>
           </div>
         </div>
 
@@ -376,7 +377,9 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
         {prescription.status === 'active' && (
           <div className="mt-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs font-medium text-slate-600">Siste 14 dager</span>
+              <span className="text-xs font-medium text-slate-600 dark:text-slate-300">
+                Siste 14 dager
+              </span>
               <button
                 onClick={() =>
                   onLogCompliance(prescription, new Date().toISOString().split('T')[0])
@@ -399,7 +402,7 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
       {/* Expandable details */}
       <button
         onClick={() => setExpanded(!expanded)}
-        className="w-full px-4 py-2 bg-slate-50 border-t flex items-center justify-center gap-1 text-sm text-slate-500 hover:bg-slate-100"
+        className="w-full px-4 py-2 bg-slate-50 border-t flex items-center justify-center gap-1 text-sm text-slate-500 dark:text-slate-400 hover:bg-slate-100"
       >
         {expanded ? (
           <>
@@ -419,13 +422,17 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
           {prescription.exercise_instructions && (
             <div className="mt-3">
               <h4 className="text-sm font-medium text-slate-700 mb-1">Instruksjoner</h4>
-              <p className="text-sm text-slate-600">{prescription.exercise_instructions}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                {prescription.exercise_instructions}
+              </p>
             </div>
           )}
           {prescription.custom_instructions && (
             <div className="mt-3">
               <h4 className="text-sm font-medium text-slate-700 mb-1">Tilpassede instruksjoner</h4>
-              <p className="text-sm text-slate-600">{prescription.custom_instructions}</p>
+              <p className="text-sm text-slate-600 dark:text-slate-300">
+                {prescription.custom_instructions}
+              </p>
             </div>
           )}
           {prescription.video_url && (
@@ -453,11 +460,17 @@ const PrescriptionCard = ({ prescription, onLogCompliance, onDiscontinue, onComp
 export const PatientExercises = ({ patientId, patientName }) => {
   const queryClient = useQueryClient();
   const confirm = useConfirm();
+  const { t } = useTranslation('exercises');
 
   // State
   const [statusFilter, setStatusFilter] = useState('active');
   const [loggingCompliance, setLoggingCompliance] = useState(null);
   const [_editingPrescription, setEditingPrescription] = useState(null);
+  const [discontinueModal, setDiscontinueModal] = useState({
+    open: false,
+    prescription: null,
+    reason: '',
+  });
 
   // Fetch patient exercises
   const { data: exercisesData, isLoading } = useQuery({
@@ -504,22 +517,27 @@ export const PatientExercises = ({ patientId, patientName }) => {
     setLoggingCompliance({ prescription, date });
   };
 
-  const handleDiscontinue = async (prescription) => {
-    const reason = window.prompt('Årsak til avbrudd (valgfritt):');
-    if (reason !== null) {
-      discontinueMutation.mutate({
-        prescriptionId: prescription.id,
-        reason: reason || 'Avbrutt av behandler',
-      });
-    }
+  const handleDiscontinue = (prescription) => {
+    setDiscontinueModal({ open: true, prescription, reason: '' });
+  };
+
+  const handleDiscontinueConfirm = () => {
+    discontinueMutation.mutate({
+      prescriptionId: discontinueModal.prescription.id,
+      reason: discontinueModal.reason.trim() || t('discontinuedByProvider', 'Avbrutt av behandler'),
+    });
+    setDiscontinueModal({ open: false, prescription: null, reason: '' });
   };
 
   const handleComplete = async (prescription) => {
     const ok = await confirm({
-      title: 'Fullfør øvelse',
-      description: `Merk "${prescription.exercise_name}" som fullført?`,
+      title: t('completeExercise', 'Fullfør øvelse'),
+      description: t(
+        'completeExerciseConfirm',
+        `Merk "${prescription.exercise_name}" som fullført?`
+      ).replace('{name}', prescription.exercise_name),
       variant: 'warning',
-      confirmText: 'Fullfør',
+      confirmText: t('completeBtn', 'Fullfør'),
     });
     if (ok) {
       completeMutation.mutate(prescription.id);
@@ -532,17 +550,21 @@ export const PatientExercises = ({ patientId, patientName }) => {
       <div className="p-6 border-b bg-white">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">Øvelsesprogram</h1>
-            {patientName && <p className="text-sm text-slate-500 mt-1">{patientName}</p>}
+            <h1 className="text-2xl font-bold text-slate-800">
+              {t('exerciseProgram', 'Øvelsesprogram')}
+            </h1>
+            {patientName && (
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">{patientName}</p>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <button className="px-4 py-2 text-sm font-medium text-slate-700 border rounded-lg hover:bg-slate-50 flex items-center gap-2">
               <Printer className="w-4 h-4" />
-              Skriv ut
+              {t('printBtn', 'Skriv ut')}
             </button>
             <button className="px-4 py-2 text-sm font-medium text-slate-700 border rounded-lg hover:bg-slate-50 flex items-center gap-2">
               <Mail className="w-4 h-4" />
-              Send til pasient
+              {t('sendToPatient', 'Send til pasient')}
             </button>
           </div>
         </div>
@@ -551,7 +573,7 @@ export const PatientExercises = ({ patientId, patientName }) => {
         <div className="grid grid-cols-4 gap-4 mb-4">
           <div className="p-4 bg-green-50 rounded-lg">
             <span className="text-2xl font-bold text-green-700">{activeCount}</span>
-            <p className="text-sm text-green-600">Aktive øvelser</p>
+            <p className="text-sm text-green-600">{t('activeExercises', 'Aktive øvelser')}</p>
           </div>
           <div className="p-4 bg-blue-50 rounded-lg">
             <span className="text-2xl font-bold text-blue-700">
@@ -563,17 +585,19 @@ export const PatientExercises = ({ patientId, patientName }) => {
                 : 0}
               %
             </span>
-            <p className="text-sm text-blue-600">Gj.snitt etterlevelse</p>
+            <p className="text-sm text-blue-600">{t('avgCompliance', 'Gj.snitt etterlevelse')}</p>
           </div>
           <div className="p-4 bg-purple-50 rounded-lg">
             <span className="text-2xl font-bold text-purple-700">
               {prescriptions.filter((p) => p.status === 'completed').length}
             </span>
-            <p className="text-sm text-purple-600">Fullførte</p>
+            <p className="text-sm text-purple-600">{t('completedLabel', 'Fullførte')}</p>
           </div>
           <div className="p-4 bg-slate-50 rounded-lg">
             <span className="text-2xl font-bold text-slate-700">{prescriptions.length}</span>
-            <p className="text-sm text-slate-600">Totalt foreskrevet</p>
+            <p className="text-sm text-slate-600 dark:text-slate-300">
+              {t('totalPrescribed', 'Totalt foreskrevet')}
+            </p>
           </div>
         </div>
 
@@ -586,10 +610,10 @@ export const PatientExercises = ({ patientId, patientName }) => {
               className={`px-4 py-1.5 text-sm rounded-lg transition-colors ${
                 statusFilter === status
                   ? 'bg-purple-100 text-purple-700 font-medium'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
               }`}
             >
-              {status === 'all' ? 'Alle' : STATUS_LABELS[status]}
+              {status === 'all' ? t('all', 'Alle') : STATUS_LABELS[status]}
             </button>
           ))}
         </div>
@@ -599,16 +623,18 @@ export const PatientExercises = ({ patientId, patientName }) => {
       <div className="flex-1 overflow-y-auto p-6 bg-slate-50">
         {isLoading ? (
           <div className="flex items-center justify-center h-64">
-            <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+            <Loader2 className="w-8 h-8 animate-spin text-slate-400 dark:text-slate-300" />
           </div>
         ) : prescriptions.length === 0 ? (
           <div className="text-center py-16">
             <Activity className="w-16 h-16 mx-auto text-slate-300 mb-4" />
-            <h3 className="text-lg font-medium text-slate-600">Ingen øvelser</h3>
-            <p className="text-sm text-slate-400 mt-1">
+            <h3 className="text-lg font-medium text-slate-600 dark:text-slate-300">
+              {t('noExercisesLabel', 'Ingen øvelser')}
+            </h3>
+            <p className="text-sm text-slate-400 dark:text-slate-300 mt-1">
               {statusFilter === 'active'
-                ? 'Pasienten har ingen aktive øvelser'
-                : 'Ingen øvelser matcher filteret'}
+                ? t('patientNoActiveExercises', 'Pasienten har ingen aktive øvelser')
+                : t('noExercisesMatchFilter', 'Ingen øvelser matcher filteret')}
             </p>
           </div>
         ) : (
@@ -641,6 +667,48 @@ export const PatientExercises = ({ patientId, patientName }) => {
           }
           isLoading={logComplianceMutation.isPending}
         />
+      )}
+
+      {/* Discontinue exercise modal */}
+      {discontinueModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold text-slate-800 mb-2">
+              {t('discontinueTitle', 'Avbryt øvelse')}
+            </h2>
+            {discontinueModal.prescription && (
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                {discontinueModal.prescription.exercise_name}
+              </p>
+            )}
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              {t('discontinueReason', 'Årsak til avbrudd (valgfritt):')}
+            </label>
+            <textarea
+              value={discontinueModal.reason}
+              onChange={(e) => setDiscontinueModal({ ...discontinueModal, reason: e.target.value })}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 resize-none"
+              rows={3}
+              placeholder={t('discontinueReasonPlaceholder', 'Valgfritt: skriv inn årsak...')}
+              autoFocus
+            />
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => setDiscontinueModal({ open: false, prescription: null, reason: '' })}
+                className="px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 rounded-lg"
+              >
+                {t('cancelBtn', 'Avbryt')}
+              </button>
+              <button
+                onClick={handleDiscontinueConfirm}
+                disabled={discontinueMutation.isPending}
+                className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {t('discontinueConfirmBtn', 'Avbryt øvelse')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

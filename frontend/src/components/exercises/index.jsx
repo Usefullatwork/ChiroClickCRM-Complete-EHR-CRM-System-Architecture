@@ -6,6 +6,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { exercisesAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 import {
   Search,
   Filter,
@@ -86,7 +87,7 @@ const ExerciseCard = ({ exercise, onSelect, isSelected, compact = false }) => {
               className="w-full h-full object-cover"
             />
           ) : (
-            <Dumbbell className="w-5 h-5 text-slate-400" />
+            <Dumbbell className="w-5 h-5 text-slate-400 dark:text-slate-300" />
           )}
         </div>
 
@@ -96,7 +97,7 @@ const ExerciseCard = ({ exercise, onSelect, isSelected, compact = false }) => {
             <div>
               <h4 className="font-medium text-sm text-slate-800 truncate">{exercise.name_no}</h4>
               <div className="flex items-center gap-2 mt-0.5">
-                <span className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-600">
+                <span className="text-xs px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 dark:text-slate-300">
                   {BODY_REGION_LABELS[exercise.body_region] || exercise.body_region}
                 </span>
                 <span className="text-xs px-1.5 py-0.5 rounded bg-purple-100 text-purple-600">
@@ -109,7 +110,7 @@ const ExerciseCard = ({ exercise, onSelect, isSelected, compact = false }) => {
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setShowDetails(!showDetails)}
-                className="p-1 rounded hover:bg-slate-100 text-slate-400"
+                className="p-1 rounded hover:bg-slate-100 text-slate-400 dark:text-slate-300"
                 title="Vis detaljer"
               >
                 <Info className="w-4 h-4" />
@@ -119,7 +120,7 @@ const ExerciseCard = ({ exercise, onSelect, isSelected, compact = false }) => {
                 className={`p-1.5 rounded ${
                   isSelected
                     ? 'bg-green-500 text-white'
-                    : 'bg-slate-100 text-slate-600 hover:bg-green-100 hover:text-green-600'
+                    : 'bg-slate-100 text-slate-600 dark:text-slate-300 hover:bg-green-100 hover:text-green-600'
                 }`}
                 title={isSelected ? 'Valgt' : 'Legg til'}
               >
@@ -130,7 +131,7 @@ const ExerciseCard = ({ exercise, onSelect, isSelected, compact = false }) => {
 
           {/* Default dosing */}
           {!compact && (
-            <div className="mt-1.5 flex items-center gap-3 text-xs text-slate-500">
+            <div className="mt-1.5 flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
               <span>
                 {exercise.default_sets || 3}x{exercise.default_reps || 10}
               </span>
@@ -146,7 +147,9 @@ const ExerciseCard = ({ exercise, onSelect, isSelected, compact = false }) => {
       {/* Expanded details */}
       {showDetails && (
         <div className="mt-3 pt-3 border-t border-slate-100">
-          <p className="text-xs text-slate-600 leading-relaxed">{exercise.instructions_no}</p>
+          <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            {exercise.instructions_no}
+          </p>
           {exercise.contraindications && (
             <div className="mt-2 p-2 bg-red-50 rounded text-xs text-red-700">
               <strong>Kontraindikasjoner:</strong> {exercise.contraindications}
@@ -212,7 +215,7 @@ const SelectedExerciseItem = ({ exercise, onRemove, onUpdate, readOnly = false }
             max="10"
             disabled={readOnly}
           />
-          <span className="text-slate-500">x</span>
+          <span className="text-slate-500 dark:text-slate-400">x</span>
           <input
             type="number"
             value={reps}
@@ -262,6 +265,7 @@ export const ExercisePanel = ({
   className = '',
   ...props
 }) => {
+  const { t } = useTranslation('exercises');
   const queryClient = useQueryClient();
 
   // State
@@ -428,7 +432,7 @@ export const ExercisePanel = ({
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'library'
                 ? 'border-green-500 text-green-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700'
             }`}
           >
             Bibliotek
@@ -438,7 +442,7 @@ export const ExercisePanel = ({
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'favorites'
                 ? 'border-green-500 text-green-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700'
             }`}
           >
             <Star className="w-3.5 h-3.5 inline mr-1" />
@@ -449,7 +453,7 @@ export const ExercisePanel = ({
             className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'programs'
                 ? 'border-green-500 text-green-600'
-                : 'border-transparent text-slate-500 hover:text-slate-700'
+                : 'border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700'
             }`}
           >
             Programmer
@@ -462,10 +466,10 @@ export const ExercisePanel = ({
         <div className="p-3 border-b border-slate-100">
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-300" />
               <input
                 type="text"
-                placeholder="Søk øvelser..."
+                placeholder={t('searchExercisesPlaceholder', 'Søk øvelser...')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-8 pr-3 py-1.5 text-sm border border-slate-200 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -476,7 +480,7 @@ export const ExercisePanel = ({
               className={`p-1.5 rounded-lg border transition-colors ${
                 showFilters || selectedCategory || selectedBodyRegion
                   ? 'border-green-500 bg-green-50 text-green-600'
-                  : 'border-slate-200 text-slate-500 hover:bg-slate-50'
+                  : 'border-slate-200 text-slate-500 dark:text-slate-400 hover:bg-slate-50'
               }`}
             >
               <Filter className="w-4 h-4" />
@@ -521,10 +525,12 @@ export const ExercisePanel = ({
           <div className="p-3 space-y-2">
             {loadingExercises ? (
               <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
+                <Loader2 className="w-5 h-5 animate-spin text-slate-400 dark:text-slate-300" />
               </div>
             ) : exercises.length === 0 ? (
-              <div className="text-center py-6 text-slate-500 text-sm">Ingen øvelser funnet</div>
+              <div className="text-center py-6 text-slate-500 dark:text-slate-400 text-sm">
+                Ingen øvelser funnet
+              </div>
             ) : (
               exercises.map((exercise) => (
                 <ExerciseCard
@@ -542,7 +548,7 @@ export const ExercisePanel = ({
         {activeTab === 'favorites' && (
           <div className="p-3 space-y-2">
             {favorites.length === 0 ? (
-              <div className="text-center py-6 text-slate-500 text-sm">
+              <div className="text-center py-6 text-slate-500 dark:text-slate-400 text-sm">
                 <Star className="w-8 h-8 mx-auto mb-2 text-slate-300" />
                 <p>Ingen favoritter ennå</p>
                 <p className="text-xs mt-1">Øvelser du bruker ofte vil vises her</p>
@@ -564,7 +570,7 @@ export const ExercisePanel = ({
         {activeTab === 'programs' && (
           <div className="p-3 space-y-2">
             {programs.length === 0 ? (
-              <div className="text-center py-6 text-slate-500 text-sm">
+              <div className="text-center py-6 text-slate-500 dark:text-slate-400 text-sm">
                 Ingen programmer tilgjengelig
               </div>
             ) : (
@@ -577,11 +583,11 @@ export const ExercisePanel = ({
                     <div>
                       <h4 className="font-medium text-sm text-slate-800">{program.name_no}</h4>
                       {program.description_no && (
-                        <p className="text-xs text-slate-500 mt-0.5 line-clamp-2">
+                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5 line-clamp-2">
                           {program.description_no}
                         </p>
                       )}
-                      <div className="mt-1 flex items-center gap-2 text-xs text-slate-400">
+                      <div className="mt-1 flex items-center gap-2 text-xs text-slate-400 dark:text-slate-300">
                         <span>{program.exercise_count || 0} øvelser</span>
                         <span>{program.duration_weeks || 6} uker</span>
                       </div>
@@ -609,7 +615,7 @@ export const ExercisePanel = ({
             </span>
             <button
               onClick={() => setSelectedExercises([])}
-              className="text-xs text-slate-500 hover:text-slate-700"
+              className="text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700"
             >
               Fjern alle
             </button>
@@ -652,12 +658,12 @@ export const ExercisePanel = ({
       {patientExercises.length > 0 && !compact && (
         <div className="border-t border-slate-200 p-3 bg-slate-50">
           <div className="flex items-center gap-2 mb-2">
-            <Clock className="w-4 h-4 text-slate-400" />
-            <span className="text-sm font-medium text-slate-600">
+            <Clock className="w-4 h-4 text-slate-400 dark:text-slate-300" />
+            <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
               Aktive øvelser ({patientExercises.length})
             </span>
           </div>
-          <div className="space-y-1 text-xs text-slate-500">
+          <div className="space-y-1 text-xs text-slate-500 dark:text-slate-400">
             {patientExercises.slice(0, 3).map((prescription) => (
               <div key={prescription.id} className="flex items-center justify-between">
                 <span className="truncate">{prescription.exercise_name}</span>
@@ -667,7 +673,9 @@ export const ExercisePanel = ({
               </div>
             ))}
             {patientExercises.length > 3 && (
-              <span className="text-slate-400">+ {patientExercises.length - 3} flere...</span>
+              <span className="text-slate-400 dark:text-slate-300">
+                + {patientExercises.length - 3} flere...
+              </span>
             )}
           </div>
         </div>

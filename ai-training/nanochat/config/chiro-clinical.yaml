@@ -1,0 +1,77 @@
+# nanochat Training Config — ChiroClickEHR Clinical Model
+# RTX 4070 (12GB VRAM) optimized
+#
+# Base: Qwen2.5-7B-Instruct (same as v6)
+# Pipeline: SFT → DPO (two-stage)
+#
+# Usage:
+#   python -m nanochat.train --config ai-training/nanochat/config/chiro-clinical.yaml
+
+# ── Model ──────────────────────────────────────
+model:
+  name: Qwen/Qwen2.5-7B-Instruct
+  dtype: bfloat16
+  load_in_4bit: true # QLoRA for 12GB VRAM
+
+# ── LoRA Config ────────────────────────────────
+lora:
+  r: 64
+  alpha: 128
+  dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+# ── SFT Stage ──────────────────────────────────
+sft:
+  dataset: ai-training/nanochat/data/sft_train.jsonl
+  val_dataset: ai-training/nanochat/data/sft_val.jsonl
+  max_seq_length: 4096
+  num_epochs: 3
+  batch_size: 2 # RTX 4070: batch=2 fits in 12GB
+  gradient_accumulation: 4 # Effective batch = 8
+  learning_rate: 2.0e-4
+  warmup_ratio: 0.03
+  weight_decay: 0.01
+  lr_scheduler: cosine
+  save_steps: 100
+  eval_steps: 50
+  logging_steps: 10
+  output_dir: ai-training/nanochat/checkpoints/sft
+
+# ── DPO Stage ──────────────────────────────────
+dpo:
+  dataset: ai-training/nanochat/data/dpo_train.jsonl
+  val_dataset: ai-training/nanochat/data/dpo_val.jsonl
+  max_seq_length: 4096
+  num_epochs: 1
+  batch_size: 1 # DPO needs more VRAM (paired samples)
+  gradient_accumulation: 8 # Effective batch = 8
+  learning_rate: 5.0e-5
+  beta: 0.1 # DPO temperature
+  warmup_ratio: 0.1
+  weight_decay: 0.01
+  lr_scheduler: cosine
+  save_steps: 50
+  eval_steps: 25
+  logging_steps: 5
+  output_dir: ai-training/nanochat/checkpoints/dpo
+
+# ── GGUF Export ────────────────────────────────
+export:
+  format: gguf
+  quantization: Q8_0 # Match v6 quality
+  output_dir: ai-training/nanochat/models
+  model_name: chiro-no-nanochat-v1
+
+# ── Hardware ───────────────────────────────────
+hardware:
+  gpu: RTX 4070
+  vram: 12GB
+  max_memory: "11.5GiB" # Leave headroom
+  torch_compile: false # Stability over speed

@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useRef, useMemo } from 'react';
+import { useTranslation } from '../i18n';
 import useEncounterStore, { selectEncounterData } from '../stores/encounterStore';
 import {
   checkCompleteness,
@@ -21,6 +22,7 @@ import {
  * @returns {{ quality: 'green'|'yellow'|'red', score: number, warnings: string[], suggestions: string[], sectionScores: object, redFlags: object }}
  */
 export function useNoteQuality({ debounceMs = 500, enabled = true } = {}) {
+  const { t } = useTranslation('clinical');
   const encounterData = useEncounterStore(selectEncounterData);
   const [result, setResult] = useState({
     quality: 'red',
@@ -57,7 +59,7 @@ export function useNoteQuality({ debounceMs = 500, enabled = true } = {}) {
       const suggestions = generateSuggestions(completeness, encounterData.encounter_type);
 
       const warnings = [
-        ...completeness.missing,
+        ...completeness.missing.map((key) => t(key, key)),
         ...(redFlags.found
           ? redFlags.flags.map(
               (f) =>
@@ -70,7 +72,7 @@ export function useNoteQuality({ debounceMs = 500, enabled = true } = {}) {
         quality,
         score: completeness.score,
         warnings,
-        suggestions,
+        suggestions: suggestions.map((key) => t(key, key)),
         sectionScores: completeness.sectionScores,
         redFlags,
       });

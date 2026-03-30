@@ -5,6 +5,7 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Alert } from '../ui/Alert';
 import { useSendKPIReport } from '../../hooks/useAnalytics';
+import { useTranslation } from '../../i18n';
 
 /**
  * Email Report Modal Component
@@ -13,8 +14,9 @@ import { useSendKPIReport } from '../../hooks/useAnalytics';
  * Generates formatted HTML email with KPI metrics
  */
 export const EmailReportModal = ({ isOpen, onClose, kpiData, dateRange, timeRange }) => {
+  const { t } = useTranslation('analytics');
   const [recipients, setRecipients] = useState('');
-  const [subject, setSubject] = useState(`ChiroClick KPI Report - ${dateRange}`);
+  const [subject, setSubject] = useState(`ChiroClick EHR KPI Report - ${dateRange}`);
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState({});
 
@@ -122,7 +124,9 @@ ${message ? `\nAdditional Notes:\n${message}` : ''}
               placeholder="email1@example.com, email2@example.com"
               error={errors.recipients}
             />
-            <p className="text-xs text-slate-500 mt-1">Separate multiple emails with commas</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+              Separate multiple emails with commas
+            </p>
           </div>
 
           {/* Subject */}
@@ -149,7 +153,10 @@ ${message ? `\nAdditional Notes:\n${message}` : ''}
               rows={4}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              placeholder="Add any additional notes or context for the recipients..."
+              placeholder={t(
+                'additionalNotesContextPlaceholder',
+                'Add any additional notes or context for the recipients...'
+              )}
             />
           </div>
 

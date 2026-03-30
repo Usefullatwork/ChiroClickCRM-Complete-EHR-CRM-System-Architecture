@@ -25,6 +25,7 @@ import {
 import { patientApi, getStoredToken, clearStoredToken } from '../../api/patientApi';
 import VimeoPlayer from '../../components/exercises/VimeoPlayer';
 
+import { useTranslation } from '../../i18n';
 import logger from '../../utils/logger';
 const ExerciseDetail = () => {
   const navigate = useNavigate();
@@ -48,6 +49,8 @@ const ExerciseDetail = () => {
     painRating: 0,
     notes: '',
   });
+
+  const { t } = useTranslation('portal');
 
   // Get token
   const token = searchParams.get('token') || getStoredToken();
@@ -85,7 +88,7 @@ const ExerciseDetail = () => {
         navigate('/portal/login');
         return;
       }
-      setError(err.message || 'Kunne ikke laste øvelsen');
+      setError(err.message || t('couldNotLoadExercise', 'Kunne ikke laste øvelsen'));
     } finally {
       setLoading(false);
     }
@@ -110,7 +113,7 @@ const ExerciseDetail = () => {
       }
     } catch (err) {
       logger.error('Error recording progress:', err);
-      setError(err.message || 'Kunne ikke registrere fremgang');
+      setError(err.message || t('couldNotRecordProgress', 'Kunne ikke registrere fremgang'));
     } finally {
       setSubmitting(false);
     }
@@ -139,11 +142,11 @@ const ExerciseDetail = () => {
   const getDifficultyLabel = (level) => {
     switch (level) {
       case 'beginner':
-        return 'Nybegynner';
+        return t('difficultyBeginner', 'Nybegynner');
       case 'intermediate':
-        return 'Middels';
+        return t('difficultyIntermediate', 'Middels');
       case 'advanced':
-        return 'Avansert';
+        return t('difficultyAdvanced', 'Avansert');
       default:
         return level;
     }
@@ -155,7 +158,9 @@ const ExerciseDetail = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Laster ovelse...</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            {t('loadingExercises', 'Laster øvelse...')}
+          </p>
         </div>
       </div>
     );
@@ -169,13 +174,15 @@ const ExerciseDetail = () => {
           <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <AlertTriangle className="w-8 h-8 text-red-600" />
           </div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Kunne ikke laste øvelsen</h1>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <h1 className="text-xl font-semibold text-gray-900 mb-2">
+            {t('couldNotLoadExercise', 'Kunne ikke laste øvelsen')}
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300 mb-6">{error}</p>
           <button
             onClick={handleBack}
             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
-            Tilbake til øvelser
+            {t('backToExercises', 'Tilbake til øvelser')}
           </button>
         </div>
       </div>
@@ -192,13 +199,15 @@ const ExerciseDetail = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={handleBack}
-              className="p-2 -ml-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 -ml-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
             </button>
             <div className="flex-1 min-w-0">
-              <h1 className="font-semibold text-gray-900 truncate">{exercise?.name || 'Ovelse'}</h1>
-              <p className="text-sm text-gray-500">{data?.clinic?.name}</p>
+              <h1 className="font-semibold text-gray-900 truncate">
+                {exercise?.name || t('exercise', 'Øvelse')}
+              </h1>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{data?.clinic?.name}</p>
             </div>
           </div>
         </div>
@@ -231,7 +240,7 @@ const ExerciseDetail = () => {
                   </div>
                 </div>
                 <p className="absolute bottom-4 left-4 text-white text-sm font-medium">
-                  Trykk for å se video
+                  {t('tapToWatchVideo', 'Trykk for å se video')}
                 </p>
               </div>
             </>
@@ -267,32 +276,37 @@ const ExerciseDetail = () => {
             {exercise?.completedToday && (
               <span className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
                 <Check className="w-3 h-3" />
-                Fullført i dag
+                {t('completedToday', 'Fullført i dag')}
               </span>
             )}
           </div>
 
           {/* Parameters */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600">
+          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
             {exercise?.sets && (
               <span className="flex items-center gap-1">
-                <Target className="w-4 h-4 text-gray-400" />
-                {exercise.sets} sett
+                <Target className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+                {exercise.sets} {t('sets', 'sett')}
               </span>
             )}
             {exercise?.reps && (
               <span className="flex items-center gap-1">
-                <Activity className="w-4 h-4 text-gray-400" />
-                {exercise.reps} rep
+                <Activity className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+                {exercise.reps} {t('reps', 'rep')}
               </span>
             )}
             {exercise?.holdSeconds > 0 && (
               <span className="flex items-center gap-1">
-                <Clock className="w-4 h-4 text-gray-400" />
-                Hold {exercise.holdSeconds} sek
+                <Clock className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+                {t('hold', 'Hold')} {exercise.holdSeconds} {t('seconds', 'sek')}
               </span>
             )}
-            {exercise?.frequencyPerDay && <span>{exercise.frequencyPerDay}x daglig</span>}
+            {exercise?.frequencyPerDay && (
+              <span>
+                {exercise.frequencyPerDay}
+                {t('timesDaily', '× daglig')}
+              </span>
+            )}
           </div>
         </div>
 
@@ -301,7 +315,9 @@ const ExerciseDetail = () => {
           {/* Custom Instructions */}
           {exercise?.customInstructions && (
             <div className="p-4 bg-blue-50 rounded-xl">
-              <h3 className="text-sm font-medium text-blue-900 mb-2">Spesielle instruksjoner</h3>
+              <h3 className="text-sm font-medium text-blue-900 mb-2">
+                {t('specialInstructions', 'Spesielle instruksjoner')}
+              </h3>
               <p className="text-sm text-blue-800 whitespace-pre-line">
                 {exercise.customInstructions}
               </p>
@@ -311,16 +327,24 @@ const ExerciseDetail = () => {
           {/* Instructions */}
           {exercise?.instructions && (
             <div className="bg-white rounded-xl p-4 shadow-sm">
-              <h3 className="font-medium text-gray-900 mb-2">Instruksjoner</h3>
-              <p className="text-sm text-gray-600 whitespace-pre-line">{exercise.instructions}</p>
+              <h3 className="font-medium text-gray-900 mb-2">
+                {t('instructions', 'Instruksjoner')}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">
+                {exercise.instructions}
+              </p>
             </div>
           )}
 
           {/* Description */}
           {exercise?.description && (
             <div className="bg-white rounded-xl p-4 shadow-sm">
-              <h3 className="font-medium text-gray-900 mb-2">Beskrivelse</h3>
-              <p className="text-sm text-gray-600 whitespace-pre-line">{exercise.description}</p>
+              <h3 className="font-medium text-gray-900 mb-2">
+                {t('descriptionLabel', 'Beskrivelse')}
+              </h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-line">
+                {exercise.description}
+              </p>
             </div>
           )}
 
@@ -330,7 +354,9 @@ const ExerciseDetail = () => {
               <div className="flex items-start gap-2">
                 <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-medium text-yellow-800 mb-1">Forsiktighetsregler</h3>
+                  <h3 className="font-medium text-yellow-800 mb-1">
+                    {t('precautions', 'Forsiktighetsregler')}
+                  </h3>
                   <ul className="text-sm text-yellow-700 space-y-1">
                     {exercise.precautions.map((p, i) => (
                       <li key={i}>- {p}</li>
@@ -347,7 +373,9 @@ const ExerciseDetail = () => {
               <div className="flex items-start gap-2">
                 <AlertTriangle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-medium text-red-800 mb-1">Kontraindikasjoner</h3>
+                  <h3 className="font-medium text-red-800 mb-1">
+                    {t('contraindicationsLabel', 'Kontraindikasjoner')}
+                  </h3>
                   <ul className="text-sm text-red-700 space-y-1">
                     {exercise.contraindications.map((c, i) => (
                       <li key={i}>- {c}</li>
@@ -366,23 +394,27 @@ const ExerciseDetail = () => {
                 className="w-full flex items-center justify-between p-4"
               >
                 <div className="flex items-center gap-2">
-                  <History className="w-5 h-5 text-gray-400" />
-                  <span className="font-medium text-gray-900">Fremgangshistorikk</span>
-                  <span className="text-sm text-gray-500">({exercise.progressHistory.length})</span>
+                  <History className="w-5 h-5 text-gray-400 dark:text-gray-300" />
+                  <span className="font-medium text-gray-900">
+                    {t('progressHistory', 'Fremgangshistorikk')}
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    ({exercise.progressHistory.length})
+                  </span>
                 </div>
                 {showHistory ? (
-                  <ChevronUp className="w-5 h-5 text-gray-400" />
+                  <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                 ) : (
-                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                  <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
                 )}
               </button>
 
               {showHistory && (
                 <div className="border-t border-gray-100 divide-y divide-gray-100">
-                  {exercise.progressHistory.map((entry, index) => (
-                    <div key={index} className="p-4">
+                  {exercise.progressHistory.map((entry) => (
+                    <div key={entry.completedAt || entry.id} className="p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-gray-500 dark:text-gray-400">
                           {new Date(entry.completedAt).toLocaleDateString('nb-NO', {
                             day: 'numeric',
                             month: 'short',
@@ -403,15 +435,27 @@ const ExerciseDetail = () => {
                           ))}
                         </div>
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        {entry.setsCompleted && <span>{entry.setsCompleted} sett</span>}
-                        {entry.repsCompleted && <span>{entry.repsCompleted} rep</span>}
+                      <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-300">
+                        {entry.setsCompleted && (
+                          <span>
+                            {entry.setsCompleted} {t('sets', 'sett')}
+                          </span>
+                        )}
+                        {entry.repsCompleted && (
+                          <span>
+                            {entry.repsCompleted} {t('reps', 'rep')}
+                          </span>
+                        )}
                         {entry.painRating > 0 && (
-                          <span className="text-orange-600">Smerte: {entry.painRating}/10</span>
+                          <span className="text-orange-600">
+                            {t('painLabel', 'Smerte')}: {entry.painRating}/10
+                          </span>
                         )}
                       </div>
                       {entry.notes && (
-                        <p className="text-sm text-gray-500 mt-2 italic">{entry.notes}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 italic">
+                          {entry.notes}
+                        </p>
                       )}
                     </div>
                   ))}
@@ -430,7 +474,7 @@ const ExerciseDetail = () => {
                 className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-100 text-gray-700 rounded-xl font-medium hover:bg-gray-200 transition-colors"
               >
                 <Play className="w-5 h-5" />
-                Se video
+                {t('watchVideo', 'Se video')}
               </button>
             )}
             <button
@@ -444,12 +488,12 @@ const ExerciseDetail = () => {
               {exercise?.completedToday ? (
                 <>
                   <Check className="w-5 h-5" />
-                  Fullført
+                  {t('completedToday', 'Fullført')}
                 </>
               ) : (
                 <>
                   <Check className="w-5 h-5" />
-                  Marker fullført
+                  {t('markAsComplete', 'Marker fullført')}
                 </>
               )}
             </button>
@@ -457,15 +501,15 @@ const ExerciseDetail = () => {
         </div>
 
         {/* Contact Footer */}
-        <div className="p-4 text-center text-sm text-gray-500 pb-24">
-          <p>Stopp øvelsen hvis du opplever økt smerte.</p>
+        <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400 pb-24">
+          <p>{t('stopExercisesWarning', 'Stopp øvelsen hvis du opplever økt smerte.')}</p>
           {data?.clinic?.phone && (
             <a
               href={`tel:${data.clinic.phone}`}
               className="flex items-center justify-center gap-2 mt-2 text-blue-600 hover:underline"
             >
               <Phone className="w-4 h-4" />
-              Kontakt klinikken: {data.clinic.phone}
+              {t('contactClinicPhone', 'Kontakt klinikken')}: {data.clinic.phone}
             </a>
           )}
         </div>
@@ -486,7 +530,9 @@ const ExerciseDetail = () => {
           <div className="bg-white w-full sm:max-w-md sm:rounded-xl rounded-t-xl max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="sticky top-0 bg-white flex items-center justify-between p-4 border-b border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900">Registrer fremgang</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t('registerProgress', 'Registrer fremgang')}
+              </h3>
               <button
                 onClick={() => setShowFeedbackModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg"
@@ -497,13 +543,13 @@ const ExerciseDetail = () => {
 
             {/* Form */}
             <div className="p-4 space-y-5">
-              <p className="text-sm text-gray-600">{exercise?.name}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{exercise?.name}</p>
 
               {/* Sets/Reps */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Sett fullført
+                    {t('setsCompleted', 'Sett fullført')}
                   </label>
                   <input
                     type="number"
@@ -521,7 +567,7 @@ const ExerciseDetail = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Repetisjoner
+                    {t('repsCompleted', 'Repetisjoner')}
                   </label>
                   <input
                     type="number"
@@ -542,7 +588,7 @@ const ExerciseDetail = () => {
               {/* Difficulty Rating */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Hvor vanskelig var øvelsen?
+                  {t('exerciseDifficulty', 'Hvor vanskelig var øvelsen?')}
                 </label>
                 <div className="flex gap-2">
                   {[1, 2, 3, 4, 5].map((rating) => (
@@ -562,16 +608,16 @@ const ExerciseDetail = () => {
                     </button>
                   ))}
                 </div>
-                <div className="flex justify-between text-xs text-gray-500 mt-1 px-1">
-                  <span>Lett</span>
-                  <span>Vanskelig</span>
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 mt-1 px-1">
+                  <span>{t('easy', 'Lett')}</span>
+                  <span>{t('difficult', 'Vanskelig')}</span>
                 </div>
               </div>
 
               {/* Pain Rating */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Smertenivå under øvelsen (0-10)
+                  {t('painLevel', 'Smertenivå under øvelsen (0-10)')}
                 </label>
                 <input
                   type="range"
@@ -586,24 +632,24 @@ const ExerciseDetail = () => {
                   min="0"
                   max="10"
                 />
-                <div className="flex justify-between text-xs text-gray-500 px-1">
-                  <span>Ingen smerte</span>
+                <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400 px-1">
+                  <span>{t('noPain', 'Ingen smerte')}</span>
                   <span className="font-semibold text-gray-700">{feedbackData.painRating}</span>
-                  <span>Verst tenkelig</span>
+                  <span>{t('worstPain', 'Verst tenkelig')}</span>
                 </div>
               </div>
 
               {/* Notes */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Notater (valgfritt)
+                  {t('notesOptional', 'Notater (valgfritt)')}
                 </label>
                 <textarea
                   value={feedbackData.notes}
                   onChange={(e) => setFeedbackData((prev) => ({ ...prev, notes: e.target.value }))}
                   className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                   rows={3}
-                  placeholder="Hvordan føltes øvelsen?"
+                  placeholder={t('exerciseFeedback', 'Hvordan føltes øvelsen?')}
                 />
               </div>
 
@@ -616,12 +662,12 @@ const ExerciseDetail = () => {
                 {submitting ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
-                    Lagrer...
+                    {t('savingBtn', 'Lagrer...')}
                   </>
                 ) : (
                   <>
                     <Check className="w-5 h-5" />
-                    Registrer fremgang
+                    {t('submitProgress', 'Registrer fremgang')}
                   </>
                 )}
               </button>

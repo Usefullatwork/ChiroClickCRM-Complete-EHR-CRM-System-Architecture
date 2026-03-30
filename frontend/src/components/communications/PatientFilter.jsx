@@ -374,7 +374,7 @@ export default function PatientFilter({
         <div className="flex items-center gap-3">
           {/* Search Input */}
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
             <input
               type="text"
               value={searchQuery}
@@ -385,7 +385,7 @@ export default function PatientFilter({
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-300 hover:text-gray-600"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -420,7 +420,7 @@ export default function PatientFilter({
             customDateTo) && (
             <button
               onClick={clearFilters}
-              className="px-3 py-2 text-gray-500 hover:text-gray-700"
+              className="px-3 py-2 text-gray-500 dark:text-gray-400 hover:text-gray-700"
               title={language === 'no' ? 'Nullstill filtre' : 'Clear filters'}
             >
               <RefreshCw className="w-4 h-4" />
@@ -442,7 +442,7 @@ export default function PatientFilter({
                     className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                       selectedStatus.includes(status.value)
                         ? `bg-${status.color}-100 text-${status.color}-800 border-${status.color}-200 border`
-                        : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
+                        : 'bg-gray-100 text-gray-600 dark:text-gray-300 border border-gray-200 hover:bg-gray-200'
                     }`}
                   >
                     {status.label[language] || status.label.no}
@@ -462,7 +462,7 @@ export default function PatientFilter({
                     className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                       selectedCategories.includes(category.value)
                         ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                        : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
+                        : 'bg-gray-100 text-gray-600 dark:text-gray-300 border border-gray-200 hover:bg-gray-200'
                     }`}
                   >
                     {category.label[language] || category.label.no}
@@ -486,7 +486,7 @@ export default function PatientFilter({
                     className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                       lastVisitPreset === preset.value
                         ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                        : 'bg-gray-100 text-gray-600 border border-gray-200 hover:bg-gray-200'
+                        : 'bg-gray-100 text-gray-600 dark:text-gray-300 border border-gray-200 hover:bg-gray-200'
                     }`}
                   >
                     {preset.label[language] || preset.label.no}
@@ -496,7 +496,9 @@ export default function PatientFilter({
 
               {/* Custom Date Range */}
               <div className="mt-3">
-                <label className="block text-xs text-gray-500 mb-1">{t.customDateRange}</label>
+                <label className="block text-xs text-gray-500 dark:text-gray-400 mb-1">
+                  {t.customDateRange}
+                </label>
                 <div className="flex items-center gap-2">
                   <input
                     type="date"
@@ -507,7 +509,7 @@ export default function PatientFilter({
                     }}
                     className="px-3 py-1.5 border border-gray-300 rounded-lg text-sm"
                   />
-                  <span className="text-gray-500">-</span>
+                  <span className="text-gray-500 dark:text-gray-400">-</span>
                   <input
                     type="date"
                     value={customDateTo}
@@ -547,7 +549,7 @@ export default function PatientFilter({
           <button
             onClick={handleSelectAll}
             disabled={filteredPatients.length === 0}
-            className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 disabled:text-gray-400"
+            className="flex items-center gap-1.5 text-sm text-blue-600 hover:text-blue-800 disabled:text-gray-400 dark:text-gray-300"
           >
             <CheckSquare className="w-4 h-4" />
             {t.selectAll}
@@ -555,7 +557,7 @@ export default function PatientFilter({
           <button
             onClick={handleSelectNone}
             disabled={selectedPatients.length === 0}
-            className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-800 disabled:text-gray-400"
+            className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-800 disabled:text-gray-400 dark:text-gray-300"
           >
             <Square className="w-4 h-4" />
             {t.selectNone}
@@ -565,7 +567,7 @@ export default function PatientFilter({
         <div className="flex items-center gap-4">
           {/* Sort Controls */}
           <div className="flex items-center gap-2 text-sm">
-            <span className="text-gray-500">{t.sortBy}:</span>
+            <span className="text-gray-500 dark:text-gray-400">{t.sortBy}:</span>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
@@ -576,7 +578,7 @@ export default function PatientFilter({
             </select>
             <button
               onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
-              className="text-gray-500 hover:text-gray-700"
+              className="text-gray-500 dark:text-gray-400 hover:text-gray-700"
             >
               {sortOrder === 'asc' ? (
                 <ChevronUp className="w-4 h-4" />
@@ -587,7 +589,7 @@ export default function PatientFilter({
           </div>
 
           {/* Selection Counter */}
-          <div className="flex items-center gap-2 text-sm text-gray-600">
+          <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
             <Users className="w-4 h-4" />
             <span className="font-medium">{selectedPatients.length}</span>
             <span>{t.of}</span>
@@ -609,10 +611,10 @@ export default function PatientFilter({
       <div className="max-h-[400px] overflow-y-auto">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <RefreshCw className="w-6 h-6 text-gray-400 animate-spin" />
+            <RefreshCw className="w-6 h-6 text-gray-400 dark:text-gray-300 animate-spin" />
           </div>
         ) : filteredPatients.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-500">
+          <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
             <Users className="w-8 h-8 mb-2 opacity-50" />
             <p>{t.noPatients}</p>
           </div>
@@ -650,14 +652,14 @@ export default function PatientFilter({
                         {patient.firstName} {patient.lastName}
                       </span>
                       {patient.category && (
-                        <span className="px-1.5 py-0.5 text-xs rounded bg-gray-100 text-gray-600">
+                        <span className="px-1.5 py-0.5 text-xs rounded bg-gray-100 text-gray-600 dark:text-gray-300">
                           {CATEGORY_OPTIONS.find((c) => c.value === patient.category)?.label[
                             language
                           ] || patient.category}
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-3 mt-0.5 text-xs text-gray-500">
+                    <div className="flex items-center gap-3 mt-0.5 text-xs text-gray-500 dark:text-gray-400">
                       {communicationType === 'SMS' ? (
                         patient.phone ? (
                           <span className="flex items-center gap-1">
@@ -777,7 +779,7 @@ export function PatientFilterCompact({
           );
         })}
       </div>
-      <div className="px-3 py-2 bg-gray-50 text-xs text-gray-500 border-t border-gray-200">
+      <div className="px-3 py-2 bg-gray-50 text-xs text-gray-500 dark:text-gray-400 border-t border-gray-200">
         {selectedPatients.length} {t.selected}
       </div>
     </div>

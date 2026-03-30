@@ -1,44 +1,19 @@
 import { lazy, Suspense } from 'react';
 import {
-  Save,
   AlertTriangle,
-  X,
   Sparkles,
-  Globe,
   BookOpen,
   ChevronLeft,
   ChevronRight,
   FileText,
-  Printer,
   Copy,
-  Shield,
-  Grid,
   Command,
-  Mic,
-  Cpu,
 } from 'lucide-react';
 // Direct file imports to avoid barrel bundling all 40+ assessment modules
 import ProblemList from '../components/assessment/ProblemList';
-import TreatmentPlanTracker, { VisitCounter } from '../components/assessment/TreatmentPlanTracker';
-import SALTButton from '../components/assessment/SALTButton';
-import { ComplianceIndicator } from '../components/assessment/ComplianceEngine';
-import { AIStatusIndicator } from '../components/assessment/AISettings';
-const OutcomeAssessment = lazy(() => import('../components/assessment/OutcomeAssessment'));
-const TemplatePicker = lazy(() => import('../components/TemplatePicker'));
-
-// Lazy-load modal-only components (shown conditionally via state flags)
-const MacroMatrix = lazy(() => import('../components/assessment/MacroMatrix'));
-const BodyChart = lazy(() => import('../components/assessment/BodyChart'));
-const TemplateLibrary = lazy(() => import('../components/assessment/TemplateLibrary'));
-const CompliancePanel = lazy(() => import('../components/assessment/ComplianceEngine'));
-const PrintPreview = lazy(() => import('../components/assessment/PrintPreview'));
-const AIScribe = lazy(() => import('../components/assessment/AIScribe'));
-const AISettings = lazy(() => import('../components/assessment/AISettings'));
-const SlashCommandReference = lazy(() =>
-  import('../components/assessment/SlashCommands').then((m) => ({
-    default: m.SlashCommandReference,
-  }))
-);
+import TreatmentPlanTracker from '../components/assessment/TreatmentPlanTracker';
+import EasyAssessmentHeader from '../components/easyassessment/EasyAssessmentHeader';
+import { EasyAssessmentModals } from '../components/easyassessment/EasyAssessmentModals';
 
 import useEasyAssessmentState from '../hooks/useEasyAssessmentState';
 
@@ -119,151 +94,29 @@ export default function EasyAssessment() {
   return (
     <div className="min-h-screen bg-gray-100">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
-        <div className="max-w-full mx-auto px-4 py-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => navigate(`/patients/${patientId}`)}
-                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <div>
-                <div className="flex items-center gap-3">
-                  <h1 className="text-lg font-bold text-gray-900">
-                    {patient?.data?.first_name} {patient?.data?.last_name}
-                  </h1>
-                  {patient?.data?.date_of_birth && (
-                    <span className="text-sm text-gray-500">
-                      {Math.floor(
-                        (new Date() - new Date(patient.data.date_of_birth)) / 31557600000
-                      )}{' '}
-                      yrs old
-                    </span>
-                  )}
-                  <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-800 rounded">
-                    Active
-                  </span>
-                </div>
-                {treatmentPlan && (
-                  <VisitCounter
-                    currentVisit={currentVisitNumber}
-                    totalVisits={
-                      treatmentPlan.phases?.reduce((sum, p) => sum + p.totalVisits, 0) || 0
-                    }
-                    className="mt-1"
-                  />
-                )}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {/* Language Selector */}
-              <button
-                onClick={() => setLanguage(language === 'en' ? 'no' : 'en')}
-                className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200"
-                title={language === 'en' ? 'Switch to Norwegian' : 'Bytt til Engelsk'}
-              >
-                <Globe className="w-4 h-4" />
-                {language === 'en' ? '\u{1F1EC}\u{1F1E7} EN' : '\u{1F1F3}\u{1F1F4} NO'}
-              </button>
-
-              <SALTButton previousEncounter={previousEncounter} onApply={handleSALTApply} />
-
-              {/* AI Status & Controls */}
-              <div className="flex items-center gap-1 border-l border-gray-200 pl-2 ml-1">
-                <AIStatusIndicator language={language} onClick={() => setShowAISettings(true)} />
-                <button
-                  onClick={() => setShowAIScribe(true)}
-                  className="flex items-center gap-1 px-2 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100"
-                  title={language === 'en' ? 'AI Voice Scribe' : 'AI Stemmeskriver'}
-                >
-                  <Mic className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setShowAISettings(true)}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100"
-                  title={language === 'en' ? 'AI Settings' : 'AI-innstillinger'}
-                >
-                  <Cpu className="w-4 h-4" />
-                </button>
-              </div>
-
-              <ComplianceIndicator
-                encounterData={encounterData}
-                onClick={() => setShowCompliancePanel(true)}
-              />
-
-              <button
-                onClick={() => setShowMacroMatrix(true)}
-                className="flex items-center gap-1 px-3 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-                title={language === 'en' ? 'Macro Matrix' : 'Makromatrise'}
-              >
-                <Grid className="w-4 h-4" />
-              </button>
-
-              {/* View Mode Toggle */}
-              <div className="inline-flex rounded-lg border border-gray-300 bg-white p-0.5">
-                {['easy', 'detailed', 'preview'].map((mode) => (
-                  <button
-                    key={mode}
-                    onClick={() => setViewMode(mode)}
-                    className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                      viewMode === mode
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-600 hover:bg-gray-100'
-                    }`}
-                  >
-                    {mode === 'easy'
-                      ? language === 'en'
-                        ? 'Easy'
-                        : 'Enkel'
-                      : mode === 'detailed'
-                        ? language === 'en'
-                          ? 'Detailed'
-                          : 'Detaljert'
-                        : language === 'en'
-                          ? 'Preview'
-                          : 'Forh\u00E5ndsvisning'}
-                  </button>
-                ))}
-              </div>
-
-              <button
-                onClick={() => setShowPrintPreview(true)}
-                className="flex items-center gap-1 px-3 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-                title={language === 'en' ? 'Print Preview' : 'Forh\u00E5ndsvisning'}
-              >
-                <Printer className="w-4 h-4" />
-              </button>
-
-              <button
-                onClick={copyToClipboard}
-                className="flex items-center gap-1 px-3 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
-              >
-                <Copy className="w-4 h-4" />
-                {copiedToClipboard
-                  ? language === 'en'
-                    ? 'Copied!'
-                    : 'Kopiert!'
-                  : language === 'en'
-                    ? 'Copy'
-                    : 'Kopier'}
-              </button>
-
-              <button
-                onClick={handleSave}
-                disabled={saveMutation.isLoading}
-                className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50"
-              >
-                <Save className="w-4 h-4" />
-                {saveMutation.isLoading ? 'Saving...' : 'Save'}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <EasyAssessmentHeader
+        patient={patient}
+        treatmentPlan={treatmentPlan}
+        currentVisitNumber={currentVisitNumber}
+        patientId={patientId}
+        navigate={navigate}
+        language={language}
+        setLanguage={setLanguage}
+        previousEncounter={previousEncounter}
+        handleSALTApply={handleSALTApply}
+        setShowAISettings={setShowAISettings}
+        setShowAIScribe={setShowAIScribe}
+        setShowCompliancePanel={setShowCompliancePanel}
+        setShowMacroMatrix={setShowMacroMatrix}
+        viewMode={viewMode}
+        setViewMode={setViewMode}
+        setShowPrintPreview={setShowPrintPreview}
+        copyToClipboard={copyToClipboard}
+        copiedToClipboard={copiedToClipboard}
+        handleSave={handleSave}
+        saveMutation={saveMutation}
+        encounterData={encounterData}
+      />
 
       {/* Main Layout - ChiroTouch Style 3-Column */}
       <div className="flex h-[calc(100vh-64px)]">
@@ -307,7 +160,9 @@ export default function EasyAssessment() {
           <div className="bg-white border-b border-gray-200 px-4 py-3">
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
-                <label className="text-xs font-medium text-gray-500">Date:</label>
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  Date:
+                </label>
                 <input
                   type="date"
                   value={encounterData.encounter_date}
@@ -318,7 +173,9 @@ export default function EasyAssessment() {
                 />
               </div>
               <div className="flex items-center gap-2">
-                <label className="text-xs font-medium text-gray-500">Type:</label>
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  Type:
+                </label>
                 <select
                   value={encounterData.encounter_type}
                   onChange={(e) =>
@@ -333,7 +190,9 @@ export default function EasyAssessment() {
                 </select>
               </div>
               <div className="flex items-center gap-2">
-                <label className="text-xs font-medium text-gray-500">Duration:</label>
+                <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                  Duration:
+                </label>
                 <input
                   type="number"
                   value={encounterData.duration_minutes}
@@ -345,12 +204,14 @@ export default function EasyAssessment() {
                   }
                   className="w-16 px-2 py-1 text-sm border border-gray-300 rounded"
                 />
-                <span className="text-xs text-gray-500">min</span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">min</span>
               </div>
               <div className="flex-1"></div>
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                  <label className="text-xs font-medium text-gray-500">VAS Start:</label>
+                  <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    VAS Start:
+                  </label>
                   <input
                     type="number"
                     min="0"
@@ -367,7 +228,9 @@ export default function EasyAssessment() {
                   />
                 </div>
                 <div className="flex items-center gap-2">
-                  <label className="text-xs font-medium text-gray-500">VAS End:</label>
+                  <label className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                    VAS End:
+                  </label>
                   <input
                     type="number"
                     min="0"
@@ -434,7 +297,7 @@ export default function EasyAssessment() {
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                         activeTab === tab.id
                           ? 'bg-blue-600 text-white shadow'
-                          : 'text-gray-600 hover:bg-gray-100'
+                          : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                       }`}
                     >
                       <span>{tab.icon}</span>
@@ -536,389 +399,39 @@ export default function EasyAssessment() {
       </div>
 
       {/* === MODALS === */}
-      <Suspense fallback={null}>
-        {/* Outcome Assessment Modal */}
-        {showOutcomeAssessment && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold">{outcomeType} Assessment</h3>
-                <button
-                  onClick={() => setShowOutcomeAssessment(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="overflow-y-auto max-h-[70vh] p-6">
-                <OutcomeAssessment
-                  type={outcomeType}
-                  responses={encounterData.outcome_assessment?.responses || {}}
-                  onChange={(responses) => {
-                    const answered = Object.keys(responses).length;
-                    const total = Object.values(responses).reduce((sum, val) => sum + val, 0);
-                    const percentage =
-                      answered > 0 ? Math.round((total / (answered * 5)) * 100) : null;
-                    setEncounterData((prev) => ({
-                      ...prev,
-                      outcome_assessment: { type: outcomeType, responses, score: percentage },
-                    }));
-                  }}
-                />
-              </div>
-              <div className="px-6 py-4 border-t border-gray-200 flex justify-end">
-                <button
-                  onClick={() => setShowOutcomeAssessment(false)}
-                  className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-                >
-                  Done
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Template Picker */}
-        <Suspense fallback={null}>
-          <TemplatePicker
-            isOpen={showTemplatePicker}
-            onClose={() => setShowTemplatePicker(false)}
-            onSelectTemplate={(text) => {
-              if (activeTab === 'subjective') {
-                updateField(
-                  'subjective',
-                  'history',
-                  `${encounterData.subjective.history}\n${text}`
-                );
-              } else if (activeTab === 'objective') {
-                updateField(
-                  'objective',
-                  'observation',
-                  `${encounterData.objective.observation}\n${text}`
-                );
-              } else if (activeTab === 'assessment') {
-                updateField(
-                  'assessment',
-                  'clinical_reasoning',
-                  `${encounterData.assessment.clinical_reasoning}\n${text}`
-                );
-              } else if (activeTab === 'plan') {
-                updateField('plan', 'treatment', `${encounterData.plan.treatment}\n${text}`);
-              }
-            }}
-            soapSection={activeTab}
-          />
-        </Suspense>
-
-        {/* Body Chart Modal */}
-        {showBodyChart && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold">Body Chart - Annotate Pain Locations</h3>
-                <button
-                  onClick={() => setShowBodyChart(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="overflow-y-auto max-h-[70vh]">
-                <BodyChart
-                  initialView="front"
-                  initialAnnotations={encounterData.body_chart?.annotations || []}
-                  initialMarkers={encounterData.body_chart?.markers || []}
-                  onSave={({ annotations, markers }) => {
-                    setEncounterData((prev) => ({
-                      ...prev,
-                      body_chart: { annotations, markers },
-                    }));
-                    setShowBodyChart(false);
-                  }}
-                  showToolbar={true}
-                  height={450}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Template Library Modal */}
-        {showTemplateLibrary && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold">Chart Template Library</h3>
-                <button
-                  onClick={() => setShowTemplateLibrary(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="overflow-y-auto max-h-[75vh]">
-                <TemplateLibrary
-                  embedded={true}
-                  showHeader={false}
-                  onSelectTemplate={(template) => {
-                    if (activeTab === 'subjective') {
-                      if (template.content?.subjective) {
-                        updateField(
-                          'subjective',
-                          'chief_complaint',
-                          (encounterData.subjective.chief_complaint
-                            ? `${encounterData.subjective.chief_complaint}\n`
-                            : '') + template.content.subjective
-                        );
-                      }
-                      if (template.content?.history) {
-                        updateField(
-                          'subjective',
-                          'history',
-                          (encounterData.subjective.history
-                            ? `${encounterData.subjective.history}\n`
-                            : '') + template.content.history
-                        );
-                      }
-                    } else if (activeTab === 'objective') {
-                      if (template.content?.objective) {
-                        updateField(
-                          'objective',
-                          'observation',
-                          (encounterData.objective.observation
-                            ? `${encounterData.objective.observation}\n`
-                            : '') + template.content.objective
-                        );
-                      }
-                    } else if (activeTab === 'assessment') {
-                      if (template.content?.assessment) {
-                        updateField(
-                          'assessment',
-                          'clinical_reasoning',
-                          (encounterData.assessment.clinical_reasoning
-                            ? `${encounterData.assessment.clinical_reasoning}\n`
-                            : '') + template.content.assessment
-                        );
-                      }
-                    } else if (activeTab === 'plan') {
-                      if (template.content?.plan) {
-                        updateField(
-                          'plan',
-                          'treatment',
-                          (encounterData.plan.treatment
-                            ? `${encounterData.plan.treatment}\n`
-                            : '') + template.content.plan
-                        );
-                      }
-                    }
-                    setShowTemplateLibrary(false);
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Macro Matrix Modal */}
-        {showMacroMatrix && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold">
-                  {language === 'en'
-                    ? 'Macro Matrix - Quick Insert'
-                    : 'Makromatrise - Hurtiginnsetting'}
-                </h3>
-                <button
-                  onClick={() => setShowMacroMatrix(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="overflow-y-auto max-h-[75vh] p-4">
-                <MacroMatrix
-                  onInsert={handleMacroInsert}
-                  targetField={activeTab}
-                  favorites={macroFavorites}
-                  onFavoritesChange={setMacroFavorites}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Compliance Panel Modal */}
-        {showCompliancePanel && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <Shield className="w-5 h-5" />
-                  {language === 'en' ? 'Compliance Check' : 'Samsvarskontroll'}
-                </h3>
-                <button
-                  onClick={() => setShowCompliancePanel(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="overflow-y-auto max-h-[75vh]">
-                <CompliancePanel
-                  encounterData={encounterData}
-                  onApplyAutoInsert={handleComplianceAutoFix}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Print Preview Modal */}
-        <PrintPreview
-          encounterData={encounterData}
-          patientData={patient?.data}
-          practiceInfo={{
-            name: 'ChiroClick Clinic',
-            address: 'Healthcare Center, Medical District',
-            phone: '+47 400 00 000',
-            provider: language === 'en' ? 'Provider Name, DC' : 'Behandler, DC',
-            credentials: language === 'en' ? 'Doctor of Chiropractic' : 'Kiropraktor',
-          }}
-          isOpen={showPrintPreview}
-          onClose={() => setShowPrintPreview(false)}
-        />
-
-        {/* Slash Command Reference Modal */}
-        {showSlashReference && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[80vh] overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <Command className="w-5 h-5" />
-                  {language === 'en' ? 'Slash Commands' : 'Skr\u00E5strek-kommandoer'}
-                </h3>
-                <button
-                  onClick={() => setShowSlashReference(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="overflow-y-auto max-h-[70vh]">
-                <SlashCommandReference />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* AI Scribe Modal */}
-        {showAIScribe && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
-              <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-                <h3 className="text-lg font-semibold flex items-center gap-2">
-                  <Mic className="w-5 h-5 text-blue-500" />
-                  {language === 'en' ? 'AI Voice Scribe' : 'AI Stemmeskriver'}
-                </h3>
-                <button
-                  onClick={() => setShowAIScribe(false)}
-                  className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="overflow-y-auto max-h-[75vh]">
-                <AIScribe
-                  language={language}
-                  onApplySOAP={(sections) => {
-                    if (sections.subjective) {
-                      updateField(
-                        'subjective',
-                        'chief_complaint',
-                        (encounterData.subjective.chief_complaint
-                          ? `${encounterData.subjective.chief_complaint}\n`
-                          : '') + sections.subjective
-                      );
-                    }
-                    if (sections.objective) {
-                      updateField(
-                        'objective',
-                        'observation',
-                        (encounterData.objective.observation
-                          ? `${encounterData.objective.observation}\n`
-                          : '') + sections.objective
-                      );
-                    }
-                    if (sections.assessment) {
-                      updateField(
-                        'assessment',
-                        'clinical_reasoning',
-                        (encounterData.assessment.clinical_reasoning
-                          ? `${encounterData.assessment.clinical_reasoning}\n`
-                          : '') + sections.assessment
-                      );
-                    }
-                    if (sections.plan) {
-                      updateField(
-                        'plan',
-                        'treatment',
-                        (encounterData.plan.treatment ? `${encounterData.plan.treatment}\n` : '') +
-                          sections.plan
-                      );
-                    }
-                    setShowAIScribe(false);
-                  }}
-                  onApplyTranscript={(transcript) => {
-                    if (activeTab === 'subjective') {
-                      updateField(
-                        'subjective',
-                        'chief_complaint',
-                        (encounterData.subjective.chief_complaint
-                          ? `${encounterData.subjective.chief_complaint}\n`
-                          : '') + transcript
-                      );
-                    } else if (activeTab === 'objective') {
-                      updateField(
-                        'objective',
-                        'observation',
-                        (encounterData.objective.observation
-                          ? `${encounterData.objective.observation}\n`
-                          : '') + transcript
-                      );
-                    } else if (activeTab === 'assessment') {
-                      updateField(
-                        'assessment',
-                        'clinical_reasoning',
-                        (encounterData.assessment.clinical_reasoning
-                          ? `${encounterData.assessment.clinical_reasoning}\n`
-                          : '') + transcript
-                      );
-                    } else if (activeTab === 'plan') {
-                      updateField(
-                        'plan',
-                        'treatment',
-                        (encounterData.plan.treatment ? `${encounterData.plan.treatment}\n` : '') +
-                          transcript
-                      );
-                    }
-                    setShowAIScribe(false);
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* AI Settings Modal */}
-        {showAISettings && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="max-w-2xl w-full">
-              <AISettings language={language} onClose={() => setShowAISettings(false)} />
-            </div>
-          </div>
-        )}
-      </Suspense>
+      <EasyAssessmentModals
+        showOutcomeAssessment={showOutcomeAssessment}
+        setShowOutcomeAssessment={setShowOutcomeAssessment}
+        showTemplatePicker={showTemplatePicker}
+        setShowTemplatePicker={setShowTemplatePicker}
+        showBodyChart={showBodyChart}
+        setShowBodyChart={setShowBodyChart}
+        showTemplateLibrary={showTemplateLibrary}
+        setShowTemplateLibrary={setShowTemplateLibrary}
+        showMacroMatrix={showMacroMatrix}
+        setShowMacroMatrix={setShowMacroMatrix}
+        showCompliancePanel={showCompliancePanel}
+        setShowCompliancePanel={setShowCompliancePanel}
+        showPrintPreview={showPrintPreview}
+        setShowPrintPreview={setShowPrintPreview}
+        showSlashReference={showSlashReference}
+        setShowSlashReference={setShowSlashReference}
+        showAIScribe={showAIScribe}
+        setShowAIScribe={setShowAIScribe}
+        showAISettings={showAISettings}
+        setShowAISettings={setShowAISettings}
+        outcomeType={outcomeType}
+        encounterData={encounterData}
+        setEncounterData={setEncounterData}
+        activeTab={activeTab}
+        updateField={updateField}
+        language={language}
+        macroFavorites={macroFavorites}
+        setMacroFavorites={setMacroFavorites}
+        handleMacroInsert={handleMacroInsert}
+        handleComplianceAutoFix={handleComplianceAutoFix}
+        patient={patient}
+      />
 
       {/* Floating Action Buttons */}
       <div className="fixed bottom-6 right-6 flex flex-col gap-3">

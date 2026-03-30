@@ -64,8 +64,188 @@ vi.mock('../../hooks', () => ({
   }),
 }));
 
+vi.mock('../../hooks/useEncounterSave', () => ({
+  useEncounterSave: () => ({
+    saveMutation: { mutate: vi.fn(), isLoading: false },
+    signMutation: { mutate: vi.fn(), isLoading: false },
+    createAmendmentMutation: { mutate: vi.fn(), isLoading: false },
+    signAmendmentMutation: { mutate: vi.fn(), isLoading: false },
+    handleSave: vi.fn(),
+    handlePreSign: vi.fn(),
+    handleSignAndLock: vi.fn(),
+    handleCreateAmendment: vi.fn(),
+    triggerAutoSave: vi.fn(),
+  }),
+}));
+
+vi.mock('../../hooks/useDiagnosisHandlers', () => ({
+  useDiagnosisHandlers: () => ({
+    toggleDiagnosis: vi.fn(),
+    removeDiagnosisCode: vi.fn(),
+    toggleTakst: vi.fn(),
+  }),
+}));
+
+vi.mock('../../hooks/useEncounterHandlers', () => ({
+  useEncounterHandlers: () => ({
+    updateField: vi.fn(),
+    handleQuickPhrase: vi.fn(),
+    handleTemplateSelect: vi.fn(),
+    handleSpineTextInsert: vi.fn(),
+    handleCarryForward: vi.fn(),
+    handleNeuroExamChange: vi.fn(),
+    handleOrthoExamChange: vi.fn(),
+    applyEncounterTypeDefaults: vi.fn(),
+    handleSALT: vi.fn(),
+  }),
+}));
+
+vi.mock('../../hooks/useEncounterEffects', () => ({
+  useEncounterEffects: vi.fn(),
+}));
+
+vi.mock('../../hooks/useAutoCoding', () => ({
+  useAutoCoding: () => ({
+    confirmedRegions: [],
+    suggestedCMTCode: null,
+    suggestedCodes: [],
+  }),
+}));
+
+vi.mock('../../hooks/useAISuggestions', () => ({
+  useAISuggestions: () => ({
+    getAISuggestions: vi.fn(),
+  }),
+}));
+
+vi.mock('../../hooks/useEncounterQueries', () => ({
+  useEncounterQueries: () => ({
+    patient: null,
+    patientLoading: false,
+    kioskIntake: null,
+    hasKioskIntake: false,
+    kioskSubjective: '',
+    existingEncounter: null,
+    commonDiagnoses: null,
+    previousEncounters: null,
+    latestAnatomyFindings: null,
+    existingAnatomyFindings: null,
+  }),
+}));
+
 vi.mock('../../hooks/useClinicalEncounterState', () => ({
   useClinicalEncounterState: () => ({
+    panels: {
+      showDiagnosisDropdown: false,
+      setShowDiagnosisDropdown: vi.fn(),
+      showAIAssistant: false,
+      setShowAIAssistant: vi.fn(),
+      showTemplatePicker: false,
+      setShowTemplatePicker: vi.fn(),
+      showKeyboardHelp: false,
+      setShowKeyboardHelp: vi.fn(),
+      showMacroHint: false,
+      showSALTBanner: false,
+      setShowSALTBanner: vi.fn(),
+      saltBannerExpanded: false,
+      setSaltBannerExpanded: vi.fn(),
+      showAIDiagnosisSidebar: false,
+      setShowAIDiagnosisSidebar: vi.fn(),
+      showExercisePanel: false,
+      setShowExercisePanel: vi.fn(),
+      showOrthoExam: false,
+      setShowOrthoExam: vi.fn(),
+      showNeuroExam: false,
+      setShowNeuroExam: vi.fn(),
+      showAnatomyPanel: false,
+      setShowAnatomyPanel: vi.fn(),
+      showROMTable: false,
+      setShowROMTable: vi.fn(),
+      showBodyDiagram: false,
+      setShowBodyDiagram: vi.fn(),
+      showExamProtocol: false,
+      setShowExamProtocol: vi.fn(),
+      showClusterTests: false,
+      setShowClusterTests: vi.fn(),
+      showRegionalExam: false,
+      setShowRegionalExam: vi.fn(),
+      showNeurologicalExam: false,
+      setShowNeurologicalExam: vi.fn(),
+      showOutcomeMeasures: false,
+      setShowOutcomeMeasures: vi.fn(),
+      showMMT: false,
+      setShowMMT: vi.fn(),
+      showDTR: false,
+      setShowDTR: vi.fn(),
+      showSensoryExam: false,
+      setShowSensoryExam: vi.fn(),
+      showCranialNerves: false,
+      setShowCranialNerves: vi.fn(),
+      showCoordination: false,
+      setShowCoordination: vi.fn(),
+      showNerveTension: false,
+      setShowNerveTension: vi.fn(),
+      showRegionalDiagrams: false,
+      setShowRegionalDiagrams: vi.fn(),
+      showPainAssessment: false,
+      setShowPainAssessment: vi.fn(),
+      showHeadacheAssessment: false,
+      setShowHeadacheAssessment: vi.fn(),
+      showTissueMarkers: false,
+      setShowTissueMarkers: vi.fn(),
+    },
+    examData: {
+      notationData: {},
+      setNotationData: vi.fn(),
+      notationNarrative: '',
+      setNotationNarrative: vi.fn(),
+      neuroExamData: null,
+      setNeuroExamData: vi.fn(),
+      orthoExamData: null,
+      setOrthoExamData: vi.fn(),
+      anatomySpineFindings: {},
+      setAnatomySpineFindings: vi.fn(),
+      anatomyBodyRegions: [],
+      setAnatomyBodyRegions: vi.fn(),
+      romTableData: {},
+      setRomTableData: vi.fn(),
+      bodyDiagramMarkers: [],
+      setBodyDiagramMarkers: vi.fn(),
+      examProtocolData: {},
+      setExamProtocolData: vi.fn(),
+      clusterTestData: {},
+      setClusterTestData: vi.fn(),
+      regionalExamData: {},
+      setRegionalExamData: vi.fn(),
+      neurologicalExamData: {},
+      setNeurologicalExamData: vi.fn(),
+      outcomeMeasureType: 'ndi',
+      setOutcomeMeasureType: vi.fn(),
+      outcomeMeasureData: {},
+      setOutcomeMeasureData: vi.fn(),
+      mmtData: {},
+      setMmtData: vi.fn(),
+      dtrData: {},
+      setDtrData: vi.fn(),
+      sensoryExamData: {},
+      setSensoryExamData: vi.fn(),
+      cranialNerveData: {},
+      setCranialNerveData: vi.fn(),
+      coordinationData: {},
+      setCoordinationData: vi.fn(),
+      nerveTensionData: {},
+      setNerveTensionData: vi.fn(),
+      regionalDiagramData: {},
+      setRegionalDiagramData: vi.fn(),
+      selectedRegion: 'shoulder',
+      setSelectedRegion: vi.fn(),
+      painAssessmentData: {},
+      setPainAssessmentData: vi.fn(),
+      headacheData: {},
+      setHeadacheData: vi.fn(),
+      tissueMarkerData: {},
+      setTissueMarkerData: vi.fn(),
+    },
     encounterData: {
       encounter_date: new Date().toISOString().split('T')[0],
       encounter_type: 'FOLLOWUP',
@@ -93,24 +273,8 @@ vi.mock('../../hooks/useClinicalEncounterState', () => ({
     setActiveField: vi.fn(),
     diagnosisSearch: '',
     setDiagnosisSearch: vi.fn(),
-    showDiagnosisDropdown: false,
-    setShowDiagnosisDropdown: vi.fn(),
-    showAIAssistant: false,
-    setShowAIAssistant: vi.fn(),
-    showTemplatePicker: false,
-    setShowTemplatePicker: vi.fn(),
-    showKeyboardHelp: false,
-    setShowKeyboardHelp: vi.fn(),
-    showMacroHint: false,
-    _setShowMacroHint: vi.fn(),
     currentMacroMatch: null,
     _setCurrentMacroMatch: vi.fn(),
-    showSALTBanner: false,
-    setShowSALTBanner: vi.fn(),
-    saltBannerExpanded: false,
-    setSaltBannerExpanded: vi.fn(),
-    showAIDiagnosisSidebar: false,
-    setShowAIDiagnosisSidebar: vi.fn(),
     selectedTakster: [],
     setSelectedTakster: vi.fn(),
     showTakster: false,
@@ -130,16 +294,8 @@ vi.mock('../../hooks/useClinicalEncounterState', () => ({
     setAmendmentType: vi.fn(),
     amendmentReason: '',
     setAmendmentReason: vi.fn(),
-    showExercisePanel: false,
-    setShowExercisePanel: vi.fn(),
     kioskDataApplied: false,
     setKioskDataApplied: vi.fn(),
-    notationData: {},
-    setNotationData: vi.fn(),
-    notationNarrative: '',
-    setNotationNarrative: vi.fn(),
-    setNeuroExamData: vi.fn(),
-    setOrthoExamData: vi.fn(),
     textAreaRefs: { current: {} },
     palpationRef: { current: null },
     autoSaveTimerRef: { current: null },
@@ -250,6 +406,16 @@ vi.mock('../../components/encounter/AIAssistantPanel', () => ({
 
 vi.mock('../../components/encounter/KeyboardShortcutsModal', () => ({
   KeyboardShortcutsModal: () => null,
+}));
+
+vi.mock('../../components/encounter/ClinicalEncounterModals', () => ({
+  ClinicalEncounterModals: () => null,
+}));
+
+vi.mock('../../components/encounter/encounterConstants', () => ({
+  macros: {},
+  buildQuickPhrases: () => ({ subjective: [], objective: [], assessment: [], plan: [] }),
+  buildKeyboardShortcuts: () => ({}),
 }));
 
 import ClinicalEncounter from '../../pages/ClinicalEncounter';

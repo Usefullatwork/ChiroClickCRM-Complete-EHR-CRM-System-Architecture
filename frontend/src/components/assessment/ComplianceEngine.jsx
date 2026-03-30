@@ -594,7 +594,7 @@ export default function CompliancePanel({ encounterData, onApplyAutoInsert, clas
           />
           <div className="text-left">
             <h3 className="font-semibold text-gray-900">Compliance Check</h3>
-            <p className="text-xs text-gray-600">{summary}</p>
+            <p className="text-xs text-gray-600 dark:text-gray-300">{summary}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
@@ -632,7 +632,7 @@ export default function CompliancePanel({ encounterData, onApplyAutoInsert, clas
               <div className="space-y-2">
                 {issues.map((issue, index) => (
                   <ComplianceItem
-                    key={index}
+                    key={`issue-${issue.field || issue.message || index}`}
                     item={issue}
                     onApplyFix={issue.suggestion ? () => onApplyAutoInsert?.(issue) : null}
                   />
@@ -651,7 +651,7 @@ export default function CompliancePanel({ encounterData, onApplyAutoInsert, clas
               <div className="space-y-2">
                 {warnings.map((warning, index) => (
                   <ComplianceItem
-                    key={index}
+                    key={`warning-${warning.field || warning.message || index}`}
                     item={warning}
                     onApplyFix={warning.suggestion ? () => onApplyAutoInsert?.(warning) : null}
                   />
@@ -669,7 +669,11 @@ export default function CompliancePanel({ encounterData, onApplyAutoInsert, clas
               </h4>
               <div className="space-y-2">
                 {suggestions.map((suggestion, index) => (
-                  <ComplianceItem key={index} item={suggestion} onApplyFix={null} />
+                  <ComplianceItem
+                    key={`suggestion-${suggestion.field || suggestion.message || index}`}
+                    item={suggestion}
+                    onApplyFix={null}
+                  />
                 ))}
               </div>
             </div>

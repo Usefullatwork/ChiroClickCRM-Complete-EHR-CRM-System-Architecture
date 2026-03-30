@@ -140,7 +140,7 @@ export default function VASPainScale({
           {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((val) => (
             <span
               key={val}
-              className={`text-xs ${value === val ? 'font-bold text-blue-600' : 'text-gray-500'}`}
+              className={`text-xs ${value === val ? 'font-bold text-blue-600' : 'text-gray-500 dark:text-gray-400'}`}
             >
               {val}
             </span>
@@ -160,7 +160,7 @@ export default function VASPainScale({
             className={`text-sm font-medium ${
               displayValue !== null && displayValue !== undefined
                 ? 'text-gray-900'
-                : 'text-gray-400'
+                : 'text-gray-400 dark:text-gray-300'
             }`}
           >
             {getPainDescription(displayValue)}
@@ -179,7 +179,7 @@ export default function VASPainScale({
             className={`flex-1 py-1.5 text-xs font-medium rounded transition-all ${
               value === val
                 ? `${getPainColor(val)} text-white`
-                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
             } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             {val}
@@ -205,7 +205,7 @@ export function VASComparisonDisplay({ startValue, endValue, className = '' }) {
     if (diff < 0) {
       return { text: `↑ ${Math.abs(diff)} points worse`, color: 'text-red-600 bg-red-50' };
     }
-    return { text: 'No change', color: 'text-gray-600 bg-gray-50' };
+    return { text: 'No change', color: 'text-gray-600 dark:text-gray-300 bg-gray-50' };
   };
 
   const change = getChangeIndicator();
@@ -217,7 +217,7 @@ export function VASComparisonDisplay({ startValue, endValue, className = '' }) {
       <div className="grid grid-cols-2 gap-4 mb-3">
         {/* Start */}
         <div className="text-center">
-          <div className="text-xs text-gray-500 mb-1">Before Treatment</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Before Treatment</div>
           <div
             className={`text-2xl font-bold ${
               startValue !== null ? 'text-gray-900' : 'text-gray-300'
@@ -229,7 +229,7 @@ export function VASComparisonDisplay({ startValue, endValue, className = '' }) {
 
         {/* End */}
         <div className="text-center">
-          <div className="text-xs text-gray-500 mb-1">After Treatment</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">After Treatment</div>
           <div
             className={`text-2xl font-bold ${
               endValue !== null ? 'text-gray-900' : 'text-gray-300'

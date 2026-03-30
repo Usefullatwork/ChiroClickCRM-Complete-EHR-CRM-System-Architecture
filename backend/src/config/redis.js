@@ -26,7 +26,7 @@ if (CACHE_ENGINE === 'memory') {
     const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
     const REDIS_PASSWORD = process.env.REDIS_PASSWORD || undefined;
     const REDIS_DB = parseInt(process.env.REDIS_DB || '0');
-    const REDIS_KEY_PREFIX = process.env.REDIS_KEY_PREFIX || 'chiroclickcrm:';
+    const REDIS_KEY_PREFIX = process.env.REDIS_KEY_PREFIX || 'chiroclickehr:';
 
     let client = null;
     let isConnected = false;

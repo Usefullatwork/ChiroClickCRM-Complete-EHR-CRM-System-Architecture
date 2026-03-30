@@ -18,11 +18,13 @@ export const getAll = async (req, res) => {
     // Build query - get org templates first, then defaults for missing
     let sql = `
       WITH org_templates AS (
-        SELECT * FROM spine_text_templates
+        SELECT id, organization_id, segment, direction, finding_type, text_template, language, is_default, sort_order, created_at, updated_at
+        FROM spine_text_templates
         WHERE organization_id = $1 AND language = $2
       ),
       default_templates AS (
-        SELECT * FROM spine_text_templates
+        SELECT id, organization_id, segment, direction, finding_type, text_template, language, is_default, sort_order, created_at, updated_at
+        FROM spine_text_templates
         WHERE is_default = true AND language = $2
       )
       SELECT
@@ -98,11 +100,13 @@ export const getGroupedBySegment = async (req, res) => {
 
     const sql = `
       WITH org_templates AS (
-        SELECT * FROM spine_text_templates
+        SELECT id, organization_id, segment, direction, finding_type, text_template, language, is_default, sort_order, created_at, updated_at
+        FROM spine_text_templates
         WHERE organization_id = $1 AND language = $2
       ),
       default_templates AS (
-        SELECT * FROM spine_text_templates
+        SELECT id, organization_id, segment, direction, finding_type, text_template, language, is_default, sort_order, created_at, updated_at
+        FROM spine_text_templates
         WHERE is_default = true AND language = $2
       )
       SELECT
@@ -158,7 +162,8 @@ export const getBySegmentDirection = async (req, res) => {
 
     // First try to get org-specific template
     let sql = `
-      SELECT * FROM spine_text_templates
+      SELECT id, organization_id, segment, direction, finding_type, text_template, language, is_default, sort_order, created_at, updated_at
+      FROM spine_text_templates
       WHERE organization_id = $1
         AND segment = $2
         AND direction = $3
@@ -170,7 +175,8 @@ export const getBySegmentDirection = async (req, res) => {
     // If not found, get default
     if (result.rows.length === 0) {
       sql = `
-        SELECT * FROM spine_text_templates
+        SELECT id, organization_id, segment, direction, finding_type, text_template, language, is_default, sort_order, created_at, updated_at
+        FROM spine_text_templates
         WHERE is_default = true
           AND segment = $1
           AND direction = $2
@@ -288,7 +294,7 @@ export const update = async (req, res) => {
     // If no org template found, check if it's a default template and create an org override
     if (result.rows.length === 0) {
       // Check if this is a default template
-      const checkSql = `SELECT * FROM spine_text_templates WHERE id = $1 AND is_default = true`;
+      const checkSql = `SELECT id, organization_id, segment, direction, finding_type, text_template, language, is_default, sort_order, created_at, updated_at FROM spine_text_templates WHERE id = $1 AND is_default = true`;
       const checkResult = await query(checkSql, [id]);
 
       if (checkResult.rows.length === 0) {

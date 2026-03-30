@@ -19,11 +19,13 @@ import {
 import { followUpsAPI, patientsAPI } from '../services/api';
 import { formatPhone } from '../lib/utils';
 import { useTranslation, formatDate } from '../i18n';
+import { usePrompt } from '../components/ui/PromptDialog';
 import toast from '../utils/toast';
 import RecallDashboard from '../components/recall/RecallDashboard';
 
 export default function FollowUps() {
   const { t, lang } = useTranslation('appointments');
+  const prompt = usePrompt();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [filters, setFilters] = useState({
@@ -86,16 +88,22 @@ export default function FollowUps() {
     },
   });
 
-  const handleComplete = (followUp) => {
-    const notes = prompt('Add completion notes (optional):');
+  const handleComplete = async (followUp) => {
+    const notes = await prompt({
+      title: t('completionNotesTitle', 'Fullforingsnotater'),
+      placeholder: t('completionNotesPlaceholder', 'Legg til notater (valgfritt)'),
+    });
     if (notes !== null) {
       // User didn't cancel
       completeMutation.mutate({ id: followUp.id, notes: notes || '' });
     }
   };
 
-  const handleSkip = (followUp) => {
-    const reason = prompt('Reason for skipping this follow-up:');
+  const handleSkip = async (followUp) => {
+    const reason = await prompt({
+      title: t('skipReasonTitle', 'Hopp over oppfolging'),
+      placeholder: t('skipReasonPlaceholder', 'Grunn for a hoppe over denne oppfolgingen'),
+    });
     if (reason) {
       skipMutation.mutate({ id: followUp.id, reason });
     }
@@ -110,7 +118,7 @@ export default function FollowUps() {
       case 'LOW':
         return 'text-blue-600 bg-blue-50 border-blue-200';
       default:
-        return 'text-gray-600 bg-gray-50 border-gray-200';
+        return 'text-gray-600 dark:text-gray-300 bg-gray-50 border-gray-200';
     }
   };
 
@@ -164,7 +172,7 @@ export default function FollowUps() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">{t('followUps')}</h1>
-        <p className="text-sm text-gray-500 mt-1">{t('followUpsSubtitle')}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('followUpsSubtitle')}</p>
       </div>
 
       {/* Tabs */}
@@ -175,7 +183,7 @@ export default function FollowUps() {
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'all'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -188,7 +196,7 @@ export default function FollowUps() {
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'pending'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -206,7 +214,7 @@ export default function FollowUps() {
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'completed'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -219,7 +227,7 @@ export default function FollowUps() {
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'needed'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -237,7 +245,7 @@ export default function FollowUps() {
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'recall'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -253,7 +261,7 @@ export default function FollowUps() {
         <div className="mb-6 bg-white rounded-lg border border-gray-200 p-4">
           <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-gray-400" />
+              <Filter className="w-5 h-5 text-gray-400 dark:text-gray-300" />
               <span className="text-sm font-medium text-gray-700">{t('filters')}:</span>
             </div>
 
@@ -281,7 +289,7 @@ export default function FollowUps() {
             </select>
 
             <div className="flex-1 min-w-[200px] relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-4 h-4" />
               <input
                 type="text"
                 placeholder={t('searchFollowUps')}
@@ -294,7 +302,7 @@ export default function FollowUps() {
             {(filters.status || filters.priority || filters.search) && (
               <button
                 onClick={() => setFilters({ status: '', priority: '', search: '' })}
-                className="text-sm text-gray-600 hover:text-gray-900 flex items-center gap-1"
+                className="text-sm text-gray-600 dark:text-gray-300 hover:text-gray-900 flex items-center gap-1"
               >
                 <X className="w-4 h-4" />
                 {t('clearFilters')}
@@ -312,14 +320,18 @@ export default function FollowUps() {
         <div className="bg-white rounded-lg border border-gray-200">
           <div className="px-6 py-4 border-b border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900">{t('patientsFlagged')}</h2>
-            <p className="text-sm text-gray-500 mt-1">{t('patientsFlaggedDesc')}</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {t('patientsFlaggedDesc')}
+            </p>
           </div>
 
           <div className="divide-y divide-gray-100">
             {patientsLoading ? (
               <div className="px-6 py-12 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-3">{t('loadingPatients')}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+                  {t('loadingPatients')}
+                </p>
               </div>
             ) : patientsNeedingFollowUp.length > 0 ? (
               patientsNeedingFollowUp.map((patient) => (
@@ -338,7 +350,7 @@ export default function FollowUps() {
                             {t('followUpNeeded')}
                           </span>
                         </div>
-                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                        <div className="flex items-center gap-4 mt-2 text-sm text-gray-500 dark:text-gray-400">
                           <span className="flex items-center gap-1">
                             <Phone className="w-4 h-4" />
                             {formatPhone(patient.phone)}
@@ -349,7 +361,7 @@ export default function FollowUps() {
                           </span>
                         </div>
                         {patient.follow_up_reason && (
-                          <p className="text-sm text-gray-600 mt-2">
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
                             {t('reasonLabel')}: {patient.follow_up_reason}
                           </p>
                         )}
@@ -377,7 +389,9 @@ export default function FollowUps() {
             ) : (
               <div className="px-6 py-12 text-center">
                 <CheckCircle2 className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">{t('noPatientsNeedFollowUp')}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  {t('noPatientsNeedFollowUp')}
+                </p>
               </div>
             )}
           </div>
@@ -389,7 +403,9 @@ export default function FollowUps() {
             {isLoading ? (
               <div className="px-6 py-12 text-center">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-3">{t('loadingFollowUps')}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">
+                  {t('loadingFollowUps')}
+                </p>
               </div>
             ) : filteredFollowUps.length > 0 ? (
               filteredFollowUps.map((followUp) => (
@@ -422,10 +438,12 @@ export default function FollowUps() {
                         </div>
 
                         {followUp.notes && (
-                          <p className="text-sm text-gray-600 mt-2">{followUp.notes}</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-2">
+                            {followUp.notes}
+                          </p>
                         )}
 
-                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
                           <span className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
                             {t('dueLabel')}: {formatDate(followUp.due_date, lang)}
@@ -475,7 +493,7 @@ export default function FollowUps() {
             ) : (
               <div className="px-6 py-12 text-center">
                 <Clock className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 dark:text-gray-400">
                   {filters.status || filters.priority || filters.search
                     ? t('noFollowUpsMatch')
                     : t('noFollowUpsFound')}

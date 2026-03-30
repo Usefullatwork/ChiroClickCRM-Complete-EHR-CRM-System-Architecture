@@ -23,6 +23,15 @@ vi.mock('../../utils/logger', () => ({
   default: { scope: () => ({ error: vi.fn(), warn: vi.fn(), info: vi.fn() }), error: vi.fn() },
 }));
 
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({
+    t: (key, fallback) => fallback || key,
+    lang: 'no',
+    setLang: vi.fn(),
+    getBilingual: (obj) => obj?.['no'] || obj?.['en'] || obj,
+  }),
+}));
+
 import { crmAPI } from '../../services/api';
 
 const mockCampaigns = [

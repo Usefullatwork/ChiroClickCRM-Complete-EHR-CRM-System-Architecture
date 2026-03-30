@@ -40,7 +40,7 @@ Notifications.setNotificationHandler({
  */
 export async function requestNotificationPermissions(): Promise<boolean> {
   if (!Device.isDevice) {
-    console.log('Push notifications require a physical device');
+    process.stdout.write('Push notifications require a physical device\n');
     return false;
   }
 
@@ -53,7 +53,7 @@ export async function requestNotificationPermissions(): Promise<boolean> {
   }
 
   if (finalStatus !== 'granted') {
-    console.log('Failed to get push notification permissions');
+    process.stdout.write('Failed to get push notification permissions\n');
     return false;
   }
 
@@ -289,6 +289,19 @@ export function addNotificationReceivedListener(
   return Notifications.addNotificationReceivedListener(callback);
 }
 
+/**
+ * Handle push notification tap — extract route and navigate
+ */
+export function handlePushNavigation(
+  response: Notifications.NotificationResponse,
+  navigate: (route: string) => void
+): void {
+  const data = response.notification.request.content.data;
+  if (data?.route && typeof data.route === 'string') {
+    navigate(data.route);
+  }
+}
+
 export default {
   requestNotificationPermissions,
   getExpoPushToken,
@@ -304,5 +317,6 @@ export default {
   setBadgeCount,
   clearBadge,
   addNotificationResponseListener,
-  addNotificationReceivedListener
+  addNotificationReceivedListener,
+  handlePushNavigation
 };

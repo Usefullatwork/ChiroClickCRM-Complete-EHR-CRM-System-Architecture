@@ -31,6 +31,7 @@ import {
 const TRANSLATIONS = {
   en: {
     startQuestionnaire: 'Start Questionnaire',
+    cancel: 'Cancel',
     continue: 'Continue',
     back: 'Back',
     next: 'Next',
@@ -53,6 +54,7 @@ const TRANSLATIONS = {
     skip: 'Skip this question',
   },
   no: {
+    cancel: 'Avbryt',
     startQuestionnaire: 'Start spørreskjema',
     continue: 'Fortsett',
     back: 'Tilbake',
@@ -117,13 +119,15 @@ function SectionQuestion({ section, answer, onChange, lang }) {
       <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
         {section.title[lang]}
         {section.optional && (
-          <span className="ml-2 text-sm font-normal text-gray-500">{t.optional}</span>
+          <span className="ml-2 text-sm font-normal text-gray-500 dark:text-gray-400">
+            {t.optional}
+          </span>
         )}
       </h3>
       <div className="space-y-2">
-        {section.options.map((option, index) => (
+        {section.options.map((option) => (
           <label
-            key={index}
+            key={option.score}
             className={`flex items-start p-4 rounded-lg border-2 cursor-pointer transition-all ${
               answer === option.score
                 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
@@ -320,7 +324,7 @@ function ResultsDisplay({ questionnaireId, score, previousScore, lang }) {
       case 'darkred':
         return 'text-red-800 bg-red-200';
       default:
-        return 'text-gray-600 bg-gray-100';
+        return 'text-gray-600 dark:text-gray-300 bg-gray-100';
     }
   };
 
@@ -338,14 +342,14 @@ function ResultsDisplay({ questionnaireId, score, previousScore, lang }) {
             {questionnaireId === 'FABQ' ? (
               <>
                 <span className="text-3xl">PA: {score.physical.score}</span>
-                <span className="mx-2 text-gray-400">/</span>
+                <span className="mx-2 text-gray-400 dark:text-gray-300">/</span>
                 <span className="text-3xl">W: {score.work.score}</span>
               </>
             ) : (
               <>
                 {score.rawScore || score.percentage}
                 {score.percentage !== undefined && (
-                  <span className="text-2xl text-gray-500">%</span>
+                  <span className="text-2xl text-gray-500 dark:text-gray-400">%</span>
                 )}
               </>
             )}
@@ -397,7 +401,7 @@ function ResultsDisplay({ questionnaireId, score, previousScore, lang }) {
                     ? 'text-green-600'
                     : change.absoluteChange < 0
                       ? 'text-red-600'
-                      : 'text-gray-600'
+                      : 'text-gray-600 dark:text-gray-300'
                 }`}
               >
                 {change.absoluteChange > 0 ? '-' : '+'}
@@ -602,7 +606,7 @@ export default function OutcomeQuestionnaire({
               onClick={currentSection === 0 ? onCancel : goBack}
               className="px-6 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
             >
-              {currentSection === 0 ? 'Cancel' : t.back}
+              {currentSection === 0 ? t.cancel : t.back}
             </button>
             <button
               onClick={goNext}

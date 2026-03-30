@@ -1,7 +1,7 @@
 {
-  "name": "chiroclickcrm-frontend",
-  "version": "2.0.0",
-  "description": "ChiroClickCRM Frontend - Norwegian EHR-CRM System",
+  "name": "chiroclickehr-frontend",
+  "version": "2.1.0",
+  "description": "ChiroClickEHR Frontend - Norwegian EHR System",
   "type": "module",
   "scripts": {
     "dev": "vite",

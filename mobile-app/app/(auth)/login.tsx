@@ -104,7 +104,7 @@ export default function LoginScreen() {
             <View style={styles.logoContainer}>
               <Text style={styles.logo}>🏃‍♂️</Text>
             </View>
-            <Text style={styles.title}>ChiroClick</Text>
+            <Text style={styles.title}>ChiroClickEHR</Text>
             <Text style={styles.subtitle}>
               Din personlige treningspartner
             </Text>

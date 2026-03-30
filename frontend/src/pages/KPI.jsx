@@ -36,7 +36,7 @@ export default function KPI() {
     return (
       <div className="p-6">
         <h1 className="text-3xl font-bold mb-6">{t('kpiDashboard')}</h1>
-        <p className="text-gray-600">{t('loadingMetrics')}</p>
+        <p className="text-gray-600 dark:text-gray-300">{t('loadingMetrics')}</p>
       </div>
     );
   }
@@ -47,7 +47,7 @@ export default function KPI() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold mb-2">{t('kpiDashboard')}</h1>
-          <p className="text-gray-600">{t('practiceMetrics')}</p>
+          <p className="text-gray-600 dark:text-gray-300">{t('practiceMetrics')}</p>
         </div>
 
         {/* Date Range Selector */}
@@ -131,13 +131,13 @@ export default function KPI() {
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
                     {category.category || 'Unknown'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 text-right">
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 text-right">
                     {category.patient_count}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 text-right">
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 text-right">
                     {category.total_visits}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 text-right">
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 text-right">
                     {parseFloat(category.avg_visits_per_patient).toFixed(1)}
                   </td>
                   <td className="px-4 py-3 text-sm text-right">
@@ -166,13 +166,13 @@ export default function KPI() {
             <div key={idx} className="border border-gray-200 rounded-lg p-4">
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-semibold text-gray-900">{geo.location_type || 'Unknown'}</h3>
-                <MapPin className="w-5 h-5 text-gray-400" />
+                <MapPin className="w-5 h-5 text-gray-400 dark:text-gray-300" />
               </div>
               <p className="text-3xl font-bold text-blue-600 mb-1">{geo.patient_count}</p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 {t('totalVisits').replace('{count}', geo.total_visits)}
               </p>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 {t('avgVisitsPerPatient').replace(
                   '{avg}',
                   parseFloat(geo.avg_visits_per_patient).toFixed(1)
@@ -210,13 +210,13 @@ export default function KPI() {
                   <td className="px-4 py-3 text-sm font-medium text-gray-900">
                     {treatment.treatment_type || 'Unknown'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 text-right">
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 text-right">
                     {treatment.patient_count}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 text-right">
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 text-right">
                     {treatment.treatment_count}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600 text-right">
+                  <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 text-right">
                     {parseFloat(treatment.avg_treatments_per_patient).toFixed(1)}
                   </td>
                 </tr>
@@ -233,7 +233,7 @@ export default function KPI() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {Object.entries(metrics.follow_up_status).map(([method, count]) => (
               <div key={method} className="border border-gray-200 rounded-lg p-4 text-center">
-                <p className="text-sm text-gray-600 mb-1">{method}</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">{method}</p>
                 <p className="text-2xl font-bold text-gray-900">{count}</p>
               </div>
             ))}
@@ -266,10 +266,10 @@ export default function KPI() {
                     <td className="px-4 py-3 text-sm font-medium text-gray-900">
                       {source.referral_source || t('directSource')}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 text-right">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 text-right">
                       {source.patient_count}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-600 text-right">
+                    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300 text-right">
                       {((source.patient_count / metrics.overview.total_patients) * 100).toFixed(1)}%
                     </td>
                   </tr>
@@ -288,7 +288,7 @@ function MetricCard({ title, value, icon, subtitle, trend }) {
   return (
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex items-center justify-between mb-2">
-        <h3 className="text-sm font-medium text-gray-600">{title}</h3>
+        <h3 className="text-sm font-medium text-gray-600 dark:text-gray-300">{title}</h3>
         {icon}
       </div>
       <div className="flex items-baseline gap-2">
@@ -300,7 +300,7 @@ function MetricCard({ title, value, icon, subtitle, trend }) {
             <TrendingDown className="w-4 h-4 text-red-600" />
           ))}
       </div>
-      {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+      {subtitle && <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{subtitle}</p>}
     </div>
   );
 }

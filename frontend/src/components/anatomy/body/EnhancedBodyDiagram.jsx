@@ -263,7 +263,9 @@ export default function EnhancedBodyDiagram({
             <button
               onClick={() => setView('anterior')}
               className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                view === 'anterior' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                view === 'anterior'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
               }`}
             >
               Foran
@@ -271,7 +273,9 @@ export default function EnhancedBodyDiagram({
             <button
               onClick={() => setView('posterior')}
               className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
-                view === 'posterior' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'
+                view === 'posterior'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
               }`}
             >
               Bak
@@ -319,7 +323,9 @@ export default function EnhancedBodyDiagram({
             {/* Quick Select */}
             {showQuickSelect && (
               <div className="mb-4">
-                <h4 className="text-xs font-medium text-gray-500 mb-2">Hurtigvalg</h4>
+                <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                  Hurtigvalg
+                </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {quickSelectRegions.map((region) => (
                     <button
@@ -341,7 +347,9 @@ export default function EnhancedBodyDiagram({
             {/* Selected Regions */}
             {selectedRegions.length > 0 && (
               <div className="mb-4">
-                <h4 className="text-xs font-medium text-gray-500 mb-2">Valgte områder</h4>
+                <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                  Valgte områder
+                </h4>
                 <div className="flex flex-wrap gap-1.5 max-h-32 overflow-y-auto">
                   {selectedRegions.map((regionId) => (
                     <span
@@ -360,11 +368,13 @@ export default function EnhancedBodyDiagram({
 
             {/* Region Groups */}
             <div>
-              <h4 className="text-xs font-medium text-gray-500 mb-2">Regioner</h4>
+              <h4 className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">
+                Regioner
+              </h4>
               <div className="space-y-2">
                 {Object.entries(CHIRO_REGIONS).map(([groupName, regions]) => (
                   <div key={groupName}>
-                    <span className="text-xs text-gray-400 uppercase">
+                    <span className="text-xs text-gray-400 dark:text-gray-300 uppercase">
                       {groupName === 'spine'
                         ? 'Ryggrad'
                         : groupName === 'upper_extremity'
@@ -381,7 +391,7 @@ export default function EnhancedBodyDiagram({
                           className={`px-1.5 py-0.5 text-[10px] rounded transition-all ${
                             selectedRegions.includes(regionId)
                               ? 'bg-red-500 text-white'
-                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                              : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-gray-200'
                           }`}
                         >
                           {REGION_LABELS[regionId]?.split(' ').pop() || regionId}

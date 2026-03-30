@@ -1,9 +1,9 @@
 /**
- * Patient Detail Page
- * Comprehensive patient profile with CRM fields
+ * Patient Detail Page — Split-View Layout
+ * Fixed sidebar with always-visible patient info + tabbed content area
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
@@ -24,13 +24,24 @@ import { patientsAPI, encountersAPI } from '../services/api';
 import { formatDate, formatPhone, calculateAge } from '../lib/utils';
 import GDPRExportModal from '../components/GDPRExportModal';
 import PatientSummaryCard from '../components/patients/PatientSummaryCard';
+import PatientChartSidebar from '../components/patients/PatientChartSidebar';
+import PatientTimeline from '../components/patients/PatientTimeline';
 import TreatmentPlanProgress from '../components/treatment/TreatmentPlanProgress';
 import OutcomeChart from '../components/clinical/OutcomeChart';
 import ComplianceDashboard from '../components/clinical/ComplianceDashboard';
-import Breadcrumbs from '../components/common/Breadcrumbs';
+import _Breadcrumbs from '../components/common/Breadcrumbs';
 import { useTranslation } from '../i18n';
 import usePatientPresence from '../hooks/usePatientPresence';
 import { useAuth } from '../hooks/useAuth';
+import PatientMessages from '../components/portal/PatientMessages';
+
+const TABS = [
+  { key: 'overview', labelEn: 'Overview', labelNo: 'Oversikt' },
+  { key: 'journals', labelEn: 'Journals', labelNo: 'Journaler' },
+  { key: 'timeline', labelEn: 'Timeline', labelNo: 'Tidslinje' },
+  { key: 'results', labelEn: 'Results', labelNo: 'Resultater' },
+  { key: 'messages', labelEn: 'Messages', labelNo: 'Meldinger' },
+];
 
 export default function PatientDetail() {
   const { id } = useParams();
@@ -41,6 +52,7 @@ export default function PatientDetail() {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({});
   const [showGDPRModal, setShowGDPRModal] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
 
   // Track who else is viewing this patient
   const patientViewers = usePatientPresence(
@@ -52,9 +64,6 @@ export default function PatientDetail() {
   const { data: patientResponse, isLoading } = useQuery({
     queryKey: ['patient', id],
     queryFn: () => patientsAPI.getById(id),
-    onSuccess: (data) => {
-      setFormData(data.data);
-    },
   });
 
   // Fetch encounters
@@ -63,8 +72,16 @@ export default function PatientDetail() {
     queryFn: () => encountersAPI.getByPatient(id),
   });
 
-  const patient = patientResponse?.data;
-  const encounters = encountersResponse?.data?.encounters || [];
+  const patient = patientResponse?.data?.data || patientResponse?.data;
+
+  // Sync formData when patient data loads (replaces deprecated onSuccess)
+  useEffect(() => {
+    if (patientResponse?.data) {
+      setFormData(patientResponse.data?.data || patientResponse.data);
+    }
+  }, [patientResponse]);
+  const encountersRaw = encountersResponse?.data?.data || encountersResponse?.data;
+  const encounters = encountersRaw?.encounters || [];
 
   // Update patient mutation
   const updateMutation = useMutation({
@@ -87,7 +104,7 @@ export default function PatientDetail() {
   if (isLoading) {
     return (
       <div className="p-6 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
       </div>
     );
   }
@@ -95,89 +112,53 @@ export default function PatientDetail() {
   if (!patient) {
     return (
       <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-800">{t('patientNotFound')}</p>
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4">
+          <p className="text-red-800 dark:text-red-400">{t('patientNotFound')}</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', href: '/' },
-          { label: t('patients') || 'Patients', href: '/patients' },
-          { label: `${patient.first_name} ${patient.last_name}` },
-        ]}
-      />
-
-      {/* Presence Indicator - show who else is viewing this patient */}
-      {patientViewers.length > 0 && (
-        <div className="mb-4 flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-lg">
-          <div className="flex -space-x-2">
-            {patientViewers.map((viewer) => (
-              <div
-                key={viewer.userId}
-                className="w-7 h-7 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs font-bold ring-2 ring-white"
-                title={viewer.name}
-              >
-                {viewer.name?.charAt(0)?.toUpperCase() || '?'}
-              </div>
-            ))}
-          </div>
-          <span className="text-sm text-amber-800">
-            {patientViewers.length === 1
-              ? `${patientViewers[0].name} ser ogsa pa denne pasienten`
-              : `${patientViewers.map((v) => v.name).join(', ')} ser ogsa pa denne pasienten`}
-          </span>
-          <div className="ml-auto flex items-center gap-1">
-            <span className="relative flex h-2.5 w-2.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-            </span>
-            <span className="text-xs text-amber-600">Live</span>
-          </div>
-        </div>
-      )}
-
-      {/* Patient Summary Card */}
-      <PatientSummaryCard patient={patient} patientId={id} />
-
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
+    <div className="flex flex-col h-full">
+      {/* Header bar */}
+      <div className="flex items-center justify-between px-6 py-3 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/patients')}
-            className="p-2 hover:bg-gray-100 rounded-lg"
-            aria-label="Back to patients"
+            className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg"
+            aria-label={t('backToPatients')}
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
           <div>
-            <h1 data-testid="patient-detail-name" className="text-3xl font-bold text-gray-900">
+            <h1
+              data-testid="patient-detail-name"
+              className="text-xl font-bold text-gray-900 dark:text-white"
+            >
               {patient.first_name} {patient.last_name}
             </h1>
-            <p className="text-gray-600">
-              {calculateAge(patient.date_of_birth)} years • ID: {patient.solvit_id}
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              {calculateAge(patient.date_of_birth)} {t('sidebar.years', 'år')} • ID:{' '}
+              {patient.solvit_id}
             </p>
           </div>
         </div>
 
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           {isEditing ? (
             <>
               <button
                 onClick={handleCancel}
-                className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <X className="w-4 h-4" />
-                Cancel
+                {t('cancel', 'Avbryt')}
               </button>
               <button
                 onClick={handleSave}
                 disabled={updateMutation.isPending}
-                className="flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-teal-600 rounded-lg hover:bg-teal-700 disabled:bg-gray-400"
               >
                 <Save className="w-4 h-4" />
                 {t('savePatient')}
@@ -187,637 +168,556 @@ export default function PatientDetail() {
             <>
               <button
                 onClick={() => setShowGDPRModal(true)}
-                className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
-                title="Export Patient Data (GDPR)"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
+                title="GDPR Export"
               >
                 <Shield className="w-4 h-4" />
-                Export Data
               </button>
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600"
               >
                 <Edit className="w-4 h-4" />
-                Edit
+                <span className="hidden sm:inline">{t('editPatient', 'Rediger')}</span>
               </button>
               <button
                 onClick={() => navigate(`/patients/${id}/easy-assessment`)}
-                className="flex items-center gap-2 px-4 py-2 text-white bg-purple-600 rounded-lg hover:bg-purple-700"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-purple-600 rounded-lg hover:bg-purple-700"
               >
                 <FileText className="w-4 h-4" />
-                Easy Assessment
+                <span className="hidden sm:inline">{t('quickAssessment', 'Hurtigvurdering')}</span>
               </button>
               <button
                 onClick={() => navigate(`/patients/${id}/encounter`)}
-                className="flex items-center gap-2 px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700"
+                className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-teal-600 rounded-lg hover:bg-teal-700"
               >
                 <FileText className="w-4 h-4" />
-                New Visit
+                <span className="hidden sm:inline">{t('newVisit')}</span>
               </button>
             </>
           )}
         </div>
       </div>
 
-      <div data-testid="patient-detail-tabs" className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Patient Info */}
-        <div data-testid="patient-detail-panel" className="lg:col-span-2 space-y-6">
-          {/* Contact Information */}
-          <div data-testid="patient-detail-tab-contact" className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">{t('contactInfo')}</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="flex items-start gap-3">
-                <Phone className="w-5 h-5 text-gray-400 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-600">{t('phone')}</p>
-                  {isEditing ? (
-                    <input
-                      type="tel"
-                      value={formData.phone || ''}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    />
-                  ) : (
-                    <p className="font-medium">{formatPhone(patient.phone) || '-'}</p>
+      {/* Presence Indicator */}
+      {patientViewers.length > 0 && (
+        <div className="flex items-center gap-2 px-6 py-2 bg-amber-50 dark:bg-amber-900/20 border-b border-amber-200 dark:border-amber-800">
+          <div className="flex -space-x-2">
+            {patientViewers.map((viewer) => (
+              <div
+                key={viewer.userId}
+                className="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-bold ring-2 ring-white dark:ring-gray-800"
+                title={viewer.name}
+              >
+                {viewer.name?.charAt(0)?.toUpperCase() || '?'}
+              </div>
+            ))}
+          </div>
+          <span className="text-xs text-amber-800 dark:text-amber-300">
+            {patientViewers.map((v) => v.name).join(', ')}{' '}
+            {t('alsoViewing', 'ser også på denne pasienten')}
+          </span>
+          <div className="ml-auto flex items-center gap-1">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+            </span>
+            <span className="text-[10px] text-amber-600 dark:text-amber-400">Live</span>
+          </div>
+        </div>
+      )}
+
+      {/* Split-view: Sidebar + Tabbed Content */}
+      <div data-testid="patient-detail-tabs" className="flex flex-1 min-h-0">
+        {/* Sidebar — hidden on mobile, 300px on desktop */}
+        <div className="hidden lg:block">
+          <PatientChartSidebar
+            patient={patient}
+            encounters={encounters}
+            isEditing={isEditing}
+            onNavigate={navigate}
+            t={t}
+            lang={lang}
+          />
+        </div>
+
+        {/* Tabbed content area */}
+        <div
+          data-testid="patient-detail-panel"
+          className="flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-gray-900"
+        >
+          {/* Tab bar */}
+          <div className="flex items-center gap-1 px-6 pt-4 pb-0">
+            {TABS.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                  activeTab === tab.key
+                    ? 'bg-white dark:bg-gray-800 text-teal-700 dark:text-teal-400 border border-gray-200 dark:border-gray-700 border-b-white dark:border-b-gray-800'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
+                }`}
+              >
+                {lang === 'no' ? tab.labelNo : tab.labelEn}
+              </button>
+            ))}
+          </div>
+
+          {/* Tab content */}
+          <div className="flex-1 overflow-y-auto bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mx-6 mb-6 rounded-b-lg rounded-tr-lg shadow-sm">
+            {/* Overview Tab */}
+            {activeTab === 'overview' && (
+              <div className="p-6 space-y-6">
+                {/* Mobile-only summary card (sidebar content for mobile) */}
+                <div className="lg:hidden">
+                  <PatientSummaryCard patient={patient} patientId={id} />
+                </div>
+
+                {/* Contact Information */}
+                <div data-testid="patient-detail-tab-contact">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {t('contactInfo')}
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="flex items-start gap-3">
+                      <Phone className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('phone')}</p>
+                        {isEditing ? (
+                          <input
+                            type="tel"
+                            value={formData.phone || ''}
+                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                            className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
+                          />
+                        ) : (
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {formatPhone(patient.phone) || '-'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <Mail className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('email')}</p>
+                        {isEditing ? (
+                          <input
+                            type="email"
+                            value={formData.email || ''}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
+                          />
+                        ) : (
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {patient.email || '-'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <MessageSquare className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {t('preferredContactMethod')}
+                        </p>
+                        {isEditing ? (
+                          <select
+                            value={formData.preferred_contact_method || ''}
+                            onChange={(e) =>
+                              setFormData({ ...formData, preferred_contact_method: e.target.value })
+                            }
+                            className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
+                          >
+                            <option value="">{t('notSet', 'Ikke satt')}</option>
+                            <option value="SMS">SMS</option>
+                            <option value="EMAIL">{t('email')}</option>
+                            <option value="PHONE">{t('phone')}</option>
+                            <option value="NO_CONTACT">{t('noContact', 'Ikke kontakt')}</option>
+                          </select>
+                        ) : (
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {patient.preferred_contact_method || '-'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3">
+                      <Globe className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                          {t('language', 'Språk')}
+                        </p>
+                        {isEditing ? (
+                          <select
+                            value={formData.language || 'NO'}
+                            onChange={(e) => setFormData({ ...formData, language: e.target.value })}
+                            className="mt-1 w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
+                          >
+                            <option value="NO">Norsk</option>
+                            <option value="EN">English</option>
+                            <option value="OTHER">{t('other', 'Annet')}</option>
+                          </select>
+                        ) : (
+                          <p className="font-medium text-gray-900 dark:text-white">
+                            {patient.language === 'NO'
+                              ? 'Norsk'
+                              : patient.language === 'EN'
+                                ? 'English'
+                                : patient.language || '-'}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {patient.address && (
+                    <div className="mt-4 flex items-start gap-3">
+                      <MapPin className="w-5 h-5 text-gray-400 dark:text-gray-300 mt-0.5" />
+                      <div>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{t('address')}</p>
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {patient.address.street}
+                          <br />
+                          {patient.address.postal_code} {patient.address.city}
+                        </p>
+                      </div>
+                    </div>
                   )}
                 </div>
-              </div>
 
-              <div className="flex items-start gap-3">
-                <Mail className="w-5 h-5 text-gray-400 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-600">{t('email')}</p>
-                  {isEditing ? (
-                    <input
-                      type="email"
-                      value={formData.email || ''}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    />
-                  ) : (
-                    <p className="font-medium">{patient.email || '-'}</p>
-                  )}
+                {/* Clinical Information */}
+                <div data-testid="patient-detail-tab-clinical">
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {t('clinical')}
+                  </h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                        {t('mainProblem')}
+                      </label>
+                      {isEditing ? (
+                        <input
+                          type="text"
+                          value={formData.main_problem || ''}
+                          onChange={(e) =>
+                            setFormData({ ...formData, main_problem: e.target.value })
+                          }
+                          placeholder={t(
+                            'mainProblemPlaceholder',
+                            'F.eks. nakkesmerter, ryggproblemer'
+                          )}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
+                        />
+                      ) : (
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {patient.main_problem || '-'}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                        {t('treatmentType', 'Behandlingstype')}
+                      </label>
+                      {isEditing ? (
+                        <select
+                          value={formData.treatment_type || ''}
+                          onChange={(e) =>
+                            setFormData({ ...formData, treatment_type: e.target.value })
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
+                        >
+                          <option value="">{t('notSet', 'Ikke satt')}</option>
+                          <option value="KIROPRAKTOR">Kiropraktor</option>
+                          <option value="NEVROBEHANDLING">Nevrobehandling</option>
+                          <option value="MUSKELBEHANDLING">Muskelbehandling</option>
+                          <option value="OTHER">{t('other', 'Annet')}</option>
+                        </select>
+                      ) : (
+                        <p className="font-medium text-gray-900 dark:text-white">
+                          {patient.treatment_type || '-'}
+                        </p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                        {t('notes')}
+                      </label>
+                      {isEditing ? (
+                        <textarea
+                          value={formData.general_notes || ''}
+                          onChange={(e) =>
+                            setFormData({ ...formData, general_notes: e.target.value })
+                          }
+                          rows={3}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
+                        />
+                      ) : (
+                        <p className="font-medium text-gray-900 dark:text-white whitespace-pre-wrap">
+                          {patient.general_notes || '-'}
+                        </p>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
 
-              <div className="flex items-start gap-3">
-                <MessageSquare className="w-5 h-5 text-gray-400 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-600">{t('preferredContactMethod')}</p>
-                  {isEditing ? (
-                    <select
-                      value={formData.preferred_contact_method || ''}
-                      onChange={(e) =>
-                        setFormData({ ...formData, preferred_contact_method: e.target.value })
-                      }
-                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    >
-                      <option value="">Not set</option>
-                      <option value="SMS">SMS</option>
-                      <option value="EMAIL">Email</option>
-                      <option value="PHONE">Phone</option>
-                      <option value="NO_CONTACT">Do not contact</option>
-                    </select>
+                {/* Treatment Preferences */}
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                    {t('treatmentPreferences')}
+                  </h2>
+                  {!isEditing ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      {[
+                        { key: 'needles', field: 'treatment_pref_needles' },
+                        { key: 'adjustments', field: 'treatment_pref_adjustments' },
+                        { key: 'neckAdjustments', field: 'treatment_pref_neck_adjustments' },
+                      ].map(({ key, field }) => {
+                        const val = patient[field];
+                        return (
+                          <div
+                            key={key}
+                            className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-700"
+                          >
+                            <div
+                              className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                                val === true
+                                  ? 'bg-green-100 dark:bg-green-900/30'
+                                  : val === false
+                                    ? 'bg-red-100 dark:bg-red-900/30'
+                                    : 'bg-gray-100 dark:bg-gray-700'
+                              }`}
+                            >
+                              <span
+                                className={`text-lg ${val === true ? 'text-green-600' : val === false ? 'text-red-600' : 'text-gray-400 dark:text-gray-300'}`}
+                              >
+                                {val === true ? '✓' : val === false ? '✗' : '?'}
+                              </span>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-600 dark:text-gray-400">{t(key)}</p>
+                              <p className="font-medium text-gray-900 dark:text-white">
+                                {val === true
+                                  ? t('prefOk')
+                                  : val === false
+                                    ? t('prefNotOk')
+                                    : t('prefNotCleared')}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   ) : (
-                    <p className="font-medium">{patient.preferred_contact_method || '-'}</p>
+                    <div className="space-y-3">
+                      {[
+                        {
+                          key: 'needles',
+                          field: 'treatment_pref_needles',
+                          name: 'edit_pref_needles',
+                        },
+                        {
+                          key: 'adjustments',
+                          field: 'treatment_pref_adjustments',
+                          name: 'edit_pref_adj',
+                        },
+                        {
+                          key: 'neckAdjustments',
+                          field: 'treatment_pref_neck_adjustments',
+                          name: 'edit_pref_neck',
+                        },
+                      ].map(({ key, field, name }) => (
+                        <div key={key} className="flex items-center gap-6">
+                          <span className="text-sm font-medium text-gray-700 dark:text-gray-300 w-32">
+                            {t(key)}:
+                          </span>
+                          <div className="flex items-center gap-4">
+                            {[
+                              {
+                                val: true,
+                                label: t('prefOk'),
+                                color: 'text-green-700 dark:text-green-400',
+                              },
+                              {
+                                val: false,
+                                label: t('prefNotOk'),
+                                color: 'text-red-700 dark:text-red-400',
+                              },
+                              {
+                                val: null,
+                                label: t('prefNotCleared'),
+                                color: 'text-gray-500 dark:text-gray-400',
+                              },
+                            ].map(({ val, label, color }) => (
+                              <label
+                                key={String(val)}
+                                className="flex items-center gap-2 cursor-pointer"
+                              >
+                                <input
+                                  type="radio"
+                                  name={name}
+                                  checked={formData[field] === val}
+                                  onChange={() => setFormData({ ...formData, [field]: val })}
+                                  className="w-4 h-4"
+                                />
+                                <span className={`text-sm ${color}`}>{label}</span>
+                              </label>
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                      <div className="mt-4">
+                        <label className="block text-sm text-gray-600 dark:text-gray-400 mb-1">
+                          {t('preferenceNotes')}
+                        </label>
+                        <textarea
+                          value={formData.treatment_pref_notes || ''}
+                          onChange={(e) =>
+                            setFormData({ ...formData, treatment_pref_notes: e.target.value })
+                          }
+                          rows={2}
+                          placeholder={t('treatmentNotesPlaceholder')}
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg"
+                        />
+                      </div>
+                    </div>
                   )}
-                </div>
-              </div>
-
-              <div className="flex items-start gap-3">
-                <Globe className="w-5 h-5 text-gray-400 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm text-gray-600">Language</p>
-                  {isEditing ? (
-                    <select
-                      value={formData.language || 'NO'}
-                      onChange={(e) => setFormData({ ...formData, language: e.target.value })}
-                      className="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg"
-                    >
-                      <option value="NO">Norsk</option>
-                      <option value="EN">English</option>
-                      <option value="OTHER">Other</option>
-                    </select>
-                  ) : (
-                    <p className="font-medium">
-                      {patient.language === 'NO'
-                        ? 'Norsk'
-                        : patient.language === 'EN'
-                          ? 'English'
-                          : 'Other'}
+                  {!isEditing && patient.treatment_pref_notes && (
+                    <p className="mt-3 text-sm text-gray-600 dark:text-gray-400">
+                      {patient.treatment_pref_notes}
                     </p>
                   )}
                 </div>
-              </div>
-            </div>
 
-            {patient.address && (
-              <div className="mt-4 flex items-start gap-3">
-                <MapPin className="w-5 h-5 text-gray-400 mt-0.5" />
+                {/* Consent Status */}
                 <div>
-                  <p className="text-sm text-gray-600">{t('address')}</p>
-                  <p className="font-medium">
-                    {patient.address.street}
-                    <br />
-                    {patient.address.postal_code} {patient.address.city}
-                  </p>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Clinical Information */}
-          <div data-testid="patient-detail-tab-clinical" className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">{t('clinical')}</h2>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">{t('mainProblem')}</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={formData.main_problem || ''}
-                    onChange={(e) => setFormData({ ...formData, main_problem: e.target.value })}
-                    placeholder="e.g., Nakke smerter, Rygg problemer"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  />
-                ) : (
-                  <p className="font-medium">{patient.main_problem || '-'}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">
-                  Treatment Type (Behandlingstype)
-                </label>
-                {isEditing ? (
-                  <select
-                    value={formData.treatment_type || ''}
-                    onChange={(e) => setFormData({ ...formData, treatment_type: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  >
-                    <option value="">Not set</option>
-                    <option value="KIROPRAKTOR">Kiropraktor</option>
-                    <option value="NEVROBEHANDLING">Nevrobehandling</option>
-                    <option value="MUSKELBEHANDLING">Muskelbehandling</option>
-                    <option value="OTHER">Other</option>
-                  </select>
-                ) : (
-                  <p className="font-medium">{patient.treatment_type || '-'}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">Preferred Therapist</label>
-                {isEditing ? (
-                  <input
-                    type="text"
-                    value={formData.preferred_therapist || ''}
-                    onChange={(e) =>
-                      setFormData({ ...formData, preferred_therapist: e.target.value })
-                    }
-                    placeholder="Mads, Andre, Mikael, Edle..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  />
-                ) : (
-                  <p className="font-medium">{patient.preferred_therapist || '-'}</p>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-sm text-gray-600 mb-1">{t('notes')}</label>
-                {isEditing ? (
-                  <textarea
-                    value={formData.general_notes || ''}
-                    onChange={(e) => setFormData({ ...formData, general_notes: e.target.value })}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  />
-                ) : (
-                  <p className="font-medium whitespace-pre-wrap">{patient.general_notes || '-'}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Treatment Preferences */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">{t('treatmentPreferences')}</h2>
-            <div className="space-y-4">
-              {/* Preference indicators when not editing */}
-              {!isEditing ? (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        patient.treatment_pref_needles === true
-                          ? 'bg-green-100'
-                          : patient.treatment_pref_needles === false
-                            ? 'bg-red-100'
-                            : 'bg-gray-100'
-                      }`}
-                    >
-                      <span
-                        className={`text-lg ${
-                          patient.treatment_pref_needles === true
-                            ? 'text-green-600'
-                            : patient.treatment_pref_needles === false
-                              ? 'text-red-600'
-                              : 'text-gray-400'
-                        }`}
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
+                    {t('consentGiven')}
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    {[
+                      { key: 'sms', field: 'consent_sms' },
+                      { key: 'email', field: 'consent_email' },
+                      { key: 'marketing', field: 'consent_marketing', label: 'Marketing' },
+                      { key: 'video', field: 'consent_video_marketing', label: 'Video' },
+                    ].map(({ key, field, label }) => (
+                      <div
+                        key={key}
+                        className="flex items-center justify-between p-2 rounded border border-gray-200 dark:border-gray-700"
                       >
-                        {patient.treatment_pref_needles === true
-                          ? '✓'
-                          : patient.treatment_pref_needles === false
-                            ? '✗'
-                            : '?'}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">{t('needles')}</p>
-                      <p className="font-medium">
-                        {patient.treatment_pref_needles === true
-                          ? t('prefOk')
-                          : patient.treatment_pref_needles === false
-                            ? t('prefNotOk')
-                            : t('prefNotCleared')}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        patient.treatment_pref_adjustments === true
-                          ? 'bg-green-100'
-                          : patient.treatment_pref_adjustments === false
-                            ? 'bg-red-100'
-                            : 'bg-gray-100'
-                      }`}
-                    >
-                      <span
-                        className={`text-lg ${
-                          patient.treatment_pref_adjustments === true
-                            ? 'text-green-600'
-                            : patient.treatment_pref_adjustments === false
-                              ? 'text-red-600'
-                              : 'text-gray-400'
-                        }`}
-                      >
-                        {patient.treatment_pref_adjustments === true
-                          ? '✓'
-                          : patient.treatment_pref_adjustments === false
-                            ? '✗'
-                            : '?'}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">{t('adjustments')}</p>
-                      <p className="font-medium">
-                        {patient.treatment_pref_adjustments === true
-                          ? t('prefOk')
-                          : patient.treatment_pref_adjustments === false
-                            ? t('prefNotOk')
-                            : t('prefNotCleared')}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-3 p-3 rounded-lg border border-gray-200">
-                    <div
-                      className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                        patient.treatment_pref_neck_adjustments === true
-                          ? 'bg-green-100'
-                          : patient.treatment_pref_neck_adjustments === false
-                            ? 'bg-red-100'
-                            : 'bg-gray-100'
-                      }`}
-                    >
-                      <span
-                        className={`text-lg ${
-                          patient.treatment_pref_neck_adjustments === true
-                            ? 'text-green-600'
-                            : patient.treatment_pref_neck_adjustments === false
-                              ? 'text-red-600'
-                              : 'text-gray-400'
-                        }`}
-                      >
-                        {patient.treatment_pref_neck_adjustments === true
-                          ? '✓'
-                          : patient.treatment_pref_neck_adjustments === false
-                            ? '✗'
-                            : '?'}
-                      </span>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600">{t('neckAdjustments')}</p>
-                      <p className="font-medium">
-                        {patient.treatment_pref_neck_adjustments === true
-                          ? t('prefOk')
-                          : patient.treatment_pref_neck_adjustments === false
-                            ? t('prefNotOk')
-                            : t('prefNotCleared')}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                /* Edit mode */
-                <div className="space-y-3">
-                  <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-gray-700 w-32">{t('needles')}:</span>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="edit_pref_needles"
-                          checked={formData.treatment_pref_needles === true}
-                          onChange={() =>
-                            setFormData({ ...formData, treatment_pref_needles: true })
+                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                          {label || t(key)}
+                        </span>
+                        <span
+                          className={
+                            patient[field] ? 'text-green-600' : 'text-gray-400 dark:text-gray-300'
                           }
-                          className="w-4 h-4 text-green-600"
-                        />
-                        <span className="text-sm text-green-700">{t('prefOk')}</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="edit_pref_needles"
-                          checked={formData.treatment_pref_needles === false}
-                          onChange={() =>
-                            setFormData({ ...formData, treatment_pref_needles: false })
-                          }
-                          className="w-4 h-4 text-red-600"
-                        />
-                        <span className="text-sm text-red-700">{t('prefNotOk')}</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="edit_pref_needles"
-                          checked={formData.treatment_pref_needles === null}
-                          onChange={() =>
-                            setFormData({ ...formData, treatment_pref_needles: null })
-                          }
-                          className="w-4 h-4 text-gray-600"
-                        />
-                        <span className="text-sm text-gray-500">{t('prefNotCleared')}</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-gray-700 w-32">
-                      {t('adjustments')}:
-                    </span>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="edit_pref_adj"
-                          checked={formData.treatment_pref_adjustments === true}
-                          onChange={() =>
-                            setFormData({ ...formData, treatment_pref_adjustments: true })
-                          }
-                          className="w-4 h-4 text-green-600"
-                        />
-                        <span className="text-sm text-green-700">{t('prefOk')}</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="edit_pref_adj"
-                          checked={formData.treatment_pref_adjustments === false}
-                          onChange={() =>
-                            setFormData({ ...formData, treatment_pref_adjustments: false })
-                          }
-                          className="w-4 h-4 text-red-600"
-                        />
-                        <span className="text-sm text-red-700">{t('prefNotOk')}</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="edit_pref_adj"
-                          checked={formData.treatment_pref_adjustments === null}
-                          onChange={() =>
-                            setFormData({ ...formData, treatment_pref_adjustments: null })
-                          }
-                          className="w-4 h-4 text-gray-600"
-                        />
-                        <span className="text-sm text-gray-500">{t('prefNotCleared')}</span>
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-6">
-                    <span className="text-sm font-medium text-gray-700 w-32">
-                      {t('neckAdjustments')}:
-                    </span>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="edit_pref_neck"
-                          checked={formData.treatment_pref_neck_adjustments === true}
-                          onChange={() =>
-                            setFormData({ ...formData, treatment_pref_neck_adjustments: true })
-                          }
-                          className="w-4 h-4 text-green-600"
-                        />
-                        <span className="text-sm text-green-700">{t('prefOk')}</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="edit_pref_neck"
-                          checked={formData.treatment_pref_neck_adjustments === false}
-                          onChange={() =>
-                            setFormData({ ...formData, treatment_pref_neck_adjustments: false })
-                          }
-                          className="w-4 h-4 text-red-600"
-                        />
-                        <span className="text-sm text-red-700">{t('prefNotOk')}</span>
-                      </label>
-                      <label className="flex items-center gap-2 cursor-pointer">
-                        <input
-                          type="radio"
-                          name="edit_pref_neck"
-                          checked={formData.treatment_pref_neck_adjustments === null}
-                          onChange={() =>
-                            setFormData({ ...formData, treatment_pref_neck_adjustments: null })
-                          }
-                          className="w-4 h-4 text-gray-600"
-                        />
-                        <span className="text-sm text-gray-500">{t('prefNotCleared')}</span>
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Notes */}
-              <div className="mt-4">
-                <label className="block text-sm text-gray-600 mb-1">{t('preferenceNotes')}</label>
-                {isEditing ? (
-                  <textarea
-                    value={formData.treatment_pref_notes || ''}
-                    onChange={(e) =>
-                      setFormData({ ...formData, treatment_pref_notes: e.target.value })
-                    }
-                    rows={2}
-                    placeholder={t('treatmentNotesPlaceholder')}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  />
-                ) : (
-                  <p className="text-gray-700">{patient.treatment_pref_notes || '-'}</p>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Recent Encounters */}
-          <div data-testid="patient-detail-tab-visits" className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">{t('recentVisits')}</h2>
-            {encounters.length === 0 ? (
-              <p className="text-gray-600">{t('noVisitsRecorded')}</p>
-            ) : (
-              <div className="space-y-3">
-                {encounters.slice(0, 5).map((encounter) => (
-                  <div
-                    key={encounter.id}
-                    className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
-                    onClick={() => navigate(`/patients/${id}/encounter/${encounter.id}`)}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="font-medium">{formatDate(encounter.encounter_date)}</p>
-                        <p className="text-sm text-gray-600">{encounter.encounter_type}</p>
+                        >
+                          {patient[field] ? '✓' : '✗'}
+                        </span>
                       </div>
-                      <FileText className="w-5 h-5 text-gray-400" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Journals Tab */}
+            {activeTab === 'journals' && (
+              <div data-testid="patient-detail-tab-visits" className="p-6 space-y-6">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {t('recentVisits')}
+                </h2>
+                {encounters.length === 0 ? (
+                  <p className="text-gray-600 dark:text-gray-400">{t('noVisitsRecorded')}</p>
+                ) : (
+                  <div className="space-y-3">
+                    {encounters.map((encounter) => (
+                      <div
+                        key={encounter.id}
+                        className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-750 cursor-pointer transition-colors"
+                        onClick={() => navigate(`/patients/${id}/encounter/${encounter.id}`)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="font-medium text-gray-900 dark:text-white">
+                              {formatDate(encounter.encounter_date)}
+                            </p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                              {encounter.encounter_type}
+                            </p>
+                            {encounter.chief_complaint && (
+                              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 line-clamp-1">
+                                {encounter.chief_complaint}
+                              </p>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {encounter.signed_at && (
+                              <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                                {t('signed', 'Signert')}
+                              </span>
+                            )}
+                            <FileText className="w-5 h-5 text-gray-400 dark:text-gray-300" />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Treatment Plan + Outcomes */}
+                <TreatmentPlanProgress
+                  patientId={id}
+                  onNewPlan={() => navigate(`/patients/${id}/treatment-plan/new`)}
+                  lang={lang === 'en' ? 'en' : 'no'}
+                />
+              </div>
+            )}
+
+            {/* Timeline Tab */}
+            {activeTab === 'timeline' && (
+              <div className="p-6">
+                <PatientTimeline patientId={id} encounters={encounters} onNavigate={navigate} />
+              </div>
+            )}
+
+            {/* Results Tab */}
+            {activeTab === 'results' && (
+              <div className="p-6 space-y-6">
+                <OutcomeChart patientId={id} />
+                <ComplianceDashboard patientId={id} />
+
+                {/* Follow-up Alert */}
+                {patient.should_be_followed_up && (
+                  <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+                    <div className="flex items-start gap-3">
+                      <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 flex-shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-semibold text-yellow-900 dark:text-yellow-200">
+                          {t('followUpNeeded', 'Oppfølging nødvendig')}
+                        </p>
+                        <p className="text-sm text-yellow-800 dark:text-yellow-300 mt-1">
+                          {t('dueLabel', 'Frist')}: {formatDate(patient.should_be_followed_up)}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                ))}
+                )}
               </div>
             )}
-            {encounters.length > 5 && (
-              <button className="mt-4 text-blue-600 hover:text-blue-700 text-sm font-medium">
-                View all {encounters.length} visits
-              </button>
+
+            {/* Messages Tab */}
+            {activeTab === 'messages' && (
+              <div className="p-6">
+                <PatientMessages patientId={id} />
+              </div>
             )}
-          </div>
-        </div>
-
-        {/* Right Column - Stats & Actions */}
-        <div className="space-y-6">
-          {/* Quick Stats */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold mb-4">Quick Stats</h2>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">{t('totalVisits')}</span>
-                <span className="font-bold text-lg">{patient.total_visits || 0}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">{t('lastVisit')}</span>
-                <span className="font-medium">{formatDate(patient.last_visit_date)}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">First Visit</span>
-                <span className="font-medium">{formatDate(patient.first_visit_date)}</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-gray-600">Status</span>
-                <span
-                  className={`px-2 py-1 text-xs font-semibold rounded-full ${
-                    patient.status === 'ACTIVE'
-                      ? 'bg-green-100 text-green-800'
-                      : patient.status === 'INACTIVE'
-                        ? 'bg-gray-100 text-gray-800'
-                        : 'bg-red-100 text-red-800'
-                  }`}
-                >
-                  {patient.status}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Treatment Plan Progress */}
-          <TreatmentPlanProgress
-            patientId={id}
-            onNewPlan={() => navigate(`/patients/${id}/treatment-plan/new`)}
-            lang={lang === 'en' ? 'en' : 'no'}
-          />
-
-          {/* Outcome Measure Trends */}
-          <OutcomeChart patientId={id} />
-
-          {/* Exercise Compliance */}
-          <ComplianceDashboard patientId={id} />
-
-          {/* Follow-up Alert */}
-          {patient.should_be_followed_up && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="font-semibold text-yellow-900">Follow-up Needed</p>
-                  <p className="text-sm text-yellow-800 mt-1">
-                    Due: {formatDate(patient.should_be_followed_up)}
-                  </p>
-                  <button className="mt-2 text-sm text-yellow-900 font-medium hover:underline">
-                    Mark as contacted
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Category Info */}
-          {patient.category && (
-            <div className="bg-white rounded-lg shadow p-6">
-              <h3 className="font-semibold mb-2">Category</h3>
-              <p className="text-sm text-gray-600">{patient.category.replace('_', ' ')}</p>
-              {patient.referral_source && (
-                <div className="mt-3">
-                  <h3 className="font-semibold mb-1">Referral Source</h3>
-                  <p className="text-sm text-gray-600">{patient.referral_source}</p>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Consent Status */}
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="font-semibold mb-3">{t('consentGiven')}</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">{t('sms')}</span>
-                <span className={patient.consent_sms ? 'text-green-600' : 'text-gray-400'}>
-                  {patient.consent_sms ? '✓' : '✗'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">{t('email')}</span>
-                <span className={patient.consent_email ? 'text-green-600' : 'text-gray-400'}>
-                  {patient.consent_email ? '✓' : '✗'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Marketing</span>
-                <span className={patient.consent_marketing ? 'text-green-600' : 'text-gray-400'}>
-                  {patient.consent_marketing ? '✓' : '✗'}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-gray-600">Video Marketing</span>
-                <span
-                  className={patient.consent_video_marketing ? 'text-green-600' : 'text-gray-400'}
-                >
-                  {patient.consent_video_marketing ? '✓' : '✗'}
-                </span>
-              </div>
-            </div>
           </div>
         </div>
       </div>

@@ -1,0 +1,31 @@
+# Ollama Model Providers — mirrors modelRouter.js MODEL_CONFIG
+# Each provider maps to a model available in local Ollama
+
+providers:
+  # Primary production model: SFT+DPO merged (96% eval, Q8_0 GGUF)
+  - id: ollama:chiro-no-sft-dpo-v6
+    label: "v6-production"
+    config:
+      temperature: 0.3
+      num_predict: "{{max_tokens | default(500)}}"
+
+  # Previous production model (for comparison)
+  - id: ollama:chiro-no-sft-dpo-v5
+    label: "v5-previous"
+    config:
+      temperature: 0.3
+      num_predict: "{{max_tokens | default(500)}}"
+
+  # Fast autocomplete model
+  - id: ollama:chiro-fast
+    label: "fast-autocomplete"
+    config:
+      temperature: 0.5
+      num_predict: "{{max_tokens | default(500)}}"
+
+  # Clinical reasoning model
+  - id: ollama:chiro-medical
+    label: "medical-reasoning"
+    config:
+      temperature: 0.2
+      num_predict: "{{max_tokens | default(500)}}"

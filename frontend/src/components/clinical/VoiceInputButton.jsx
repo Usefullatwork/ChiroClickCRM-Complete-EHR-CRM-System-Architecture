@@ -161,17 +161,21 @@ export default function VoiceInputButton({
   const variantClasses = {
     default: isListening
       ? 'bg-red-500 text-white shadow-lg hover:bg-red-600'
-      : 'bg-gray-100 text-gray-600 hover:bg-red-50 hover:text-red-500',
-    minimal: isListening ? 'text-red-500 bg-red-50' : 'text-gray-400 hover:text-red-500',
+      : 'bg-gray-100 text-gray-600 dark:text-gray-300 hover:bg-red-50 hover:text-red-500',
+    minimal: isListening
+      ? 'text-red-500 bg-red-50'
+      : 'text-gray-400 dark:text-gray-300 hover:text-red-500',
     pill: isListening
       ? 'bg-red-500 text-white px-3 rounded-full'
-      : 'bg-gray-100 text-gray-600 px-3 rounded-full hover:bg-red-50 hover:text-red-500',
+      : 'bg-gray-100 text-gray-600 dark:text-gray-300 px-3 rounded-full hover:bg-red-50 hover:text-red-500',
   };
 
   // Not supported
   if (!isSupported) {
     return (
-      <div className={`flex items-center gap-1 text-gray-400 text-xs ${className}`}>
+      <div
+        className={`flex items-center gap-1 text-gray-400 dark:text-gray-300 text-xs ${className}`}
+      >
         <MicOff className="w-4 h-4" />
         <span>Tale ikke støttet</span>
       </div>

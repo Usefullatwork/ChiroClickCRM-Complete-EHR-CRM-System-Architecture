@@ -33,6 +33,7 @@ import PrescriptionPreview from '../components/exercises/PrescriptionPreview';
 import TemplateSelector from '../components/exercises/TemplateSelector';
 import WeeklyScheduleView from '../components/exercises/WeeklyScheduleView';
 
+import { useTranslation } from '../i18n';
 import logger from '../utils/logger';
 /**
  * ExercisePrescription Component
@@ -69,6 +70,8 @@ export default function ExercisePrescription() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [savedPrescriptionId, setSavedPrescriptionId] = useState(null);
+
+  const { t } = useTranslation('exercises');
 
   const isEditing = !!prescriptionId;
 
@@ -133,9 +136,9 @@ export default function ExercisePrescription() {
     }
   }, [existingPrescription]);
 
-  const exercises = exercisesData?.data || [];
-  const categories = categoriesData?.data || [];
-  const templates = templatesData?.data || [];
+  const exercises = exercisesData?.data?.data || exercisesData?.data || [];
+  const categories = categoriesData?.data?.data || categoriesData?.data || [];
+  const templates = templatesData?.data?.data || templatesData?.data || [];
 
   /**
    * Handle adding exercise to prescription
@@ -208,7 +211,7 @@ export default function ExercisePrescription() {
   const handleSelectTemplate = useCallback(
     (template) => {
       if (!template.exercises || template.exercises.length === 0) {
-        setError('Malen inneholder ingen ovelser');
+        setError(t('templateHasNoExercises', 'Malen inneholder ingen øvelser'));
         return;
       }
 
@@ -234,11 +237,16 @@ export default function ExercisePrescription() {
 
       if (templateExercises.length > 0) {
         setSelectedExercises(templateExercises);
-        setSuccess(`Mal "${template.name}" lastet med ${templateExercises.length} ovelser`);
+        setSuccess(
+          t(
+            'templateLoaded',
+            `Mal "${template.name}" lastet med ${templateExercises.length} øvelser`
+          )
+        );
         setRightPanelView('selector');
         setTimeout(() => setSuccess(null), 3000);
       } else {
-        setError('Kunne ikke finne ovelser fra malen');
+        setError(t('templateExercisesNotFound', 'Kunne ikke finne øvelser fra malen'));
       }
     },
     [exercises]
@@ -252,12 +260,12 @@ export default function ExercisePrescription() {
     async (templateData) => {
       try {
         await exercisesApi.createTemplate(templateData);
-        setSuccess('Mal opprettet!');
+        setSuccess(t('templateCreated', 'Mal opprettet!'));
         refetchTemplates();
         setTimeout(() => setSuccess(null), 3000);
       } catch (err) {
         logger.error('Error saving template:', err);
-        setError('Kunne ikke opprette mal');
+        setError(t('templateCreateFailed', 'Kunne ikke opprette mal'));
         throw err;
       }
     },
@@ -269,7 +277,7 @@ export default function ExercisePrescription() {
    */
   const handleSave = async () => {
     if (selectedExercises.length === 0) {
-      setError('Velg minst en ovelse');
+      setError(t('selectAtLeastOneExercise', 'Velg minst én øvelse'));
       return;
     }
 
@@ -298,7 +306,7 @@ export default function ExercisePrescription() {
 
       const response = await exercisesApi.createPrescription(prescriptionData);
 
-      setSuccess('Treningsprogram lagret!');
+      setSuccess(t('programSaved', 'Treningsprogram lagret!'));
       setSavedPrescriptionId(response.data?.id);
 
       // Invalidate queries
@@ -307,7 +315,7 @@ export default function ExercisePrescription() {
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       logger.error('Save failed:', err);
-      setError(err.message || 'Kunne ikke lagre treningsprogram');
+      setError(err.message || t('failedToSave', 'Kunne ikke lagre treningsprogram'));
     } finally {
       setSaving(false);
     }
@@ -319,7 +327,7 @@ export default function ExercisePrescription() {
   const handleSendEmail = async () => {
     const idToSend = savedPrescriptionId || prescriptionId;
     if (!idToSend) {
-      setError('Lagre programmet forst');
+      setError(t('saveProgramFirst', 'Lagre programmet først'));
       return;
     }
 
@@ -327,11 +335,11 @@ export default function ExercisePrescription() {
       setSending(true);
       setError(null);
       await exercisesApi.sendEmail(idToSend);
-      setSuccess('E-post sendt til pasient!');
+      setSuccess(t('emailSentToPatient', 'E-post sendt til pasient!'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       logger.error('Send email failed:', err);
-      setError('Kunne ikke sende e-post');
+      setError(t('failedToSendEmail', 'Kunne ikke sende e-post'));
     } finally {
       setSending(false);
     }
@@ -343,7 +351,7 @@ export default function ExercisePrescription() {
   const handleSendSMS = async () => {
     const idToSend = savedPrescriptionId || prescriptionId;
     if (!idToSend) {
-      setError('Lagre programmet forst');
+      setError(t('saveProgramFirst', 'Lagre programmet først'));
       return;
     }
 
@@ -351,11 +359,11 @@ export default function ExercisePrescription() {
       setSending(true);
       setError(null);
       await exercisesApi.sendSMS(idToSend);
-      setSuccess('SMS sendt til pasient!');
+      setSuccess(t('smsSentToPatient', 'SMS sendt til pasient!'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       logger.error('Send SMS failed:', err);
-      setError('Kunne ikke sende SMS');
+      setError(t('failedToSendSMS', 'Kunne ikke sende SMS'));
     } finally {
       setSending(false);
     }
@@ -367,7 +375,7 @@ export default function ExercisePrescription() {
   const handleDownloadPDF = async () => {
     const idToDownload = savedPrescriptionId || prescriptionId;
     if (!idToDownload) {
-      setError('Lagre programmet forst');
+      setError(t('saveProgramFirst', 'Lagre programmet først'));
       return;
     }
 
@@ -387,11 +395,11 @@ export default function ExercisePrescription() {
       link.remove();
       window.URL.revokeObjectURL(url);
 
-      setSuccess('PDF lastet ned!');
+      setSuccess(t('pdfDownloaded', 'PDF lastet ned!'));
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       logger.error('PDF download failed:', err);
-      setError('Kunne ikke generere PDF');
+      setError(t('failedToGeneratePDF', 'Kunne ikke generere PDF'));
     } finally {
       setSending(false);
     }
@@ -420,9 +428,11 @@ export default function ExercisePrescription() {
             </button>
             <div>
               <h1 className="text-xl font-semibold text-gray-900">
-                {isEditing ? 'Rediger treningsprogram' : 'Nytt treningsprogram'}
+                {isEditing
+                  ? t('editExerciseProgram', 'Rediger treningsprogram')
+                  : t('newExerciseProgram', 'Nytt treningsprogram')}
               </h1>
-              <div className="flex items-center gap-3 text-sm text-gray-500 mt-0.5">
+              <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mt-0.5">
                 {patientId && (
                   <span className="flex items-center gap-1">
                     <User className="w-3.5 h-3.5" />
@@ -431,7 +441,7 @@ export default function ExercisePrescription() {
                 )}
                 <span className="flex items-center gap-1">
                   <Dumbbell className="w-3.5 h-3.5" />
-                  {selectedExercises.length} ovelser
+                  {selectedExercises.length} {t('exercises', 'øvelser')}
                 </span>
                 <span className="flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />~{Math.ceil(estimatedTime / 60)} min
@@ -447,7 +457,7 @@ export default function ExercisePrescription() {
               className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <Eye className="w-4 h-4" />
-              Forhandsvis
+              {t('preview', 'Forhåndsvis')}
             </button>
 
             <button
@@ -458,12 +468,12 @@ export default function ExercisePrescription() {
               {saving ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Lagrer...
+                  {t('savingBtn', 'Lagrer...')}
                 </>
               ) : (
                 <>
                   <Save className="w-4 h-4" />
-                  Lagre
+                  {t('saveBtn', 'Lagre')}
                 </>
               )}
             </button>
@@ -477,12 +487,12 @@ export default function ExercisePrescription() {
                 {sending ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Sender...
+                    {t('sendingBtn', 'Sender...')}
                   </>
                 ) : (
                   <>
                     <Send className="w-4 h-4" />
-                    Send til pasient
+                    {t('sendToPatient', 'Send til pasient')}
                     <ChevronDown className="w-3.5 h-3.5" />
                   </>
                 )}
@@ -493,21 +503,21 @@ export default function ExercisePrescription() {
                   className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 >
                   <Mail className="w-4 h-4" />
-                  Send pa e-post
+                  {t('sendEmail', 'Send på e-post')}
                 </button>
                 <button
                   onClick={handleSendSMS}
                   className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  Send SMS-lenke
+                  {t('sendSMSLink', 'Send SMS-lenke')}
                 </button>
                 <button
                   onClick={handleDownloadPDF}
                   className="flex items-center gap-2 w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                 >
                   <Download className="w-4 h-4" />
-                  Last ned PDF
+                  {t('downloadPDF', 'Last ned PDF')}
                 </button>
               </div>
             </div>
@@ -538,7 +548,9 @@ export default function ExercisePrescription() {
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-            <span className="ml-3 text-gray-500">Laster...</span>
+            <span className="ml-3 text-gray-500 dark:text-gray-400">
+              {t('loading', 'Laster...')}
+            </span>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -548,19 +560,22 @@ export default function ExercisePrescription() {
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                   <FileText className="w-5 h-5 text-blue-600" />
-                  Programdetaljer
+                  {t('programDetails', 'Programdetaljer')}
                 </h2>
                 <div className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Instruksjoner til pasient
+                      {t('instructionsToPatient', 'Instruksjoner til pasient')}
                     </label>
                     <textarea
                       value={prescription.patientInstructions}
                       onChange={(e) =>
                         setPrescription((p) => ({ ...p, patientInstructions: e.target.value }))
                       }
-                      placeholder="F.eks. 'Gjor ovelsene morgen og kveld. Stopp hvis du opplever okt smerte.'"
+                      placeholder={t(
+                        'patientInstructionsPlaceholder',
+                        "F.eks. 'Gjor ovelsene morgen og kveld. Stopp hvis du opplever okt smerte.'"
+                      )}
                       rows={3}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     />
@@ -569,7 +584,7 @@ export default function ExercisePrescription() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Startdato
+                        {t('startDate', 'Startdato')}
                       </label>
                       <input
                         type="date"
@@ -582,7 +597,7 @@ export default function ExercisePrescription() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Sluttdato (valgfritt)
+                        {t('endDateOptional', 'Sluttdato (valgfritt)')}
                       </label>
                       <input
                         type="date"
@@ -598,14 +613,17 @@ export default function ExercisePrescription() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Kliniske notater (kun for journal)
+                      {t('clinicalNotesJournalOnly', 'Kliniske notater (kun for journal)')}
                     </label>
                     <textarea
                       value={prescription.clinicalNotes}
                       onChange={(e) =>
                         setPrescription((p) => ({ ...p, clinicalNotes: e.target.value }))
                       }
-                      placeholder="Interne notater som ikke sendes til pasient..."
+                      placeholder={t(
+                        'internalNotesPlaceholder',
+                        'Interne notater som ikke sendes til pasient...'
+                      )}
                       rows={2}
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                     />
@@ -625,24 +643,28 @@ export default function ExercisePrescription() {
               {/* Summary */}
               {selectedExercises.length > 0 && (
                 <div className="bg-blue-50 rounded-lg border border-blue-200 p-4">
-                  <h3 className="font-medium text-blue-900 mb-3">Programoversikt</h3>
+                  <h3 className="font-medium text-blue-900 mb-3">
+                    {t('programOverview', 'Programoversikt')}
+                  </h3>
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
-                      <span className="text-blue-600">Antall ovelser</span>
+                      <span className="text-blue-600">
+                        {t('numberOfExercises', 'Antall øvelser')}
+                      </span>
                       <p className="font-semibold text-blue-900">{selectedExercises.length}</p>
                     </div>
                     <div>
-                      <span className="text-blue-600">Estimert tid</span>
+                      <span className="text-blue-600">{t('estimatedTime', 'Estimert tid')}</span>
                       <p className="font-semibold text-blue-900">
                         ~{Math.ceil(estimatedTime / 60)} min
                       </p>
                     </div>
                     <div>
-                      <span className="text-blue-600">Varighet</span>
+                      <span className="text-blue-600">{t('duration', 'Varighet')}</span>
                       <p className="font-semibold text-blue-900">
                         {prescription.endDate
-                          ? `${Math.ceil((new Date(prescription.endDate) - new Date(prescription.startDate)) / (1000 * 60 * 60 * 24))} dager`
-                          : 'Lopende'}
+                          ? `${Math.ceil((new Date(prescription.endDate) - new Date(prescription.startDate)) / (1000 * 60 * 60 * 24))} ${t('days', 'dager')}`
+                          : t('ongoing', 'Løpende')}
                       </p>
                     </div>
                   </div>
@@ -659,30 +681,30 @@ export default function ExercisePrescription() {
                   className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                     rightPanelView === 'selector'
                       ? 'bg-blue-600 text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                   }`}
                 >
-                  Ovelsebibliotek
+                  {t('exerciseLibrary', 'Øvelsesbibliotek')}
                 </button>
                 <button
                   onClick={() => setRightPanelView('templates')}
                   className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                     rightPanelView === 'templates'
                       ? 'bg-purple-600 text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                   }`}
                 >
-                  Maler
+                  {t('templates', 'Maler')}
                 </button>
                 <button
                   onClick={() => setRightPanelView('schedule')}
                   className={`flex-1 px-4 py-2 text-sm font-medium rounded-md transition-colors ${
                     rightPanelView === 'schedule'
                       ? 'bg-green-600 text-white'
-                      : 'text-gray-600 hover:bg-gray-100'
+                      : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100'
                   }`}
                 >
-                  Ukeoversikt
+                  {t('weeklyOverview', 'Ukeoversikt')}
                 </button>
               </div>
 

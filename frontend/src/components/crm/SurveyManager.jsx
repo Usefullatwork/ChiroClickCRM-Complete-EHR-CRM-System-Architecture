@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from '../../i18n';
 import {
   Star,
   ThumbsUp,
@@ -22,6 +23,7 @@ import toast from '../../utils/toast';
 import logger from '../../utils/logger';
 
 const SurveyManager = () => {
+  const { t } = useTranslation('crm');
   const [activeTab, setActiveTab] = useState('dashboard');
   const [showNewSurvey, setShowNewSurvey] = useState(false);
   const [selectedSurvey, setSelectedSurvey] = useState(null);
@@ -41,32 +43,32 @@ const SurveyManager = () => {
   const surveyTemplates = [
     {
       id: 'nps',
-      name: 'NPS Undersøkelse',
-      description: 'Net Promoter Score - standard kundetilfredshetsundersøkelse',
+      name: t('templateNpsName'),
+      description: t('templateNpsDesc'),
       questions: [
         {
           type: 'nps',
-          question: 'Hvor sannsynlig er det at du ville anbefalt oss til venner eller familie?',
+          question: t('templateNpsQuestion'),
         },
       ],
     },
     {
       id: 'visit-satisfaction',
-      name: 'Besøkstilfredshet',
-      description: 'Evaluering etter hvert besøk',
+      name: t('templateVisitName'),
+      description: t('templateVisitDesc'),
       questions: [
-        { type: 'rating', question: 'Hvordan vil du vurdere dagens behandling?' },
-        { type: 'text', question: 'Har du noen kommentarer?' },
+        { type: 'rating', question: t('templateVisitQ1') },
+        { type: 'text', question: t('templateVisitQ2') },
       ],
     },
     {
       id: 'new-patient',
-      name: 'Ny Pasient Opplevelse',
-      description: 'For nye pasienter etter første besøk',
+      name: t('templateNewPatientName'),
+      description: t('templateNewPatientDesc'),
       questions: [
-        { type: 'rating', question: 'Hvor enkelt var det å bestille time?' },
-        { type: 'rating', question: 'Hvordan opplevde du velkomsten?' },
-        { type: 'nps', question: 'Ville du anbefalt oss basert på første inntrykk?' },
+        { type: 'rating', question: t('templateNewPatientQ1') },
+        { type: 'rating', question: t('templateNewPatientQ2') },
+        { type: 'nps', question: t('templateNewPatientQ3') },
       ],
     },
   ];
@@ -133,13 +135,28 @@ const SurveyManager = () => {
   const getCategoryStyle = (category) => {
     switch (category) {
       case 'PROMOTER':
-        return { bg: 'bg-green-100', text: 'text-green-700', icon: ThumbsUp, label: 'Promotør' };
+        return {
+          bg: 'bg-green-100',
+          text: 'text-green-700',
+          icon: ThumbsUp,
+          label: t('promoterLabel'),
+        };
       case 'PASSIVE':
-        return { bg: 'bg-yellow-100', text: 'text-yellow-700', icon: Meh, label: 'Passiv' };
+        return {
+          bg: 'bg-yellow-100',
+          text: 'text-yellow-700',
+          icon: Meh,
+          label: t('passiveLabel'),
+        };
       case 'DETRACTOR':
-        return { bg: 'bg-red-100', text: 'text-red-700', icon: ThumbsDown, label: 'Kritiker' };
+        return {
+          bg: 'bg-red-100',
+          text: 'text-red-700',
+          icon: ThumbsDown,
+          label: t('detractorLabel'),
+        };
       default:
-        return { bg: 'bg-gray-100', text: 'text-gray-700', icon: Meh, label: 'Ukjent' };
+        return { bg: 'bg-gray-100', text: 'text-gray-700', icon: Meh, label: t('unknownLabel') };
     }
   };
 
@@ -163,7 +180,7 @@ const SurveyManager = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
-        <span className="ml-2 text-gray-600">Laster undersøkelser...</span>
+        <span className="ml-2 text-gray-600 dark:text-gray-300">{t('loadingSurveys')}</span>
       </div>
     );
   }
@@ -178,7 +195,7 @@ const SurveyManager = () => {
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
         >
-          Prøv igjen
+          {t('tryAgain')}
         </button>
       </div>
     );
@@ -189,15 +206,15 @@ const SurveyManager = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Undersøkelser & NPS</h2>
-          <p className="text-gray-600">Mål kundetilfredshet og samle tilbakemeldinger</p>
+          <h2 className="text-2xl font-bold text-gray-900">{t('surveysAndNps')}</h2>
+          <p className="text-gray-600 dark:text-gray-300">{t('surveysAndNpsSubtitle')}</p>
         </div>
         <button
           onClick={() => setShowNewSurvey(true)}
           className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center gap-2"
         >
           <Plus className="w-4 h-4" />
-          Ny Undersøkelse
+          {t('newSurvey')}
         </button>
       </div>
 
@@ -206,7 +223,7 @@ const SurveyManager = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* NPS Score */}
           <div className="text-center">
-            <p className="text-sm opacity-80 mb-1">Net Promoter Score</p>
+            <p className="text-sm opacity-80 mb-1">{t('netPromoterScore')}</p>
             <p className="text-5xl font-bold">{npsStats.score}</p>
             <div className="flex items-center justify-center gap-1 mt-2">
               {npsStats.trend >= 0 ? (
@@ -216,7 +233,7 @@ const SurveyManager = () => {
               )}
               <span className={npsStats.trend >= 0 ? 'text-green-300' : 'text-red-300'}>
                 {npsStats.trend > 0 ? '+' : ''}
-                {npsStats.trend} siste måned
+                {npsStats.trend} {t('lastMonth')}
               </span>
             </div>
           </div>
@@ -227,7 +244,7 @@ const SurveyManager = () => {
               <ThumbsUp className="w-6 h-6" />
             </div>
             <p className="text-3xl font-bold">{npsStats.promoters}%</p>
-            <p className="text-sm opacity-80">Promotører (9-10)</p>
+            <p className="text-sm opacity-80">{t('promoters')}</p>
           </div>
 
           {/* Passives */}
@@ -236,7 +253,7 @@ const SurveyManager = () => {
               <Meh className="w-6 h-6" />
             </div>
             <p className="text-3xl font-bold">{npsStats.passives}%</p>
-            <p className="text-sm opacity-80">Passive (7-8)</p>
+            <p className="text-sm opacity-80">{t('passives')}</p>
           </div>
 
           {/* Detractors */}
@@ -245,7 +262,7 @@ const SurveyManager = () => {
               <ThumbsDown className="w-6 h-6" />
             </div>
             <p className="text-3xl font-bold">{npsStats.detractors}%</p>
-            <p className="text-sm opacity-80">Kritikere (0-6)</p>
+            <p className="text-sm opacity-80">{t('detractors')}</p>
           </div>
         </div>
       </div>
@@ -253,10 +270,10 @@ const SurveyManager = () => {
       {/* Tabs */}
       <div className="flex gap-4 border-b border-gray-200">
         {[
-          { id: 'dashboard', label: 'Oversikt' },
-          { id: 'surveys', label: 'Undersøkelser' },
-          { id: 'responses', label: 'Svar' },
-          { id: 'analytics', label: 'Analyse' },
+          { id: 'dashboard', label: t('tabOverview') },
+          { id: 'surveys', label: t('tabSurveys') },
+          { id: 'responses', label: t('tabResponses') },
+          { id: 'analytics', label: t('tabAnalytics') },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -264,7 +281,7 @@ const SurveyManager = () => {
             className={`px-4 py-2 border-b-2 transition-colors ${
               activeTab === tab.id
                 ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-900'
+                : 'border-transparent text-gray-600 dark:text-gray-300 hover:text-gray-900'
             }`}
           >
             {tab.label}
@@ -278,12 +295,12 @@ const SurveyManager = () => {
           {/* Active Surveys */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900">Aktive Undersøkelser</h3>
+              <h3 className="font-bold text-gray-900">{t('activeSurveys')}</h3>
               <button
                 onClick={() => setActiveTab('surveys')}
                 className="text-blue-500 text-sm hover:underline"
               >
-                Se alle
+                {t('viewAllShort')}
               </button>
             </div>
             <div className="space-y-3">
@@ -292,20 +309,20 @@ const SurveyManager = () => {
                   <div className="flex items-center justify-between mb-2">
                     <h4 className="font-medium text-gray-900">{survey.name}</h4>
                     <span className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded-full">
-                      Aktiv
+                      {t('activeStatus')}
                     </span>
                   </div>
                   <div className="grid grid-cols-3 gap-4 text-sm">
                     <div>
-                      <p className="text-gray-500">Sendt</p>
+                      <p className="text-gray-500 dark:text-gray-400">{t('sent')}</p>
                       <p className="font-medium">{survey.sentCount}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Svar</p>
+                      <p className="text-gray-500 dark:text-gray-400">{t('responses')}</p>
                       <p className="font-medium">{survey.responseCount}</p>
                     </div>
                     <div>
-                      <p className="text-gray-500">Svarrate</p>
+                      <p className="text-gray-500 dark:text-gray-400">{t('responseRateSurvey')}</p>
                       <p className="font-medium text-blue-600">{survey.responseRate}%</p>
                     </div>
                   </div>
@@ -317,12 +334,12 @@ const SurveyManager = () => {
           {/* Recent Responses */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-gray-900">Siste Svar</h3>
+              <h3 className="font-bold text-gray-900">{t('recentResponses')}</h3>
               <button
                 onClick={() => setActiveTab('responses')}
                 className="text-blue-500 text-sm hover:underline"
               >
-                Se alle
+                {t('viewAllShort')}
               </button>
             </div>
             <div className="space-y-3">
@@ -352,9 +369,13 @@ const SurveyManager = () => {
                             {response.score}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-500">{response.surveyName}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {response.surveyName}
+                        </p>
                         {response.comment && (
-                          <p className="text-sm text-gray-600 mt-1 italic">"{response.comment}"</p>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 italic">
+                            "{response.comment}"
+                          </p>
                         )}
                       </div>
                     </div>
@@ -366,11 +387,11 @@ const SurveyManager = () => {
 
           {/* NPS Trend Chart Placeholder */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 lg:col-span-2">
-            <h3 className="font-bold text-gray-900 mb-4">NPS Utvikling</h3>
+            <h3 className="font-bold text-gray-900 mb-4">{t('npsTrend')}</h3>
             <div className="h-64 flex items-center justify-center bg-gray-50 rounded-lg">
-              <div className="text-center text-gray-500">
+              <div className="text-center text-gray-500 dark:text-gray-400">
                 <BarChart2 className="w-12 h-12 mx-auto mb-2 opacity-50" />
-                <p>Graf vises her med NPS-utvikling over tid</p>
+                <p>{t('npsChartPlaceholder')}</p>
               </div>
             </div>
           </div>
@@ -384,16 +405,18 @@ const SurveyManager = () => {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="text-lg font-bold text-gray-900">{survey.name}</h3>
-                  <p className="text-sm text-gray-500">Sist sendt: {formatDate(survey.lastSent)}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    {t('lastSentDate', { date: formatDate(survey.lastSent) })}
+                  </p>
                 </div>
                 <div className="flex gap-2">
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
+                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
                     <Edit className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
+                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
                     <Send className="w-4 h-4" />
                   </button>
-                  <button className="p-2 text-gray-400 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
+                  <button className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 hover:bg-blue-50 rounded-lg">
                     <BarChart2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -403,17 +426,19 @@ const SurveyManager = () => {
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <Send className="w-5 h-5 text-blue-500 mx-auto mb-1" />
                   <p className="text-xl font-bold text-gray-900">{survey.sentCount}</p>
-                  <p className="text-xs text-gray-500">Sendt</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('sent')}</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <MessageSquare className="w-5 h-5 text-green-500 mx-auto mb-1" />
                   <p className="text-xl font-bold text-gray-900">{survey.responseCount}</p>
-                  <p className="text-xs text-gray-500">Svar</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{t('responses')}</p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <Users className="w-5 h-5 text-purple-500 mx-auto mb-1" />
                   <p className="text-xl font-bold text-gray-900">{survey.responseRate}%</p>
-                  <p className="text-xs text-gray-500">Svarrate</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {t('responseRateSurvey')}
+                  </p>
                 </div>
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
                   <Star className="w-5 h-5 text-yellow-500 mx-auto mb-1" />
@@ -424,7 +449,9 @@ const SurveyManager = () => {
                   >
                     {survey.npsScore || survey.avgRating}
                   </p>
-                  <p className="text-xs text-gray-500">{survey.npsScore ? 'NPS' : 'Snitt'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {survey.npsScore ? t('npsLabel') : t('avgLabel')}
+                  </p>
                 </div>
               </div>
             </div>
@@ -437,42 +464,42 @@ const SurveyManager = () => {
           <div className="p-4 border-b border-gray-200">
             <div className="flex gap-2">
               <button className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
-                Promotører
+                {t('promotersFilter')}
               </button>
               <button className="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-sm">
-                Passive
+                {t('passivesFilter')}
               </button>
               <button className="px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm">
-                Kritikere
+                {t('detractorsFilter')}
               </button>
               <button className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm">
-                Alle
+                {t('allFilter')}
               </button>
             </div>
           </div>
           <table className="w-full">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Pasient
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  {t('thPatient')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Undersøkelse
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  {t('thSurvey')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Score
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  {t('thScore')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Kategori
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  {t('thCategory')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Kommentar
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  {t('thComment')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Dato
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  {t('thDate')}
                 </th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Handling
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  {t('thAction')}
                 </th>
               </tr>
             </thead>
@@ -485,7 +512,9 @@ const SurveyManager = () => {
                     <td className="px-4 py-3">
                       <span className="font-medium text-gray-900">{response.patientName}</span>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{response.surveyName}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                      {response.surveyName}
+                    </td>
                     <td className="px-4 py-3">
                       <span
                         className={`text-lg font-bold ${
@@ -510,28 +539,30 @@ const SurveyManager = () => {
                     <td className="px-4 py-3">
                       {response.comment ? (
                         <p
-                          className="text-sm text-gray-600 max-w-xs truncate"
+                          className="text-sm text-gray-600 dark:text-gray-300 max-w-xs truncate"
                           title={response.comment}
                         >
                           {response.comment}
                         </p>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span className="text-gray-400 dark:text-gray-300">-</span>
                       )}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{formatDate(response.date)}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">
+                      {formatDate(response.date)}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex gap-1">
                         <button
-                          className="p-2 text-gray-400 hover:text-blue-500 rounded-lg"
-                          title="Vis detaljer"
+                          className="p-2 text-gray-400 dark:text-gray-300 hover:text-blue-500 rounded-lg"
+                          title={t('viewDetails')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
                         {response.category === 'DETRACTOR' && (
                           <button
-                            className="p-2 text-gray-400 hover:text-orange-500 rounded-lg"
-                            title="Følg opp"
+                            className="p-2 text-gray-400 dark:text-gray-300 hover:text-orange-500 rounded-lg"
+                            title={t('followUp')}
                           >
                             <Mail className="w-4 h-4" />
                           </button>
@@ -549,14 +580,16 @@ const SurveyManager = () => {
       {activeTab === 'analytics' && (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="font-bold text-gray-900 mb-4">Score Fordeling</h3>
+            <h3 className="font-bold text-gray-900 mb-4">{t('scoreDistribution')}</h3>
             <div className="space-y-3">
               {[10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map((score) => {
                 const count = responses.filter((r) => r.score === score).length;
                 const percent = (count / responses.length) * 100;
                 return (
                   <div key={score} className="flex items-center gap-3">
-                    <span className="w-6 text-sm font-medium text-gray-600">{score}</span>
+                    <span className="w-6 text-sm font-medium text-gray-600 dark:text-gray-300">
+                      {score}
+                    </span>
                     <div className="flex-1 h-6 bg-gray-100 rounded overflow-hidden">
                       <div
                         className={`h-full rounded transition-all ${
@@ -565,7 +598,7 @@ const SurveyManager = () => {
                         style={{ width: `${percent}%` }}
                       />
                     </div>
-                    <span className="w-8 text-sm text-gray-500">{count}</span>
+                    <span className="w-8 text-sm text-gray-500 dark:text-gray-400">{count}</span>
                   </div>
                 );
               })}
@@ -573,27 +606,27 @@ const SurveyManager = () => {
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="font-bold text-gray-900 mb-4">Innsikt</h3>
+            <h3 className="font-bold text-gray-900 mb-4">{t('insights')}</h3>
             <div className="space-y-4">
               <div className="p-4 bg-green-50 rounded-lg border border-green-200">
-                <h4 className="font-medium text-green-800 mb-1">Styrker</h4>
+                <h4 className="font-medium text-green-800 mb-1">{t('strengths')}</h4>
                 <ul className="text-sm text-green-700 space-y-1">
-                  <li>• Høy tilfredshet med behandlingskvalitet</li>
-                  <li>• God oppfølging etter behandling</li>
-                  <li>• Vennlig og profesjonelt personale</li>
+                  <li>• {t('strengthItem1')}</li>
+                  <li>• {t('strengthItem2')}</li>
+                  <li>• {t('strengthItem3')}</li>
                 </ul>
               </div>
               <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200">
-                <h4 className="font-medium text-yellow-800 mb-1">Forbedringspotensial</h4>
+                <h4 className="font-medium text-yellow-800 mb-1">{t('improvementPotential')}</h4>
                 <ul className="text-sm text-yellow-700 space-y-1">
-                  <li>• Ventetid ved mottak</li>
-                  <li>• Tilgjengelighet for akutte timer</li>
+                  <li>• {t('improvementItem1')}</li>
+                  <li>• {t('improvementItem2')}</li>
                 </ul>
               </div>
               <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-                <h4 className="font-medium text-red-800 mb-1">Kritiske Tilbakemeldinger</h4>
+                <h4 className="font-medium text-red-800 mb-1">{t('criticalFeedback')}</h4>
                 <ul className="text-sm text-red-700 space-y-1">
-                  <li>• 2 kritikere siste uke - krever oppfølging</li>
+                  <li>• {t('criticalItem1')}</li>
                 </ul>
               </div>
             </div>
@@ -605,11 +638,13 @@ const SurveyManager = () => {
       {showNewSurvey && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Ny Undersøkelse</h3>
+            <h3 className="text-lg font-bold text-gray-900 mb-4">{t('newSurveyModal')}</h3>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Velg Mal</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('selectTemplate')}
+                </label>
                 <div className="space-y-2">
                   {surveyTemplates.map((template) => (
                     <button
@@ -622,7 +657,9 @@ const SurveyManager = () => {
                       }`}
                     >
                       <p className="font-medium text-gray-900">{template.name}</p>
-                      <p className="text-sm text-gray-500">{template.description}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {template.description}
+                      </p>
                     </button>
                   ))}
                 </div>
@@ -630,33 +667,35 @@ const SurveyManager = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Undersøkelsesnavn
+                  {t('surveyName')}
                 </label>
                 <input
                   type="text"
-                  placeholder="F.eks. 'Januar NPS'"
+                  placeholder={t('surveyNamePlaceholder')}
                   className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Send til</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('sendTo')}
+                </label>
                 <select className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
-                  <option>Alle aktive pasienter</option>
-                  <option>Nye pasienter (siste 30 dager)</option>
-                  <option>Pasienter med besøk siste uke</option>
-                  <option>Manuelt utvalg</option>
+                  <option>{t('sendToAllActive')}</option>
+                  <option>{t('sendToNewPatients')}</option>
+                  <option>{t('sendToRecentVisits')}</option>
+                  <option>{t('sendToManual')}</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Sendetidspunkt
+                  {t('sendTime')}
                 </label>
                 <div className="flex gap-2">
                   <select className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500">
-                    <option>Send nå</option>
-                    <option>Planlegg sending</option>
+                    <option>{t('sendNow')}</option>
+                    <option>{t('scheduleSend')}</option>
                   </select>
                 </div>
               </div>
@@ -670,7 +709,7 @@ const SurveyManager = () => {
                 }}
                 className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
               >
-                Avbryt
+                {t('cancel')}
               </button>
               <button
                 onClick={() => {
@@ -679,7 +718,7 @@ const SurveyManager = () => {
                 }}
                 className="flex-1 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
               >
-                Opprett Undersøkelse
+                {t('createSurvey')}
               </button>
             </div>
           </div>

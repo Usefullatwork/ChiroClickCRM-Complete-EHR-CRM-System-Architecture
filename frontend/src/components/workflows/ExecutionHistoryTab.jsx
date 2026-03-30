@@ -31,7 +31,7 @@ export default function ExecutionHistoryTab({
       <div className="mb-6 bg-white rounded-lg border border-gray-200 p-4">
         <div className="flex items-center gap-4 flex-wrap">
           <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-gray-400" />
+            <Filter className="w-5 h-5 text-gray-400 dark:text-gray-300" />
             <span className="text-sm font-medium text-gray-700">
               {language === 'no' ? 'Filtrer:' : 'Filter:'}
             </span>
@@ -80,19 +80,19 @@ export default function ExecutionHistoryTab({
         <table className="w-full">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {language === 'no' ? 'Arbeidsflyt' : 'Workflow'}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {t.patient}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {t.status}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {t.started}
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 {t.actions}
               </th>
             </tr>
@@ -114,7 +114,7 @@ export default function ExecutionHistoryTab({
                       <div className="text-sm font-medium text-gray-900">
                         {execution.workflow_name}
                       </div>
-                      <div className="text-xs text-gray-500">
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
                         {getTriggerLabel(execution.trigger_type)}
                       </div>
                     </td>
@@ -128,10 +128,10 @@ export default function ExecutionHistoryTab({
                         {execution.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {formatRelativeTime(execution.created_at)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {execution.current_step || 0}/{execution.total_steps || 0}
                     </td>
                   </tr>
@@ -141,7 +141,7 @@ export default function ExecutionHistoryTab({
               <tr>
                 <td colSpan={5} className="px-6 py-12 text-center">
                   <History className="w-10 h-10 text-gray-300 mx-auto mb-2" />
-                  <p className="text-sm text-gray-500">{t.noExecutions}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t.noExecutions}</p>
                 </td>
               </tr>
             )}

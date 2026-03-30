@@ -16,10 +16,10 @@
 
 // Storage keys
 const STORAGE_KEYS = {
-  GOOGLE_TOKEN: 'chiroclick_google_token',
-  MICROSOFT_TOKEN: 'chiroclick_microsoft_token',
-  SYNC_CONFIG: 'chiroclick_sync_config',
-  LAST_SYNC: 'chiroclick_last_sync',
+  GOOGLE_TOKEN: 'chiroclickehr_google_token',
+  MICROSOFT_TOKEN: 'chiroclickehr_microsoft_token',
+  SYNC_CONFIG: 'chiroclickehr_sync_config',
+  LAST_SYNC: 'chiroclickehr_last_sync',
 };
 
 // Sync providers

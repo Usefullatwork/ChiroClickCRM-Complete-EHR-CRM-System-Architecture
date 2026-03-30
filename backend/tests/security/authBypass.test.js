@@ -398,7 +398,7 @@ describe('Authentication Bypass Prevention', () => {
 
       const response2 = await request(app)
         .post('/api/v1/auth/login')
-        .send({ email: 'admin@chiroclickcrm.no', password: 'wrongpassword' });
+        .send({ email: 'admin@chiroclickehr.no', password: 'wrongpassword' });
 
       // Both should return 401 with similar error messages
       expect(response1.status).toBe(401);
@@ -484,7 +484,7 @@ describe('Authentication Bypass Prevention', () => {
         const start1 = Date.now();
         await request(app)
           .post('/api/v1/auth/login')
-          .send({ email: 'admin@chiroclickcrm.no', password: 'wrongpassword' });
+          .send({ email: 'admin@chiroclickehr.no', password: 'wrongpassword' });
         existingTimes.push(Date.now() - start1);
 
         const start2 = Date.now();

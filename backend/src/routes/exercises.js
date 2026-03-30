@@ -6,6 +6,7 @@
 import express from 'express';
 import * as exerciseController from '../controllers/exercises.js';
 import { requireAuth, requireOrganization, requireRole } from '../middleware/auth.js';
+import { requireModule } from '../middleware/featureGate.js';
 import validate from '../middleware/validation.js';
 import {
   listExercisesSchema,
@@ -28,6 +29,7 @@ router.get('/health', (req, res) => {
 
 router.use(requireAuth);
 router.use(requireOrganization);
+router.use(requireModule('exercise_rx'));
 
 // ============================================================================
 // EXERCISE LIBRARY
@@ -567,6 +569,12 @@ router.post(
   '/prescriptions/:id/send-sms',
   requireRole(['ADMIN', 'PRACTITIONER']),
   exerciseController.sendSMS
+);
+
+router.post(
+  '/prescriptions/:id/deliver',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  exerciseController.deliverPrescription
 );
 
 // ============================================================================

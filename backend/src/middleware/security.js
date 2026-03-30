@@ -12,8 +12,29 @@
 
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
+import sanitizeHtml from 'sanitize-html';
 import { redisRateLimiter } from '../config/redis.js';
 import { csrfProtection as customCsrfProtection, csrfErrorHandler } from './csrf.js';
+
+/**
+ * Sanitize-html presets: strict for non-clinical, permissive for SOAP fields
+ */
+const STRICT_SANITIZE_OPTS = {
+  allowedTags: [],
+  allowedAttributes: {},
+};
+
+const CLINICAL_SANITIZE_OPTS = {
+  allowedTags: ['b', 'i', 'em', 'strong', 'ul', 'ol', 'li', 'br', 'p', 'sub', 'sup'],
+  allowedAttributes: {},
+};
+
+/**
+ * Strip dangerous URI protocols and inline event handlers that sanitize-html
+ * may not catch in plain text (non-attribute) contexts
+ */
+const stripDangerousProtocols = (str) =>
+  str.replace(/javascript\s*:/gi, '').replace(/on\w+\s*=/gi, '');
 
 /**
  * CSRF Protection Middleware
@@ -218,42 +239,35 @@ export const authBruteForceLimit = rateLimit({
 
 /**
  * Input sanitization middleware
- * Prevents XSS and injection attacks
+ * Prevents XSS and injection attacks using allow-list approach (sanitize-html)
  */
 export const sanitizeInput = (req, res, next) => {
-  // Sanitize query parameters
+  // Clinical fields that may contain basic formatting
+  const clinicalFields = ['subjective', 'objective', 'assessment', 'plan', 'notes'];
+
+  // Sanitize query parameters (strict — no HTML allowed)
   if (req.query) {
     Object.keys(req.query).forEach((key) => {
       if (typeof req.query[key] === 'string') {
-        req.query[key] = sanitizeString(req.query[key]);
+        req.query[key] = stripDangerousProtocols(
+          sanitizeHtml(req.query[key], STRICT_SANITIZE_OPTS)
+        ).trim();
       }
     });
   }
 
-  // Sanitize body (but preserve specific fields that need HTML)
+  // Sanitize body
   if (req.body) {
-    const preserveFields = ['subjective', 'objective', 'assessment', 'plan', 'notes'];
-
     Object.keys(req.body).forEach((key) => {
-      if (typeof req.body[key] === 'string' && !preserveFields.includes(key)) {
-        req.body[key] = sanitizeString(req.body[key]);
+      if (typeof req.body[key] === 'string') {
+        const opts = clinicalFields.includes(key) ? CLINICAL_SANITIZE_OPTS : STRICT_SANITIZE_OPTS;
+        req.body[key] = stripDangerousProtocols(sanitizeHtml(req.body[key], opts)).trim();
       }
     });
   }
 
   next();
 };
-
-/**
- * Sanitize string input (remove potentially dangerous characters)
- */
-const sanitizeString = (str) =>
-  str
-    .replace(/<script[^>]*>.*?<\/script>/gi, '') // Remove script tags
-    .replace(/<iframe[^>]*>.*?<\/iframe>/gi, '') // Remove iframes
-    .replace(/javascript:/gi, '') // Remove javascript: protocol
-    .replace(/on\w+\s*=/gi, '') // Remove inline event handlers
-    .trim();
 
 /**
  * Validate organization ownership
@@ -319,7 +333,7 @@ export const secureSession = {
  * Log security events
  */
 export const logSecurityEvent = async (req, eventType, details = {}) => {
-  const { logAction, _ACTION_TYPES } = await import('../services/auditLog.js');
+  const { logAction, _ACTION_TYPES } = await import('../services/practice/auditLog.js');
 
   await logAction(eventType, req.user?.id, {
     resourceType: 'security_event',

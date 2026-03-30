@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useConfirm } from '../ui/ConfirmDialog';
+import { useTranslation } from '../../i18n';
 import {
   Dumbbell,
   Search,
@@ -18,31 +19,31 @@ import {
 import { exercisesAPI } from '../../services/api';
 import toast from '../../utils/toast';
 
-// Category and body region labels
-const categoryLabels = {
-  stretching: { no: 'Tøyning', en: 'Stretching' },
-  strengthening: { no: 'Styrke', en: 'Strengthening' },
-  mobility: { no: 'Mobilitet', en: 'Mobility' },
-  balance: { no: 'Balanse', en: 'Balance' },
-  posture: { no: 'Holdning', en: 'Posture' },
-  breathing: { no: 'Pust', en: 'Breathing' },
-  nerve_glide: { no: 'Nervegliding', en: 'Nerve Glide' },
-  vestibular: { no: 'Vestibulær', en: 'Vestibular' },
+// Category and body region translation key maps
+const categoryKeys = {
+  stretching: 'catStretching',
+  strengthening: 'catStrengthening',
+  mobility: 'catMobility',
+  balance: 'catBalance',
+  posture: 'catPosture',
+  breathing: 'catBreathing',
+  nerve_glide: 'catNerveGlide',
+  vestibular: 'catVestibular',
 };
 
-const bodyRegionLabels = {
-  cervical: { no: 'Nakke', en: 'Cervical' },
-  thoracic: { no: 'Brystsøyle', en: 'Thoracic' },
-  lumbar: { no: 'Korsrygg', en: 'Lumbar' },
-  shoulder: { no: 'Skulder', en: 'Shoulder' },
-  hip: { no: 'Hofte', en: 'Hip' },
-  knee: { no: 'Kne', en: 'Knee' },
-  ankle: { no: 'Ankel', en: 'Ankle' },
-  foot: { no: 'Fot', en: 'Foot' },
-  core: { no: 'Kjerne', en: 'Core' },
-  upper_extremity: { no: 'Overekstremitet', en: 'Upper Extremity' },
-  lower_extremity: { no: 'Underekstremitet', en: 'Lower Extremity' },
-  full_body: { no: 'Helkropp', en: 'Full Body' },
+const bodyRegionKeys = {
+  cervical: 'regionCervical',
+  thoracic: 'regionThoracic',
+  lumbar: 'regionLumbar',
+  shoulder: 'regionShoulder',
+  hip: 'regionHip',
+  knee: 'regionKnee',
+  ankle: 'regionAnkle',
+  foot: 'regionFoot',
+  core: 'regionCore',
+  upper_extremity: 'regionUpperExtremity',
+  lower_extremity: 'regionLowerExtremity',
+  full_body: 'regionFullBody',
 };
 
 // Helper to extract YouTube video ID
@@ -55,6 +56,7 @@ const getYouTubeVideoId = (url) => {
 };
 
 export default function ExerciseSettings({ lang }) {
+  const { t } = useTranslation('exercises');
   const queryClient = useQueryClient();
   const confirm = useConfirm();
 
@@ -103,11 +105,11 @@ export default function ExerciseSettings({ lang }) {
       queryClient.invalidateQueries(['exercises']);
       setExerciseModalMode(null);
       setExerciseFormData({});
-      toast.success(lang === 'no' ? 'Øvelse opprettet' : 'Exercise created');
+      toast.success(t('exerciseCreated', 'Øvelse opprettet'));
     },
     onError: (error) => {
       toast.error(
-        `${lang === 'no' ? 'Kunne ikke opprette øvelse' : 'Failed to create exercise'}: ${error.response?.data?.message || error.message}`
+        `${t('failedToCreateExercise', 'Kunne ikke opprette øvelse')}: ${error.response?.data?.message || error.message}`
       );
     },
   });
@@ -120,11 +122,11 @@ export default function ExerciseSettings({ lang }) {
       setExerciseModalMode(null);
       setSelectedExercise(null);
       setExerciseFormData({});
-      toast.success(lang === 'no' ? 'Øvelse oppdatert' : 'Exercise updated');
+      toast.success(t('exerciseUpdated', 'Øvelse oppdatert'));
     },
     onError: (error) => {
       toast.error(
-        `${lang === 'no' ? 'Kunne ikke oppdatere øvelse' : 'Failed to update exercise'}: ${error.response?.data?.message || error.message}`
+        `${t('failedToUpdateExercise', 'Kunne ikke oppdatere øvelse')}: ${error.response?.data?.message || error.message}`
       );
     },
   });
@@ -134,11 +136,11 @@ export default function ExerciseSettings({ lang }) {
     mutationFn: (id) => exercisesAPI.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries(['exercises']);
-      toast.success(lang === 'no' ? 'Øvelse slettet' : 'Exercise deleted');
+      toast.success(t('exerciseDeleted', 'Øvelse slettet'));
     },
     onError: (error) => {
       toast.error(
-        `${lang === 'no' ? 'Kunne ikke slette øvelse' : 'Failed to delete exercise'}: ${error.response?.data?.message || error.message}`
+        `${t('failedToDeleteExercise', 'Kunne ikke slette øvelse')}: ${error.response?.data?.message || error.message}`
       );
     },
   });
@@ -206,11 +208,11 @@ export default function ExerciseSettings({ lang }) {
 
   const handleDeleteExercise = async (exercise) => {
     const ok = await confirm({
-      title: lang === 'no' ? 'Slett øvelse' : 'Delete exercise',
-      description:
-        lang === 'no'
-          ? `Er du sikker på at du vil slette "${exercise.name_no}"?`
-          : `Are you sure you want to delete "${exercise.name_en || exercise.name_no}"?`,
+      title: t('deleteExercise', 'Slett øvelse'),
+      description: t(
+        'deleteExerciseConfirm',
+        `Er du sikker på at du vil slette "${exercise.name_no}"?`
+      ).replace('{name}', exercise.name_no),
       variant: 'destructive',
     });
     if (ok) {
@@ -230,12 +232,10 @@ export default function ExerciseSettings({ lang }) {
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                  {lang === 'no' ? 'Øvelsesbibliotek' : 'Exercise Library'}
+                  {t('exerciseLibraryTitle', 'Øvelsesbibliotek')}
                 </h2>
                 <p className="text-sm text-gray-500 dark:text-gray-200">
-                  {lang === 'no'
-                    ? 'Administrer øvelser, legg til videoer og bilder'
-                    : 'Manage exercises, add videos and images'}
+                  {t('manageExercisesDesc', 'Administrer øvelser, legg til videoer og bilder')}
                 </p>
               </div>
             </div>
@@ -244,7 +244,7 @@ export default function ExerciseSettings({ lang }) {
               className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
-              {lang === 'no' ? 'Ny øvelse' : 'New Exercise'}
+              {t('newExercise', 'Ny øvelse')}
             </button>
           </div>
         </div>
@@ -254,12 +254,12 @@ export default function ExerciseSettings({ lang }) {
           <div className="flex flex-col sm:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
               <input
                 type="text"
                 value={exerciseSearch}
                 onChange={(e) => setExerciseSearch(e.target.value)}
-                placeholder={lang === 'no' ? 'Søk etter øvelser...' : 'Search exercises...'}
+                placeholder={t('searchExercises', 'Søk etter øvelser...')}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
               />
             </div>
@@ -271,14 +271,14 @@ export default function ExerciseSettings({ lang }) {
                 onChange={(e) => setExerciseCategoryFilter(e.target.value)}
                 className="appearance-none pl-4 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 dark:text-white"
               >
-                <option value="">{lang === 'no' ? 'Alle kategorier' : 'All Categories'}</option>
+                <option value="">{t('allCategories', 'Alle kategorier')}</option>
                 {exerciseCategories.map((cat) => (
                   <option key={cat} value={cat}>
-                    {categoryLabels[cat]?.[lang] || cat}
+                    {t(categoryKeys[cat], cat)}
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300 pointer-events-none" />
             </div>
 
             {/* Body Region Filter */}
@@ -288,14 +288,14 @@ export default function ExerciseSettings({ lang }) {
                 onChange={(e) => setExerciseBodyRegionFilter(e.target.value)}
                 className="appearance-none pl-4 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-800 dark:text-white"
               >
-                <option value="">{lang === 'no' ? 'Alle regioner' : 'All Regions'}</option>
+                <option value="">{t('allRegions', 'Alle regioner')}</option>
                 {exerciseBodyRegions.map((region) => (
                   <option key={region} value={region}>
-                    {bodyRegionLabels[region]?.[lang] || region}
+                    {t(bodyRegionKeys[region], region)}
                   </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300 pointer-events-none" />
             </div>
           </div>
         </div>
@@ -306,7 +306,7 @@ export default function ExerciseSettings({ lang }) {
             <div className="px-6 py-12 text-center">
               <Loader2 className="w-8 h-8 animate-spin text-green-600 mx-auto" />
               <p className="text-sm text-gray-500 dark:text-gray-200 mt-3">
-                {lang === 'no' ? 'Laster øvelser...' : 'Loading exercises...'}
+                {t('loadingExercisesEllipsis', 'Laster øvelser...')}
               </p>
             </div>
           ) : exercises.length > 0 ? (
@@ -329,7 +329,7 @@ export default function ExerciseSettings({ lang }) {
                           }}
                         />
                       ) : (
-                        <Dumbbell className="w-6 h-6 text-gray-400" />
+                        <Dumbbell className="w-6 h-6 text-gray-400 dark:text-gray-300" />
                       )}
                     </div>
 
@@ -340,10 +340,10 @@ export default function ExerciseSettings({ lang }) {
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded">
-                          {categoryLabels[exercise.category]?.[lang] || exercise.category}
+                          {t(categoryKeys[exercise.category], exercise.category)}
                         </span>
                         <span className="px-2 py-0.5 text-xs font-medium bg-blue-100 text-blue-700 rounded">
-                          {bodyRegionLabels[exercise.body_region]?.[lang] || exercise.body_region}
+                          {t(bodyRegionKeys[exercise.body_region], exercise.body_region)}
                         </span>
                       </div>
                     </div>
@@ -353,15 +353,15 @@ export default function ExerciseSettings({ lang }) {
                       {exercise.image_url ? (
                         <div
                           className="flex items-center gap-1 text-green-600"
-                          title={lang === 'no' ? 'Har bilde' : 'Has image'}
+                          title={t('hasImage', 'Har bilde')}
                         >
                           <Image className="w-4 h-4" />
                           <Check className="w-3 h-3" />
                         </div>
                       ) : (
                         <div
-                          className="flex items-center gap-1 text-gray-400"
-                          title={lang === 'no' ? 'Mangler bilde' : 'No image'}
+                          className="flex items-center gap-1 text-gray-400 dark:text-gray-300"
+                          title={t('noImage', 'Mangler bilde')}
                         >
                           <Image className="w-4 h-4" />
                           <X className="w-3 h-3" />
@@ -371,15 +371,15 @@ export default function ExerciseSettings({ lang }) {
                       {exercise.video_url ? (
                         <div
                           className="flex items-center gap-1 text-green-600"
-                          title={lang === 'no' ? 'Har video' : 'Has video'}
+                          title={t('hasVideo', 'Har video')}
                         >
                           <Video className="w-4 h-4" />
                           <Check className="w-3 h-3" />
                         </div>
                       ) : (
                         <div
-                          className="flex items-center gap-1 text-gray-400"
-                          title={lang === 'no' ? 'Mangler video' : 'No video'}
+                          className="flex items-center gap-1 text-gray-400 dark:text-gray-300"
+                          title={t('noVideo', 'Mangler video')}
                         >
                           <Video className="w-4 h-4" />
                           <X className="w-3 h-3" />
@@ -393,7 +393,7 @@ export default function ExerciseSettings({ lang }) {
                     <button
                       onClick={() => handleOpenExerciseEdit(exercise)}
                       className="p-2 text-gray-500 dark:text-gray-200 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                      title={lang === 'no' ? 'Rediger' : 'Edit'}
+                      title={t('editBtn', 'Rediger')}
                     >
                       <Edit3 className="w-4 h-4" />
                     </button>
@@ -401,7 +401,7 @@ export default function ExerciseSettings({ lang }) {
                       <button
                         onClick={() => handleDeleteExercise(exercise)}
                         className="p-2 text-gray-500 dark:text-gray-200 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title={lang === 'no' ? 'Slett' : 'Delete'}
+                        title={t('deleteBtn', 'Slett')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -415,12 +415,8 @@ export default function ExerciseSettings({ lang }) {
               <Dumbbell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
               <p className="text-sm text-gray-500 dark:text-gray-200">
                 {exerciseSearch || exerciseCategoryFilter || exerciseBodyRegionFilter
-                  ? lang === 'no'
-                    ? 'Ingen øvelser funnet med disse filtrene'
-                    : 'No exercises found with these filters'
-                  : lang === 'no'
-                    ? 'Ingen øvelser lagt til ennå'
-                    : 'No exercises added yet'}
+                  ? t('noExercisesWithFilters', 'Ingen øvelser funnet med disse filtrene')
+                  : t('noExercisesAddedYet', 'Ingen øvelser lagt til ennå')}
               </p>
             </div>
           )}
@@ -429,9 +425,10 @@ export default function ExerciseSettings({ lang }) {
         {/* Results Summary */}
         {exercises.length > 0 && (
           <div className="px-6 py-3 bg-gray-50 dark:bg-gray-700 border-t border-gray-200 text-sm text-gray-500 dark:text-gray-200">
-            {lang === 'no'
-              ? `Viser ${exercises.length} øvelse${exercises.length !== 1 ? 'r' : ''}`
-              : `Showing ${exercises.length} exercise${exercises.length !== 1 ? 's' : ''}`}
+            {t('showingExercises', `Viser ${exercises.length} øvelse(r)`).replace(
+              '{count}',
+              exercises.length
+            )}
           </div>
         )}
       </div>
@@ -444,16 +441,12 @@ export default function ExerciseSettings({ lang }) {
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between flex-shrink-0">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                 {exerciseModalMode === 'create'
-                  ? lang === 'no'
-                    ? 'Ny øvelse'
-                    : 'New Exercise'
-                  : lang === 'no'
-                    ? 'Rediger øvelse'
-                    : 'Edit Exercise'}
+                  ? t('newExercise', 'Ny øvelse')
+                  : t('editExerciseTitle', 'Rediger øvelse')}
               </h3>
               <button
                 onClick={handleCloseExerciseModal}
-                className="p-2 text-gray-400 hover:text-gray-600 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 dark:bg-gray-700"
+                className="p-2 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 dark:bg-gray-700"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -466,7 +459,7 @@ export default function ExerciseSettings({ lang }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                      {lang === 'no' ? 'Navn (Norsk)' : 'Name (Norwegian)'} *
+                      {t('nameNorwegian', 'Navn (Norsk)')} *
                     </label>
                     <input
                       type="text"
@@ -475,16 +468,12 @@ export default function ExerciseSettings({ lang }) {
                         setExerciseFormData({ ...exerciseFormData, name_no: e.target.value })
                       }
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder={
-                        lang === 'no'
-                          ? 'f.eks. Kne til bryst tøyning'
-                          : 'e.g. Knee to Chest Stretch'
-                      }
+                      placeholder={t('nameNorwegianPlaceholder', 'f.eks. Kne til bryst tøyning')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                      {lang === 'no' ? 'Navn (Engelsk)' : 'Name (English)'}
+                      {t('nameEnglish', 'Navn (Engelsk)')}
                     </label>
                     <input
                       type="text"
@@ -502,7 +491,7 @@ export default function ExerciseSettings({ lang }) {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                      {lang === 'no' ? 'Kategori' : 'Category'}
+                      {t('category', 'Kategori')}
                     </label>
                     <select
                       value={exerciseFormData.category || 'strengthening'}
@@ -511,16 +500,16 @@ export default function ExerciseSettings({ lang }) {
                       }
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      {Object.entries(categoryLabels).map(([key, labels]) => (
+                      {Object.entries(categoryKeys).map(([key, tKey]) => (
                         <option key={key} value={key}>
-                          {labels[lang] || key}
+                          {t(tKey, key)}
                         </option>
                       ))}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                      {lang === 'no' ? 'Kroppsregion' : 'Body Region'}
+                      {t('bodyRegion', 'Kroppsregion')}
                     </label>
                     <select
                       value={exerciseFormData.body_region || 'core'}
@@ -532,16 +521,16 @@ export default function ExerciseSettings({ lang }) {
                       }
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      {Object.entries(bodyRegionLabels).map(([key, labels]) => (
+                      {Object.entries(bodyRegionKeys).map(([key, tKey]) => (
                         <option key={key} value={key}>
-                          {labels[lang] || key}
+                          {t(tKey, key)}
                         </option>
                       ))}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                      {lang === 'no' ? 'Vanskelighetsgrad' : 'Difficulty'}
+                      {t('difficultyLabel', 'Vanskelighetsgrad')}
                     </label>
                     <select
                       value={exerciseFormData.difficulty || 'beginner'}
@@ -550,11 +539,9 @@ export default function ExerciseSettings({ lang }) {
                       }
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      <option value="beginner">{lang === 'no' ? 'Nybegynner' : 'Beginner'}</option>
-                      <option value="intermediate">
-                        {lang === 'no' ? 'Middels' : 'Intermediate'}
-                      </option>
-                      <option value="advanced">{lang === 'no' ? 'Avansert' : 'Advanced'}</option>
+                      <option value="beginner">{t('beginner', 'Nybegynner')}</option>
+                      <option value="intermediate">{t('intermediate', 'Middels')}</option>
+                      <option value="advanced">{t('advanced', 'Avansert')}</option>
                     </select>
                   </div>
                 </div>
@@ -562,7 +549,7 @@ export default function ExerciseSettings({ lang }) {
                 {/* Video URL */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                    {lang === 'no' ? 'Video URL (YouTube)' : 'Video URL (YouTube)'}
+                    {t('videoUrlLabel', 'Video URL (YouTube)')}
                   </label>
                   <input
                     type="url"
@@ -591,7 +578,7 @@ export default function ExerciseSettings({ lang }) {
                 {/* Image URL */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                    {lang === 'no' ? 'Bilde URL' : 'Image URL'}
+                    {t('imageUrlLabel', 'Bilde URL')}
                   </label>
                   <input
                     type="url"
@@ -620,7 +607,7 @@ export default function ExerciseSettings({ lang }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                      {lang === 'no' ? 'Instruksjoner (Norsk)' : 'Instructions (Norwegian)'}
+                      {t('instructionsNorwegian', 'Instruksjoner (Norsk)')}
                     </label>
                     <textarea
                       value={exerciseFormData.instructions_no || ''}
@@ -632,14 +619,12 @@ export default function ExerciseSettings({ lang }) {
                       }
                       rows={4}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder={
-                        lang === 'no' ? 'Detaljerte instruksjoner...' : 'Detailed instructions...'
-                      }
+                      placeholder={t('detailedInstructions', 'Detaljerte instruksjoner...')}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                      {lang === 'no' ? 'Instruksjoner (Engelsk)' : 'Instructions (English)'}
+                      {t('instructionsEnglish', 'Instruksjoner (Engelsk)')}
                     </label>
                     <textarea
                       value={exerciseFormData.instructions_en || ''}
@@ -651,7 +636,7 @@ export default function ExerciseSettings({ lang }) {
                       }
                       rows={4}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder="Detailed instructions..."
+                      placeholder={t('detailedInstructionsPlaceholder', 'Detailed instructions...')}
                     />
                   </div>
                 </div>
@@ -660,7 +645,7 @@ export default function ExerciseSettings({ lang }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                      {lang === 'no' ? 'Kontraindikasjoner' : 'Contraindications'}
+                      {t('contraindications', 'Kontraindikasjoner')}
                     </label>
                     <textarea
                       value={exerciseFormData.contraindications || ''}
@@ -672,16 +657,15 @@ export default function ExerciseSettings({ lang }) {
                       }
                       rows={2}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder={
-                        lang === 'no'
-                          ? 'Når øvelsen ikke bør utføres...'
-                          : 'When the exercise should not be performed...'
-                      }
+                      placeholder={t(
+                        'contraindicationsShortPlaceholder',
+                        'Når øvelsen ikke bør utføres...'
+                      )}
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 dark:text-white mb-1">
-                      {lang === 'no' ? 'Forholdsregler' : 'Precautions'}
+                      {t('precautions', 'Forholdsregler')}
                     </label>
                     <textarea
                       value={exerciseFormData.precautions || ''}
@@ -693,9 +677,7 @@ export default function ExerciseSettings({ lang }) {
                       }
                       rows={2}
                       className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
-                      placeholder={
-                        lang === 'no' ? 'Viktige hensyn...' : 'Important considerations...'
-                      }
+                      placeholder={t('precautionsShortPlaceholder', 'Viktige hensyn...')}
                     />
                   </div>
                 </div>
@@ -703,12 +685,12 @@ export default function ExerciseSettings({ lang }) {
                 {/* Dosing Defaults */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">
-                    {lang === 'no' ? 'Standard dosering' : 'Default Dosing'}
+                    {t('defaultDosing', 'Standard dosering')}
                   </label>
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     <div>
                       <label className="block text-xs text-gray-500 dark:text-gray-200 mb-1">
-                        {lang === 'no' ? 'Sett' : 'Sets'}
+                        {t('setsLabel', 'Sett')}
                       </label>
                       <input
                         type="number"
@@ -726,7 +708,7 @@ export default function ExerciseSettings({ lang }) {
                     </div>
                     <div>
                       <label className="block text-xs text-gray-500 dark:text-gray-200 mb-1">
-                        {lang === 'no' ? 'Reps' : 'Reps'}
+                        {t('repsLabel', 'Reps')}
                       </label>
                       <input
                         type="number"
@@ -744,7 +726,7 @@ export default function ExerciseSettings({ lang }) {
                     </div>
                     <div>
                       <label className="block text-xs text-gray-500 dark:text-gray-200 mb-1">
-                        {lang === 'no' ? 'Hold (sek)' : 'Hold (sec)'}
+                        {t('holdSec', 'Hold (sek)')}
                       </label>
                       <input
                         type="number"
@@ -763,7 +745,7 @@ export default function ExerciseSettings({ lang }) {
                     </div>
                     <div>
                       <label className="block text-xs text-gray-500 dark:text-gray-200 mb-1">
-                        {lang === 'no' ? 'Frekvens' : 'Frequency'}
+                        {t('frequencyLabel', 'Frekvens')}
                       </label>
                       <select
                         value={exerciseFormData.default_frequency || 'daily'}
@@ -775,15 +757,11 @@ export default function ExerciseSettings({ lang }) {
                         }
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                       >
-                        <option value="daily">{lang === 'no' ? 'Daglig' : 'Daily'}</option>
-                        <option value="2x_daily">{lang === 'no' ? '2x daglig' : '2x Daily'}</option>
-                        <option value="3x_week">
-                          {lang === 'no' ? '3x per uke' : '3x Weekly'}
-                        </option>
-                        <option value="2x_week">
-                          {lang === 'no' ? '2x per uke' : '2x Weekly'}
-                        </option>
-                        <option value="weekly">{lang === 'no' ? 'Ukentlig' : 'Weekly'}</option>
+                        <option value="daily">{t('freqDaily', 'Daglig')}</option>
+                        <option value="2x_daily">{t('freq2xDaily', '2x daglig')}</option>
+                        <option value="3x_week">{t('freq3xWeek', '3x per uke')}</option>
+                        <option value="2x_week">{t('freq2xWeek', '2x per uke')}</option>
+                        <option value="weekly">{t('freqWeekly', 'Ukentlig')}</option>
                       </select>
                     </div>
                   </div>
@@ -797,7 +775,7 @@ export default function ExerciseSettings({ lang }) {
                 onClick={handleCloseExerciseModal}
                 className="px-4 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-700"
               >
-                {lang === 'no' ? 'Avbryt' : 'Cancel'}
+                {t('cancelBtn', 'Avbryt')}
               </button>
               <button
                 onClick={handleSaveExercise}
@@ -811,12 +789,12 @@ export default function ExerciseSettings({ lang }) {
                 {createExerciseMutation.isLoading || updateExerciseMutation.isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    {lang === 'no' ? 'Lagrer...' : 'Saving...'}
+                    {t('savingBtn', 'Lagrer...')}
                   </>
                 ) : (
                   <>
                     <Save className="w-4 h-4" />
-                    {lang === 'no' ? 'Lagre' : 'Save'}
+                    {t('saveBtn', 'Lagre')}
                   </>
                 )}
               </button>

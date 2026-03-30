@@ -104,7 +104,7 @@ function NPRSForm({ onSubmit }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-gray-600 dark:text-gray-300">
         Select your current pain level (0 = no pain, 10 = worst possible):
       </p>
       <div className="flex flex-wrap gap-2">
@@ -153,7 +153,9 @@ function VASForm({ onSubmit }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-600">Drag the slider to indicate your pain intensity:</p>
+      <p className="text-sm text-gray-600 dark:text-gray-300">
+        Drag the slider to indicate your pain intensity:
+      </p>
       <div className="space-y-2">
         <input
           type="range"
@@ -166,7 +168,7 @@ function VASForm({ onSubmit }) {
             background: `linear-gradient(to right, #22c55e 0%, #eab308 50%, #ef4444 100%)`,
           }}
         />
-        <div className="flex justify-between text-xs text-gray-500">
+        <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
           <span>No pain (0)</span>
           <span>Worst pain (100)</span>
         </div>
@@ -204,7 +206,7 @@ function MultiSectionForm({ sections, label, maxPerItem, onSubmit }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-gray-600 dark:text-gray-300">
         Rate each section from 0 (no problem) to {maxPerItem} (worst):
         <span className="ml-2 font-medium">
           {answeredCount}/{sections.length} answered
@@ -262,7 +264,7 @@ function DASHForm({ onSubmit }) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-gray-600 dark:text-gray-300">
         Rate each item: 1 = No difficulty, 5 = Unable.
         <span className="ml-2 font-medium">{answeredCount}/30 answered (min 27 required)</span>
       </p>
@@ -368,7 +370,7 @@ export default function OutcomeMeasures({ patientId, encounterId, onSubmitted })
 
   const severityColor = (severity) => {
     if (!severity) {
-      return 'text-gray-600';
+      return 'text-gray-600 dark:text-gray-300';
     }
     const s = severity.toLowerCase();
     if (s.includes('no ') || s.includes('minimal') || s.includes('none')) {
@@ -411,7 +413,7 @@ export default function OutcomeMeasures({ patientId, encounterId, onSubmitted })
 
       {/* Form */}
       {submitting ? (
-        <div className="flex items-center gap-2 py-8 justify-center text-gray-500">
+        <div className="flex items-center gap-2 py-8 justify-center text-gray-500 dark:text-gray-400">
           <div className="animate-spin rounded-full h-5 w-5 border-2 border-teal-600 border-t-transparent" />
           Scoring...
         </div>
@@ -436,20 +438,20 @@ export default function OutcomeMeasures({ patientId, encounterId, onSubmitted })
           </div>
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div>
-              <span className="text-gray-600">Score:</span>{' '}
+              <span className="text-gray-600 dark:text-gray-300">Score:</span>{' '}
               <span className="font-medium">
                 {result.scoring?.score ?? result.calculated_score} /{' '}
                 {result.scoring?.maxScore ?? result.max_possible_score}
               </span>
             </div>
             <div>
-              <span className="text-gray-600">Percentage:</span>{' '}
+              <span className="text-gray-600 dark:text-gray-300">Percentage:</span>{' '}
               <span className="font-medium">
                 {result.scoring?.percentage ?? result.percentage_score}%
               </span>
             </div>
             <div className="col-span-2">
-              <span className="text-gray-600">Severity:</span>{' '}
+              <span className="text-gray-600 dark:text-gray-300">Severity:</span>{' '}
               <span
                 className={`font-medium ${severityColor(result.scoring?.severity ?? result.severity_category)}`}
               >

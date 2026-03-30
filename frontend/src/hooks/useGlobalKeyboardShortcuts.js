@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 /**
  * Global keyboard shortcuts for the application.
- * Ctrl+K: Focus search / command palette
+ * Ctrl+K: Open command palette (handled in DashboardLayout)
  * Ctrl+N: Navigate to new patient
  * Ctrl+/: Toggle shortcut help modal
  */
@@ -25,14 +25,7 @@ export default function useGlobalKeyboardShortcuts() {
 
       const isCtrl = e.ctrlKey || e.metaKey;
 
-      if (isCtrl && e.key === 'k') {
-        e.preventDefault();
-        // Focus the search input if it exists
-        const searchInput = document.querySelector('[data-search-input]');
-        if (searchInput) {
-          searchInput.focus();
-        }
-      }
+      // Ctrl+K is now handled by DashboardLayout for the command palette
 
       if (isCtrl && e.key === 'n') {
         e.preventDefault();
@@ -60,7 +53,7 @@ export default function useGlobalKeyboardShortcuts() {
 }
 
 export const SHORTCUTS = [
-  { keys: ['Ctrl', 'K'], description: 'Focus search' },
+  { keys: ['Ctrl', 'K'], description: 'Command palette' },
   { keys: ['Ctrl', 'N'], description: 'New patient' },
   { keys: ['Ctrl', '/'], description: 'Show keyboard shortcuts' },
   { keys: ['Esc'], description: 'Close dialogs' },

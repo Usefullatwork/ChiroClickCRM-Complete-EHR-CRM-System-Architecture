@@ -18,7 +18,7 @@
 import cron from 'node-cron';
 import logger from '../utils/logger.js';
 import { query } from '../config/database.js';
-import automatedCommsService from '../services/automatedComms.js';
+import automatedCommsService from '../services/communication/automatedComms.js';
 
 // Timezone for Norway
 const TIMEZONE = process.env.SCHEDULER_TIMEZONE || 'Europe/Oslo';
@@ -148,7 +148,7 @@ const processDaysSinceVisitRecalls = async () => {
 
   const results = {
     '90_days': { count: 0, error: null },
-    '180_days': { count: 0, error: null }
+    '180_days': { count: 0, error: null },
   };
 
   try {
@@ -191,23 +191,31 @@ export const initializeReminderJobs = () => {
   // =====================================================
 
   // 24-hour appointment reminders - Every hour at minute 0
-  const apt24hJob = cron.schedule('0 * * * *', () => {
-    executeJob('appointment_reminder_24h', processAppointment24hReminders, 300000);
-  }, { timezone: TIMEZONE });
+  const apt24hJob = cron.schedule(
+    '0 * * * *',
+    () => {
+      executeJob('appointment_reminder_24h', processAppointment24hReminders, 300000);
+    },
+    { timezone: TIMEZONE }
+  );
   reminderJobs.set('appointment_reminder_24h', {
     job: apt24hJob,
     description: 'Send 24-hour appointment reminders',
-    schedule: '0 * * * *'
+    schedule: '0 * * * *',
   });
 
   // 1-hour appointment reminders - Every 15 minutes
-  const apt1hJob = cron.schedule('*/15 * * * *', () => {
-    executeJob('appointment_reminder_1h', processAppointment1hReminders, 300000);
-  }, { timezone: TIMEZONE });
+  const apt1hJob = cron.schedule(
+    '*/15 * * * *',
+    () => {
+      executeJob('appointment_reminder_1h', processAppointment1hReminders, 300000);
+    },
+    { timezone: TIMEZONE }
+  );
   reminderJobs.set('appointment_reminder_1h', {
     job: apt1hJob,
     description: 'Send 1-hour appointment reminders',
-    schedule: '*/15 * * * *'
+    schedule: '*/15 * * * *',
   });
 
   // =====================================================
@@ -215,33 +223,45 @@ export const initializeReminderJobs = () => {
   // =====================================================
 
   // Birthday greetings - Daily at 08:00
-  const birthdayJob = cron.schedule('0 8 * * *', () => {
-    executeJob('birthday_greetings', processBirthdayGreetings, 600000);
-  }, { timezone: TIMEZONE });
+  const birthdayJob = cron.schedule(
+    '0 8 * * *',
+    () => {
+      executeJob('birthday_greetings', processBirthdayGreetings, 600000);
+    },
+    { timezone: TIMEZONE }
+  );
   reminderJobs.set('birthday_greetings', {
     job: birthdayJob,
     description: 'Send birthday greetings',
-    schedule: '0 8 * * *'
+    schedule: '0 8 * * *',
   });
 
   // Follow-up reminders - Daily at 09:00
-  const followUpJob = cron.schedule('0 9 * * *', () => {
-    executeJob('followup_reminders', processFollowUpReminders, 600000);
-  }, { timezone: TIMEZONE });
+  const followUpJob = cron.schedule(
+    '0 9 * * *',
+    () => {
+      executeJob('followup_reminders', processFollowUpReminders, 600000);
+    },
+    { timezone: TIMEZONE }
+  );
   reminderJobs.set('followup_reminders', {
     job: followUpJob,
     description: 'Send follow-up scheduling reminders',
-    schedule: '0 9 * * *'
+    schedule: '0 9 * * *',
   });
 
   // Exercise inactivity reminders - Daily at 10:00
-  const exerciseJob = cron.schedule('0 10 * * *', () => {
-    executeJob('exercise_inactivity', processExerciseReminders, 600000);
-  }, { timezone: TIMEZONE });
+  const exerciseJob = cron.schedule(
+    '0 10 * * *',
+    () => {
+      executeJob('exercise_inactivity', processExerciseReminders, 600000);
+    },
+    { timezone: TIMEZONE }
+  );
   reminderJobs.set('exercise_inactivity', {
     job: exerciseJob,
     description: 'Send exercise program inactivity reminders',
-    schedule: '0 10 * * *'
+    schedule: '0 10 * * *',
   });
 
   // =====================================================
@@ -249,13 +269,17 @@ export const initializeReminderJobs = () => {
   // =====================================================
 
   // Days-since-visit recalls - Weekly Monday at 10:00
-  const daysSinceJob = cron.schedule('0 10 * * 1', () => {
-    executeJob('days_since_visit_recall', processDaysSinceVisitRecalls, 900000);
-  }, { timezone: TIMEZONE });
+  const daysSinceJob = cron.schedule(
+    '0 10 * * 1',
+    () => {
+      executeJob('days_since_visit_recall', processDaysSinceVisitRecalls, 900000);
+    },
+    { timezone: TIMEZONE }
+  );
   reminderJobs.set('days_since_visit_recall', {
     job: daysSinceJob,
     description: 'Send visit recall reminders (90/180 days)',
-    schedule: '0 10 * * 1'
+    schedule: '0 10 * * 1',
   });
 
   logger.info(`Reminder jobs initialized successfully (${reminderJobs.size} jobs)`);
@@ -263,7 +287,7 @@ export const initializeReminderJobs = () => {
   return {
     jobCount: reminderJobs.size,
     timezone: TIMEZONE,
-    jobs: Array.from(reminderJobs.keys())
+    jobs: Array.from(reminderJobs.keys()),
   };
 };
 
@@ -278,7 +302,7 @@ export const getReminderJobStatus = () => {
       name: jobName,
       description: jobInfo.description,
       schedule: jobInfo.schedule,
-      isRunning: runningJobs.has(jobName)
+      isRunning: runningJobs.has(jobName),
     });
   }
 
@@ -286,7 +310,7 @@ export const getReminderJobStatus = () => {
     timezone: TIMEZONE,
     totalJobs: reminderJobs.size,
     runningJobs: runningJobs.size,
-    jobs: status
+    jobs: status,
   };
 };
 
@@ -301,7 +325,7 @@ export const triggerReminderJob = async (jobName) => {
     followup_reminders: processFollowUpReminders,
     exercise_inactivity: processExerciseReminders,
     days_since_visit_recall: processDaysSinceVisitRecalls,
-    all_reminders: processAllReminders
+    all_reminders: processAllReminders,
   };
 
   if (!jobs[jobName]) {
@@ -365,5 +389,5 @@ export default {
   triggerReminderJob,
   stopReminderJob,
   startReminderJob,
-  shutdownReminderJobs
+  shutdownReminderJobs,
 };

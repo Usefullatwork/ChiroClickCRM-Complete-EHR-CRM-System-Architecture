@@ -49,10 +49,10 @@ export const PatientMetrics = ({ data = [], stats = {}, loading = false }) => {
       return (
         <div className="bg-white px-4 py-3 shadow-lg rounded-lg border border-gray-200">
           <p className="text-sm font-semibold text-gray-900 mb-2">{label}</p>
-          {payload.map((entry, index) => (
-            <div key={index} className="flex items-center gap-2 text-sm">
+          {payload.map((entry) => (
+            <div key={entry.name} className="flex items-center gap-2 text-sm">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-              <span className="text-gray-600">{entry.name}:</span>
+              <span className="text-gray-600 dark:text-gray-300">{entry.name}:</span>
               <span className="font-semibold text-gray-900">{entry.value}</span>
             </div>
           ))}
@@ -84,18 +84,18 @@ export const PatientMetrics = ({ data = [], stats = {}, loading = false }) => {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">Pasientvolum</h3>
-              <p className="text-sm text-gray-500">Siste 12 maneder</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Siste 12 maneder</p>
             </div>
           </div>
 
           {/* Quick stats */}
           <div className="hidden md:flex items-center gap-6">
             <div className="text-right">
-              <p className="text-xs text-gray-500">Totalt aktive</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Totalt aktive</p>
               <p className="text-lg font-bold text-gray-900">{stats.activePatients || 0}</p>
             </div>
             <div className="text-right">
-              <p className="text-xs text-gray-500">Nye denne mnd</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Nye denne mnd</p>
               <p className="text-lg font-bold text-green-600">+{stats.newPatientsThisMonth || 0}</p>
             </div>
           </div>
@@ -155,7 +155,7 @@ export const PatientMetrics = ({ data = [], stats = {}, loading = false }) => {
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="h-64 flex items-center justify-center text-gray-400">
+          <div className="h-64 flex items-center justify-center text-gray-400 dark:text-gray-300">
             <div className="text-center">
               <Activity size={48} className="mx-auto mb-2 opacity-50" />
               <p>Ingen data tilgjengelig</p>
@@ -168,28 +168,28 @@ export const PatientMetrics = ({ data = [], stats = {}, loading = false }) => {
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="flex items-center justify-center gap-1 text-gray-500 mb-1">
+            <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 mb-1">
               <Users size={14} />
               <span className="text-xs">Totalt</span>
             </div>
             <p className="text-xl font-bold text-gray-900">{stats.totalPatients || 0}</p>
           </div>
           <div className="text-center">
-            <div className="flex items-center justify-center gap-1 text-gray-500 mb-1">
+            <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 mb-1">
               <UserPlus size={14} />
               <span className="text-xs">Nye (denne mnd)</span>
             </div>
             <p className="text-xl font-bold text-green-600">{stats.newPatientsThisMonth || 0}</p>
           </div>
           <div className="text-center">
-            <div className="flex items-center justify-center gap-1 text-gray-500 mb-1">
+            <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 mb-1">
               <Activity size={14} />
               <span className="text-xs">Aktive (90 dager)</span>
             </div>
             <p className="text-xl font-bold text-blue-600">{stats.activePatients || 0}</p>
           </div>
           <div className="text-center">
-            <div className="flex items-center justify-center gap-1 text-gray-500 mb-1">
+            <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 mb-1">
               <TrendingUp size={14} />
               <span className="text-xs">Endring</span>
             </div>

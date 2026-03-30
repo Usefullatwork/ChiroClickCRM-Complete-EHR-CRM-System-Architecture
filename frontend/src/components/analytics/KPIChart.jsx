@@ -26,7 +26,7 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
 
   if (!chartData || chartData.length === 0) {
     return (
-      <div className="flex items-center justify-center h-64 text-slate-400">
+      <div className="flex items-center justify-center h-64 text-slate-400 dark:text-slate-300">
         <p>Ingen data tilgjengelig</p>
       </div>
     );
@@ -38,8 +38,8 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
     return (
       <div className="space-y-4">
         <div className="flex items-end justify-between gap-2 h-64">
-          {chartData.map((item, index) => (
-            <div key={index} className="flex-1 flex flex-col items-center gap-2">
+          {chartData.map((item) => (
+            <div key={item.label} className="flex-1 flex flex-col items-center gap-2">
               <div
                 className="w-full flex items-end justify-center relative"
                 style={{ height: '200px' }}
@@ -58,7 +58,9 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
                   </div>
                 </div>
               </div>
-              <span className="text-xs text-slate-600 font-medium">{item.label}</span>
+              <span className="text-xs text-slate-600 dark:text-slate-300 font-medium">
+                {item.label}
+              </span>
             </div>
           ))}
         </div>
@@ -67,7 +69,7 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
         <div className="flex items-center justify-between pt-4 border-t border-slate-200">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded" style={{ backgroundColor: color }}></div>
-            <span className="text-sm text-slate-600">{label}</span>
+            <span className="text-sm text-slate-600 dark:text-slate-300">{label}</span>
           </div>
           <span className="text-sm font-semibold text-slate-700">Max: {maxValue}</span>
         </div>
@@ -121,7 +123,7 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
             const x = (index / (chartData.length - 1)) * svgWidth;
             const y = svgHeight - item.percentage;
             return (
-              <g key={index}>
+              <g key={item.label}>
                 <circle
                   cx={x}
                   cy={y}
@@ -140,10 +142,10 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
 
         {/* X-axis labels */}
         <div className="flex justify-between mt-2">
-          {chartData.map((item, index) => (
+          {chartData.map((item) => (
             <span
-              key={index}
-              className="text-xs text-slate-600 font-medium"
+              key={item.label}
+              className="text-xs text-slate-600 dark:text-slate-300 font-medium"
               style={{ width: `${100 / chartData.length}%`, textAlign: 'center' }}
             >
               {item.label}
@@ -156,7 +158,7 @@ export const KPIChart = ({ data = [], type = 'line', color = '#14b8a6', label = 
       <div className="flex items-center justify-between pt-4 border-t border-slate-200">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: color }}></div>
-          <span className="text-sm text-slate-600">{label}</span>
+          <span className="text-sm text-slate-600 dark:text-slate-300">{label}</span>
         </div>
         <span className="text-sm font-semibold text-slate-700">Max: {maxValue}</span>
       </div>

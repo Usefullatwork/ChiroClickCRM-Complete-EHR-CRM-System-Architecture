@@ -285,6 +285,22 @@ export class CircuitBreaker {
   }
 
   /**
+   * Check if circuit breaker is healthy (not OPEN)
+   */
+  isHealthy() {
+    return this.state !== CircuitState.OPEN;
+  }
+
+  /**
+   * Cleanup interface for registry management
+   */
+  destroy() {
+    this.state = CircuitState.CLOSED;
+    this.failures = 0;
+    this.successes = 0;
+  }
+
+  /**
    * Reset the circuit breaker
    */
   reset() {

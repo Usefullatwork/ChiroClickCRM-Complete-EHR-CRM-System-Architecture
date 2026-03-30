@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "ChiroClick",
-    "slug": "chiroclick",
+    "name": "ChiroClickEHR",
+    "slug": "chiroclickehr",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "chiroclick",
+    "scheme": "chiroclickehr",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -15,7 +15,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "no.chiroclick.app",
+      "bundleIdentifier": "no.chiroclickehr.app",
       "usesAppleSignIn": true,
       "infoPlist": {
         "NSCameraUsageDescription": "Brukes for profilbilde",
@@ -23,7 +23,7 @@
       }
     },
     "android": {
-      "package": "no.chiroclick.app",
+      "package": "no.chiroclickehr.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#007AFF"
@@ -59,7 +59,7 @@
       "typedRoutes": true
     },
     "extra": {
-      "apiUrl": "https://api.chiroclick.no/api/v1",
+      "apiUrl": "https://api.chiroclickehr.no/api/v1",
       "googleClientId": "",
       "googleIosClientId": "",
       "googleAndroidClientId": "",
@@ -68,10 +68,10 @@
         "projectId": ""
       }
     },
-    "owner": "chiroclick",
+    "owner": "chiroclickehr",
     "updates": {
       "fallbackToCacheTimeout": 0,
-      "url": "https://u.expo.dev/chiroclickcrm"
+      "url": "https://u.expo.dev/chiroclickehr"
     },
     "runtimeVersion": {
       "policy": "appVersion"

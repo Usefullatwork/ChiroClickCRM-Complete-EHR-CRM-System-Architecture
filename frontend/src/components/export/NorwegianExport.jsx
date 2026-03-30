@@ -514,7 +514,7 @@ export default function NorwegianExport({
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">{t.title}</h3>
-              <p className="text-sm text-gray-500">{t.subtitle}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">{t.subtitle}</p>
             </div>
           </div>
         </div>
@@ -629,7 +629,7 @@ export default function NorwegianExport({
         {/* Preview Toggle */}
         <button
           onClick={() => setShowPreview(!showPreview)}
-          className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-800"
+          className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300 hover:text-gray-800"
         >
           {showPreview ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           {t.preview}
@@ -641,7 +641,7 @@ export default function NorwegianExport({
             <div className="absolute top-2 right-2 flex gap-2">
               <button
                 onClick={handleCopy}
-                className="p-1.5 text-gray-400 hover:text-gray-600 bg-white rounded shadow-sm"
+                className="p-1.5 text-gray-400 dark:text-gray-300 hover:text-gray-600 bg-white rounded shadow-sm"
                 title={t.copyToClipboard}
               >
                 {copied ? (
@@ -662,7 +662,7 @@ export default function NorwegianExport({
       <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex items-center justify-end gap-3">
         <button
           onClick={handleCopy}
-          className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800"
+          className="flex items-center gap-2 px-4 py-2 text-gray-600 dark:text-gray-300 hover:text-gray-800"
         >
           <Copy className="w-4 h-4" />
           {copied ? t.copied : t.copyToClipboard}

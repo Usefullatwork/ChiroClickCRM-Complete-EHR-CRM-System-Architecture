@@ -21,6 +21,11 @@ export default function Appointments() {
   const [statusFilter, setStatusFilter] = useState('');
   const [viewMode, setViewMode] = useState('list');
   const confirm = useConfirm();
+  const [cancelReasonModal, setCancelReasonModal] = useState({
+    open: false,
+    appointment: null,
+    reason: '',
+  });
 
   // Fetch appointments
   const { data: appointmentsResponse, isLoading } = useQuery({
@@ -58,10 +63,18 @@ export default function Appointments() {
     if (!ok) {
       return;
     }
-    const reason = window.prompt(t('cancellationReasonPrompt'));
-    if (reason) {
-      cancelMutation.mutate({ id: appointment.id, reason });
+    setCancelReasonModal({ open: true, appointment, reason: '' });
+  };
+
+  const handleCancelReasonConfirm = () => {
+    if (!cancelReasonModal.reason.trim()) {
+      return;
     }
+    cancelMutation.mutate({
+      id: cancelReasonModal.appointment.id,
+      reason: cancelReasonModal.reason,
+    });
+    setCancelReasonModal({ open: false, appointment: null, reason: '' });
   };
 
   const handleConfirm = (appointment) => {
@@ -91,7 +104,7 @@ export default function Appointments() {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">{t('title')}</h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-gray-600 dark:text-gray-300 mt-1">
             {t('appointmentsOnDate')
               .replace('{count}', appointments.length)
               .replace('{date}', formatDate(selectedDate, lang))}
@@ -104,22 +117,22 @@ export default function Appointments() {
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'list'
                   ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
               }`}
             >
               <List className="w-4 h-4" />
-              {t('list') || 'Liste'}
+              {t('list', 'Liste')}
             </button>
             <button
               onClick={() => setViewMode('board')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                 viewMode === 'board'
                   ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  : 'text-gray-500 dark:text-gray-400 hover:text-gray-700'
               }`}
             >
               <LayoutGrid className="w-4 h-4" />
-              {t('board') || 'Tavle'}
+              {t('board', 'Tavle')}
             </button>
           </div>
           <button
@@ -175,9 +188,9 @@ export default function Appointments() {
             </div>
           ) : appointments.length === 0 ? (
             <div className="text-center py-12 bg-gray-50 rounded-lg">
-              <Calendar className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 text-lg">{t('noAppointmentsFound')}</p>
-              <p className="text-gray-500 mt-2">{t('tryDifferentFilter')}</p>
+              <Calendar className="w-16 h-16 text-gray-400 dark:text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-600 dark:text-gray-300 text-lg">{t('noAppointmentsFound')}</p>
+              <p className="text-gray-500 dark:text-gray-400 mt-2">{t('tryDifferentFilter')}</p>
             </div>
           ) : (
             <div
@@ -203,7 +216,7 @@ export default function Appointments() {
                             <h3 className="text-lg font-semibold text-gray-900">
                               {appointment.patient_name}
                             </h3>
-                            <div className="flex items-center gap-4 mt-1 text-sm text-gray-600">
+                            <div className="flex items-center gap-4 mt-1 text-sm text-gray-600 dark:text-gray-300">
                               <div className="flex items-center gap-1">
                                 <Clock className="w-4 h-4" />
                                 {formatTime(appointment.start_time, lang)} -{' '}
@@ -215,7 +228,9 @@ export default function Appointments() {
                               </div>
                             </div>
                             {appointment.notes && (
-                              <p className="mt-2 text-sm text-gray-600">{appointment.notes}</p>
+                              <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+                                {appointment.notes}
+                              </p>
                             )}
                           </div>
                         </div>
@@ -264,6 +279,49 @@ export default function Appointments() {
             </div>
           )}
         </>
+      )}
+      {/* Cancel reason modal */}
+      {cancelReasonModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-md p-6">
+            <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              {t('cancellationReasonTitle', 'Grunn for kansellering')}
+            </h2>
+            {cancelReasonModal.appointment && (
+              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+                {cancelReasonModal.appointment.patient_name}
+              </p>
+            )}
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {t('cancellationReasonPrompt', 'Angi grunn for kansellering:')}
+            </label>
+            <textarea
+              value={cancelReasonModal.reason}
+              onChange={(e) =>
+                setCancelReasonModal({ ...cancelReasonModal, reason: e.target.value })
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+              rows={3}
+              placeholder={t('cancellationReasonPlaceholder', 'Skriv inn grunn...')}
+              autoFocus
+            />
+            <div className="flex justify-end gap-3 mt-4">
+              <button
+                onClick={() => setCancelReasonModal({ open: false, appointment: null, reason: '' })}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg"
+              >
+                {t('cancel', 'Avbryt')}
+              </button>
+              <button
+                onClick={handleCancelReasonConfirm}
+                disabled={!cancelReasonModal.reason.trim() || cancelMutation.isPending}
+                className="px-4 py-2 text-sm font-medium bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50"
+              >
+                {t('confirmCancellation', 'Bekreft kansellering')}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

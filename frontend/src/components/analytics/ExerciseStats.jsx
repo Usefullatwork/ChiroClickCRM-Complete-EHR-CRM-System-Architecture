@@ -87,19 +87,19 @@ export const ExerciseStats = ({ data = [], loading = false, limit = 10 }) => {
           <p className="text-sm font-semibold text-gray-900 mb-2">{item.name}</p>
           <div className="space-y-1 text-sm">
             <div className="flex justify-between gap-4">
-              <span className="text-gray-600">Foreskrivninger:</span>
+              <span className="text-gray-600 dark:text-gray-300">Foreskrivninger:</span>
               <span className="font-semibold text-gray-900">{item.foreskrivninger}</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="text-gray-600">Pasienter:</span>
+              <span className="text-gray-600 dark:text-gray-300">Pasienter:</span>
               <span className="font-semibold text-gray-900">{item.pasienter}</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="text-gray-600">Kategori:</span>
+              <span className="text-gray-600 dark:text-gray-300">Kategori:</span>
               <span className="font-medium text-gray-700">{item.category}</span>
             </div>
             <div className="flex justify-between gap-4">
-              <span className="text-gray-600">Kroppsregion:</span>
+              <span className="text-gray-600 dark:text-gray-300">Kroppsregion:</span>
               <span className="font-medium text-gray-700">{item.bodyRegion}</span>
             </div>
           </div>
@@ -131,7 +131,9 @@ export const ExerciseStats = ({ data = [], loading = false, limit = 10 }) => {
             </div>
             <div>
               <h3 className="text-lg font-semibold text-gray-900">Mest foreskrevne ovelser</h3>
-              <p className="text-sm text-gray-500">Topp {limit} siste 90 dager</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Topp {limit} siste 90 dager
+              </p>
             </div>
           </div>
 
@@ -142,7 +144,7 @@ export const ExerciseStats = ({ data = [], loading = false, limit = 10 }) => {
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 viewMode === 'chart'
                   ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
               }`}
             >
               Graf
@@ -152,7 +154,7 @@ export const ExerciseStats = ({ data = [], loading = false, limit = 10 }) => {
               className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
                 viewMode === 'list'
                   ? 'bg-white text-gray-900 shadow-sm'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 dark:text-gray-300 hover:text-gray-900'
               }`}
             >
               Liste
@@ -196,9 +198,9 @@ export const ExerciseStats = ({ data = [], loading = false, limit = 10 }) => {
             </ResponsiveContainer>
           ) : (
             <div className="space-y-3 max-h-96 overflow-y-auto">
-              {chartData.map((item, index) => (
+              {chartData.map((item) => (
                 <div
-                  key={index}
+                  key={item.name}
                   className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
                 >
                   <div
@@ -207,18 +209,18 @@ export const ExerciseStats = ({ data = [], loading = false, limit = 10 }) => {
                   />
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-gray-900 truncate">{item.name}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-gray-500 dark:text-gray-400">
                       {item.category} - {item.bodyRegion}
                     </p>
                   </div>
                   <div className="flex items-center gap-4 flex-shrink-0">
                     <div className="text-right">
                       <p className="text-sm font-bold text-gray-900">{item.foreskrivninger}</p>
-                      <p className="text-xs text-gray-500">foreskrivninger</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">foreskrivninger</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm font-bold text-blue-600">{item.pasienter}</p>
-                      <p className="text-xs text-gray-500">pasienter</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">pasienter</p>
                     </div>
                   </div>
                 </div>
@@ -226,7 +228,7 @@ export const ExerciseStats = ({ data = [], loading = false, limit = 10 }) => {
             </div>
           )
         ) : (
-          <div className="h-64 flex items-center justify-center text-gray-400">
+          <div className="h-64 flex items-center justify-center text-gray-400 dark:text-gray-300">
             <div className="text-center">
               <Dumbbell size={48} className="mx-auto mb-2 opacity-50" />
               <p>Ingen ovelsesdata tilgjengelig</p>
@@ -241,21 +243,21 @@ export const ExerciseStats = ({ data = [], loading = false, limit = 10 }) => {
         <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-gray-500 mb-1">
+              <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 mb-1">
                 <Activity size={14} />
                 <span className="text-xs">Unike ovelser</span>
               </div>
               <p className="text-xl font-bold text-gray-900">{chartData.length}</p>
             </div>
             <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-gray-500 mb-1">
+              <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 mb-1">
                 <TrendingUp size={14} />
                 <span className="text-xs">Totalt foreskrivninger</span>
               </div>
               <p className="text-xl font-bold text-purple-600">{totals.prescriptions}</p>
             </div>
             <div className="text-center">
-              <div className="flex items-center justify-center gap-1 text-gray-500 mb-1">
+              <div className="flex items-center justify-center gap-1 text-gray-500 dark:text-gray-400 mb-1">
                 <Users size={14} />
                 <span className="text-xs">Pasienter</span>
               </div>
@@ -289,7 +291,10 @@ export const ExerciseStatsCompact = ({ data = [], loading = false }) => {
   return (
     <div className="space-y-2">
       {data.slice(0, 5).map((item, index) => (
-        <div key={index} className="flex items-center gap-2">
+        <div
+          key={item.nameNo || item.nameEn || item.name || index}
+          className="flex items-center gap-2"
+        >
           <div className="w-2 h-6 rounded-full" style={{ backgroundColor: COLORS[index] }} />
           <span className="flex-1 text-sm text-gray-700 truncate">
             {item.nameNo || item.nameEn || item.name}

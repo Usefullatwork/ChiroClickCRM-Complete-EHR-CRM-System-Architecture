@@ -10,7 +10,7 @@
  */
 
 import { ICPC2_CODES } from '../../data/icpc2-codes.js';
-import { RED_FLAG_CATEGORIES } from '../redFlagEngine.js';
+import { RED_FLAG_CATEGORIES } from '../clinical/redFlagEngine.js';
 
 class ClinicalPromptCache {
   constructor() {

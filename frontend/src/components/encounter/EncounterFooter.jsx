@@ -16,7 +16,7 @@ export function EncounterFooter({
   return (
     <footer className="bg-white border-t border-slate-200 px-6 py-3 flex justify-between items-center flex-shrink-0 shadow-[0_-2px_10px_rgba(0,0,0,0.03)]">
       <div className="flex items-center gap-4">
-        <span className="text-sm text-slate-500 flex items-center gap-1">
+        <span className="text-sm text-slate-500 dark:text-slate-400 flex items-center gap-1">
           <Activity className="h-4 w-4 text-amber-500" />
           {saveMutation.isPending ? 'Lagrer...' : 'Klar til lagring'}
         </span>

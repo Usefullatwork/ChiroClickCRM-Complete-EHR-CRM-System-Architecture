@@ -183,6 +183,42 @@ export const strictLimiter = rateLimit({
   },
 });
 
+/**
+ * Read endpoint rate limiter
+ * 100 requests per minute per user for list/detail endpoints
+ */
+export const readLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => ['test', 'e2e'].includes(process.env.NODE_ENV),
+  keyGenerator: (req) => req.user?.id || req.ip,
+  message: {
+    error: 'ReadRateLimitError',
+    code: 'READ_RATE_LIMIT_EXCEEDED',
+    message: 'Too many read requests. Please try again shortly.',
+  },
+});
+
+/**
+ * Search endpoint rate limiter
+ * 30 requests per minute per user for search endpoints
+ */
+export const searchLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: () => ['test', 'e2e'].includes(process.env.NODE_ENV),
+  keyGenerator: (req) => req.user?.id || req.ip,
+  message: {
+    error: 'SearchRateLimitError',
+    code: 'SEARCH_RATE_LIMIT_EXCEEDED',
+    message: 'Too many search requests. Please try again shortly.',
+  },
+});
+
 export default {
   generalLimiter,
   smsLimiter,
@@ -190,4 +226,6 @@ export default {
   perPatientLimiter,
   loginLimiter,
   strictLimiter,
+  readLimiter,
+  searchLimiter,
 };

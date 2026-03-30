@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   TrendingUp,
   FileText,
+  FileWarning,
   MessageSquare,
   Clock,
   ArrowRight,
@@ -14,15 +15,19 @@ import {
   ChevronDown,
   ChevronUp,
   Bell,
-  Brain,
+  Brain as _Brain,
   AlertCircle,
+  AlertTriangle,
   Mail,
   CreditCard,
   Activity,
   UserPlus,
   Search,
+  RefreshCcw,
+  CalendarClock,
 } from 'lucide-react';
 import { dashboardAPI, appointmentsAPI, followUpsAPI } from '../services/api';
+import { unwrap } from '../utils/api-helpers';
 import {
   useTranslation,
   formatDateWithWeekday,
@@ -69,9 +74,10 @@ export default function Dashboard() {
     queryFn: () => followUpsAPI.getPatientsNeedingFollowUp(),
   });
 
-  const stats = statsResponse?.data;
-  const appointments = appointmentsResponse?.data?.appointments || [];
-  const followUpPatients = followUpPatientsResponse?.data || [];
+  const stats = unwrap(statsResponse);
+  const appointments = unwrap(appointmentsResponse)?.appointments || [];
+  const followUpRaw = unwrap(followUpPatientsResponse);
+  const followUpPatients = Array.isArray(followUpRaw) ? followUpRaw : [];
 
   // Derived data
   const overdueFollowUps = followUpPatients.filter((p) => new Date(p.follow_up_date) < new Date());
@@ -176,7 +182,9 @@ export default function Dashboard() {
     },
   ];
 
-  // ─── Stat cards config ─────────────────────────────────────
+  // ─── Stat cards config (EHR-first order) ──────────────────
+
+  const [showMoreStats, setShowMoreStats] = useState(false);
 
   const statCards = [
     {
@@ -189,13 +197,14 @@ export default function Dashboard() {
       trendLabel: t('vsLastWeek'),
     },
     {
-      label: t('activePatients'),
-      value: stats?.activePatients || 0,
-      icon: Users,
-      bgClass: 'bg-green-50',
-      iconClass: 'text-green-600',
-      trend: stats?.patientsTrend,
-      trendLabel: t('vsLastMonth'),
+      label: t('aiInsights'),
+      value: stats?.aiRedFlags || 0,
+      icon: AlertTriangle,
+      bgClass: (stats?.aiRedFlags || 0) > 0 ? 'bg-red-50' : 'bg-slate-50',
+      iconClass: (stats?.aiRedFlags || 0) > 0 ? 'text-red-600' : 'text-slate-400',
+      trend: stats?.aiTrend,
+      trendLabel: t('redFlagsToday'),
+      urgent: (stats?.aiRedFlags || 0) > 0,
     },
     {
       label: t('pendingFollowUps'),
@@ -203,6 +212,15 @@ export default function Dashboard() {
       icon: CheckCircle2,
       bgClass: 'bg-orange-50',
       iconClass: 'text-orange-600',
+    },
+    {
+      label: t('activePatients'),
+      value: stats?.activePatients || 0,
+      icon: Users,
+      bgClass: 'bg-green-50',
+      iconClass: 'text-green-600',
+      trend: stats?.patientsTrend,
+      trendLabel: t('vsLastMonth'),
     },
     {
       label: t('revenueThisMonth'),
@@ -214,13 +232,11 @@ export default function Dashboard() {
       trendLabel: t('vsLastMonth'),
     },
     {
-      label: t('aiInsights'),
-      value: stats?.aiRedFlags || 0,
-      icon: Brain,
-      bgClass: 'bg-teal-50',
-      iconClass: 'text-teal-600',
-      trend: stats?.aiTrend,
-      trendLabel: t('redFlagsToday'),
+      label: t('unsignedNotesToday'),
+      value: stats?.unsignedNotesToday || 0,
+      icon: FileWarning,
+      bgClass: 'bg-amber-50',
+      iconClass: 'text-amber-600',
     },
   ];
 
@@ -281,14 +297,14 @@ export default function Dashboard() {
         <div className="flex items-center gap-2">
           <button
             onClick={() => navigate('/search')}
-            className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="p-2 rounded-lg text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             title={t('search')}
           >
             <Search className="w-5 h-5" />
           </button>
           <button
             onClick={() => navigate('/notifications')}
-            className="relative p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+            className="relative p-2 rounded-lg text-gray-400 dark:text-gray-300 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             title={t('notifications')}
           >
             <Bell className="w-5 h-5" />
@@ -299,11 +315,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* ── Stat Cards (5-column grid) ─────────────────────── */}
+      {/* ── Stat Cards (EHR-first order) ──────────────────── */}
       {statsLoading ? (
-        <StatsGridSkeleton count={5} className="" />
+        <StatsGridSkeleton count={6} className="" />
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {statCards.map((stat) => (
             <StatCard
               key={stat.label}
@@ -314,8 +330,64 @@ export default function Dashboard() {
               iconClass={stat.iconClass}
               trend={stat.trend}
               trendLabel={stat.trendLabel}
+              urgent={stat.urgent}
             />
           ))}
+        </div>
+      )}
+
+      {/* ── Secondary stats (collapsible) ────────────────── */}
+      {!statsLoading && (
+        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-soft-sm">
+          <button
+            onClick={() => setShowMoreStats(!showMoreStats)}
+            className="w-full px-5 py-3 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors rounded-xl"
+          >
+            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
+              {t('moreStats', 'Mer statistikk')}
+            </span>
+            {showMoreStats ? (
+              <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+            ) : (
+              <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
+            )}
+          </button>
+          {showMoreStats && (
+            <div className="border-t border-gray-100 dark:border-gray-700 px-5 py-4 grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Rebooking Rate */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-teal-50 dark:bg-teal-900/30 flex items-center justify-center flex-shrink-0">
+                  <RefreshCcw className="w-5 h-5 text-teal-600 dark:text-teal-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {t('rebookingRate', 'Gjenbookingsrate')}
+                  </p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    {stats?.rebooking_rate !== null ? `${stats.rebooking_rate}%` : '—'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Available Capacity */}
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                  <CalendarClock className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    {t('availableCapacity', 'Ledig kapasitet')}
+                  </p>
+                  <p className="text-lg font-bold text-gray-900 dark:text-white">
+                    {stats?.available_slots !== null ? stats.available_slots : '—'}
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-gray-300">
+                    {t('slotsToday', 'ledige timer i dag')}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       )}
 
@@ -336,7 +408,7 @@ export default function Dashboard() {
                   {t('todaysSchedule')}
                 </h2>
                 {appointments.length > 0 && (
-                  <span className="text-xs font-medium text-gray-400 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+                  <span className="text-xs font-medium text-gray-400 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full">
                     {appointments.length} {t('appointments')}
                   </span>
                 )}
@@ -369,7 +441,7 @@ export default function Dashboard() {
                           <div className="text-sm font-semibold text-gray-900 dark:text-white">
                             {i18nFormatTime(apt.start_time, lang)}
                           </div>
-                          <div className="text-xs text-gray-400">
+                          <div className="text-xs text-gray-400 dark:text-gray-300">
                             {apt.duration_minutes || 30} {t('min')}
                           </div>
                         </div>
@@ -448,15 +520,15 @@ export default function Dashboard() {
               className="w-full px-5 py-3.5 flex items-center justify-between text-left hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors rounded-xl"
             >
               <div className="flex items-center gap-3">
-                <Activity className="w-4 h-4 text-gray-400" />
+                <Activity className="w-4 h-4 text-gray-400 dark:text-gray-300" />
                 <h2 className="text-sm font-semibold text-gray-900 dark:text-white">
                   {t('recentActivity')}
                 </h2>
               </div>
               {showActivity ? (
-                <ChevronUp className="w-4 h-4 text-gray-400" />
+                <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
               ) : (
-                <ChevronDown className="w-4 h-4 text-gray-400" />
+                <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
               )}
             </button>
             {showActivity && (
@@ -511,7 +583,7 @@ export default function Dashboard() {
                     <span className="text-sm font-medium text-gray-700 dark:text-gray-200 flex-1">
                       {action.name}
                     </span>
-                    <kbd className="hidden sm:inline text-[10px] font-mono text-gray-400 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+                    <kbd className="hidden sm:inline text-[10px] font-mono text-gray-400 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 px-1.5 py-0.5 rounded opacity-0 group-hover:opacity-100 transition-opacity">
                       {action.shortcut}
                     </kbd>
                   </button>
@@ -634,9 +706,9 @@ export default function Dashboard() {
             </h2>
           </div>
           {showRecall ? (
-            <ChevronUp className="w-5 h-5 text-gray-400" />
+            <ChevronUp className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           ) : (
-            <ChevronDown className="w-5 h-5 text-gray-400" />
+            <ChevronDown className="w-5 h-5 text-gray-400 dark:text-gray-300" />
           )}
         </button>
         {showRecall && (
@@ -659,7 +731,7 @@ function ActivityItem({ icon: Icon, text, time, color }) {
     <div className="flex items-center gap-3 text-sm">
       <Icon className={`w-4 h-4 ${color} flex-shrink-0`} />
       <span className="text-gray-600 dark:text-gray-300 flex-1">{text}</span>
-      <span className="text-xs text-gray-400 flex-shrink-0">{time}</span>
+      <span className="text-xs text-gray-400 dark:text-gray-300 flex-shrink-0">{time}</span>
     </div>
   );
 }

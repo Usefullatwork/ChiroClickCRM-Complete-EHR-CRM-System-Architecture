@@ -24,6 +24,7 @@ import {
   Target,
   Award,
 } from 'lucide-react';
+import { useTranslation } from '../../i18n/useTranslation';
 
 /**
  * Status colors for compliance states
@@ -42,15 +43,33 @@ const STATUS_COLORS = {
  * @param {boolean} loading - Loading state
  */
 export const ComplianceOverview = ({ data = {}, loading = false }) => {
+  const { t } = useTranslation('analytics');
+
   // Prepare status distribution data for chart
   const statusDistribution = useMemo(() => {
     return [
-      { name: 'Fullfort', value: data.completed || 0, color: STATUS_COLORS.completed },
-      { name: 'Aktiv', value: data.active || 0, color: STATUS_COLORS.active },
-      { name: 'Pause', value: data.paused || 0, color: STATUS_COLORS.paused },
-      { name: 'Avbrutt', value: data.cancelled || 0, color: STATUS_COLORS.cancelled },
+      {
+        name: t('complianceCompleted', 'Fullført'),
+        value: data.completed || 0,
+        color: STATUS_COLORS.completed,
+      },
+      {
+        name: t('complianceActive', 'Aktiv'),
+        value: data.active || 0,
+        color: STATUS_COLORS.active,
+      },
+      {
+        name: t('compliancePaused', 'Pauset'),
+        value: data.paused || 0,
+        color: STATUS_COLORS.paused,
+      },
+      {
+        name: t('complianceCancelled', 'Avbrutt'),
+        value: data.cancelled || 0,
+        color: STATUS_COLORS.cancelled,
+      },
     ].filter((item) => item.value > 0);
-  }, [data]);
+  }, [data, t]);
 
   // Format weekly trend data
   const weeklyTrendData = useMemo(() => {
@@ -77,10 +96,10 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
       return (
         <div className="bg-white px-4 py-3 shadow-lg rounded-lg border border-gray-200">
           <p className="text-sm font-semibold text-gray-900 mb-2">{label}</p>
-          {payload.map((entry, index) => (
-            <div key={index} className="flex items-center gap-2 text-sm">
+          {payload.map((entry) => (
+            <div key={entry.name} className="flex items-center gap-2 text-sm">
               <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
-              <span className="text-gray-600">{entry.name}:</span>
+              <span className="text-gray-600 dark:text-gray-300">{entry.name}:</span>
               <span className="font-semibold text-gray-900">
                 {entry.name === 'Etterlevelse' ? `${entry.value}%` : entry.value}
               </span>
@@ -95,15 +114,23 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
   // Determine compliance level and color
   const getComplianceLevel = (rate) => {
     if (rate >= 80) {
-      return { label: 'Utmerket', color: 'text-green-600', bgColor: 'bg-green-100' };
+      return {
+        label: t('complianceExcellent', 'Utmerket'),
+        color: 'text-green-600',
+        bgColor: 'bg-green-100',
+      };
     }
     if (rate >= 60) {
-      return { label: 'God', color: 'text-blue-600', bgColor: 'bg-blue-100' };
+      return { label: t('complianceGood', 'God'), color: 'text-blue-600', bgColor: 'bg-blue-100' };
     }
     if (rate >= 40) {
-      return { label: 'Moderat', color: 'text-yellow-600', bgColor: 'bg-yellow-100' };
+      return {
+        label: t('complianceModerate', 'Moderat'),
+        color: 'text-yellow-600',
+        bgColor: 'bg-yellow-100',
+      };
     }
-    return { label: 'Lav', color: 'text-red-600', bgColor: 'bg-red-100' };
+    return { label: t('complianceLow', 'Lav'), color: 'text-red-600', bgColor: 'bg-red-100' };
   };
 
   const completionRate = data.completionRate || 0;
@@ -131,8 +158,12 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
               <Target size={20} className="text-indigo-600" />
             </div>
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Pasientetterlevelse</h3>
-              <p className="text-sm text-gray-500">Ovelsesforeskrivninger (90 dager)</p>
+              <h3 className="text-lg font-semibold text-gray-900">
+                {t('complianceTitle', 'Pasientetterlevelse')}
+              </h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {t('compliancePrescriptionsLabel', 'Øvelsesforeskrivninger (90 dager)')}
+              </p>
             </div>
           </div>
 
@@ -155,13 +186,16 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
           <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-4 border border-green-100">
             <div className="flex items-center gap-2 mb-2">
               <CheckCircle size={16} className="text-green-600" />
-              <span className="text-sm font-medium text-green-700">Fullforingsrate</span>
+              <span className="text-sm font-medium text-green-700">
+                {t('complianceRate', 'Etterlevelsesrate')}
+              </span>
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-green-700">{completionRate}%</span>
             </div>
             <p className="text-xs text-green-600 mt-1">
-              {data.completed || 0} av {data.totalPrescriptions || 0} foreskrivninger
+              {data.completed || 0} av {data.totalPrescriptions || 0}{' '}
+              {t('compliancePrescriptions', 'foreskrivninger')}
             </p>
           </div>
 
@@ -169,31 +203,39 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
           <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl p-4 border border-blue-100">
             <div className="flex items-center gap-2 mb-2">
               <Activity size={16} className="text-blue-600" />
-              <span className="text-sm font-medium text-blue-700">Gj.snitt fremgang</span>
+              <span className="text-sm font-medium text-blue-700">
+                {t('complianceAvgProgress', 'Gj.snitt progresjon')}
+              </span>
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-blue-700">{avgProgressRate}%</span>
             </div>
-            <p className="text-xs text-blue-600 mt-1">Gjennomsnittlig okt/fullforte</p>
+            <p className="text-xs text-blue-600 mt-1">
+              {t('complianceAvgProgressDetail', 'Gjennomsnittlig økt/fullførte')}
+            </p>
           </div>
 
           {/* Active Prescriptions */}
           <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-4 border border-purple-100">
             <div className="flex items-center gap-2 mb-2">
               <TrendingUp size={16} className="text-purple-600" />
-              <span className="text-sm font-medium text-purple-700">Aktive pagaende</span>
+              <span className="text-sm font-medium text-purple-700">
+                {t('complianceActiveOngoing', 'Aktive pågående')}
+              </span>
             </div>
             <div className="flex items-baseline gap-2">
               <span className="text-3xl font-bold text-purple-700">{data.active || 0}</span>
             </div>
-            <p className="text-xs text-purple-600 mt-1">{data.paused || 0} pa pause</p>
+            <p className="text-xs text-purple-600 mt-1">
+              {data.paused || 0} {t('complianceOnPause', 'på pause')}
+            </p>
           </div>
         </div>
 
         {/* Weekly Trend Chart */}
         <div className="mt-6">
           <h4 className="text-sm font-semibold text-gray-900 mb-4">
-            Ukentlig etterlevelse (12 uker)
+            {t('complianceWeekly12', 'Ukentlig etterlevelse (12 uker)')}
           </h4>
           {weeklyTrendData.length > 0 ? (
             <ResponsiveContainer width="100%" height={240}>
@@ -230,10 +272,10 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
               </AreaChart>
             </ResponsiveContainer>
           ) : (
-            <div className="h-60 flex items-center justify-center text-gray-400">
+            <div className="h-60 flex items-center justify-center text-gray-400 dark:text-gray-300">
               <div className="text-center">
                 <Activity size={48} className="mx-auto mb-2 opacity-50" />
-                <p>Ingen trenddata tilgjengelig</p>
+                <p>{t('complianceNoTrendAvailable', 'Ingen trenddata tilgjengelig')}</p>
               </div>
             </div>
           )}
@@ -243,8 +285,12 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
       {/* Status Distribution Footer */}
       <div className="px-6 py-4 bg-gray-50 border-t border-gray-200 rounded-b-xl">
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-gray-700">Statusfordeling</h4>
-          <span className="text-sm text-gray-500">Totalt: {data.totalPrescriptions || 0}</span>
+          <h4 className="text-sm font-semibold text-gray-700">
+            {t('complianceStatusDistribution', 'Statusfordeling')}
+          </h4>
+          <span className="text-sm text-gray-500 dark:text-gray-400">
+            {t('complianceTotalLabel', 'Totalt')}: {data.totalPrescriptions || 0}
+          </span>
         </div>
 
         <div className="mt-3 grid grid-cols-4 gap-3">
@@ -252,7 +298,9 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
               <CheckCircle size={14} className="text-green-500" />
-              <span className="text-xs text-gray-600">Fullfort</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300">
+                {t('complianceCompleted', 'Fullført')}
+              </span>
             </div>
             <p className="text-lg font-bold text-green-600">{data.completed || 0}</p>
           </div>
@@ -261,7 +309,9 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
               <Activity size={14} className="text-blue-500" />
-              <span className="text-xs text-gray-600">Aktiv</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300">
+                {t('complianceActive', 'Aktiv')}
+              </span>
             </div>
             <p className="text-lg font-bold text-blue-600">{data.active || 0}</p>
           </div>
@@ -270,7 +320,9 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
               <PauseCircle size={14} className="text-yellow-500" />
-              <span className="text-xs text-gray-600">Pause</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300">
+                {t('compliancePaused', 'Pauset')}
+              </span>
             </div>
             <p className="text-lg font-bold text-yellow-600">{data.paused || 0}</p>
           </div>
@@ -279,7 +331,9 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-1 mb-1">
               <XCircle size={14} className="text-red-500" />
-              <span className="text-xs text-gray-600">Avbrutt</span>
+              <span className="text-xs text-gray-600 dark:text-gray-300">
+                {t('complianceCancelled', 'Avbrutt')}
+              </span>
             </div>
             <p className="text-lg font-bold text-red-600">{data.cancelled || 0}</p>
           </div>
@@ -288,12 +342,12 @@ export const ComplianceOverview = ({ data = {}, loading = false }) => {
         {/* Progress bar */}
         <div className="mt-4">
           <div className="h-2 bg-gray-200 rounded-full overflow-hidden flex">
-            {statusDistribution.map((item, index) => {
+            {statusDistribution.map((item) => {
               const total = data.totalPrescriptions || 1;
               const percentage = (item.value / total) * 100;
               return (
                 <div
-                  key={index}
+                  key={item.name}
                   className="h-full transition-all duration-500"
                   style={{
                     width: `${percentage}%`,

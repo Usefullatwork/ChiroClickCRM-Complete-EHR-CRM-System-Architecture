@@ -69,7 +69,7 @@ jest.unstable_mockModule('../../../src/services/providers/emailProvider.js', () 
 }));
 
 // Import after mocking
-const commsService = await import('../../../src/services/communications.js');
+const commsService = await import('../../../src/services/communication/communications.js');
 
 describe('Communications Service', () => {
   const testOrgId = 'org-test-001';

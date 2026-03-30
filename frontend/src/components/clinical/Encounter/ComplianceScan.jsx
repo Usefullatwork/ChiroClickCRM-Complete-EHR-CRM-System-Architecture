@@ -8,6 +8,7 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
+import { useTranslation } from '../../../i18n';
 
 /**
  * ComplianceScan — Pre-sign compliance checklist (ChiroTouch-inspired).
@@ -34,6 +35,7 @@ export default function ComplianceScan({
   onDismiss,
   onProceed,
 }) {
+  const { t } = useTranslation('clinical');
   const [expanded, setExpanded] = useState(true);
 
   const checks = useMemo(() => {
@@ -48,10 +50,10 @@ export default function ComplianceScan({
       encounterData.icpc_codes?.length > 0 || encounterData.icd10_codes?.length > 0;
     results.push({
       id: 'diagnosis',
-      label: 'Diagnosekoder er satt',
+      label: t('complianceDiagnosisSet', 'Diagnosekoder er satt'),
       description: hasDiagnosis
-        ? `${(encounterData.icpc_codes?.length || 0) + (encounterData.icd10_codes?.length || 0)} koder registrert`
-        : 'Ingen ICPC-2 eller ICD-10 koder',
+        ? `${(encounterData.icpc_codes?.length || 0) + (encounterData.icd10_codes?.length || 0)} ${t('complianceCodesRegistered', 'koder registrert')}`
+        : t('complianceNoCodes', 'Ingen ICPC-2 eller ICD-10 koder'),
       status: hasDiagnosis ? 'pass' : 'fail',
       severity: 'error',
     });
@@ -60,10 +62,10 @@ export default function ComplianceScan({
     const hasTakster = selectedTakster.length > 0;
     results.push({
       id: 'takster',
-      label: 'Takster er valgt',
+      label: t('complianceTaksterSelected', 'Takster er valgt'),
       description: hasTakster
-        ? `${selectedTakster.length} takst(er) valgt`
-        : 'Ingen takster valgt for fakturering',
+        ? `${selectedTakster.length} ${t('complianceTaksterCount', 'takst(er) valgt')}`
+        : t('complianceNoTakster', 'Ingen takster valgt for fakturering'),
       status: hasTakster ? 'pass' : 'warn',
       severity: 'warning',
     });
@@ -73,10 +75,10 @@ export default function ComplianceScan({
     const hasChiefComplaint = !!subj.chief_complaint?.trim();
     results.push({
       id: 'subjective',
-      label: 'Hovedklage dokumentert',
+      label: t('complianceChiefComplaintDocumented', 'Hovedklage dokumentert'),
       description: hasChiefComplaint
         ? subj.chief_complaint.substring(0, 60) + (subj.chief_complaint.length > 60 ? '...' : '')
-        : 'Hovedklage mangler i Subjektiv',
+        : t('complianceChiefComplaintMissing', 'Hovedklage mangler i Subjektiv'),
       status: hasChiefComplaint ? 'pass' : 'fail',
       severity: 'error',
     });
@@ -86,10 +88,10 @@ export default function ComplianceScan({
     const hasObjective = !!(obj.palpation?.trim() || obj.rom?.trim() || obj.observation?.trim());
     results.push({
       id: 'objective',
-      label: 'Objektive funn dokumentert',
+      label: t('complianceObjectiveDocumented', 'Objektive funn dokumentert'),
       description: hasObjective
-        ? 'Palpasjon, ROM eller observasjon er fylt ut'
-        : 'Ingen objektive funn registrert',
+        ? t('complianceObjectiveFilled', 'Palpasjon, ROM eller observasjon er fylt ut')
+        : t('complianceNoObjective', 'Ingen objektive funn registrert'),
       status: hasObjective ? 'pass' : 'warn',
       severity: 'warning',
     });
@@ -99,10 +101,10 @@ export default function ComplianceScan({
     const hasPlan = !!(plan.treatment?.trim() || plan.follow_up?.trim());
     results.push({
       id: 'plan',
-      label: 'Behandlingsplan dokumentert',
+      label: t('compliancePlanDocumented', 'Behandlingsplan dokumentert'),
       description: hasPlan
-        ? 'Behandling og/eller oppfølging er beskrevet'
-        : 'Ingen behandlingsplan eller oppfølging',
+        ? t('compliancePlanFilled', 'Behandling og/eller oppfølging er beskrevet')
+        : t('complianceNoPlan', 'Ingen behandlingsplan eller oppfølging'),
       status: hasPlan ? 'pass' : 'warn',
       severity: 'warning',
     });
@@ -112,10 +114,13 @@ export default function ComplianceScan({
       const hasAssessment = !!encounterData.assessment?.clinical_reasoning?.trim();
       results.push({
         id: 'red_flags',
-        label: `${redFlagAlerts.length} røde flagg vurdert`,
+        label: `${redFlagAlerts.length} ${t('complianceRedFlagsAssessed', 'røde flagg vurdert')}`,
         description: hasAssessment
-          ? 'Klinisk resonnement dokumentert'
-          : 'Røde flagg oppdaget — klinisk vurdering mangler',
+          ? t('complianceClinicalReasoningDocumented', 'Klinisk resonnement dokumentert')
+          : t(
+              'complianceRedFlagsMissingReasoning',
+              'Røde flagg oppdaget — klinisk vurdering mangler'
+            ),
         status: hasAssessment ? 'pass' : 'fail',
         severity: 'error',
       });
@@ -126,12 +131,12 @@ export default function ComplianceScan({
     const durationOk = duration >= 10 && duration <= 120;
     results.push({
       id: 'duration',
-      label: 'Varighet er rimelig',
+      label: t('complianceDurationReasonable', 'Varighet er rimelig'),
       description: durationOk
-        ? `${duration} minutter`
+        ? `${duration} ${t('complianceMinutes', 'minutter')}`
         : duration < 10
-          ? 'Under 10 minutter — verifiser'
-          : 'Over 2 timer — verifiser',
+          ? t('complianceDurationUnder10', 'Under 10 minutter — verifiser')
+          : t('complianceDurationOver2h', 'Over 2 timer — verifiser'),
       status: durationOk ? 'pass' : 'warn',
       severity: 'warning',
     });
@@ -165,18 +170,18 @@ export default function ComplianceScan({
             <ShieldAlert className="w-5 h-5 text-amber-500" />
           )}
           <span className="text-sm font-semibold text-gray-900 dark:text-white">
-            Samsvarskontroll
+            {t('complianceScanTitle', 'Samsvarskontroll')}
           </span>
-          <span className="text-xs text-gray-500">
-            {passCount}/{checks.length} bestått
-            {warnCount > 0 && ` · ${warnCount} advarsler`}
-            {failCount > 0 && ` · ${failCount} feil`}
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {passCount}/{checks.length} {t('compliancePassed', 'bestått')}
+            {warnCount > 0 && ` · ${warnCount} ${t('complianceWarnings', 'advarsler')}`}
+            {failCount > 0 && ` · ${failCount} ${t('complianceErrors', 'feil')}`}
           </span>
         </div>
         {expanded ? (
-          <ChevronUp className="w-4 h-4 text-gray-400" />
+          <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
         ) : (
-          <ChevronDown className="w-4 h-4 text-gray-400" />
+          <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
         )}
       </button>
 
@@ -215,23 +220,25 @@ export default function ComplianceScan({
           <div className="flex items-center justify-end gap-3 pt-3 border-t border-gray-200 dark:border-gray-700">
             <button
               onClick={onDismiss}
-              className="px-3 py-1.5 text-sm text-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="px-3 py-1.5 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg transition-colors"
             >
-              Lukk
+              {t('complianceClose', 'Lukk')}
             </button>
             {hasErrors ? (
               <button
                 onClick={onProceed}
                 className="px-4 py-1.5 text-sm font-medium text-amber-700 bg-amber-100 hover:bg-amber-200 rounded-lg transition-colors"
               >
-                Signer likevel
+                {t('complianceSignAnyway', 'Signer likevel')}
               </button>
             ) : (
               <button
                 onClick={onProceed}
                 className="px-4 py-1.5 text-sm font-medium text-white bg-teal-600 hover:bg-teal-700 rounded-lg transition-colors"
               >
-                {allPassed ? 'Alt OK — Signer' : 'Signer likevel'}
+                {allPassed
+                  ? t('complianceAllOkSign', 'Alt OK — Signer')
+                  : t('complianceSignAnyway', 'Signer likevel')}
               </button>
             )}
           </div>

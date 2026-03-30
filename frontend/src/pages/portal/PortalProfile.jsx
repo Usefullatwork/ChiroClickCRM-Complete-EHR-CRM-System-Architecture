@@ -4,11 +4,21 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, ChevronLeft, Loader2, AlertCircle, CheckCircle, Edit3, Save, X } from 'lucide-react';
+import { useQuery, useMutation } from '@tanstack/react-query';
+import {
+  User,
+  ChevronLeft,
+  Loader2,
+  AlertCircle,
+  CheckCircle,
+  Edit3,
+  Save,
+  X,
+  Bell,
+} from 'lucide-react';
 import { patientPortalAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 import logger from '../../utils/logger';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
 export default function PortalProfile() {
   const navigate = useNavigate();
@@ -19,6 +29,38 @@ export default function PortalProfile() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [editForm, setEditForm] = useState({ phone: '', email: '' });
+
+  const { t } = useTranslation('settings');
+
+  const { data: prefsResponse } = useQuery({
+    queryKey: ['comm-prefs'],
+    queryFn: () => patientPortalAPI.getCommunicationPreferences(),
+    retry: false,
+  });
+
+  const [commPrefs, setCommPrefs] = useState({
+    sms_enabled: true,
+    email_enabled: true,
+    reminder_enabled: true,
+    exercise_reminder_enabled: true,
+    marketing_enabled: false,
+  });
+
+  useEffect(() => {
+    if (prefsResponse?.data) {
+      setCommPrefs((prev) => ({ ...prev, ...prefsResponse.data }));
+    }
+  }, [prefsResponse]);
+
+  const updatePrefsMutation = useMutation({
+    mutationFn: (data) => patientPortalAPI.updateCommunicationPreferences(data),
+  });
+
+  const handlePrefToggle = (key) => {
+    const updated = { ...commPrefs, [key]: !commPrefs[key] };
+    setCommPrefs(updated);
+    updatePrefsMutation.mutate(updated);
+  };
 
   useEffect(() => {
     loadProfile();
@@ -33,7 +75,7 @@ export default function PortalProfile() {
       setEditForm({ phone: data.phone || '', email: data.email || '' });
     } catch (err) {
       logger.error('Failed to load profile:', err);
-      setError('Kunne ikke laste profilen');
+      setError(t('couldNotLoadProfile', 'Kunne ikke laste profilen'));
     } finally {
       setLoading(false);
     }
@@ -43,19 +85,14 @@ export default function PortalProfile() {
     try {
       setSaving(true);
       setError(null);
-      await fetch(`${API_URL}/patient-portal/profile`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(editForm),
-      });
+      await patientPortalAPI.updateProfile(editForm);
       setProfile((prev) => ({ ...prev, ...editForm }));
       setSaved(true);
       setEditing(false);
       setTimeout(() => setSaved(false), 3000);
     } catch (err) {
       logger.error('Failed to update profile:', err);
-      setError('Kunne ikke lagre endringer');
+      setError(t('couldNotSaveChanges', 'Kunne ikke lagre endringer'));
     } finally {
       setSaving(false);
     }
@@ -83,9 +120,9 @@ export default function PortalProfile() {
             onClick={() => navigate('/portal')}
             className="p-2 -ml-2 hover:bg-gray-100 rounded-lg transition-colors"
           >
-            <ChevronLeft className="w-5 h-5 text-gray-600" />
+            <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
-          <h1 className="font-bold text-gray-900">Min profil</h1>
+          <h1 className="font-bold text-gray-900">{t('myProfileTitle', 'Min profil')}</h1>
         </div>
       </header>
 
@@ -100,7 +137,7 @@ export default function PortalProfile() {
         {saved && (
           <div className="flex items-center gap-2 p-3 bg-green-50 text-green-700 rounded-xl border border-green-200">
             <CheckCircle className="w-5 h-5 flex-shrink-0" />
-            <span className="text-sm">Endringer lagret!</span>
+            <span className="text-sm">{t('changesSaved', 'Endringer lagret!')}</span>
           </div>
         )}
 
@@ -113,8 +150,8 @@ export default function PortalProfile() {
             {profile?.firstName} {profile?.lastName}
           </h2>
           {profile?.dateOfBirth && (
-            <p className="text-sm text-gray-500 mt-1">
-              Fodt{' '}
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+              {t('bornLabel', 'Født')}{' '}
               {new Date(profile.dateOfBirth).toLocaleDateString('nb-NO', {
                 day: 'numeric',
                 month: 'long',
@@ -127,14 +164,16 @@ export default function PortalProfile() {
         {/* Contact Info */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-gray-900">Kontaktinformasjon</h3>
+            <h3 className="font-semibold text-gray-900">
+              {t('contactInformation', 'Kontaktinformasjon')}
+            </h3>
             {!editing && (
               <button
                 onClick={() => setEditing(true)}
                 className="flex items-center gap-1.5 text-sm text-orange-600 hover:text-orange-700"
               >
                 <Edit3 className="w-4 h-4" />
-                Rediger
+                {t('editLabel', 'Rediger')}
               </button>
             )}
           </div>
@@ -142,7 +181,9 @@ export default function PortalProfile() {
           {editing ? (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Telefon</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('phoneLabel', 'Telefon')}
+                </label>
                 <input
                   type="tel"
                   value={editForm.phone}
@@ -152,7 +193,9 @@ export default function PortalProfile() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">E-post</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('emailLabel', 'E-post')}
+                </label>
                 <input
                   type="email"
                   value={editForm.email}
@@ -172,51 +215,127 @@ export default function PortalProfile() {
                   ) : (
                     <Save className="w-4 h-4" />
                   )}
-                  Lagre
+                  {t('saveBtn', 'Lagre')}
                 </button>
                 <button
                   onClick={handleCancel}
                   className="px-4 py-3 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors flex items-center gap-2"
                 >
                   <X className="w-4 h-4" />
-                  Avbryt
+                  {t('cancelBtn', 'Avbryt')}
                 </button>
               </div>
             </div>
           ) : (
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-gray-500 mb-0.5">Telefon</p>
-                <p className="text-gray-900">{profile?.phone || 'Ikke registrert'}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+                  {t('phoneLabel', 'Telefon')}
+                </p>
+                <p className="text-gray-900">
+                  {profile?.phone || t('notRegistered', 'Ikke registrert')}
+                </p>
               </div>
               <div className="border-t border-gray-100 pt-4">
-                <p className="text-xs text-gray-500 mb-0.5">E-post</p>
-                <p className="text-gray-900">{profile?.email || 'Ikke registrert'}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+                  {t('emailLabel', 'E-post')}
+                </p>
+                <p className="text-gray-900">
+                  {profile?.email || t('notRegistered', 'Ikke registrert')}
+                </p>
               </div>
               <div className="border-t border-gray-100 pt-4">
-                <p className="text-xs text-gray-500 mb-0.5">Fodselsdato</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mb-0.5">
+                  {t('dateOfBirthLabel', 'Fødselsdato')}
+                </p>
                 <p className="text-gray-900">
                   {profile?.dateOfBirth
                     ? new Date(profile.dateOfBirth).toLocaleDateString('nb-NO')
-                    : 'Ikke registrert'}
+                    : t('notRegistered', 'Ikke registrert')}
                 </p>
               </div>
             </div>
           )}
         </div>
 
+        {/* Communication Preferences */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+          <div className="flex items-center gap-2 mb-4">
+            <Bell className="w-5 h-5 text-orange-600" />
+            <h3 className="font-semibold text-gray-900">
+              {t('communicationPreferences', 'Kommunikasjonspreferanser')}
+            </h3>
+          </div>
+          <p className="text-xs text-gray-500 mb-4">
+            {t('communicationPreferencesDesc', 'Velg hvordan vi kan kontakte deg')}
+          </p>
+
+          <div className="space-y-3">
+            {[
+              {
+                key: 'sms_enabled',
+                label: t('smsNotifications', 'SMS-varsler'),
+                desc: t('smsNotificationsDesc', 'Motta meldinger via SMS'),
+              },
+              {
+                key: 'email_enabled',
+                label: t('emailNotificationsPortal', 'E-postvarsler'),
+                desc: t('emailNotificationsPortalDesc', 'Motta meldinger via e-post'),
+              },
+              {
+                key: 'reminder_enabled',
+                label: t('reminderNotifications', 'Timepåminnelser'),
+                desc: t('reminderNotificationsDesc', 'Få påminnelser før timer'),
+              },
+              {
+                key: 'exercise_reminder_enabled',
+                label: t('exerciseReminderNotifications', 'Øvelsespåminnelser'),
+                desc: t('exerciseReminderNotificationsDesc', 'Få påminnelser om øvelsesprogrammer'),
+              },
+              {
+                key: 'marketing_enabled',
+                label: t('marketingMessages', 'Markedsføringsmeldinger'),
+                desc: t('marketingMessagesDesc', 'Motta tilbud og nyheter'),
+              },
+            ].map(({ key, label, desc }) => (
+              <div key={key} className="flex items-center justify-between py-2">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{label}</p>
+                  <p className="text-xs text-gray-500">{desc}</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={commPrefs[key]}
+                    onChange={() => handlePrefToggle(key)}
+                    disabled={updatePrefsMutation.isPending}
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                </label>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Privacy note */}
         <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
-          <p className="text-xs text-gray-500">
-            Din personlige informasjon er trygt oppbevart i henhold til norsk lov om helsepersonell
-            og GDPR. Kun din behandler og autorisert helsepersonell har tilgang til dine
-            journaldata.
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {t(
+              'privacyNote',
+              'Din personlige informasjon er trygt oppbevart i henhold til norsk lov om helsepersonell og GDPR. Kun din behandler og autorisert helsepersonell har tilgang til dine journaldata.'
+            )}
           </p>
         </div>
       </div>
 
-      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400">
-        <p>Kontakt klinikken for a oppdatere navn eller fodselsdato</p>
+      <footer className="max-w-2xl mx-auto px-4 py-8 text-center text-sm text-gray-400 dark:text-gray-300">
+        <p>
+          {t(
+            'contactClinicToUpdateInfo',
+            'Kontakt klinikken for å oppdatere navn eller fødselsdato'
+          )}
+        </p>
       </footer>
     </div>
   );

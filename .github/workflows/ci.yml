@@ -156,6 +156,12 @@ jobs:
         run: npm audit --audit-level=high
         continue-on-error: true
 
+      - name: Scan for hardcoded secrets (gitleaks)
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
   # ============================================
   # Docker Build Test
   # ============================================
@@ -177,7 +183,7 @@ jobs:
           context: ./backend
           file: ./backend/Dockerfile
           push: false
-          tags: chiroclickcrm-backend:test
+          tags: chiroclickehr-backend:test
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -187,7 +193,7 @@ jobs:
           context: ./frontend
           file: ./frontend/Dockerfile
           push: false
-          tags: chiroclickcrm-frontend:test
+          tags: chiroclickehr-frontend:test
           build-args: |
             VITE_API_URL=http://localhost:3000/api/v1
             VITE_CLERK_PUBLISHABLE_KEY=pk_test_placeholder
@@ -323,3 +329,50 @@ jobs:
           name: playwright-traces
           path: e2e/test-results/
           retention-days: 7
+
+  # ============================================
+  # AI Evaluation (optional, non-blocking)
+  # Only runs when ai-training files change
+  # Requires Ollama — skips gracefully if unavailable
+  # ============================================
+  ai-eval:
+    name: AI Eval (promptfoo)
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    if: |
+      github.event_name == 'push' ||
+      contains(github.event.pull_request.changed_files || '', 'ai-training/')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Check if Ollama available
+        id: ollama-check
+        run: |
+          if curl -s http://localhost:11434/api/tags > /dev/null 2>&1; then
+            echo "available=true" >> $GITHUB_OUTPUT
+          else
+            echo "available=false" >> $GITHUB_OUTPUT
+            echo "Ollama not available — skipping AI eval"
+          fi
+        continue-on-error: true
+
+      - name: Run promptfoo regression
+        if: steps.ollama-check.outputs.available == 'true'
+        working-directory: ./ai-training/promptfoo
+        run: npx promptfoo eval --no-progress-bar
+        continue-on-error: true
+
+      - name: Upload eval results
+        if: steps.ollama-check.outputs.available == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: promptfoo-results
+          path: ai-training/promptfoo/results/
+          retention-days: 30

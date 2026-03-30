@@ -3,7 +3,7 @@
  * CRUD operations for Claude Batch API jobs.
  */
 
-import * as batchProcessor from '../services/batchProcessor.js';
+import * as batchProcessor from '../services/practice/batchProcessor.js';
 import logger from '../utils/logger.js';
 
 export const createBatch = async (req, res) => {

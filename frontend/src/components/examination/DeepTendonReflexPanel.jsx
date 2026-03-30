@@ -50,7 +50,7 @@ const DTR_GRADES = [
     label: 'NT',
     description: 'Not Tested',
     descriptionNo: 'Ikke testet',
-    color: 'bg-gray-100 text-gray-500 border-gray-300',
+    color: 'bg-gray-100 text-gray-500 dark:text-gray-400 border-gray-300',
   },
 ];
 
@@ -210,7 +210,7 @@ function GradeButton({ value, currentValue, onChange, lang }) {
       type="button"
       onClick={() => onChange(value)}
       className={`w-10 h-10 rounded-lg border-2 font-bold text-sm transition-all
-                 ${isSelected ? `${grade.color} border-current shadow-md scale-105` : 'bg-white border-gray-200 text-gray-400 hover:border-gray-300'}`}
+                 ${isSelected ? `${grade.color} border-current shadow-md scale-105` : 'bg-white border-gray-200 text-gray-400 dark:text-gray-300 hover:border-gray-300'}`}
       title={lang === 'no' ? grade.descriptionNo : grade.description}
     >
       {grade.label}
@@ -252,7 +252,7 @@ function DTRRow({ reflex, values, onChange, lang, showTechnique = false }) {
             {lang === 'no' ? reflex.nameNo : reflex.name}
           </span>
           {showTechnique && (
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {lang === 'no' ? reflex.techniqueNo : reflex.technique}
             </p>
           )}
@@ -311,7 +311,11 @@ function PathologicalReflexItem({ reflex, values, onChange, lang }) {
   const rightKey = `${reflex.id}_right`;
 
   const options = [
-    { value: 'NT', label: lang === 'no' ? 'IT' : 'NT', color: 'bg-gray-100 text-gray-500' },
+    {
+      value: 'NT',
+      label: lang === 'no' ? 'IT' : 'NT',
+      color: 'bg-gray-100 text-gray-500 dark:text-gray-400',
+    },
     {
       value: 'negative',
       label: lang === 'no' ? 'Neg' : 'Neg',
@@ -330,7 +334,7 @@ function PathologicalReflexItem({ reflex, values, onChange, lang }) {
           <h5 className="font-medium text-gray-700">
             {lang === 'no' ? reflex.nameNo : reflex.name}
           </h5>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
             {lang === 'no' ? reflex.techniqueNo : reflex.technique}
           </p>
           {(values[leftKey] === 'positive' || values[rightKey] === 'positive') && (
@@ -342,7 +346,9 @@ function PathologicalReflexItem({ reflex, values, onChange, lang }) {
 
         <div className="flex gap-4">
           <div className="text-center">
-            <span className="text-xs text-gray-400 block mb-1">{lang === 'no' ? 'V' : 'L'}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-300 block mb-1">
+              {lang === 'no' ? 'V' : 'L'}
+            </span>
             <div className="flex gap-1">
               {options.map((opt) => (
                 <button
@@ -350,7 +356,7 @@ function PathologicalReflexItem({ reflex, values, onChange, lang }) {
                   type="button"
                   onClick={() => onChange({ ...values, [leftKey]: opt.value })}
                   className={`px-2 py-1 text-xs rounded border transition-colors
-                             ${values[leftKey] === opt.value ? `${opt.color} border-current font-medium` : 'bg-white border-gray-200 text-gray-400'}`}
+                             ${values[leftKey] === opt.value ? `${opt.color} border-current font-medium` : 'bg-white border-gray-200 text-gray-400 dark:text-gray-300'}`}
                 >
                   {opt.label}
                 </button>
@@ -358,7 +364,9 @@ function PathologicalReflexItem({ reflex, values, onChange, lang }) {
             </div>
           </div>
           <div className="text-center">
-            <span className="text-xs text-gray-400 block mb-1">{lang === 'no' ? 'H' : 'R'}</span>
+            <span className="text-xs text-gray-400 dark:text-gray-300 block mb-1">
+              {lang === 'no' ? 'H' : 'R'}
+            </span>
             <div className="flex gap-1">
               {options.map((opt) => (
                 <button
@@ -366,7 +374,7 @@ function PathologicalReflexItem({ reflex, values, onChange, lang }) {
                   type="button"
                   onClick={() => onChange({ ...values, [rightKey]: opt.value })}
                   className={`px-2 py-1 text-xs rounded border transition-colors
-                             ${values[rightKey] === opt.value ? `${opt.color} border-current font-medium` : 'bg-white border-gray-200 text-gray-400'}`}
+                             ${values[rightKey] === opt.value ? `${opt.color} border-current font-medium` : 'bg-white border-gray-200 text-gray-400 dark:text-gray-300'}`}
                 >
                   {opt.label}
                 </button>
@@ -548,7 +556,7 @@ export default function DeepTendonReflexPanel({
             {lang === 'no' ? 'Dype senereflekser (DTR)' : 'Deep Tendon Reflexes (DTR)'}
           </h3>
           {summary.tested > 0 && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {summary.tested} {lang === 'no' ? 'tester' : 'tests'}
               {summary.abnormal > 0 && (
                 <span className="text-red-600 ml-2">
@@ -598,16 +606,16 @@ export default function DeepTendonReflexPanel({
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500">
+              <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400">
                 {lang === 'no' ? 'Refleks' : 'Reflex'}
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500">
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
                 {lang === 'no' ? 'Nerverot' : 'Nerve Root'}
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500">
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
                 {lang === 'no' ? 'Venstre' : 'Left'}
               </th>
-              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500">
+              <th className="px-2 py-2 text-center text-xs font-medium text-gray-500 dark:text-gray-400">
                 {lang === 'no' ? 'Høyre' : 'Right'}
               </th>
             </tr>

@@ -3,7 +3,7 @@
  * Thin controller wrapping kiosk service calls.
  */
 
-import * as kioskService from '../services/kiosk.js';
+import * as kioskService from '../services/practice/kiosk.js';
 import logger from '../utils/logger.js';
 
 /**

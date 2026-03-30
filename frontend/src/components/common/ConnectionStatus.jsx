@@ -5,6 +5,7 @@
 
 import { useState, useEffect } from 'react';
 import { Wifi, WifiOff, RefreshCw, Check, AlertCircle } from 'lucide-react';
+import { useTranslation } from '../../i18n/useTranslation';
 
 export default function ConnectionStatus({
   pendingChanges = 0,
@@ -13,6 +14,7 @@ export default function ConnectionStatus({
   onRetrySync = null,
   position = 'bottom-right', // 'bottom-right', 'bottom-left', 'top-right', 'top-left'
 }) {
+  const { t } = useTranslation('common');
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [showDetails, setShowDetails] = useState(false);
 
@@ -38,8 +40,11 @@ export default function ConnectionStatus({
         borderColor: 'border-yellow-200',
         textColor: 'text-yellow-800',
         iconColor: 'text-yellow-600',
-        label: 'Offline',
-        sublabel: pendingChanges > 0 ? `${pendingChanges} ventende` : 'Endringer lagres lokalt',
+        label: t('connOffline', 'Offline'),
+        sublabel:
+          pendingChanges > 0
+            ? t('connOfflinePending', '{count} ventende').replace('{count}', pendingChanges)
+            : t('connOfflineSavingLocally', 'Endringer lagres lokalt'),
       };
     }
 
@@ -51,12 +56,14 @@ export default function ConnectionStatus({
         borderColor: 'border-red-200',
         textColor: 'text-red-800',
         iconColor: 'text-red-600',
-        label: 'Synkroniseringsfeil',
-        sublabel: 'Klikk for å prøve igjen',
+        label: t('connSyncError', 'Synkroniseringsfeil'),
+        sublabel: t('connSyncErrorRetry', 'Klikk for å prøve igjen'),
       };
     }
 
     if (pendingChanges > 0) {
+      const changeWord =
+        pendingChanges > 1 ? t('connChanges', 'endringer') : t('connChange', 'endring');
       return {
         icon: RefreshCw,
         color: 'blue',
@@ -64,8 +71,8 @@ export default function ConnectionStatus({
         borderColor: 'border-blue-200',
         textColor: 'text-blue-800',
         iconColor: 'text-blue-600',
-        label: 'Synkroniserer...',
-        sublabel: `${pendingChanges} endring${pendingChanges > 1 ? 'er' : ''}`,
+        label: t('connSyncing', 'Synkroniserer...'),
+        sublabel: `${pendingChanges} ${changeWord}`,
         animate: true,
       };
     }
@@ -77,7 +84,7 @@ export default function ConnectionStatus({
       borderColor: 'border-green-200',
       textColor: 'text-green-800',
       iconColor: 'text-green-600',
-      label: 'Synkronisert',
+      label: t('connSynced', 'Synkronisert'),
       sublabel: lastSyncTime ? formatRelativeTime(lastSyncTime) : null,
     };
   };
@@ -91,18 +98,18 @@ export default function ConnectionStatus({
     const seconds = Math.floor((now - then) / 1000);
 
     if (seconds < 10) {
-      return 'akkurat nå';
+      return t('connJustNow', 'akkurat nå');
     }
     if (seconds < 60) {
-      return `${seconds}s siden`;
+      return t('connSecondsAgo', '{n}s siden').replace('{n}', seconds);
     }
     const minutes = Math.floor(seconds / 60);
     if (minutes < 60) {
-      return `${minutes}m siden`;
+      return t('connMinutesAgo', '{n}m siden').replace('{n}', minutes);
     }
     const hours = Math.floor(minutes / 60);
     if (hours < 24) {
-      return `${hours}t siden`;
+      return t('connHoursAgo', '{n}t siden').replace('{n}', hours);
     }
     return then.toLocaleDateString('nb-NO');
   };
@@ -155,17 +162,19 @@ export default function ConnectionStatus({
         >
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-gray-700">Status</span>
+              <span className="text-sm font-medium text-gray-700">
+                {t('connStatusLabel', 'Status')}
+              </span>
               <div className="flex items-center gap-1.5">
                 {isOnline ? (
                   <>
                     <Wifi className="w-4 h-4 text-green-500" />
-                    <span className="text-xs text-green-600">Online</span>
+                    <span className="text-xs text-green-600">{t('connOnline', 'Online')}</span>
                   </>
                 ) : (
                   <>
                     <WifiOff className="w-4 h-4 text-yellow-500" />
-                    <span className="text-xs text-yellow-600">Offline</span>
+                    <span className="text-xs text-yellow-600">{t('connOffline', 'Offline')}</span>
                   </>
                 )}
               </div>
@@ -173,14 +182,20 @@ export default function ConnectionStatus({
 
             {lastSyncTime && (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Sist synkronisert</span>
-                <span className="text-xs text-gray-500">{formatRelativeTime(lastSyncTime)}</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {t('connLastSynced', 'Sist synkronisert')}
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">
+                  {formatRelativeTime(lastSyncTime)}
+                </span>
               </div>
             )}
 
             {pendingChanges > 0 && (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-600">Ventende endringer</span>
+                <span className="text-sm text-gray-600 dark:text-gray-300">
+                  {t('connPendingChanges', 'Ventende endringer')}
+                </span>
                 <span className="text-xs font-medium text-blue-600">{pendingChanges}</span>
               </div>
             )}
@@ -190,15 +205,18 @@ export default function ConnectionStatus({
                 onClick={onRetrySync}
                 className="w-full mt-2 px-3 py-1.5 bg-red-100 text-red-700 text-sm rounded hover:bg-red-200 transition-colors"
               >
-                Prøv igjen
+                {t('connRetry', 'Prøv igjen')}
               </button>
             )}
 
             <div className="pt-2 border-t border-gray-100">
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {isOnline
-                  ? 'Alle endringer synkroniseres automatisk.'
-                  : 'Endringer lagres lokalt og synkroniseres når du er online igjen.'}
+                  ? t('connAutoSync', 'Alle endringer synkroniseres automatisk.')
+                  : t(
+                      'connOfflineNote',
+                      'Endringer lagres lokalt og synkroniseres når du er online igjen.'
+                    )}
               </p>
             </div>
           </div>

@@ -21,8 +21,10 @@ import {
 } from 'lucide-react';
 import { followUpsAPI } from '../../services/api';
 import toast from '../../utils/toast';
+import { useTranslation } from '../../i18n';
 
 export default function RecallDashboard() {
+  const { t } = useTranslation('appointments');
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [sortField, setSortField] = useState('days_overdue');
@@ -139,8 +141,8 @@ export default function RecallDashboard() {
           <Bell className="w-8 h-8 text-blue-600" />
           <h1 className="text-3xl font-bold">Recall Dashboard</h1>
         </div>
-        <p className="text-gray-600">
-          Pasienter som bor kalles inn til ny time basert pa tilstand og siste besok.
+        <p className="text-gray-600 dark:text-gray-300">
+          Pasienter som bør kalles inn til ny time basert på tilstand og siste besøk.
         </p>
       </div>
 
@@ -183,9 +185,9 @@ export default function RecallDashboard() {
               Recall-regler ({rulesData.length} kategorier)
             </span>
             {expandedRules ? (
-              <ChevronUp className="w-4 h-4 text-gray-400" />
+              <ChevronUp className="w-4 h-4 text-gray-400 dark:text-gray-300" />
             ) : (
-              <ChevronDown className="w-4 h-4 text-gray-400" />
+              <ChevronDown className="w-4 h-4 text-gray-400 dark:text-gray-300" />
             )}
           </button>
           {expandedRules && (
@@ -196,7 +198,7 @@ export default function RecallDashboard() {
                     <div className="font-medium text-gray-900">
                       {rule.category || rule.condition}
                     </div>
-                    <div className="text-gray-500 mt-1">
+                    <div className="text-gray-500 dark:text-gray-400 mt-1">
                       Intervall: {rule.interval_days || rule.intervalDays} dager
                     </div>
                     {rule.priority && (
@@ -206,7 +208,7 @@ export default function RecallDashboard() {
                             ? 'bg-red-50 text-red-700'
                             : rule.priority === 'medium'
                               ? 'bg-yellow-50 text-yellow-700'
-                              : 'bg-gray-50 text-gray-600'
+                              : 'bg-gray-50 text-gray-600 dark:text-gray-300'
                         }`}
                       >
                         {rule.priority}
@@ -224,18 +226,18 @@ export default function RecallDashboard() {
       <div className="bg-white rounded-lg shadow p-4">
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-gray-300" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Sok pasient eller tilstand..."
+              placeholder={t('searchPatientOrCondition', 'Søk pasient eller tilstand...')}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             />
           </div>
           <button
             onClick={() => queryClient.invalidateQueries({ queryKey: ['recall-patients'] })}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-2 text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
             title="Oppdater"
           >
             <RefreshCw className={`w-5 h-5 ${patientsLoading ? 'animate-spin' : ''}`} />
@@ -246,14 +248,16 @@ export default function RecallDashboard() {
       {/* Patient Table */}
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {patientsLoading ? (
-          <div className="p-8 text-center text-gray-500">Laster pasienter...</div>
+          <div className="p-8 text-center text-gray-500 dark:text-gray-400">
+            Laster pasienter...
+          </div>
         ) : filteredPatients.length === 0 ? (
           <div className="p-8 text-center">
             <CheckCircle2 className="w-12 h-12 text-green-300 mx-auto mb-3" />
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-gray-400">
               {searchQuery
-                ? 'Ingen pasienter matcher soket.'
-                : 'Ingen pasienter trenger recall akkurat na.'}
+                ? 'Ingen pasienter matcher søket.'
+                : 'Ingen pasienter trenger recall akkurat nå.'}
             </p>
           </div>
         ) : (
@@ -262,31 +266,35 @@ export default function RecallDashboard() {
               <thead>
                 <tr className="bg-gray-50 border-b">
                   <th
-                    className="text-left py-3 px-4 font-medium text-gray-600 cursor-pointer hover:text-gray-900"
+                    className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900"
                     onClick={() => toggleSort('last_name')}
                   >
                     Pasient <SortIcon field="last_name" />
                   </th>
                   <th
-                    className="text-left py-3 px-4 font-medium text-gray-600 cursor-pointer hover:text-gray-900"
+                    className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900"
                     onClick={() => toggleSort('last_visit')}
                   >
-                    Siste besok <SortIcon field="last_visit" />
+                    Siste besøk <SortIcon field="last_visit" />
                   </th>
                   <th
-                    className="text-left py-3 px-4 font-medium text-gray-600 cursor-pointer hover:text-gray-900"
+                    className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900"
                     onClick={() => toggleSort('condition')}
                   >
                     Tilstand <SortIcon field="condition" />
                   </th>
                   <th
-                    className="text-left py-3 px-4 font-medium text-gray-600 cursor-pointer hover:text-gray-900"
+                    className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300 cursor-pointer hover:text-gray-900"
                     onClick={() => toggleSort('days_overdue')}
                   >
                     Dager forfalt <SortIcon field="days_overdue" />
                   </th>
-                  <th className="text-left py-3 px-4 font-medium text-gray-600">Type</th>
-                  <th className="text-right py-3 px-4 font-medium text-gray-600">Handlinger</th>
+                  <th className="text-left py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Type
+                  </th>
+                  <th className="text-right py-3 px-4 font-medium text-gray-600 dark:text-gray-300">
+                    Handlinger
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
@@ -329,9 +337,11 @@ function PatientRow({ patient, onContact, isContacting }) {
         <div className="font-medium text-gray-900">
           {patient.first_name} {patient.last_name}
         </div>
-        {patient.phone && <div className="text-xs text-gray-400">{patient.phone}</div>}
+        {patient.phone && (
+          <div className="text-xs text-gray-400 dark:text-gray-300">{patient.phone}</div>
+        )}
       </td>
-      <td className="py-3 px-4 text-gray-600">
+      <td className="py-3 px-4 text-gray-600 dark:text-gray-300">
         {patient.last_visit
           ? new Date(patient.last_visit).toLocaleDateString('nb-NO')
           : patient.last_visit_date
@@ -344,7 +354,7 @@ function PatientRow({ patient, onContact, isContacting }) {
             {patient.condition || patient.recall_category}
           </span>
         ) : (
-          <span className="text-gray-400">-</span>
+          <span className="text-gray-400 dark:text-gray-300">-</span>
         )}
       </td>
       <td className="py-3 px-4">
@@ -356,7 +366,7 @@ function PatientRow({ patient, onContact, isContacting }) {
               : `Om ${Math.abs(daysOverdue)} d.`}
         </span>
       </td>
-      <td className="py-3 px-4 text-gray-600 text-xs">
+      <td className="py-3 px-4 text-gray-600 dark:text-gray-300 text-xs">
         {patient.recall_type || patient.followup_type || 'Standard'}
       </td>
       <td className="py-3 px-4">
@@ -380,7 +390,7 @@ function PatientRow({ patient, onContact, isContacting }) {
           <button
             onClick={() => onContact('dismissed')}
             disabled={isContacting}
-            className="p-1.5 rounded hover:bg-gray-100 text-gray-400 transition-colors"
+            className="p-1.5 rounded hover:bg-gray-100 text-gray-400 dark:text-gray-300 transition-colors"
             title="Avvis recall"
           >
             <BellOff className="w-4 h-4" />
@@ -404,7 +414,7 @@ function StatCard({ icon, label, value, color }) {
       <div className={`p-3 rounded-lg ${colorClasses[color]}`}>{icon}</div>
       <div>
         <div className="text-2xl font-bold text-gray-900">{value}</div>
-        <div className="text-sm text-gray-500">{label}</div>
+        <div className="text-sm text-gray-500 dark:text-gray-400">{label}</div>
       </div>
     </div>
   );

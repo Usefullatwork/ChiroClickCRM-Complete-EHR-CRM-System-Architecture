@@ -18,6 +18,7 @@ import { communicationsAPI, patientsAPI } from '../services/api';
 import { formatPhone } from '../lib/utils';
 import { useTranslation, formatDate } from '../i18n';
 import toast from '../utils/toast';
+import CommunicationThread from '../components/communications/CommunicationThread';
 
 import logger from '../utils/logger';
 export default function Communications() {
@@ -32,9 +33,10 @@ export default function Communications() {
   const [showPatientSearch, setShowPatientSearch] = useState(false);
   const [copied, setCopied] = useState(false);
   const [historyFilter, setHistoryFilter] = useState('');
+  const [viewMode, setViewMode] = useState('flat');
 
   // Fetch templates
-  const { data: templatesResponse } = useQuery({
+  const { data: templatesResponse, isLoading: templatesLoading } = useQuery({
     queryKey: ['communication-templates'],
     queryFn: () => communicationsAPI.getTemplates(),
   });
@@ -143,11 +145,11 @@ export default function Communications() {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto">
+    <div className="p-6 max-w-7xl mx-auto" data-testid="communications-page">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900">{t('title')}</h1>
-        <p className="text-sm text-gray-500 mt-1">{t('subtitle')}</p>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{t('subtitle')}</p>
       </div>
 
       {/* Tabs */}
@@ -158,7 +160,7 @@ export default function Communications() {
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'compose'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -171,7 +173,7 @@ export default function Communications() {
             className={`pb-3 px-1 border-b-2 font-medium text-sm transition-colors ${
               activeTab === 'history'
                 ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 hover:border-gray-300'
             }`}
           >
             <div className="flex items-center gap-2">
@@ -234,7 +236,7 @@ export default function Communications() {
                       <p className="text-sm font-medium text-gray-900">
                         {selectedPatient.first_name} {selectedPatient.last_name}
                       </p>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-gray-600 dark:text-gray-300">
                         {messageType === 'sms'
                           ? formatPhone(selectedPatient.phone)
                           : selectedPatient.email || t('noEmailOnFile')}
@@ -250,7 +252,7 @@ export default function Communications() {
                 </div>
               ) : (
                 <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-300 w-5 h-5" />
                   <input
                     type="text"
                     placeholder={t('searchPatients')}
@@ -267,7 +269,7 @@ export default function Communications() {
                   {showPatientSearch && searchTerm.length >= 2 && (
                     <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto">
                       {searchLoading ? (
-                        <div className="p-4 text-center text-sm text-gray-500">
+                        <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
                           {t('searching')}
                         </div>
                       ) : searchResults.length > 0 ? (
@@ -284,13 +286,13 @@ export default function Communications() {
                             <div className="font-medium text-gray-900">
                               {patient.first_name} {patient.last_name}
                             </div>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-gray-500 dark:text-gray-400">
                               {formatPhone(patient.phone)} • {patient.email}
                             </div>
                           </button>
                         ))
                       ) : (
-                        <div className="p-4 text-center text-sm text-gray-500">
+                        <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
                           {t('noPatientsFound')}
                         </div>
                       )}
@@ -307,6 +309,7 @@ export default function Communications() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder={messageType === 'sms' ? t('typeMessageSms') : t('typeMessageEmail')}
+                data-testid="communications-message-input"
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                 rows={messageType === 'sms' ? 6 : 10}
               />
@@ -320,12 +323,12 @@ export default function Communications() {
                         ? 'text-red-600 font-medium'
                         : remainingChars < 20
                           ? 'text-orange-600'
-                          : 'text-gray-500'
+                          : 'text-gray-500 dark:text-gray-400'
                     }`}
                   >
                     {t('charactersRemaining').replace('{count}', remainingChars)}
                   </span>
-                  <span className="text-gray-500">
+                  <span className="text-gray-500 dark:text-gray-400">
                     {smsCount > 1
                       ? t('smsCountPlural').replace('{count}', smsCount)
                       : t('smsCount').replace('{count}', smsCount)}
@@ -355,6 +358,7 @@ export default function Communications() {
                 <button
                   onClick={handleSend}
                   disabled={!selectedPatient || !message.trim() || sendMutation.isLoading}
+                  data-testid="communications-send-btn"
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Send className="w-4 h-4" />
@@ -363,7 +367,7 @@ export default function Communications() {
               </div>
 
               {messageType === 'sms' && (
-                <p className="text-xs text-gray-500 mt-3">{t('smsNote')}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3">{t('smsNote')}</p>
               )}
             </div>
           </div>
@@ -377,7 +381,11 @@ export default function Communications() {
               </h3>
 
               <div className="space-y-2">
-                {templates.length > 0 ? (
+                {templatesLoading ? (
+                  <div className="text-center py-6 text-sm text-gray-500 dark:text-gray-400">
+                    {t('loading', 'Laster...')}
+                  </div>
+                ) : templates.length > 0 ? (
                   templates
                     .filter((tmpl) => !messageType || tmpl.type === messageType.toUpperCase())
                     .map((template) => (
@@ -391,13 +399,15 @@ export default function Communications() {
                         }`}
                       >
                         <div className="font-medium text-sm text-gray-900">{template.name}</div>
-                        <div className="text-xs text-gray-500 mt-1 line-clamp-2">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
                           {template.content}
                         </div>
                       </button>
                     ))
                 ) : (
-                  <div className="text-center py-6 text-sm text-gray-500">{t('noTemplates')}</div>
+                  <div className="text-center py-6 text-sm text-gray-500 dark:text-gray-400">
+                    {t('noTemplates')}
+                  </div>
                 )}
               </div>
             </div>
@@ -408,92 +418,123 @@ export default function Communications() {
       {/* History Tab */}
       {activeTab === 'history' && (
         <div className="bg-white rounded-lg border border-gray-200">
-          {/* Filter */}
+          {/* Filter + View Toggle */}
           <div className="px-6 py-4 border-b border-gray-200">
-            <div className="flex items-center gap-4">
-              <Filter className="w-5 h-5 text-gray-400" />
-              <select
-                value={historyFilter}
-                onChange={(e) => setHistoryFilter(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">{t('allMessages')}</option>
-                <option value="SMS">{t('smsOnly')}</option>
-                <option value="EMAIL">{t('emailOnly')}</option>
-              </select>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <Filter className="w-5 h-5 text-gray-400 dark:text-gray-300" />
+                <select
+                  value={historyFilter}
+                  onChange={(e) => setHistoryFilter(e.target.value)}
+                  data-testid="communications-history-filter"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">{t('allMessages')}</option>
+                  <option value="SMS">{t('smsOnly')}</option>
+                  <option value="EMAIL">{t('emailOnly')}</option>
+                </select>
+              </div>
+              <div className="flex items-center gap-1 bg-gray-100 dark:bg-gray-700 rounded-lg p-0.5">
+                <button
+                  onClick={() => setViewMode('flat')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    viewMode === 'flat'
+                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  }`}
+                >
+                  {t('flatView', 'Flat')}
+                </button>
+                <button
+                  onClick={() => setViewMode('thread')}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+                    viewMode === 'thread'
+                      ? 'bg-white dark:bg-gray-600 text-gray-900 dark:text-gray-100 shadow-sm'
+                      : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
+                  }`}
+                >
+                  {t('byPatient', 'Per pasient')}
+                </button>
+              </div>
             </div>
           </div>
 
           {/* History List */}
-          <div className="divide-y divide-gray-100">
-            {historyLoading ? (
-              <div className="px-6 py-12 text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-3">{t('loadingHistory')}</p>
-              </div>
-            ) : history.length > 0 ? (
-              history.map((comm) => (
-                <div key={comm.id} className="px-6 py-4 hover:bg-gray-50">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3 flex-1">
-                      <div
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                          comm.type === 'SMS' ? 'bg-purple-50' : 'bg-blue-50'
-                        }`}
-                      >
-                        {comm.type === 'SMS' ? (
-                          <Smartphone className="w-5 h-5 text-purple-600" />
-                        ) : (
-                          <Mail className="w-5 h-5 text-blue-600" />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium text-gray-900">
-                            {comm.patient_name}
-                          </span>
-                          <span
-                            className={`px-2 py-0.5 text-xs font-medium rounded ${
-                              comm.type === 'SMS'
-                                ? 'bg-purple-100 text-purple-700'
-                                : 'bg-blue-100 text-blue-700'
-                            }`}
-                          >
-                            {comm.type}
-                          </span>
-                        </div>
-                        <p className="text-sm text-gray-600 mt-1">{comm.message}</p>
-                        <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                          <span>
-                            {formatDate(comm.created_at, lang, {
-                              year: 'numeric',
-                              month: 'short',
-                              day: 'numeric',
-                              hour: '2-digit',
-                              minute: '2-digit',
-                            })}
-                          </span>
-                          {comm.template_name && (
-                            <span>
-                              {t('templateLabel')}: {comm.template_name}
-                            </span>
+          {historyLoading ? (
+            <div className="px-6 py-12 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-3">{t('loadingHistory')}</p>
+            </div>
+          ) : viewMode === 'thread' ? (
+            <CommunicationThread communications={history} />
+          ) : (
+            <div className="divide-y divide-gray-100">
+              {history.length > 0 ? (
+                history.map((comm) => (
+                  <div key={comm.id} className="px-6 py-4 hover:bg-gray-50">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3 flex-1">
+                        <div
+                          className={`w-10 h-10 rounded-lg flex items-center justify-center ${
+                            comm.type === 'SMS' ? 'bg-purple-50' : 'bg-blue-50'
+                          }`}
+                        >
+                          {comm.type === 'SMS' ? (
+                            <Smartphone className="w-5 h-5 text-purple-600" />
+                          ) : (
+                            <Mail className="w-5 h-5 text-blue-600" />
                           )}
-                          <span>
-                            {t('byLabel')}: {comm.sent_by_name || t('system')}
-                          </span>
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm font-medium text-gray-900">
+                              {comm.patient_name}
+                            </span>
+                            <span
+                              className={`px-2 py-0.5 text-xs font-medium rounded ${
+                                comm.type === 'SMS'
+                                  ? 'bg-purple-100 text-purple-700'
+                                  : 'bg-blue-100 text-blue-700'
+                              }`}
+                            >
+                              {comm.type}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
+                            {comm.message}
+                          </p>
+                          <div className="flex items-center gap-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
+                            <span>
+                              {formatDate(comm.created_at, lang, {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              })}
+                            </span>
+                            {comm.template_name && (
+                              <span>
+                                {t('templateLabel')}: {comm.template_name}
+                              </span>
+                            )}
+                            <span>
+                              {t('byLabel')}: {comm.sent_by_name || t('system')}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                ))
+              ) : (
+                <div className="px-6 py-12 text-center">
+                  <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('noMessagesSent')}</p>
                 </div>
-              ))
-            ) : (
-              <div className="px-6 py-12 text-center">
-                <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-500">{t('noMessagesSent')}</p>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>

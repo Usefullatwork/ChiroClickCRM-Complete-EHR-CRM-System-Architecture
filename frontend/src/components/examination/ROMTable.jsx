@@ -383,7 +383,7 @@ function RegionROMTable({
                            }`}
               >
                 {/* Movement name */}
-                <div className="text-xs font-medium text-gray-600 text-center mb-1 truncate">
+                <div className="text-xs font-medium text-gray-600 dark:text-gray-300 text-center mb-1 truncate">
                   {lang === 'no' ? movement.nameNo : movement.name}
                 </div>
 
@@ -396,7 +396,7 @@ function RegionROMTable({
                 />
 
                 {/* Normal value label */}
-                <div className="text-[10px] text-gray-400 text-center">
+                <div className="text-[10px] text-gray-400 dark:text-gray-300 text-center">
                   Normal: {movement.normal}°
                 </div>
 
@@ -410,7 +410,7 @@ function RegionROMTable({
                                ${
                                  hasPain
                                    ? 'bg-red-500 text-white'
-                                   : 'bg-gray-100 text-gray-400 hover:bg-red-100 hover:text-red-500'
+                                   : 'bg-gray-100 text-gray-400 dark:text-gray-300 hover:bg-red-100 hover:text-red-500'
                                }`}
                   >
                     {hasPain ? '⚡ Smerte' : '+ Smerte'}
@@ -537,7 +537,7 @@ export default function ROMTable({
             {lang === 'no' ? 'Leddutslag (ROM)' : 'Range of Motion'}
           </h3>
           {summary.total > 0 && (
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {summary.total} {lang === 'no' ? 'målinger' : 'measurements'}
               {summary.restricted > 0 && (
                 <span className="text-red-600 ml-2">
@@ -565,7 +565,7 @@ export default function ROMTable({
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 text-xs text-gray-500">
+      <div className="flex items-center gap-4 text-xs text-gray-500 dark:text-gray-400">
         <div className="flex items-center gap-1">
           <div className="w-3 h-3 bg-red-100 border border-red-300 rounded" />
           <span>&lt;70% = {lang === 'no' ? 'Betydelig redusert' : 'Significantly restricted'}</span>

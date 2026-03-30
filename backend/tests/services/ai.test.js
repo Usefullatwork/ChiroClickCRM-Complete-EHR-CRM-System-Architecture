@@ -34,7 +34,7 @@ jest.unstable_mockModule('../../src/utils/logger.js', () => ({
 }));
 
 // Mock clinicalValidation - provides rule-based red flag detection
-jest.unstable_mockModule('../../src/services/clinicalValidation.js', () => ({
+jest.unstable_mockModule('../../src/services/clinical/clinicalValidation.js', () => ({
   validateClinicalContent: jest.fn().mockResolvedValue({
     isValid: true,
     hasRedFlags: false,
@@ -61,12 +61,12 @@ jest.unstable_mockModule('../../src/services/clinicalValidation.js', () => ({
 }));
 
 // Mock guardrails (dynamically imported in ai.js)
-jest.unstable_mockModule('../../src/services/guardrails.js', () => ({
+jest.unstable_mockModule('../../src/services/clinical/guardrails.js', () => ({
   guardrailsService: null,
 }));
 
 // Mock RAG service (dynamically imported in ai.js)
-jest.unstable_mockModule('../../src/services/rag.js', () => ({
+jest.unstable_mockModule('../../src/services/training/rag.js', () => ({
   ragService: null,
 }));
 
@@ -88,8 +88,8 @@ describe('AI Service', () => {
     process.env.GUARDRAILS_ENABLED = 'false';
     process.env.NODE_ENV = 'test';
 
-    clinicalValidation = await import('../../src/services/clinicalValidation.js');
-    aiService = await import('../../src/services/ai.js');
+    clinicalValidation = await import('../../src/services/clinical/clinicalValidation.js');
+    aiService = await import('../../src/services/ai/index.js');
   });
 
   describe('getAIStatus', () => {

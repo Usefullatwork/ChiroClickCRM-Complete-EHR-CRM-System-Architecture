@@ -180,7 +180,7 @@ export default function ChiefComplaintCapture({ onNext, onBack, lang = 'no' }) {
       {/* Back button */}
       <button
         onClick={onBack}
-        className="self-start flex items-center gap-2 text-slate-500 hover:text-slate-700
+        className="self-start flex items-center gap-2 text-slate-500 dark:text-slate-400 hover:text-slate-700
                    transition-colors mb-4"
       >
         <ArrowLeft className="w-5 h-5" />
@@ -190,7 +190,7 @@ export default function ChiefComplaintCapture({ onNext, onBack, lang = 'no' }) {
       {/* Header */}
       <div className="text-center mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-slate-800 mb-2">{t.title}</h1>
-        <p className="text-lg text-slate-500">{t.subtitle}</p>
+        <p className="text-lg text-slate-500 dark:text-slate-400">{t.subtitle}</p>
       </div>
 
       {/* Complaint buttons - 2 column grid */}
@@ -213,7 +213,9 @@ export default function ChiefComplaintCapture({ onNext, onBack, lang = 'no' }) {
                 <span className="text-base md:text-lg font-medium text-slate-800 block">
                   {c.label}
                 </span>
-                <span className="text-xs text-slate-500 hidden md:block">{c.description}</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400 hidden md:block">
+                  {c.description}
+                </span>
               </div>
             </div>
           </button>
@@ -223,7 +225,7 @@ export default function ChiefComplaintCapture({ onNext, onBack, lang = 'no' }) {
       {/* Custom text input */}
       {showCustom && (
         <div className="mb-4">
-          <div className="flex items-center gap-2 text-slate-600 mb-2">
+          <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300 mb-2">
             <MessageSquare className="w-5 h-5" />
             <span className="font-medium">
               {lang === 'no' ? 'Beskriv problemet' : 'Describe your concern'}

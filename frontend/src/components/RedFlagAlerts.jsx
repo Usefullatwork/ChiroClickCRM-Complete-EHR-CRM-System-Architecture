@@ -48,8 +48,11 @@ export default function RedFlagAlerts({ encounterId }) {
         </p>
 
         <div className="space-y-3">
-          {redFlags.data.map((redFlag, index) => (
-            <div key={index} className="bg-white border border-red-200 rounded-lg p-3 shadow-sm">
+          {redFlags.data.map((redFlag) => (
+            <div
+              key={redFlag.test_name}
+              className="bg-white border border-red-200 rounded-lg p-3 shadow-sm"
+            >
               {/* Test Name */}
               <div className="flex items-start gap-2 mb-2">
                 <AlertTriangle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />

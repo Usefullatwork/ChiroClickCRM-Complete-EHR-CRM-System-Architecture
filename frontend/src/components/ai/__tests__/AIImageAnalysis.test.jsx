@@ -10,9 +10,25 @@ import AIImageAnalysis from '../AIImageAnalysis';
 
 vi.mock('../../../i18n', () => ({
   useTranslation: () => ({
-    t: (key) => key,
-    language: 'no',
+    t: (key, fallback) => {
+      const map = {
+        imageAnalysisTitle: 'Bildeanalyse',
+        imageAnalysisType: 'Analysetype',
+        imageAnalysisDropzone: 'Dra og slipp bilde her, eller klikk for a velge',
+        imageAnalysisAnalyze: 'Analyser bilde',
+        imageAnalysisAnalyzing: 'Analyserer...',
+        imageAnalysisRemove: 'Fjern',
+        imageAnalysisDisclaimer:
+          'AI-assistert analyse -- ma bekreftes av kvalifisert helsepersonell',
+        analysisTypeXray: 'Rontgen',
+        analysisTypeMri: 'MR',
+        analysisTypePosture: 'Holdning',
+        analysisTypeGeneral: 'Generell',
+      };
+      return map[key] || fallback || key;
+    },
     lang: 'no',
+    setLang: vi.fn(),
   }),
 }));
 

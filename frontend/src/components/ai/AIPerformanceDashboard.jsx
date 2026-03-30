@@ -33,116 +33,64 @@ import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Alert } from '../ui/Alert';
 import { aiFeedbackAPI } from '../../services/api';
+import { useTranslation } from '../../i18n';
 
-// Translations
-const TEXTS = {
-  NO: {
-    title: 'AI Ytelsesdashbord',
-    subtitle: 'Overvak AI-ytelse og laering',
-    overview: 'Oversikt',
-    totalInteractions: 'Totale Interaksjoner',
-    acceptanceRate: 'Godkjenningsrate',
-    avgRating: 'Gj.snitt Vurdering',
-    avgTimeToDecision: 'Gj.snitt Beslutningstid',
-    byType: 'Etter Type',
-    trends: 'Trender',
-    last7Days: 'Siste 7 dager',
-    last30Days: 'Siste 30 dager',
-    last90Days: 'Siste 90 dager',
-    commonCorrections: 'Vanlige Korreksjoner',
-    correctionPattern: 'Korreksjonsmonster',
-    occurrences: 'Forekomster',
-    retrainingStatus: 'Retreningstatus',
-    needsRetraining: 'Trenger Retrening',
-    noRetrainingNeeded: 'Ingen retrening nodvendig',
-    triggerRetraining: 'Start Retrening',
-    retrainingHistory: 'Retrenigshistorikk',
-    modelVersion: 'Modellversjon',
-    rollback: 'Tilbakestill',
-    exportData: 'Eksporter Data',
+// Build a t-based text object that matches the old TEXTS shape
+function buildTexts(t) {
+  return {
+    title: t('dashboardTitle', 'AI Performance Dashboard'),
+    subtitle: t('dashboardSubtitle', 'Monitor AI performance and learning'),
+    overview: t('overview', 'Overview'),
+    totalInteractions: t('totalInteractions', 'Total Interactions'),
+    acceptanceRate: t('acceptanceRate', 'Acceptance Rate'),
+    avgRating: t('avgRating', 'Avg. Rating'),
+    avgTimeToDecision: t('avgTimeToDecision', 'Avg. Decision Time'),
+    byType: t('byType', 'By Suggestion Type'),
+    trends: t('trends', 'Trends'),
+    last7Days: t('last7Days', 'Last 7 days'),
+    last30Days: t('last30Days', 'Last 30 days'),
+    last90Days: t('last90Days', 'Last 90 days'),
+    commonCorrections: t('commonCorrections', 'Common Corrections'),
+    correctionPattern: t('correctionPattern', 'Correction Pattern'),
+    occurrences: t('occurrences', 'Occurrences'),
+    retrainingStatus: t('retrainingStatus', 'Retraining Status'),
+    needsRetraining: t('needsRetraining', 'Needs Retraining'),
+    noRetrainingNeeded: t('noRetrainingNeeded', 'No retraining needed'),
+    triggerRetraining: t('triggerRetraining', 'Trigger Retraining'),
+    retrainingHistory: t('retrainingHistory', 'Retraining History'),
+    modelVersion: t('modelVersion', 'Model Version'),
+    rollback: t('rollback', 'Rollback'),
+    exportData: t('exportData', 'Export Data'),
     suggestionTypes: {
-      soap_suggestion: 'SOAP-forslag',
-      diagnosis_suggestion: 'Diagnosforslag',
-      red_flag_analysis: 'Rodt Flagg-analyse',
-      clinical_summary: 'Klinisk Sammendrag',
-      spell_check: 'Stavekontroll',
+      soap_suggestion: t('typeSoapSuggestion', 'SOAP Suggestion'),
+      diagnosis_suggestion: t('typeDiagnosisSuggestion', 'Diagnosis Suggestion'),
+      red_flag_analysis: t('typeRedFlagAnalysis', 'Red Flag Analysis'),
+      clinical_summary: t('typeClinicalSummary', 'Clinical Summary'),
+      spell_check: t('typeSpellCheck', 'Spell Check'),
     },
     metrics: {
-      accepted: 'Godkjent',
-      rejected: 'Avvist',
-      modified: 'Modifisert',
+      accepted: t('actionAccepted', 'Accepted'),
+      rejected: t('actionRejected', 'Rejected'),
+      modified: t('actionModified', 'Modified'),
     },
-    noData: 'Ingen data tilgjengelig',
-    loading: 'Laster...',
-    error: 'Feil ved lasting av data',
-    refresh: 'Oppdater',
+    noData: t('noData', 'No data available'),
+    loading: t('loading', 'Loading...'),
+    error: t('errorLoadingData', 'Error loading data'),
+    refresh: t('refresh', 'Refresh'),
     timeRanges: {
-      day: 'Dag',
-      week: 'Uke',
-      month: 'Maned',
+      day: t('timeRangeDay', 'Day'),
+      week: t('timeRangeWeek', 'Week'),
+      month: t('timeRangeMonth', 'Month'),
     },
     performance: {
-      excellent: 'Utmerket',
-      good: 'Bra',
-      fair: 'Ok',
-      poor: 'Darlig',
+      excellent: t('performanceExcellent', 'Excellent'),
+      good: t('performanceGood', 'Good'),
+      fair: t('performanceFair', 'Fair'),
+      poor: t('performancePoor', 'Poor'),
     },
-    seconds: 'sekunder',
-  },
-  EN: {
-    title: 'AI Performance Dashboard',
-    subtitle: 'Monitor AI performance and learning',
-    overview: 'Overview',
-    totalInteractions: 'Total Interactions',
-    acceptanceRate: 'Acceptance Rate',
-    avgRating: 'Avg. Rating',
-    avgTimeToDecision: 'Avg. Decision Time',
-    byType: 'By Type',
-    trends: 'Trends',
-    last7Days: 'Last 7 days',
-    last30Days: 'Last 30 days',
-    last90Days: 'Last 90 days',
-    commonCorrections: 'Common Corrections',
-    correctionPattern: 'Correction Pattern',
-    occurrences: 'Occurrences',
-    retrainingStatus: 'Retraining Status',
-    needsRetraining: 'Needs Retraining',
-    noRetrainingNeeded: 'No retraining needed',
-    triggerRetraining: 'Trigger Retraining',
-    retrainingHistory: 'Retraining History',
-    modelVersion: 'Model Version',
-    rollback: 'Rollback',
-    exportData: 'Export Data',
-    suggestionTypes: {
-      soap_suggestion: 'SOAP Suggestion',
-      diagnosis_suggestion: 'Diagnosis Suggestion',
-      red_flag_analysis: 'Red Flag Analysis',
-      clinical_summary: 'Clinical Summary',
-      spell_check: 'Spell Check',
-    },
-    metrics: {
-      accepted: 'Accepted',
-      rejected: 'Rejected',
-      modified: 'Modified',
-    },
-    noData: 'No data available',
-    loading: 'Loading...',
-    error: 'Error loading data',
-    refresh: 'Refresh',
-    timeRanges: {
-      day: 'Day',
-      week: 'Week',
-      month: 'Month',
-    },
-    performance: {
-      excellent: 'Excellent',
-      good: 'Good',
-      fair: 'Fair',
-      poor: 'Poor',
-    },
-    seconds: 'seconds',
-  },
-};
+    seconds: t('seconds', 'seconds'),
+  };
+}
 
 // Helper to format percentage
 const formatPercent = (value) => {
@@ -173,7 +121,7 @@ const MiniBarChart = ({ data, maxValue, label, color = 'teal' }) => {
   return (
     <div className="space-y-1">
       <div className="flex justify-between text-sm">
-        <span className="text-slate-600">{label}</span>
+        <span className="text-slate-600 dark:text-slate-300">{label}</span>
         <span className="font-medium text-slate-900">{data}</span>
       </div>
       <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -209,8 +157,10 @@ const StatCard = ({ icon: Icon, label, value, subValue, trend, color = 'slate' }
         </div>
         <div className="mt-3">
           <p className="text-2xl font-bold text-slate-900">{value}</p>
-          <p className="text-sm text-slate-500">{label}</p>
-          {subValue && <p className="text-xs text-slate-400 mt-1">{subValue}</p>}
+          <p className="text-sm text-slate-500 dark:text-slate-400">{label}</p>
+          {subValue && (
+            <p className="text-xs text-slate-400 dark:text-slate-300 mt-1">{subValue}</p>
+          )}
         </div>
       </CardBody>
     </Card>
@@ -254,12 +204,12 @@ const SuggestionTypeCard = ({ type, data, t, maxTotal }) => {
 
         <div className="mt-3 pt-3 border-t border-slate-100">
           <div className="flex justify-between text-sm">
-            <span className="text-slate-500">{t.totalInteractions}</span>
+            <span className="text-slate-500 dark:text-slate-400">{t.totalInteractions}</span>
             <span className="font-medium">{data.total || 0}</span>
           </div>
           {data.avg_rating && (
             <div className="flex justify-between text-sm mt-1">
-              <span className="text-slate-500">{t.avgRating}</span>
+              <span className="text-slate-500 dark:text-slate-400">{t.avgRating}</span>
               <span className="font-medium flex items-center gap-1">
                 <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
                 {parseFloat(data.avg_rating).toFixed(1)}
@@ -273,8 +223,9 @@ const SuggestionTypeCard = ({ type, data, t, maxTotal }) => {
 };
 
 // Main Dashboard Component
-export default function AIPerformanceDashboard({ language = 'NO' }) {
-  const t = TEXTS[language] || TEXTS.NO;
+export default function AIPerformanceDashboard({ language: _language = 'NO' }) {
+  const { t: translate } = useTranslation('analytics');
+  const t = useMemo(() => buildTexts(translate), [translate]);
   const queryClient = useQueryClient();
 
   const [timeRange, setTimeRange] = useState('30');
@@ -408,7 +359,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
   if (isLoading && !performanceData) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="flex items-center gap-3 text-slate-500">
+        <div className="flex items-center gap-3 text-slate-500 dark:text-slate-400">
           <Loader2 className="w-6 h-6 animate-spin" />
           <span>{t.loading}</span>
         </div>
@@ -439,7 +390,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-slate-900">{t.title}</h1>
-          <p className="text-slate-500">{t.subtitle}</p>
+          <p className="text-slate-500 dark:text-slate-400">{t.subtitle}</p>
         </div>
         <div className="flex items-center gap-3">
           {/* Time range selector */}
@@ -503,7 +454,9 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
               <SuggestionTypeCard key={type} type={type} data={data} t={t} maxTotal={maxTotal} />
             ))}
           {(!performanceData?.byType || Object.keys(performanceData.byType).length === 0) && (
-            <div className="col-span-3 text-center py-8 text-slate-500">{t.noData}</div>
+            <div className="col-span-3 text-center py-8 text-slate-500 dark:text-slate-400">
+              {t.noData}
+            </div>
           )}
         </div>
       </div>
@@ -567,7 +520,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
                       className="flex items-center justify-between p-2 bg-slate-50 rounded-lg"
                     >
                       <div className="flex items-center gap-2">
-                        <GitBranch className="w-4 h-4 text-slate-400" />
+                        <GitBranch className="w-4 h-4 text-slate-400 dark:text-slate-300" />
                         <span className="text-sm text-slate-700">
                           {event.model_version || `v${idx + 1}`}
                         </span>
@@ -577,7 +530,7 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
                           </Badge>
                         )}
                       </div>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-slate-500 dark:text-slate-400">
                         {event.created_at
                           ? new Date(event.created_at).toLocaleDateString('nb-NO')
                           : '-'}
@@ -586,7 +539,9 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
                   ))}
                 </div>
               ) : (
-                <p className="text-sm text-slate-500 text-center py-4">{t.noData}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-4">
+                  {t.noData}
+                </p>
               )}
             </div>
           </CardBody>
@@ -629,7 +584,9 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-500 text-center py-8">{t.noData}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 text-center py-8">
+                {t.noData}
+              </p>
             )}
           </CardBody>
         </Card>
@@ -638,4 +595,4 @@ export default function AIPerformanceDashboard({ language = 'NO' }) {
   );
 }
 
-export { TEXTS, StatCard, SuggestionTypeCard };
+export { StatCard, SuggestionTypeCard };

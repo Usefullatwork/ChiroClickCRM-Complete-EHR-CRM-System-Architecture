@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ============================================================
-echo   ChiroClick AI - Model Builder
+echo   ChiroClickEHR AI - Model Builder
 echo   Bygger tilpassede kiropraktor-modeller med Ollama
 echo ============================================================
 echo.
@@ -96,7 +96,7 @@ if %PULL_ERRORS% gtr 0 (
 echo.
 
 REM ---- Step 5: Build custom models ----
-echo [5/7] Bygger tilpassede ChiroClick-modeller...
+echo [5/7] Bygger tilpassede ChiroClickEHR-modeller...
 echo.
 
 set "BUILD_ERRORS=0"
