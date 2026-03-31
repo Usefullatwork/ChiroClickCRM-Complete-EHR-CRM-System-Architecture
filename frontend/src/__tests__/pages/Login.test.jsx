@@ -47,7 +47,7 @@ describe('Login Page', () => {
 
   it('renders without crashing', () => {
     render(<Login />);
-    expect(screen.getByText('Sign in to your account')).toBeTruthy();
+    expect(screen.getByText('Logg inn på kontoen din')).toBeTruthy();
   });
 
   it('renders email and password input fields', () => {
@@ -60,7 +60,7 @@ describe('Login Page', () => {
     render(<Login />);
     const button = screen.getByTestId('login-submit-button');
     expect(button).toBeTruthy();
-    expect(button.textContent).toBe('Sign in');
+    expect(button.textContent).toBe('Logg inn');
   });
 
   it('renders the ChiroClick EHR brand name', () => {
@@ -120,7 +120,7 @@ describe('Login Page', () => {
     fireEvent.click(screen.getByTestId('login-submit-button'));
 
     await waitFor(() => {
-      expect(screen.getByTestId('login-submit-button').textContent).toBe('Signing in...');
+      expect(screen.getByTestId('login-submit-button').textContent).toBe('Logger inn...');
       expect(screen.getByTestId('login-submit-button').disabled).toBe(true);
     });
   });
@@ -161,7 +161,7 @@ describe('Login Page', () => {
     fireEvent.click(screen.getByTestId('login-submit-button'));
 
     await waitFor(() => {
-      expect(toast.success).toHaveBeenCalledWith('Successfully logged in');
+      expect(toast.success).toHaveBeenCalledWith('Innlogging vellykket');
     });
   });
 
@@ -262,7 +262,7 @@ describe('Login Page', () => {
 
     await waitFor(() => {
       const errorEl = screen.getByTestId('login-error-message');
-      expect(errorEl.textContent).toContain('Failed to login');
+      expect(errorEl.textContent).toContain('Kunne ikke logge inn');
     });
   });
 
@@ -283,7 +283,7 @@ describe('Login Page', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('login-submit-button').disabled).toBe(false);
-      expect(screen.getByTestId('login-submit-button').textContent).toBe('Sign in');
+      expect(screen.getByTestId('login-submit-button').textContent).toBe('Logg inn');
     });
   });
 

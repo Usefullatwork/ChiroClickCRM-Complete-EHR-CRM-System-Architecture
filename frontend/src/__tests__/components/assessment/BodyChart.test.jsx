@@ -113,7 +113,7 @@ describe('BodyChart', () => {
 
     render(<BodyChart onSave={onSave} initialMarkers={initialMarkers} />);
 
-    expect(screen.getByText('Marker Legend')).toBeDefined();
+    expect(screen.getByText('Markørforklaring')).toBeDefined();
     expect(screen.getByPlaceholderText('Description for marker 1...')).toBeDefined();
   });
 

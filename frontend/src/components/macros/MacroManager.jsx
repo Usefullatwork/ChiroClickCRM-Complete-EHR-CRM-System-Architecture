@@ -501,6 +501,7 @@ export default function MacroManager() {
 }
 
 function MacroModal({ macro, onSave, onClose, isSaving }) {
+  const { t } = useTranslation('macros');
   const [form, setForm] = useState({
     name: macro?.name || '',
     text: macro?.text || '',

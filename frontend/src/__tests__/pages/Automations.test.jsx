@@ -16,6 +16,8 @@ vi.mock('../../i18n', () => ({
     lang: 'no',
     setLang: vi.fn(),
   }),
+  useLanguage: () => ({ lang: 'no', setLang: vi.fn() }),
+  LanguageProvider: ({ children }) => children,
 }));
 
 // Mock ConfirmDialog
@@ -166,7 +168,7 @@ describe('Automations Page', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Automatiser pasientengasjement og oppfolginger')
+          screen.getByText('Automatiser pasientengasjement og oppfølginger')
         ).toBeInTheDocument();
       });
     });

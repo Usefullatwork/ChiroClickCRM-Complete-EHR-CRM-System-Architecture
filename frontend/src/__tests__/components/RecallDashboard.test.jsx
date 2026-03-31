@@ -8,6 +8,13 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import RecallDashboard from '../../components/recall/RecallDashboard';
 
+// Mock i18n
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({ t: (key, fallback) => fallback || key, lang: 'no', setLang: vi.fn() }),
+  useLanguage: () => ({ lang: 'no', setLang: vi.fn() }),
+  LanguageProvider: ({ children }) => children,
+}));
+
 // Mock API
 vi.mock('../../services/api', () => ({
   followUpsAPI: {

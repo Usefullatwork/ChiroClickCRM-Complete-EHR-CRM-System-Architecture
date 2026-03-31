@@ -29,11 +29,13 @@ vi.mock('../../i18n', () => ({
     lang: 'no',
     setLang: vi.fn(),
   }),
+  useLanguage: () => ({ lang: 'no', setLang: vi.fn() }),
+  LanguageProvider: ({ children }) => children,
 }));
 
 // Mock training tab components
-vi.mock('../../components/training', () => ({
-  ModelsTab: ({ status, trainingData }) => (
+vi.mock('../../components/training/ModelsTab', () => ({
+  default: ({ status, trainingData }) => (
     <div data-testid="models-tab">
       <span data-testid="model-status">{status ? 'has-status' : 'no-status'}</span>
       <span data-testid="training-data">{trainingData ? 'has-data' : 'no-data'}</span>

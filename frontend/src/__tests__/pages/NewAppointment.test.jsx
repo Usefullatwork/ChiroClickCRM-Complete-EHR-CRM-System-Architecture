@@ -126,7 +126,7 @@ describe('NewAppointment Page', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('breadcrumbs')).toBeInTheDocument();
-      expect(screen.getByText('Dashboard')).toBeInTheDocument();
+      expect(screen.getByText('Oversikt')).toBeInTheDocument();
     });
   });
 
@@ -235,10 +235,10 @@ describe('NewAppointment Page', () => {
     fireEvent.click(screen.getByText('createAppointment'));
 
     await waitFor(() => {
-      expect(screen.getByText('Patient is required')).toBeInTheDocument();
-      expect(screen.getByText('Practitioner is required')).toBeInTheDocument();
-      expect(screen.getByText('Start time is required')).toBeInTheDocument();
-      expect(screen.getByText('End time is required')).toBeInTheDocument();
+      expect(screen.getByText('Pasient er påkrevd')).toBeInTheDocument();
+      expect(screen.getByText('Behandler er påkrevd')).toBeInTheDocument();
+      expect(screen.getByText('Starttid er påkrevd')).toBeInTheDocument();
+      expect(screen.getByText('Sluttid er påkrevd')).toBeInTheDocument();
     });
   });
 
@@ -252,7 +252,7 @@ describe('NewAppointment Page', () => {
     fireEvent.click(screen.getByText('createAppointment'));
 
     await waitFor(() => {
-      expect(screen.getByText('Patient is required')).toBeInTheDocument();
+      expect(screen.getByText('Pasient er påkrevd')).toBeInTheDocument();
     });
 
     expect(appointmentsAPI.create).not.toHaveBeenCalled();
@@ -350,9 +350,7 @@ describe('NewAppointment Page', () => {
     fireEvent.click(screen.getByText('createAppointment'));
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Recurring end date is required for recurring appointments')
-      ).toBeInTheDocument();
+      expect(screen.getByText('Sluttdato er påkrevd for gjentakende avtaler')).toBeInTheDocument();
     });
 
     expect(appointmentsAPI.create).not.toHaveBeenCalled();

@@ -10,6 +10,17 @@ import axios from 'axios';
 import PatientPortal from '../../pages/PatientPortal';
 import { createMockPrescription, createMockExercise } from '../setup';
 
+// Mock i18n
+vi.mock('../../i18n/useTranslation', () => ({
+  useTranslation: () => ({ t: (key, fallback) => fallback || key, lang: 'no', setLang: vi.fn() }),
+}));
+
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({ t: (key, fallback) => fallback || key, lang: 'no', setLang: vi.fn() }),
+  useLanguage: () => ({ lang: 'no', setLang: vi.fn() }),
+  LanguageProvider: ({ children }) => children,
+}));
+
 // Mock axios
 vi.mock('axios');
 

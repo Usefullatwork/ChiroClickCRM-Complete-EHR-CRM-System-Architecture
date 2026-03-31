@@ -5,6 +5,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // --- Module-level mocks (BEFORE imports) ---
 
+// Mock i18n
+vi.mock('../../i18n', () => ({
+  useTranslation: () => ({ t: (key, fallback) => fallback || key, lang: 'no', setLang: vi.fn() }),
+  useLanguage: () => ({ lang: 'no', setLang: vi.fn() }),
+  LanguageProvider: ({ children }) => children,
+}));
+
 const mockNavigate = vi.fn();
 const mockConfirm = vi.fn().mockResolvedValue(true);
 
@@ -534,7 +541,7 @@ describe('ClinicalNotes Page', () => {
       expect(initialItems.length).toBeGreaterThanOrEqual(2);
       const followupItems = screen.getAllByText('Oppfolgingskonsultasjon');
       expect(followupItems.length).toBeGreaterThanOrEqual(1);
-      const vestibularItems = screen.getAllByText('Vestibular vurdering');
+      const vestibularItems = screen.getAllByText('Vestibulær vurdering');
       expect(vestibularItems.length).toBeGreaterThanOrEqual(2);
     });
   });
@@ -646,7 +653,7 @@ describe('ClinicalNotes Page', () => {
   // =============================================
   // 19. Clicking Vestibular opens vestibular template
   // =============================================
-  it('opens Vestibular template when Vestibular vurdering quick action is clicked', async () => {
+  it('opens Vestibular template when Vestibulær vurdering quick action is clicked', async () => {
     clinicalNotesAPI.getByPatient.mockResolvedValue({ data: { data: [] } });
 
     renderWithProviders(<ClinicalNotes />);
@@ -656,9 +663,9 @@ describe('ClinicalNotes Page', () => {
     });
     fireEvent.click(screen.getByText('Ola Nordmann'));
 
-    // Click the Vestibular vurdering quick action card
+    // Click the Vestibulær vurdering quick action card
     await waitFor(() => {
-      const options = screen.getAllByText('Vestibular vurdering');
+      const options = screen.getAllByText('Vestibulær vurdering');
       fireEvent.click(options[0]);
     });
 

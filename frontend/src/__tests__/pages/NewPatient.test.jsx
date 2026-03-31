@@ -29,6 +29,8 @@ vi.mock('../../services/api', () => ({
 }));
 
 vi.mock('../../i18n', () => ({
+  useLanguage: () => ({ lang: 'no', setLang: vi.fn() }),
+  LanguageProvider: ({ children }) => children,
   useTranslation: () => ({
     t: (key, fallback) => {
       const map = {
@@ -77,6 +79,7 @@ vi.mock('../../i18n', () => ({
         cancel: 'Cancel',
         creating: 'Creating...',
         backToPatients: 'Back to patients',
+        failedToCreate: 'Failed to create patient',
         // Validation keys
         'validation.solvitIdRequired': 'SolvIt ID is required',
         'validation.firstNameRequired': 'First name is required',
@@ -147,7 +150,7 @@ const renderPage = () => {
 
 /** Fills the minimum required fields so the form passes validation. */
 const fillRequiredFields = () => {
-  fireEvent.change(screen.getByPlaceholderText('e.g., SOLV12345'), {
+  fireEvent.change(screen.getByPlaceholderText('f.eks. SOLV12345'), {
     target: { value: 'SOLV-999' },
   });
   fireEvent.change(screen.getByTestId('new-patient-first-name'), {
@@ -217,7 +220,7 @@ describe('NewPatient Page', () => {
 
   it('should render the SolvIt ID input field', () => {
     renderPage();
-    expect(screen.getByPlaceholderText('e.g., SOLV12345')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('f.eks. SOLV12345')).toBeInTheDocument();
   });
 
   it('should render first name and last name inputs with test IDs', () => {
@@ -259,9 +262,9 @@ describe('NewPatient Page', () => {
 
   it('should render address fields (street, postal code, city)', () => {
     renderPage();
-    expect(screen.getByPlaceholderText('Street address')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('e.g., 0123')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('City')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Gateadresse')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('f.eks. 0123')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('By')).toBeInTheDocument();
   });
 
   it('should render language select defaulting to Norsk', () => {
@@ -277,9 +280,9 @@ describe('NewPatient Page', () => {
 
   it('should render main problem, preferred therapist, referral source inputs', () => {
     renderPage();
-    expect(screen.getByPlaceholderText('e.g., Nakke smerter, Rygg problemer')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('f.eks. Nakkesmerter, ryggproblemer')).toBeInTheDocument();
     expect(screen.getByPlaceholderText('Mads, Andre, Mikael, Edle...')).toBeInTheDocument();
-    expect(screen.getByPlaceholderText('e.g., Doctor, Friend, Google')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('f.eks. Fastlege, bekjent, Google')).toBeInTheDocument();
   });
 
   it('should render treatment type select with Norwegian options', () => {
@@ -292,7 +295,7 @@ describe('NewPatient Page', () => {
   it('should render general notes textarea', () => {
     renderPage();
     expect(
-      screen.getByPlaceholderText('Any additional notes about the patient...')
+      screen.getByPlaceholderText('Eventuelle tilleggsnotater om pasienten...')
     ).toBeInTheDocument();
   });
 
@@ -575,7 +578,7 @@ describe('NewPatient Page', () => {
   it('should include address when at least one address field is filled', async () => {
     renderPage();
     fillRequiredFields();
-    fireEvent.change(screen.getByPlaceholderText('Street address'), {
+    fireEvent.change(screen.getByPlaceholderText('Gateadresse'), {
       target: { value: 'Karl Johans gate 1' },
     });
 
@@ -670,9 +673,9 @@ describe('NewPatient Page', () => {
 
   it('should update address fields independently', () => {
     renderPage();
-    const streetInput = screen.getByPlaceholderText('Street address');
-    const cityInput = screen.getByPlaceholderText('City');
-    const postalInput = screen.getByPlaceholderText('e.g., 0123');
+    const streetInput = screen.getByPlaceholderText('Gateadresse');
+    const cityInput = screen.getByPlaceholderText('By');
+    const postalInput = screen.getByPlaceholderText('f.eks. 0123');
 
     fireEvent.change(streetInput, { target: { value: 'Storgata 5' } });
     fireEvent.change(cityInput, { target: { value: 'Oslo' } });
@@ -685,7 +688,7 @@ describe('NewPatient Page', () => {
 
   it('should update general notes textarea', () => {
     renderPage();
-    const notesArea = screen.getByPlaceholderText('Any additional notes about the patient...');
+    const notesArea = screen.getByPlaceholderText('Eventuelle tilleggsnotater om pasienten...');
     fireEvent.change(notesArea, { target: { value: 'Test note' } });
     expect(notesArea).toHaveValue('Test note');
   });

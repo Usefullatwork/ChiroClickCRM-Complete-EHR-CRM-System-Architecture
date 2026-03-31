@@ -30,6 +30,8 @@ vi.mock('../../i18n', () => ({
     lang: 'en',
     setLang: vi.fn(),
   }),
+  useLanguage: () => ({ lang: 'en', setLang: vi.fn() }),
+  LanguageProvider: ({ children }) => children,
 }));
 
 vi.mock('lucide-react', () => ({
@@ -137,8 +139,8 @@ describe('AdvancedPatientSearch Component', () => {
 
   it('should allow setting age filters', () => {
     renderWithProviders();
-    const minAge = screen.getByPlaceholderText('e.g., 18');
-    const maxAge = screen.getByPlaceholderText('e.g., 65');
+    const minAge = screen.getByPlaceholderText('f.eks. 18');
+    const maxAge = screen.getByPlaceholderText('f.eks. 65');
     fireEvent.change(minAge, { target: { value: '20' } });
     fireEvent.change(maxAge, { target: { value: '50' } });
     expect(minAge.value).toBe('20');
