@@ -704,6 +704,13 @@ Foreslå:
       temperature: 0.5,
     });
 
+    if (suggestion == null) {
+      return {
+        success: false,
+        error: 'AI-tjeneste utilgjengelig',
+      };
+    }
+
     return {
       success: true,
       suggestion: suggestion.trim(),
