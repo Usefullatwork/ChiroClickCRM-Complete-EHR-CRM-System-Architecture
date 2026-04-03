@@ -1,6 +1,6 @@
 {
   "name": "chiroclickehr-frontend",
-  "version": "2.1.0",
+  "version": "2.2.0-rc1",
   "description": "ChiroClickEHR Frontend - Norwegian EHR System",
   "type": "module",
   "scripts": {

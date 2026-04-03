@@ -1,6 +1,6 @@
 {
   "name": "chiroclickehr",
-  "version": "2.1.0",
+  "version": "2.2.0-rc1",
   "description": "Norwegian-compliant EHR-CRM-PMS for chiropractic practices",
   "private": true,
   "scripts": {

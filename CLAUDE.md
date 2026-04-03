@@ -5,7 +5,7 @@ Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electro
 ## Identity
 
 - **Brand**: ChiroClickEHR (DB name stays `chiroclickcrm`)
-- **Version**: v2.1.0 (2026-03-20). Patient connectivity sprint complete.
+- **Version**: v2.2.0-rc1 (2026-04-03). Letter generation system wired.
 - **Mode**: Desktop — `DB_ENGINE=pglite`, `CACHE_ENGINE=memory`, `DEV_SKIP_AUTH=true`
 - **Ports**: Backend=3000, Frontend=5173, Ollama=11434
 - **Credentials**: admin@chiroclickehr.no / admin123
@@ -18,7 +18,7 @@ Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electro
 - **CI**: 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
 - **Electron**: Portable exe verified (96MB), PGlite WASM loads correctly
 - **Latest migration**: 079 (`v7 training data`)
-- **Branch**: `sprint6/overnight-blitz` (Sprint 6: test coverage + refactoring blitz)
+- **Branch**: `main` (Sprint 7 + letter wiring merged)
 - **Services**: 8 domain dirs + 27 extracted modules. All files <500 lines. Zero SELECT \*.
 - **Sprint 6**: Wave 1+2 (+42 test files, 5 FE splits, 4 data→JSON, 5 BE route splits, 3 E2E specs) + Wave 3 (+4 FE splits, 6 BE service splits, 4 exam test files, 3 i18n splits)
 
@@ -68,6 +68,24 @@ cd frontend && npx playwright test              # E2E tests
 
 **Provider strategy**: Mock in desktop mode. Set `EMAIL_PROVIDER=smtp` + `SMS_PROVIDER=twilio` + Firebase creds for real delivery.
 
+## Letter Generation System (v2.2 — RC1)
+
+| Component                                          | Description                                                                     |
+| -------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `frontend/src/pages/Letters.jsx`                   | Letter hub — list, create, manage all letter types                              |
+| `frontend/src/pages/SickNotes.jsx`                 | Sick note (sykemelding) generation page                                         |
+| `frontend/src/pages/ReferralLetters.jsx`           | Referral letter (henvisning) generation page                                    |
+| `frontend/src/api/letters.js`                      | Letters API client (6 methods: types, generate, suggest, save, history, status) |
+| `backend/src/routes/ai.js` (lines 605-749)         | 6 letter endpoints under `/ai/` prefix                                          |
+| `backend/src/services/clinical/letterGenerator.js` | 3-tier AI fallback: Ollama → Claude API → Norwegian templates                   |
+| `backend/src/config/db-init.js`                    | `generated_letters` table (21 columns) + `letter_variable_definitions`          |
+
+**Letter types** (7): Medical Certificate, University Letter, Vestibular Referral, Headache Referral, Membership Freeze, Clinical Note, Work Declaration.
+
+**Routes**: `/letters`, `/sick-notes`, `/referral-letters` in App.jsx. "Letters" nav in sidebar (DashboardLayout.jsx CORE_NAV).
+
+**Known gaps**: PDF generation buttons not yet wired — generators have Copy/Print/Save but don't call `POST /pdf/referral-letter` or `POST /pdf/sick-note` backend endpoints (which exist and are functional).
+
 ## Gotchas
 
 1. **Git**: `-m` flag only (HEREDOC hangs on Windows). Stage files by name (never `git add .`).
@@ -99,6 +117,8 @@ Budget enforcement: `canSpend()` pre-flight. Auto-resets daily/monthly.
 - `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (future)
 - `services/ai/` — runtime inference (9 modules). `services/training/` — model training pipeline (13 modules)
 - i18n: ~50 bilingual `{en,no}` strings remain by design
+- `frontend/src/api/letters.js` creates own axios instance with Bearer auth — should use shared `api/client.js` (CSRF) for production
+- PDF generation: `SickNoteGenerator.jsx` and `ReferralLetterGenerator.jsx` lack "Generate PDF" buttons (backend endpoints exist at `/pdf/referral-letter` and `/pdf/sick-note`)
 
 ## System Basics V2 (v1.3.0, medical preset)
 
