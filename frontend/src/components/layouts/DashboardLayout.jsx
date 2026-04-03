@@ -76,6 +76,7 @@ const CORE_NAV = [
   { key: 'patientFlow', href: '/patient-flow', icon: Kanban },
   { key: 'communications', href: '/communications', icon: MessageSquare, module: 'crm_marketing' },
   { key: 'followUps', href: '/follow-ups', icon: CheckCircle2 },
+  { key: 'letters', href: '/letters', icon: FileText },
   { key: 'financial', href: '/financial', icon: DollarSign },
 ];
 
