@@ -5,7 +5,7 @@ Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electro
 ## Identity
 
 - **Brand**: ChiroClickEHR (DB name stays `chiroclickcrm`)
-- **Version**: v2.2.0-rc1 (2026-04-03). Letter generation system wired.
+- **Version**: v2.2.0-rc2 (2026-04-03). PDF buttons wired, auth unified, AES-GCM encryption.
 - **Mode**: Desktop — `DB_ENGINE=pglite`, `CACHE_ENGINE=memory`, `DEV_SKIP_AUTH=true`
 - **Ports**: Backend=3000, Frontend=5173, Ollama=11434
 - **Credentials**: admin@chiroclickehr.no / admin123
@@ -17,7 +17,7 @@ Norwegian-compliant EHR/CRM/PMS for chiropractic clinics. Desktop-first (Electro
 - **E2E**: 21 Playwright spec files (+3 in Sprint 6: GDPR erasure, kiosk intake, multi-org security)
 - **CI**: 5/5 GREEN (Security, Backend, Frontend, Docker Build, E2E)
 - **Electron**: Portable exe verified (96MB), PGlite WASM loads correctly
-- **Latest migration**: 079 (`v7 training data`)
+- **Latest migration**: 079 (`v7 training data`). AES-GCM data migration runs at startup (idempotent).
 - **Branch**: `main` (Sprint 7 + letter wiring merged)
 - **Services**: 8 domain dirs + 27 extracted modules. All files <500 lines. Zero SELECT \*.
 - **Sprint 6**: Wave 1+2 (+42 test files, 5 FE splits, 4 data→JSON, 5 BE route splits, 3 E2E specs) + Wave 3 (+4 FE splits, 6 BE service splits, 4 exam test files, 3 i18n splits)
@@ -117,8 +117,9 @@ Budget enforcement: `canSpend()` pre-flight. Auto-resets daily/monthly.
 - `routes/fhir.js` + `routes/helseId.js` are regulatory stubs (future)
 - `services/ai/` — runtime inference (9 modules). `services/training/` — model training pipeline (13 modules)
 - i18n: ~50 bilingual `{en,no}` strings remain by design
-- `frontend/src/api/letters.js` creates own axios instance with Bearer auth — should use shared `api/client.js` (CSRF) for production
-- PDF generation: `SickNoteGenerator.jsx` and `ReferralLetterGenerator.jsx` lack "Generate PDF" buttons (backend endpoints exist at `/pdf/referral-letter` and `/pdf/sick-note`)
+- ~~`frontend/src/api/letters.js` creates own axios instance~~ → Migrated to shared apiClient (PR #19)
+- ~~PDF generation buttons missing~~ → "Last ned PDF" buttons wired (PR #19), disabled without encounter context
+- PDF buttons need encounter context: either embed generators in encounter flow or add encounter selector dropdown
 
 ## System Basics V2 (v1.3.0, medical preset)
 
