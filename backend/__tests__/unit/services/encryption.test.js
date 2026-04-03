@@ -21,6 +21,7 @@ const {
   encrypt,
   decrypt,
   hash,
+  isGcmFormat,
   maskSensitive,
   validateFodselsnummer,
   validateFodselsnummerDetailed,
@@ -74,14 +75,18 @@ describe('Encryption Utilities', () => {
       expect(result).toContain(':');
     });
 
-    it('should return hex format with IV:ciphertext', () => {
+    it('should return GCM format with gcm:{iv}:{authTag}:{ciphertext}', () => {
       const result = encrypt('test');
-      const parts = result.split(':');
-      expect(parts).toHaveLength(2);
+      expect(result.startsWith('gcm:')).toBe(true);
+      const payload = result.slice(4);
+      const parts = payload.split(':');
+      expect(parts).toHaveLength(3);
       // IV should be 32 hex chars (16 bytes)
       expect(parts[0]).toMatch(/^[0-9a-f]{32}$/);
+      // Auth tag should be 32 hex chars (16 bytes)
+      expect(parts[1]).toMatch(/^[0-9a-f]{32}$/);
       // Ciphertext should be hex
-      expect(parts[1]).toMatch(/^[0-9a-f]+$/);
+      expect(parts[2]).toMatch(/^[0-9a-f]+$/);
     });
   });
 
@@ -130,6 +135,69 @@ describe('Encryption Utilities', () => {
       const encrypted = encrypt('test');
       const corrupted = encrypted.slice(0, -4) + 'zzzz';
       expect(() => decrypt(corrupted)).toThrow('Failed to decrypt data');
+    });
+
+    it('should throw when GCM auth tag is tampered', () => {
+      const encrypted = encrypt('sensitive data');
+      // Flip a character in the auth tag (second segment after gcm:)
+      const parts = encrypted.split(':');
+      const tagChars = parts[2].split('');
+      tagChars[0] = tagChars[0] === 'a' ? 'b' : 'a';
+      parts[2] = tagChars.join('');
+      const tampered = parts.join(':');
+      expect(() => decrypt(tampered)).toThrow('Failed to decrypt data');
+    });
+
+    it('should throw when GCM ciphertext is tampered', () => {
+      const encrypted = encrypt('sensitive data');
+      const parts = encrypted.split(':');
+      const ctChars = parts[3].split('');
+      ctChars[0] = ctChars[0] === 'a' ? 'b' : 'a';
+      parts[3] = ctChars.join('');
+      const tampered = parts.join(':');
+      expect(() => decrypt(tampered)).toThrow('Failed to decrypt data');
+    });
+
+    it('should throw for invalid GCM format (missing auth tag)', () => {
+      expect(() => decrypt('gcm:aabbccdd:ciphertext')).toThrow('Failed to decrypt data');
+    });
+
+    it('should decrypt legacy CBC-format data', async () => {
+      // Manually create a CBC-encrypted value using the same key
+      const { default: nodeCrypto } = await import('crypto');
+      const iv = nodeCrypto.randomBytes(16);
+      const cipher = nodeCrypto.createCipheriv(
+        'aes-256-cbc',
+        Buffer.from(process.env.ENCRYPTION_KEY),
+        iv
+      );
+      let cbcEncrypted = cipher.update('legacy-data', 'utf8', 'hex');
+      cbcEncrypted += cipher.final('hex');
+      const cbcFormat = `${iv.toString('hex')}:${cbcEncrypted}`;
+
+      // decrypt() should auto-detect CBC and handle it
+      expect(decrypt(cbcFormat)).toBe('legacy-data');
+    });
+  });
+
+  // =============================================================================
+  // IS GCM FORMAT
+  // =============================================================================
+
+  describe('isGcmFormat', () => {
+    it('should return true for GCM-encrypted strings', () => {
+      const encrypted = encrypt('test');
+      expect(isGcmFormat(encrypted)).toBe(true);
+    });
+
+    it('should return false for CBC-format strings', () => {
+      expect(isGcmFormat('aabbccdd00112233:ciphertext')).toBe(false);
+    });
+
+    it('should return false for null/undefined/empty', () => {
+      expect(isGcmFormat(null)).toBe(false);
+      expect(isGcmFormat(undefined)).toBe(false);
+      expect(isGcmFormat('')).toBe(false);
     });
   });
 
