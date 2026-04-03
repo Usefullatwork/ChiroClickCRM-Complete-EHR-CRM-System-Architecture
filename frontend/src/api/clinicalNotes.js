@@ -3,88 +3,47 @@
  * API client for SOAP documentation and clinical notes
  */
 
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
-
-// Get the organization ID — aligned with App.jsx auto-login storage
-const DESKTOP_ORG_ID = 'a0000000-0000-0000-0000-000000000001';
-const getOrganizationId = () => {
-  return localStorage.getItem('organizationId') || DESKTOP_ORG_ID;
-};
-
-// Create axios instance for clinical notes
-const notesClient = axios.create({
-  baseURL: `${API_URL}/notes`,
-  timeout: 30000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  withCredentials: true,
-});
-
-// Request interceptor - Add organization ID
-notesClient.interceptors.request.use(
-  async (config) => {
-    const organizationId = getOrganizationId();
-    if (organizationId) {
-      config.headers['X-Organization-Id'] = organizationId;
-    }
-    return config;
-  },
-  (error) => Promise.reject(error)
-);
-
-// Response interceptor - Handle errors
-notesClient.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      window.location.href = '/sign-in';
-    }
-    return Promise.reject(error);
-  }
-);
+import apiClient from '../services/api/client';
 
 /**
  * Clinical Notes API methods
  */
 export const clinicalNotesAPI = {
   // Notes CRUD
-  getAll: (params) => notesClient.get('/', { params }),
-  getById: (id) => notesClient.get(`/${id}`),
-  getByPatient: (patientId, params) => notesClient.get(`/patient/${patientId}`, { params }),
-  create: (data) => notesClient.post('/', data),
-  update: (id, data) => notesClient.patch(`/${id}`, data),
-  delete: (id) => notesClient.delete(`/${id}`),
+  getAll: (params) => apiClient.get('/notes', { params }),
+  getById: (id) => apiClient.get(`/notes/${id}`),
+  getByPatient: (patientId, params) => apiClient.get(`/notes/patient/${patientId}`, { params }),
+  create: (data) => apiClient.post('/notes', data),
+  update: (id, data) => apiClient.patch(`/notes/${id}`, data),
+  delete: (id) => apiClient.delete(`/notes/${id}`),
 
   // Draft management
-  getDrafts: () => notesClient.get('/drafts'),
-  autoSave: (id, data) => notesClient.post(`/${id}/autosave`, data),
+  getDrafts: () => apiClient.get('/notes/drafts'),
+  autoSave: (id, data) => apiClient.post(`/notes/${id}/autosave`, data),
 
   // Signing
-  sign: (id) => notesClient.post(`/${id}/sign`),
+  sign: (id) => apiClient.post(`/notes/${id}/sign`),
 
   // Export/Generate
-  generateFormatted: (id) => notesClient.post(`/${id}/generate`),
+  generateFormatted: (id) => apiClient.post(`/notes/${id}/generate`),
 
   // PDF Export
   downloadPDF: async (id) => {
-    const response = await notesClient.get(`/${id}/pdf`, {
+    const response = await apiClient.get(`/notes/${id}/pdf`, {
       responseType: 'blob',
     });
     return response;
   },
 
   // Amendments
-  getHistory: (id) => notesClient.get(`/${id}/history`),
-  createAmendment: (id, data) => notesClient.post(`/${id}/amend`, data),
+  getHistory: (id) => apiClient.get(`/notes/${id}/history`),
+  createAmendment: (id, data) => apiClient.post(`/notes/${id}/amend`, data),
 
   // Templates
-  getTemplates: (params) => notesClient.get('/templates', { params }),
+  getTemplates: (params) => apiClient.get('/notes/templates', { params }),
 
   // Search
-  search: (query, params) => notesClient.get('/search', { params: { q: query, ...params } }),
+  search: (query, params) => apiClient.get('/notes/search', { params: { q: query, ...params } }),
 };
 
 export default clinicalNotesAPI;
