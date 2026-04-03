@@ -23,7 +23,9 @@ import {
   Copy,
   ChevronDown,
   ChevronUp,
+  FileDown,
 } from 'lucide-react';
+import { pdfAPI } from '../../services/api/billing';
 
 // Common ICPC-2 codes for chiropractic practice
 const COMMON_DIAGNOSES = [
@@ -189,6 +191,8 @@ export default function SickNoteGenerator({
   initialData = null,
   patientData = null,
   practitionerData = null,
+  patientId,
+  encounterId,
   onSave,
   _onSend,
 }) {
@@ -342,6 +346,37 @@ ${'='.repeat(60)}
       onSave(data);
     }
   }, [data, onSave]);
+
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  const handleGeneratePDF = useCallback(async () => {
+    if (!patientId || !encounterId) return;
+    try {
+      setPdfLoading(true);
+      const response = await pdfAPI.generateSickNote({
+        patientId,
+        encounterId,
+        diagnosisCode: data.clinical?.mainDiagnosisCode,
+        diagnosisText: data.clinical?.mainDiagnosis,
+        startDate: data.period?.startDate,
+        endDate: data.period?.endDate,
+        percentage: data.period?.workCapacity,
+        functionalAssessment: data.clinical?.clinicalFindings,
+        workRestrictions: data.restrictions?.restrictionDetails,
+      });
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'sykmelding.pdf';
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      // Let the shared apiClient error interceptor handle it
+    } finally {
+      setPdfLoading(false);
+    }
+  }, [patientId, encounterId, data]);
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
@@ -734,6 +769,19 @@ ${'='.repeat(60)}
             >
               <Printer className="w-4 h-4" />
               {t('sickNotePrint', 'Skriv ut')}
+            </button>
+            <button
+              onClick={handleGeneratePDF}
+              disabled={!patientId || !encounterId || pdfLoading}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              title={
+                !patientId || !encounterId
+                  ? t('pdfRequiresEncounter', 'PDF krever aktiv konsultasjon')
+                  : ''
+              }
+            >
+              <FileDown className="w-4 h-4" />
+              {pdfLoading ? t('generating', 'Genererer...') : t('downloadPDF', 'Last ned PDF')}
             </button>
           </div>
           <div className="flex gap-2">
