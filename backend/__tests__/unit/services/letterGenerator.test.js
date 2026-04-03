@@ -139,14 +139,16 @@ describe('Letter Generator Service', () => {
       );
     });
 
-    it('should return failure object when AI call fails', async () => {
+    it('should fall back to template when AI call fails', async () => {
       mockAxiosPost.mockRejectedValue(new Error('Connection refused'));
 
       const result = await generateLetter('MEDICAL_CERTIFICATE', baseData);
 
-      expect(result.success).toBe(false);
+      expect(result.success).toBe(true);
       expect(result.letterType).toBe('MEDICAL_CERTIFICATE');
-      expect(result.error).toBeDefined();
+      expect(result.model).toBe('template-fallback');
+      expect(result.aiGenerated).toBe(false);
+      expect(result.content).toBeDefined();
     });
 
     it('should post-process placeholders in generated content', async () => {
