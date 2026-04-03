@@ -735,18 +735,13 @@ router.patch(
     const { letterId } = req.params;
     const { status } = req.body;
     if (!status || !['DRAFT', 'FINALIZED', 'SENT', 'ARCHIVED'].includes(status)) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: 'Valid status required (DRAFT, FINALIZED, SENT, ARCHIVED)',
-        });
+      return res.status(400).json({
+        success: false,
+        error: 'Valid status required (DRAFT, FINALIZED, SENT, ARCHIVED)',
+      });
     }
-    const { query: dbQuery } = await import('../config/database.js');
-    await dbQuery(
-      'UPDATE letters SET status = $1, updated_at = NOW() WHERE id = $2 AND organization_id = $3',
-      [status, letterId, req.organizationId]
-    );
+    const { updateLetterStatus } = await import('../services/clinical/letterGenerator.js');
+    await updateLetterStatus(letterId, status, req.organizationId);
     res.json({ success: true, letterId, status });
   }
 );

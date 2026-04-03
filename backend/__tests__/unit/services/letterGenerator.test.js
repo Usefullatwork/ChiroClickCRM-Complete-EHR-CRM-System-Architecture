@@ -38,6 +38,7 @@ const {
   getLetterTypes,
   saveLetter,
   getLetterHistory,
+  updateLetterStatus,
 } = await import('../../../src/services/clinical/letterGenerator.js');
 
 describe('Letter Generator Service', () => {
@@ -351,6 +352,31 @@ describe('Letter Generator Service', () => {
       mockQuery.mockRejectedValue(new Error('Query timeout'));
 
       await expect(getLetterHistory('org-1', 'pat-1')).rejects.toThrow('Query timeout');
+    });
+  });
+
+  // ─── updateLetterStatus ────────────────────────────────────────────────────
+
+  describe('updateLetterStatus', () => {
+    it('should update status in generated_letters table', async () => {
+      mockQuery.mockResolvedValue({ rowCount: 1 });
+
+      await updateLetterStatus('letter-1', 'FINALIZED', 'org-1');
+
+      expect(mockQuery).toHaveBeenCalledTimes(1);
+      const [sql, params] = mockQuery.mock.calls[0];
+      expect(sql).toContain('UPDATE generated_letters');
+      expect(sql).toContain('SET status = $1');
+      expect(sql).toContain('WHERE id = $2 AND organization_id = $3');
+      expect(params).toEqual(['FINALIZED', 'letter-1', 'org-1']);
+    });
+
+    it('should propagate database errors', async () => {
+      mockQuery.mockRejectedValue(new Error('Connection refused'));
+
+      await expect(updateLetterStatus('letter-1', 'SENT', 'org-1')).rejects.toThrow(
+        'Connection refused'
+      );
     });
   });
 });

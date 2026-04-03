@@ -791,6 +791,26 @@ export const getLetterHistory = async (organizationId, patientId) => {
   }
 };
 
+/**
+ * Update letter status
+ * @param {string} letterId - Letter ID
+ * @param {string} status - New status (DRAFT, FINALIZED, SENT, ARCHIVED)
+ * @param {string} organizationId - Organization ID (for row-level security)
+ * @returns {Promise<Object>} Query result
+ */
+export const updateLetterStatus = async (letterId, status, organizationId) => {
+  try {
+    const result = await query(
+      'UPDATE generated_letters SET status = $1, updated_at = NOW() WHERE id = $2 AND organization_id = $3',
+      [status, letterId, organizationId]
+    );
+    return result;
+  } catch (error) {
+    logger.error('Error updating letter status:', error);
+    throw error;
+  }
+};
+
 export default {
   LETTER_TYPES,
   generateLetter,
@@ -798,4 +818,5 @@ export default {
   getLetterTypes,
   saveLetter,
   getLetterHistory,
+  updateLetterStatus,
 };
