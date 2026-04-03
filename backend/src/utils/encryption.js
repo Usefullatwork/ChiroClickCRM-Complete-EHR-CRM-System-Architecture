@@ -1,7 +1,7 @@
 /**
  * Encryption Utilities
  * For sensitive data like Norwegian fødselsnummer (personal ID)
- * Uses AES-256-CBC encryption
+ * Uses AES-256-GCM (authenticated encryption) with CBC fallback for legacy data
  */
 
 import crypto from 'crypto';
@@ -10,7 +10,10 @@ import logger from './logger.js';
 
 dotenv.config();
 
-const ALGORITHM = process.env.ENCRYPTION_ALGORITHM || 'aes-256-cbc';
+const CBC_ALGORITHM = 'aes-256-cbc';
+const GCM_ALGORITHM = 'aes-256-gcm';
+const GCM_PREFIX = 'gcm:';
+const AUTH_TAG_LENGTH = 16; // 128-bit auth tag
 const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
 
 /**
@@ -86,9 +89,10 @@ try {
 }
 
 /**
- * Encrypt sensitive data
+ * Encrypt sensitive data using AES-256-GCM (authenticated encryption).
+ * Output format: gcm:{iv_hex}:{authTag_hex}:{ciphertext_hex}
  * @param {string} text - Plain text to encrypt
- * @returns {string} Encrypted text with IV prepended (hex format)
+ * @returns {string|null} Encrypted text in GCM format, or null for falsy input
  */
 export const encrypt = (text) => {
   if (!text) {
@@ -96,18 +100,14 @@ export const encrypt = (text) => {
   }
 
   try {
-    // Generate random initialization vector
     const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv(GCM_ALGORITHM, Buffer.from(ENCRYPTION_KEY), iv);
 
-    // Create cipher
-    const cipher = crypto.createCipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY), iv);
-
-    // Encrypt the text
     let encrypted = cipher.update(text, 'utf8', 'hex');
     encrypted += cipher.final('hex');
+    const authTag = cipher.getAuthTag();
 
-    // Return IV + encrypted data (IV is needed for decryption)
-    return `${iv.toString('hex')}:${encrypted}`;
+    return `${GCM_PREFIX}${iv.toString('hex')}:${authTag.toString('hex')}:${encrypted}`;
   } catch (error) {
     logger.error('Encryption error:', error);
     throw new Error('Failed to encrypt data');
@@ -115,9 +115,11 @@ export const encrypt = (text) => {
 };
 
 /**
- * Decrypt sensitive data
- * @param {string} encryptedText - Encrypted text with IV (hex format)
- * @returns {string} Decrypted plain text
+ * Decrypt sensitive data. Auto-detects GCM vs legacy CBC format.
+ * - GCM format: gcm:{iv_hex}:{authTag_hex}:{ciphertext_hex}
+ * - Legacy CBC format: {iv_hex}:{ciphertext_hex}
+ * @param {string} encryptedText - Encrypted text in either format
+ * @returns {string|null} Decrypted plain text, or null for falsy input
  */
 export const decrypt = (encryptedText) => {
   if (!encryptedText) {
@@ -125,7 +127,29 @@ export const decrypt = (encryptedText) => {
   }
 
   try {
-    // Split IV and encrypted data
+    const key = Buffer.from(ENCRYPTION_KEY);
+
+    if (encryptedText.startsWith(GCM_PREFIX)) {
+      // GCM format: gcm:{iv}:{authTag}:{ciphertext}
+      const payload = encryptedText.slice(GCM_PREFIX.length);
+      const parts = payload.split(':');
+      if (parts.length !== 3) {
+        throw new Error('Invalid GCM encrypted data format');
+      }
+
+      const iv = Buffer.from(parts[0], 'hex');
+      const authTag = Buffer.from(parts[1], 'hex');
+      const ciphertext = parts[2];
+
+      const decipher = crypto.createDecipheriv(GCM_ALGORITHM, key, iv);
+      decipher.setAuthTag(authTag);
+
+      let decrypted = decipher.update(ciphertext, 'hex', 'utf8');
+      decrypted += decipher.final('utf8');
+      return decrypted;
+    }
+
+    // Legacy CBC format: {iv}:{ciphertext}
     const parts = encryptedText.split(':');
     if (parts.length !== 2) {
       throw new Error('Invalid encrypted data format');
@@ -134,18 +158,25 @@ export const decrypt = (encryptedText) => {
     const iv = Buffer.from(parts[0], 'hex');
     const encrypted = parts[1];
 
-    // Create decipher
-    const decipher = crypto.createDecipheriv(ALGORITHM, Buffer.from(ENCRYPTION_KEY), iv);
+    const decipher = crypto.createDecipheriv(CBC_ALGORITHM, key, iv);
 
-    // Decrypt the text
     let decrypted = decipher.update(encrypted, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
-
     return decrypted;
   } catch (error) {
     logger.error('Decryption error:', error);
     throw new Error('Failed to decrypt data');
   }
+};
+
+/**
+ * Check if an encrypted string uses the GCM format.
+ * Useful for migration monitoring and health checks.
+ * @param {string} text - Encrypted text to check
+ * @returns {boolean} True if GCM format
+ */
+export const isGcmFormat = (text) => {
+  return typeof text === 'string' && text.startsWith(GCM_PREFIX);
 };
 
 /**
@@ -388,6 +419,7 @@ export default {
   encrypt,
   decrypt,
   hash,
+  isGcmFormat,
   validateFodselsnummer,
   getBirthYearFromFodselsnummer,
   maskSensitive,

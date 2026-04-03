@@ -1,6 +1,6 @@
 /**
  * Unit Tests for Encryption Utilities
- * Tests AES-256-CBC encryption/decryption for sensitive data
+ * Tests AES-256-GCM encryption/decryption for sensitive data (with CBC fallback)
  */
 
 // Set encryption key before importing module (must be exactly 32 characters for AES-256)
@@ -66,47 +66,47 @@ describe('Encryption Utilities', () => {
       expect(decrypt(undefined)).toBeNull();
     });
 
-    test('encrypted format should include IV and ciphertext separated by colon', () => {
+    test('encrypted format should be GCM with gcm:{iv}:{authTag}:{ciphertext}', () => {
       const original = 'test';
       const encrypted = encrypt(original);
 
-      expect(encrypted).toMatch(/^[0-9a-f]+:[0-9a-f]+$/);
+      expect(encrypted.startsWith('gcm:')).toBe(true);
 
-      const parts = encrypted.split(':');
-      expect(parts).toHaveLength(2);
+      const payload = encrypted.slice(4);
+      const parts = payload.split(':');
+      expect(parts).toHaveLength(3);
 
       // IV should be 32 hex characters (16 bytes)
       expect(parts[0]).toHaveLength(32);
+      expect(parts[0]).toMatch(/^[0-9a-f]+$/);
+
+      // Auth tag should be 32 hex characters (16 bytes)
+      expect(parts[1]).toHaveLength(32);
+      expect(parts[1]).toMatch(/^[0-9a-f]+$/);
 
       // Ciphertext should be hex
-      expect(parts[1]).toMatch(/^[0-9a-f]+$/);
+      expect(parts[2]).toMatch(/^[0-9a-f]+$/);
     });
 
     test('should throw error for invalid encrypted format', () => {
       expect(() => decrypt('invalid_format')).toThrow('Failed to decrypt data');
-      expect(() => decrypt('no:colon:multiple')).toThrow(); // Too many parts
+      // Non-gcm prefixed string with 3 parts is invalid CBC (expects exactly 2)
+      expect(() => decrypt('no:colon:multiple')).toThrow();
     });
 
-    test('should not decrypt corrupted ciphertext to original value', () => {
+    test('should throw on corrupted ciphertext (GCM auth tag rejects tampering)', () => {
       const original = 'test';
       const encrypted = encrypt(original);
 
-      // Corrupt the ciphertext by flipping a character at a known position
+      // Corrupt the ciphertext portion (last segment)
       const parts = encrypted.split(':');
-      const ct = parts[1];
+      const ct = parts[3];
       const flipped = ct[0] === 'f' ? '0' : 'f';
-      const corrupted = parts[0] + ':' + flipped + ct.slice(1);
+      parts[3] = flipped + ct.slice(1);
+      const corrupted = parts.join(':');
 
-      // AES-CBC without auth tag: corrupted data either causes a padding
-      // error (throws) or decrypts to garbled output — both are acceptable
-      let result;
-      try {
-        result = decrypt(corrupted);
-      } catch {
-        return; // Threw — corruption detected via invalid padding
-      }
-      // If it didn't throw, the decrypted output must differ from original
-      expect(result).not.toBe(original);
+      // GCM always throws on tampered data (unlike CBC which may silently garble)
+      expect(() => decrypt(corrupted)).toThrow('Failed to decrypt data');
     });
   });
 
@@ -196,10 +196,12 @@ describe('Encryption Utilities', () => {
   });
 
   describe('Encryption Security Tests', () => {
-    test('should use AES-256-CBC algorithm', () => {
+    test('should use AES-256-GCM algorithm with 16-byte IV', () => {
       const original = 'test';
       const encrypted = encrypt(original);
-      const parts = encrypted.split(':');
+      // GCM format: gcm:{iv}:{authTag}:{ciphertext}
+      const payload = encrypted.slice(4); // strip 'gcm:'
+      const parts = payload.split(':');
       const iv = Buffer.from(parts[0], 'hex');
 
       // IV should be 16 bytes (128 bits)
@@ -238,18 +240,16 @@ describe('Encryption Utilities', () => {
       expect(decrypted).toBe(withNull);
     });
 
-    test('should not be vulnerable to padding oracle attacks', () => {
-      const original = 'test';
+    test('should reject truncated ciphertext', () => {
+      const original = 'this is a longer string to ensure ciphertext is substantial';
       const encrypted = encrypt(original);
       const parts = encrypted.split(':');
 
-      // Truncate the ciphertext to guarantee invalid block size (always fails)
-      const ciphertext = parts[1];
-      const truncated = ciphertext.slice(0, 8); // Too short for a valid AES block
+      // Truncate the ciphertext (last segment) to guarantee auth tag mismatch
+      parts[3] = parts[3].slice(0, 4);
+      const corruptedEncrypted = parts.join(':');
 
-      const corruptedEncrypted = parts[0] + ':' + truncated;
-
-      // Should throw error (not leak padding information)
+      // GCM always throws on truncated data (auth tag verification fails)
       expect(() => decrypt(corruptedEncrypted)).toThrow();
     });
   });
@@ -339,9 +339,8 @@ describe('Encryption Utilities', () => {
       const fnr = '15076500565';
       const encrypted = encrypt(fnr);
 
-      // 16 bytes IV (32 hex) + 1 colon + ciphertext
-      // 11-char input -> 16 bytes padded -> 32 hex chars ciphertext
-      // Total: 32 + 1 + 32 = 65 chars - fits easily in VARCHAR(255)
+      // GCM format: gcm: + 32 hex IV + : + 32 hex authTag + : + hex ciphertext
+      // ≈102 chars for 11-digit input — fits in VARCHAR(255)
       expect(encrypted.length).toBeLessThan(255);
     });
 

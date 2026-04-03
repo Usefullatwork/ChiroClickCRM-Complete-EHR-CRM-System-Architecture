@@ -27,6 +27,7 @@ import {
   sanitizeInput,
 } from './middleware/security.js';
 import { scheduleKeyRotation, createKeyRotationTable } from './utils/keyRotation.js';
+import { migrateEncryptionToGcm } from './utils/migrateEncryptionGcm.js';
 import { initializeScheduler, shutdownScheduler } from './jobs/scheduler.js';
 import { initializeWebSocket, getIO } from './services/communication/websocket.js';
 import { correlationId } from './middleware/correlationId.js';
@@ -574,12 +575,24 @@ if (process.env.NODE_ENV !== 'test') {
       try {
         await createKeyRotationTable();
         scheduleKeyRotation();
-        logger.info('🔐 Encryption key rotation scheduler initialized');
+        logger.info('Encryption key rotation scheduler initialized');
       } catch (error) {
         logger.warn(
-          '⚠️  Key rotation initialization skipped (table may not exist yet):',
+          'Key rotation initialization skipped (table may not exist yet):',
           error.message
         );
+      }
+
+      // One-time CBC → GCM encryption migration (idempotent)
+      try {
+        const result = await migrateEncryptionToGcm();
+        if (result.migrated > 0) {
+          logger.info(
+            `AES-GCM migration: ${result.migrated} records migrated, ${result.skipped} skipped`
+          );
+        }
+      } catch (error) {
+        logger.warn('AES-GCM migration skipped:', error.message);
       }
 
       // Initialize job scheduler for automated communications and workflows
