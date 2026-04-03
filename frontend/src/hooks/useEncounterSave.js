@@ -47,9 +47,11 @@ export function useEncounterSave({
   const queryClient = useQueryClient();
 
   const buildSavePayload = useCallback(() => {
+    // Use authenticated user ID; fall back to desktop default practitioner
+    const userId = localStorage.getItem('userId') || 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22';
     const baseData = {
       patient_id: patientId,
-      practitioner_id: 'b1eebc99-9c0b-4ef8-bb6d-6bb9bd380a22',
+      practitioner_id: userId,
       encounter_date: encounterData.encounter_date,
       encounter_type: encounterData.encounter_type,
       duration_minutes: encounterData.duration_minutes,

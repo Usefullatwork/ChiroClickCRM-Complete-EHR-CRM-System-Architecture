@@ -169,6 +169,9 @@ function App() {
           const orgId = data.user?.organization_id || data.user?.organizationId || DESKTOP_ORG_ID;
           setOrganizationId(orgId);
           localStorage.setItem('organizationId', orgId);
+          if (data.user?.id) {
+            localStorage.setItem('userId', data.user.id);
+          }
           setIsAuthReady(true);
           return;
         }
