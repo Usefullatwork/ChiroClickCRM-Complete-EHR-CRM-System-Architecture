@@ -3,27 +3,15 @@
  * API client for SOAP documentation and clinical notes
  */
 
-import axios from 'axios'
+import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api/v1';
 
-// Get the organization ID from session storage
+// Get the organization ID — aligned with App.jsx auto-login storage
+const DESKTOP_ORG_ID = 'a0000000-0000-0000-0000-000000000001';
 const getOrganizationId = () => {
-  try {
-    const stored = sessionStorage.getItem('org_session')
-    if (!stored) {
-      // Use default organization ID in development mode
-      if (import.meta.env.DEV) {
-        return 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11'
-      }
-      return null
-    }
-    const data = JSON.parse(atob(stored))
-    return data.id
-  } catch {
-    return null
-  }
-}
+  return localStorage.getItem('organizationId') || DESKTOP_ORG_ID;
+};
 
 // Create axios instance for clinical notes
 const notesClient = axios.create({
@@ -33,30 +21,30 @@ const notesClient = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true,
-})
+});
 
 // Request interceptor - Add organization ID
 notesClient.interceptors.request.use(
   async (config) => {
-    const organizationId = getOrganizationId()
+    const organizationId = getOrganizationId();
     if (organizationId) {
-      config.headers['X-Organization-Id'] = organizationId
+      config.headers['X-Organization-Id'] = organizationId;
     }
-    return config
+    return config;
   },
   (error) => Promise.reject(error)
-)
+);
 
 // Response interceptor - Handle errors
 notesClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      window.location.href = '/sign-in'
+      window.location.href = '/sign-in';
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 
 /**
  * Clinical Notes API methods
@@ -83,9 +71,9 @@ export const clinicalNotesAPI = {
   // PDF Export
   downloadPDF: async (id) => {
     const response = await notesClient.get(`/${id}/pdf`, {
-      responseType: 'blob'
-    })
-    return response
+      responseType: 'blob',
+    });
+    return response;
   },
 
   // Amendments
@@ -97,6 +85,6 @@ export const clinicalNotesAPI = {
 
   // Search
   search: (query, params) => notesClient.get('/search', { params: { q: query, ...params } }),
-}
+};
 
-export default clinicalNotesAPI
+export default clinicalNotesAPI;

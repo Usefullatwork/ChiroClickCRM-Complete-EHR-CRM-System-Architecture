@@ -598,4 +598,152 @@ router.post(
   aiController.runClinicalPipeline
 );
 
+// =================================================================
+// Letter Generation Endpoints
+// =================================================================
+
+import {
+  getLetterTypes,
+  generateLetter,
+  suggestLetterContent,
+  saveLetter,
+  getLetterHistory,
+} from '../services/clinical/letterGenerator.js';
+
+/**
+ * @swagger
+ * /ai/letter-types:
+ *   get:
+ *     summary: Get available letter types
+ *     tags: [AI, Letters]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of available letter types
+ */
+router.get('/letter-types', requireRole(['ADMIN', 'PRACTITIONER']), async (_req, res) => {
+  const types = getLetterTypes();
+  res.json({ success: true, types });
+});
+
+/**
+ * @swagger
+ * /ai/generate-letter:
+ *   post:
+ *     summary: Generate a clinical letter using AI
+ *     tags: [AI, Letters]
+ *     security:
+ *       - BearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [letterType]
+ *             properties:
+ *               letterType:
+ *                 type: string
+ *               patient:
+ *                 type: object
+ *               diagnosis:
+ *                 type: string
+ *               findings:
+ *                 type: string
+ *               purpose:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Generated letter content
+ */
+router.post('/generate-letter', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
+  const { letterType, ...data } = req.body;
+  if (!letterType) {
+    return res.status(400).json({ success: false, error: 'letterType is required' });
+  }
+  const result = await generateLetter(letterType, data);
+  res.json(result);
+});
+
+/**
+ * @swagger
+ * /ai/suggest-letter-content:
+ *   post:
+ *     summary: Get AI suggestions for letter content
+ *     tags: [AI, Letters]
+ *     security:
+ *       - BearerAuth: []
+ */
+router.post('/suggest-letter-content', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
+  const result = await suggestLetterContent(req.body);
+  res.json(result);
+});
+
+/**
+ * @swagger
+ * /ai/letters/save:
+ *   post:
+ *     summary: Save a generated letter to patient record
+ *     tags: [AI, Letters]
+ *     security:
+ *       - BearerAuth: []
+ */
+router.post('/letters/save', requireRole(['ADMIN', 'PRACTITIONER']), async (req, res) => {
+  const organizationId = req.organizationId;
+  const { patientId, ...letterData } = req.body;
+  if (!patientId) {
+    return res.status(400).json({ success: false, error: 'patientId is required' });
+  }
+  const result = await saveLetter(organizationId, patientId, letterData);
+  res.json(result);
+});
+
+/**
+ * @swagger
+ * /ai/letters/patient/{patientId}:
+ *   get:
+ *     summary: Get letter history for a patient
+ *     tags: [AI, Letters]
+ *     security:
+ *       - BearerAuth: []
+ */
+router.get(
+  '/letters/patient/:patientId',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  async (req, res) => {
+    const organizationId = req.organizationId;
+    const { patientId } = req.params;
+    const history = await getLetterHistory(organizationId, patientId);
+    res.json({ success: true, letters: history });
+  }
+);
+
+/**
+ * @swagger
+ * /ai/letters/{letterId}/status:
+ *   patch:
+ *     summary: Update letter status
+ *     tags: [AI, Letters]
+ *     security:
+ *       - BearerAuth: []
+ */
+router.patch(
+  '/letters/:letterId/status',
+  requireRole(['ADMIN', 'PRACTITIONER']),
+  async (req, res) => {
+    const { letterId } = req.params;
+    const { status } = req.body;
+    if (!status || !['DRAFT', 'FINALIZED', 'SENT', 'ARCHIVED'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Valid status required (DRAFT, FINALIZED, SENT, ARCHIVED)',
+      });
+    }
+    const { updateLetterStatus } = await import('../services/clinical/letterGenerator.js');
+    await updateLetterStatus(letterId, status, req.organizationId);
+    res.json({ success: true, letterId, status });
+  }
+);
+
 export default router;

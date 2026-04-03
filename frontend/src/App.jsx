@@ -34,6 +34,9 @@ const CRM = lazy(() => import('./pages/CRM'));
 const Macros = lazy(() => import('./pages/Macros'));
 const AIPerformance = lazy(() => import('./pages/AIPerformance'));
 const Help = lazy(() => import('./pages/Help'));
+const Letters = lazy(() => import('./pages/Letters'));
+const SickNotes = lazy(() => import('./pages/SickNotes'));
+const ReferralLetters = lazy(() => import('./pages/ReferralLetters'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 
 // Patient Portal (public, no auth required)
@@ -166,6 +169,9 @@ function App() {
           const orgId = data.user?.organization_id || data.user?.organizationId || DESKTOP_ORG_ID;
           setOrganizationId(orgId);
           localStorage.setItem('organizationId', orgId);
+          if (data.user?.id) {
+            localStorage.setItem('userId', data.user.id);
+          }
           setIsAuthReady(true);
           return;
         }
@@ -418,6 +424,30 @@ function App() {
             element={
               <PageErrorBoundary pageName={t('aiPerformance')}>
                 <AIPerformance />
+              </PageErrorBoundary>
+            }
+          />
+          <Route
+            path="letters"
+            element={
+              <PageErrorBoundary pageName={t('letters')}>
+                <Letters />
+              </PageErrorBoundary>
+            }
+          />
+          <Route
+            path="sick-notes"
+            element={
+              <PageErrorBoundary pageName={t('sickNotes')}>
+                <SickNotes />
+              </PageErrorBoundary>
+            }
+          />
+          <Route
+            path="referral-letters"
+            element={
+              <PageErrorBoundary pageName={t('referralLetters')}>
+                <ReferralLetters />
               </PageErrorBoundary>
             }
           />

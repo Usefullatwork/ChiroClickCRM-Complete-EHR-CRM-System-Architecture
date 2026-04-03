@@ -215,9 +215,13 @@ Beskytt sensitiv medisinsk informasjon - gi kun arbeidsrelevant info.`,
  * @param {Object} options - Generation options
  * @returns {Promise<string>} Generated text
  */
+/**
+ * 3-tier AI generation: Ollama → Claude API → Template fallback
+ */
 const generateCompletion = async (prompt, systemPrompt, options = {}) => {
   const { maxTokens = 1500, temperature = 0.4 } = options;
 
+  // Tier 1: Try Ollama (local AI)
   try {
     const response = await axios.post(
       `${OLLAMA_BASE_URL}/api/generate`,
@@ -232,12 +236,44 @@ const generateCompletion = async (prompt, systemPrompt, options = {}) => {
       },
       { timeout: 60000 }
     );
-
+    logger.info('Letter generated via Ollama');
     return response.data.response;
-  } catch (error) {
-    logger.error('Letter generation AI error:', error.message);
-    throw new Error('AI letter generation unavailable');
+  } catch (ollamaError) {
+    logger.warn('Ollama unavailable for letter generation, trying Claude API fallback');
   }
+
+  // Tier 2: Try Claude API (requires CLAUDE_API_KEY)
+  const claudeApiKey = process.env.CLAUDE_API_KEY;
+  const claudeMode = process.env.CLAUDE_FALLBACK_MODE || 'disabled';
+  if (claudeApiKey && claudeMode !== 'disabled') {
+    try {
+      const claudeResponse = await axios.post(
+        'https://api.anthropic.com/v1/messages',
+        {
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: maxTokens,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: prompt }],
+        },
+        {
+          timeout: 60000,
+          headers: {
+            'x-api-key': claudeApiKey,
+            'anthropic-version': '2023-06-01',
+            'content-type': 'application/json',
+          },
+        }
+      );
+      logger.info('Letter generated via Claude API fallback');
+      return claudeResponse.data.content[0].text;
+    } catch (claudeError) {
+      logger.warn('Claude API fallback failed for letter generation:', claudeError.message);
+    }
+  }
+
+  // Tier 3: Template fallback (no AI required)
+  logger.info('Using template fallback for letter generation (no AI available)');
+  return null; // Signals generateLetter to use template
 };
 
 /**
@@ -263,6 +299,21 @@ export const generateLetter = async (letterType, data) => {
       temperature: 0.3,
     });
 
+    // If null, AI is unavailable — use template fallback
+    if (generatedContent === null) {
+      const templateContent = buildTemplateFallback(letterType, data);
+      return {
+        success: true,
+        letterType,
+        letterTypeName: letterConfig.name,
+        content: templateContent,
+        rawContent: templateContent,
+        generatedAt: new Date().toISOString(),
+        model: 'template-fallback',
+        aiGenerated: false,
+      };
+    }
+
     // Post-process the generated letter
     const processedLetter = postProcessLetter(generatedContent, data);
 
@@ -274,13 +325,21 @@ export const generateLetter = async (letterType, data) => {
       rawContent: generatedContent,
       generatedAt: new Date().toISOString(),
       model: AI_MODEL,
+      aiGenerated: true,
     };
   } catch (error) {
     logger.error('Letter generation error:', error);
+    // Final fallback: return template even on error
+    const templateContent = buildTemplateFallback(letterType, data);
     return {
-      success: false,
+      success: true,
       letterType,
-      error: error.message,
+      letterTypeName: letterConfig.name,
+      content: templateContent,
+      rawContent: templateContent,
+      generatedAt: new Date().toISOString(),
+      model: 'template-fallback',
+      aiGenerated: false,
     };
   }
 };
@@ -377,6 +436,191 @@ const buildLetterPrompt = (letterType, data) => {
   prompt += `\nSkriv et komplett, profesjonelt brev klart til signering.`;
 
   return prompt;
+};
+
+/**
+ * Build a template-based letter when no AI is available (Tier 3 fallback)
+ * @param {string} letterType - Letter type
+ * @param {Object} data - Patient/clinical data
+ * @returns {string} Formatted Norwegian letter from template
+ */
+const buildTemplateFallback = (letterType, data) => {
+  const today = new Date().toLocaleDateString('nb-NO', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  });
+  const patientName = data.patient?.name || '[Pasientnavn]';
+  const patientDob = data.patient?.dateOfBirth || '[Fødselsdato]';
+  const diagnosis = data.diagnosis || '[Diagnose]';
+  const findings = data.findings || '[Kliniske funn]';
+  const recipient = data.recipient || '[Mottaker]';
+  const providerName = data.provider?.name || '[Behandlerens navn]';
+  const providerHpr = data.provider?.hprNumber || '[HPR-nummer]';
+
+  const templates = {
+    MEDICAL_CERTIFICATE: `MEDISINSK ERKLÆRING
+
+Dato: ${today}
+
+Pasient: ${patientName}
+Fødselsdato: ${patientDob}
+
+Det bekreftes herved at ovennevnte pasient er under behandling hos undertegnede kiropraktor.
+
+Diagnose: ${diagnosis}
+
+Kliniske funn:
+${findings}
+
+Formål: ${data.purpose || '[Formål med erklæringen]'}
+
+Med vennlig hilsen,
+
+${providerName}
+Kiropraktor
+HPR: ${providerHpr}`,
+
+    VESTIBULAR_REFERRAL: `HENVISNING - VESTIBULÆR UTREDNING
+
+Dato: ${today}
+Til: ${recipient}
+
+Pasient: ${patientName}
+Fødselsdato: ${patientDob}
+
+Henvisningsårsak:
+Pasienten henvises for vestibulær utredning grunnet ${diagnosis}.
+
+Kliniske funn:
+${findings}
+${data.vngResults ? `\nVNG-resultater:\n${data.vngResults}` : ''}
+${data.symptoms ? `\nSymptomer:\n${data.symptoms}` : ''}
+
+Spørsmålsstilling:
+Vennligst vurder videre utredning og eventuell behandling.
+
+Med vennlig hilsen,
+
+${providerName}
+Kiropraktor
+HPR: ${providerHpr}`,
+
+    HEADACHE_REFERRAL: `HENVISNING - HODEPINEUTREDNING
+
+Dato: ${today}
+Til: ${recipient}
+
+Pasient: ${patientName}
+Fødselsdato: ${patientDob}
+
+Henvisningsårsak:
+Pasienten henvises for hodepineutredning.
+${data.headacheType ? `Type: ${data.headacheType}` : ''}
+${data.frequency ? `Frekvens: ${data.frequency}` : ''}
+${data.triggers ? `Triggere: ${data.triggers}` : ''}
+
+Kliniske funn:
+${findings}
+
+Diagnose: ${diagnosis}
+
+Spørsmålsstilling:
+Vennligst vurder videre utredning og diagnostikk.
+
+Med vennlig hilsen,
+
+${providerName}
+Kiropraktor
+HPR: ${providerHpr}`,
+
+    WORK_DECLARATION: `ERKLÆRING TIL ARBEIDSGIVER
+
+Dato: ${today}
+
+Vedrørende: ${patientName}
+Fødselsdato: ${patientDob}
+
+Det bekreftes herved at ovennevnte er under behandling for en muskel-skjelettlidelse.
+
+Funksjonsvurdering:
+${data.workCapacity || '[Arbeidsevne]'}
+
+Eventuelle restriksjoner:
+${data.restrictions || '[Restriksjoner]'}
+
+Forventet varighet: ${data.duration || '[Varighet]'}
+
+Med vennlig hilsen,
+
+${providerName}
+Kiropraktor
+HPR: ${providerHpr}`,
+
+    MEMBERSHIP_FREEZE: `MEDISINSK ERKLÆRING - AKTIVITETSPAUSE
+
+Dato: ${today}
+
+Til: ${recipient || '[Treningssenter]'}
+
+Vedrørende: ${patientName}
+Fødselsdato: ${patientDob}
+
+Det bekreftes at ovennevnte er under behandling for ${diagnosis} og anbefales aktivitetspause i ${data.duration || '[varighet]'}.
+
+Med vennlig hilsen,
+
+${providerName}
+Kiropraktor
+HPR: ${providerHpr}`,
+
+    CLINICAL_NOTE: `KLINISK NOTAT
+
+Dato: ${today}
+
+Pasient: ${patientName}
+Fødselsdato: ${patientDob}
+
+ANAMNESE:
+${data.purpose || '[Henvisningsårsak og sykehistorie]'}
+
+OBJEKTIVE FUNN:
+${findings}
+
+VURDERING:
+Diagnose: ${diagnosis}
+
+PLAN:
+${data.additionalInfo || '[Behandlingsplan og oppfølging]'}
+
+${providerName}
+Kiropraktor
+HPR: ${providerHpr}`,
+
+    UNIVERSITY_LETTER: `MEDISINSK ERKLÆRING - UTSATT EKSAMEN
+
+Dato: ${today}
+Til: ${data.institution || '[Universitet/Fakultet]'}
+
+Vedrørende: ${patientName}
+Fødselsdato: ${patientDob}
+${data.examDate ? `Eksamensdato: ${data.examDate}` : ''}
+
+Det bekreftes herved at ovennevnte student er under behandling for ${diagnosis}.
+
+Kliniske funn:
+${findings}
+
+Anbefaling: Det anbefales tilrettelegging/utsettelse av eksamen grunnet ovennevnte tilstand.
+
+Med vennlig hilsen,
+
+${providerName}
+Kiropraktor
+HPR: ${providerHpr}`,
+  };
+
+  return templates[letterType] || templates.CLINICAL_NOTE;
 };
 
 /**
@@ -547,6 +791,26 @@ export const getLetterHistory = async (organizationId, patientId) => {
   }
 };
 
+/**
+ * Update letter status
+ * @param {string} letterId - Letter ID
+ * @param {string} status - New status (DRAFT, FINALIZED, SENT, ARCHIVED)
+ * @param {string} organizationId - Organization ID (for row-level security)
+ * @returns {Promise<Object>} Query result
+ */
+export const updateLetterStatus = async (letterId, status, organizationId) => {
+  try {
+    const result = await query(
+      'UPDATE generated_letters SET status = $1, updated_at = NOW() WHERE id = $2 AND organization_id = $3',
+      [status, letterId, organizationId]
+    );
+    return result;
+  } catch (error) {
+    logger.error('Error updating letter status:', error);
+    throw error;
+  }
+};
+
 export default {
   LETTER_TYPES,
   generateLetter,
@@ -554,4 +818,5 @@ export default {
   getLetterTypes,
   saveLetter,
   getLetterHistory,
+  updateLetterStatus,
 };
