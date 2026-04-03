@@ -28,6 +28,13 @@ vi.mock('lucide-react', () => ({
   Copy: (props) => <span data-testid="icon-copy" {...props} />,
   ChevronDown: (props) => <span data-testid="icon-chevdown" {...props} />,
   ChevronUp: (props) => <span data-testid="icon-chevup" {...props} />,
+  FileDown: (props) => <span data-testid="icon-filedown" {...props} />,
+}));
+
+vi.mock('../../../services/api/billing', () => ({
+  pdfAPI: {
+    generateSickNote: vi.fn(),
+  },
 }));
 
 import SickNoteGenerator from '../../../components/documents/SickNoteGenerator';

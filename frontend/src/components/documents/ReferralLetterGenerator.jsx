@@ -26,7 +26,9 @@ import {
   Copy,
   AlertCircle,
   Clock,
+  FileDown,
 } from 'lucide-react';
+import { pdfAPI } from '../../services/api/billing';
 
 // Referral types
 const REFERRAL_TYPES = {
@@ -192,6 +194,8 @@ export default function ReferralLetterGenerator({
   initialData = null,
   patientData = null,
   senderData = null,
+  patientId,
+  encounterId,
   onSave,
   _onSend,
 }) {
@@ -359,6 +363,37 @@ ${t('referralDocDate', 'Dato')}: ${today}
     printWindow.document.close();
     printWindow.print();
   }, [generateDocument, t]);
+
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  const handleGeneratePDF = useCallback(async () => {
+    if (!patientId || !encounterId) return;
+    try {
+      setPdfLoading(true);
+      const response = await pdfAPI.generateReferralLetter({
+        patientId,
+        encounterId,
+        recipientName: data.recipient?.name,
+        recipientAddress: [data.recipient?.clinic, data.recipient?.address]
+          .filter(Boolean)
+          .join(', '),
+        reasonForReferral: data.clinical?.reasonForReferral,
+        relevantFindings: data.clinical?.examinationFindings,
+        relevantTestResults: data.clinical?.treatmentToDate,
+      });
+      const blob = new Blob([response.data], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'henvisning.pdf';
+      link.click();
+      window.URL.revokeObjectURL(url);
+    } catch (err) {
+      // Let the shared apiClient error interceptor handle it
+    } finally {
+      setPdfLoading(false);
+    }
+  }, [patientId, encounterId, data]);
 
   return (
     <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg">
@@ -644,6 +679,19 @@ ${t('referralDocDate', 'Dato')}: ${today}
           >
             <Printer className="w-4 h-4" />
             {t('print', 'Skriv ut')}
+          </button>
+          <button
+            onClick={handleGeneratePDF}
+            disabled={!patientId || !encounterId || pdfLoading}
+            className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            title={
+              !patientId || !encounterId
+                ? t('pdfRequiresEncounter', 'PDF krever aktiv konsultasjon')
+                : ''
+            }
+          >
+            <FileDown className="w-4 h-4" />
+            {pdfLoading ? t('generating', 'Genererer...') : t('downloadPDF', 'Last ned PDF')}
           </button>
         </div>
         <button

@@ -49,4 +49,7 @@ export const pdfAPI = {
   generatePatientLetter: (encounterId, letterType) =>
     apiClient.post(`/pdf/letter/${encounterId}`, { letterType }),
   deliverDocument: (type, id, data) => apiClient.post(`/pdf/${type}/${id}/deliver`, data),
+  generateReferralLetter: (data) =>
+    apiClient.post('/pdf/referral-letter', data, { responseType: 'blob' }),
+  generateSickNote: (data) => apiClient.post('/pdf/sick-note', data, { responseType: 'blob' }),
 };

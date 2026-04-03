@@ -28,6 +28,13 @@ vi.mock('lucide-react', () => ({
   Copy: (props) => <span data-testid="icon-copy" {...props} />,
   AlertCircle: (props) => <span data-testid="icon-alertcircle" {...props} />,
   Clock: (props) => <span data-testid="icon-clock" {...props} />,
+  FileDown: (props) => <span data-testid="icon-filedown" {...props} />,
+}));
+
+vi.mock('../../../services/api/billing', () => ({
+  pdfAPI: {
+    generateReferralLetter: vi.fn(),
+  },
 }));
 
 import ReferralLetterGenerator from '../../../components/documents/ReferralLetterGenerator';
